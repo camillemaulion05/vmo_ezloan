@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
-const usersList = (req, res, next) => {
+const usersList = (req, res) => {
     User
         .find()
         .exec((err, users) => {
@@ -17,19 +17,17 @@ const usersList = (req, res, next) => {
         });
 };
 
-const usersCreate = (req, res, next) => {
-    if (!req.body.username || !req.body.password) {
-        return res
-            .status(400)
-            .json({
-                "msg": "All fields required"
-            });
-    }
-
+const usersCreate = (req, res) => {
     const user = new User({
-        username: req.body.username,
-        password: req.body.password
-    });
+        username,
+        password
+    } = req.body);
+
+    // dummy
+    user.passwordResetToken = "147a58e984a24e51412b1d7d8ddd5802";
+    user.passwordResetExpires = Date.now() + 3600000;
+    user.lastLogin = Date.now();
+    user.lastFailedLogin = Date.now();
 
     User.findOne({
         username: req.body.username
@@ -44,7 +42,7 @@ const usersCreate = (req, res, next) => {
                     "msg": "Account with that username already exists."
                 });
         }
-        user.save((err, newUser) => {
+        user.save((err) => {
             if (err) {
                 return res
                     .status(400)
@@ -57,7 +55,7 @@ const usersCreate = (req, res, next) => {
     });
 };
 
-const usersReadOne = (req, res, next) => {
+const usersReadOne = (req, res) => {
     const {
         userid
     } = req.params;
@@ -82,7 +80,7 @@ const usersReadOne = (req, res, next) => {
         });
 };
 
-const usersUpdateOne = (req, res, next) => {
+const usersUpdateOne = (req, res) => {
     const {
         userid
     } = req.params;
@@ -108,7 +106,7 @@ const usersUpdateOne = (req, res, next) => {
     });
 };
 
-const usersDeleteOne = (req, res, next) => {
+const usersDeleteOne = (req, res) => {
     const {
         userid
     } = req.params;
