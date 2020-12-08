@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description' content='VMO EZ Loan')
+    meta(name='author' content='Ma. Camille G. Maulion')
+    title #{title} - VMO EZ Loan
+    link(rel='shortcut icon', href='/favicon.png')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/font-awesome.min.css')
+    link(rel='stylesheet', href='/stylesheets/agency.css') 
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Montserrat:400,700')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Kaushan+Script')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700')
+  body
+    block content
+
+    script(src='/javascripts/jquery.min.js')  
+    script(src='/javascripts/jquery.validate.min.js')
+    script(src='/javascripts/bootstrap.min.js')
+    script(src='/javascripts/jquery.easing.min.js')
+    script(src='/javascripts/classie.js')
+    script(src=(title === 'Home') ? '/javascripts/cbpAnimatedHeader.min.js' : undefined)
+    script(src='/javascripts/methods.js')
+    script(src='/javascripts/agency.js')
