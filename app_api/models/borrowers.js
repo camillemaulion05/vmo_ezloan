@@ -75,7 +75,7 @@ const borrowerSchema = new mongoose.Schema({
         // Other
         monthlyIncome: String,
         annualIncome: String,
-        salaryDate: Date,
+        salaryDate: String,
         officeAddress: String,
         officeAddressZipcode: String,
         officePhone: String,
@@ -85,51 +85,55 @@ const borrowerSchema = new mongoose.Schema({
         companyIdFront: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         companyIdBack: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         payslip1: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         payslip2: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         underAgency: Boolean
     },
     gcashAccount: {
         name: String,
-        String: String,
-        proof: String
+        number: String,
+        proof: {
+            filename: String,
+            contentType: String,
+            file: Buffer
+        }
     },
     documents: {
         govIdType: String, //TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance
         primaryIdFront: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         primaryIdBack: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         selfiewithId: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         },
         proofOfTIN: {
             filename: String,
             contentType: String,
-            file: Binary
+            file: Buffer
         }
     },
     beneficiaries: { // Members only
@@ -166,9 +170,13 @@ const borrowerSchema = new mongoose.Schema({
     },
     employeeNum: String, // Members only
     maxLoanAmount: String, // Set by Loan Officer
+    reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee' // Loan Officer
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User" // User account
     },
     transactions: [{
         type: mongoose.Schema.Types.ObjectId,

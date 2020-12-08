@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 
 const withdrawalsSchema = new mongoose.Schema({
     withdrawalNum: String,
-    amount: {
-        type: String,
-        default: 0
-    },
+    amount: String,
     reason: String,
     serviceFee: String, // 1% of requested amount
     newProceedsAmount: String, // = amount - serviceFee
+    requestBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Borrower'
+    },
     requestDate: {
         type: Date,
         default: Date.now

@@ -20,9 +20,14 @@ const withdrawalsList = (req, res) => {
 const withdrawalsCreate = (req, res) => {
     const withdrawal = new Withdrawal({
         amount,
-        reason
+        reason,
+        requestBy,
+        status,
+        approvedBy,
+        transactionId
     } = req.body);
     withdrawal.withdrawalNum = Date.now();
+    withdrawal.approvedDate = Date.now();
     withdrawal.compute(req.body.amount);
     withdrawal.save((err) => {
         if (err) {
@@ -93,10 +98,14 @@ const withdrawalsUpdateOne = (req, res) => {
                     .status(400)
                     .json(err);
             }
+            withdrawal.amount = req.body.amount;
+            withdrawal.reason = req.body.reason;
+            withdrawal.compute(req.body.amount);
+            withdrawal.requestBy = req.body.requestBy;
             withdrawal.status = req.body.status;
+            withdrawal.approvedDate = Date.now();
             withdrawal.approvedBy = req.body.approvedBy;
             withdrawal.transactionId = req.body.transactionId;
-            withdrawal.approvedDate = Date.now();
             withdrawal.save((err) => {
                 if (err) {
                     res

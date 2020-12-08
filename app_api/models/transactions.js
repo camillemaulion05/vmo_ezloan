@@ -9,8 +9,8 @@ const transactionSchema = new mongoose.Schema({
     amount: String,
     type: String, //Repayments of Loan, Cash Release, Contributions, Withdrawals, Membership Fee
     message: String,
-    senderString: String,
-    receiverString: String,
+    senderNum: String,
+    receiverNum: String,
     referenceNo: String,
     postDate: Date,
     postBy: {

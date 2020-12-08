@@ -7,13 +7,11 @@ const inquirySchema = new mongoose.Schema({
     phone: String,
     message: String,
     response: {
+        createdAt: Date,
         text: String,
-        author: {
-            id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
-            },
-            username: String
+        authorId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         }
     }
 }, {

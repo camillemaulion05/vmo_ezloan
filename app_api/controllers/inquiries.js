@@ -22,7 +22,8 @@ const inquiriesCreate = (req, res) => {
         name,
         email,
         phone,
-        message
+        message,
+        response
     } = req.body);
     inquiry.inquiryNum = Date.now();
     inquiry.save((err) => {
@@ -94,13 +95,12 @@ const inquiriesUpdateOne = (req, res) => {
                     .status(400)
                     .json(err);
             }
-            inquiry.response = {
-                author: {
-                    id,
-                    username
-                },
-                text
-            } = req.body;
+            inquiry.name = req.body.name;
+            inquiry.email = req.body.email;
+            inquiry.phone = req.body.phone;
+            inquiry.message = req.body.message;
+            inquiry.response = req.body.response;
+            inquiry.response.createdAt = Date.now();
             inquiry.save((err) => {
                 if (err) {
                     res

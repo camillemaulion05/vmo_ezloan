@@ -21,15 +21,19 @@ const usersCreate = (req, res) => {
     const user = new User({
         username,
         password,
+        passwordResetToken,
+        passwordResetExpires,
+        lastLogin,
+        lastFailedLogin,
+        status,
         isAdmin
     } = req.body);
-
-    // dummy
+    user.userNum = Date.now();
+    //dummy
     user.passwordResetToken = "147a58e984a24e51412b1d7d8ddd5802";
     user.passwordResetExpires = Date.now() + 3600000;
     user.lastLogin = Date.now();
     user.lastFailedLogin = Date.now();
-
     User.findOne({
         username: req.body.username
     }, (err, existingUser) => {
@@ -107,6 +111,11 @@ const usersUpdateOne = (req, res) => {
         }
         user.username = req.body.username;
         user.password = req.body.password;
+        user.passwordResetToken = req.body.passwordResetToken;
+        user.passwordResetExpires = req.body.passwordResetExpires;
+        user.lastLogin = req.body.lastLogin;
+        user.lastFailedLogin = req.body.lastFailedLogin;
+        user.status = req.body.status;
         user.isAdmin = req.body.isAdmin;
         user.save((err) => {
             if (err) {

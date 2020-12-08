@@ -22,11 +22,13 @@ const transactionsCreate = (req, res) => {
         amount,
         type,
         message,
-        senderString,
-        receiverString,
-        referenceNo
+        senderNum,
+        receiverNum,
+        referenceNo,
+        postBy
     } = req.body);
     transaction.transactionNum = Date.now();
+    transaction.postDate = Date.now();
     transaction.save((err) => {
         if (err) {
             return res
@@ -99,8 +101,8 @@ const transactionsUpdateOne = (req, res) => {
             transaction.amount = req.body.amount;
             transaction.type = req.body.type;
             transaction.message = req.body.message;
-            transaction.senderString = req.body.senderString;
-            transaction.receiverString = req.body.receiverString;
+            transaction.senderNum = req.body.senderNum;
+            transaction.receiverNum = req.body.receiverNum;
             transaction.referenceNo = req.body.referenceNo;
             transaction.postBy = req.body.postBy;
             transaction.postDate = Date.now();

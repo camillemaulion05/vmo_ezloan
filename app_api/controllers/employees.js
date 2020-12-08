@@ -118,6 +118,7 @@ const employeesUpdateOne = (req, res) => {
             }
             employee.type = req.body.type;
             employee.profile = req.body.profile;
+            employee.userId = req.body.userId;
             employee.save((err) => {
                 if (err) {
                     res
