@@ -3,6 +3,7 @@ const router = express.Router();
 const ctrlHome = require('../controllers/home');
 const ctrlUsers = require('../controllers/users');
 const ctrlInquiries = require('../controllers/inquiries');
+const ctrlEmployees = require('../controllers/employees');
 
 router.get('/', ctrlHome.index);
 
@@ -29,5 +30,17 @@ router
     .get(ctrlInquiries.inquiriesReadOne)
     .put(ctrlInquiries.inquiriesUpdateOne)
     .delete(ctrlInquiries.inquiriesDeleteOne);
+
+// employees
+router
+    .route('/employees')
+    .get(ctrlEmployees.employeesList)
+    .post(ctrlEmployees.employeesCreate);
+
+router
+    .route('/employees/:employeeid')
+    .get(ctrlEmployees.employeesReadOne)
+    .put(ctrlEmployees.employeesUpdateOne)
+    .delete(ctrlEmployees.employeesDeleteOne);
 
 module.exports = router;

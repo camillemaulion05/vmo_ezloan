@@ -20,7 +20,8 @@ const usersList = (req, res) => {
 const usersCreate = (req, res) => {
     const user = new User({
         username,
-        password
+        password,
+        isAdmin
     } = req.body);
 
     // dummy
@@ -59,6 +60,13 @@ const usersReadOne = (req, res) => {
     const {
         userid
     } = req.params;
+    if (!userid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    }
     User
         .findById(userid)
         .exec((err, user) => {
@@ -84,13 +92,22 @@ const usersUpdateOne = (req, res) => {
     const {
         userid
     } = req.params;
+    if (!userid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    }
     User.findById(userid, (err, user) => {
         if (err) {
             return res
                 .status(400)
                 .json(err);
         }
+        user.username = req.body.username;
         user.password = req.body.password;
+        user.isAdmin = req.body.isAdmin;
         user.save((err) => {
             if (err) {
                 return res
@@ -99,9 +116,7 @@ const usersUpdateOne = (req, res) => {
             }
             res
                 .status(200)
-                .json({
-                    msg: 'Password has been changed.'
-                });
+                .json(user);
         });
     });
 };
@@ -110,26 +125,25 @@ const usersDeleteOne = (req, res) => {
     const {
         userid
     } = req.params;
-    if (userid) {
-        User
-            .findByIdAndRemove(userid)
-            .exec((err, user) => {
-                if (err) {
-                    return res
-                        .status(404)
-                        .json(err);
-                }
-                res
-                    .status(204)
-                    .json(null);
-            });
-    } else {
-        res
+    if (!userid) {
+        return res
             .status(404)
             .json({
-                "message": "No User"
+                "message": "Not found, userid is required"
             });
     }
+    User
+        .findByIdAndRemove(userid)
+        .exec((err, user) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            }
+            res
+                .status(204)
+                .json(null);
+        });
 };
 
 module.exports = {

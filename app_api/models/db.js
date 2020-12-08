@@ -64,3 +64,4 @@ connect();
 
 require('./users');
 require('./inquiries');
+require('./employees');

@@ -119,26 +119,25 @@ const inquiriesDeleteOne = (req, res) => {
     const {
         inquiryid
     } = req.params;
-    if (inquiryid) {
-        Inquiry
-            .findByIdAndRemove(inquiryid)
-            .exec((err, inquiry) => {
-                if (err) {
-                    return res
-                        .status(404)
-                        .json(err);
-                }
-                res
-                    .status(204)
-                    .json(null);
-            });
-    } else {
-        res
+    if (!inquiryid) {
+        return res
             .status(404)
             .json({
-                "message": "No inquiry"
+                "message": "Not found, inquiryid is required"
             });
     }
+    Inquiry
+        .findByIdAndRemove(inquiryid)
+        .exec((err, inquiry) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            }
+            res
+                .status(204)
+                .json(null);
+        });
 };
 
 module.exports = {
