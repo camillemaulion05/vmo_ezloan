@@ -12,8 +12,8 @@ const transactionSchema = new mongoose.Schema({
     senderString: String,
     receiverString: String,
     referenceNo: String,
-    postedDate: Date,
-    postedBy: {
+    postDate: Date,
+    postBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' //Loan Processor
     },

@@ -4,6 +4,7 @@ const ctrlHome = require('../controllers/home');
 const ctrlUsers = require('../controllers/users');
 const ctrlInquiries = require('../controllers/inquiries');
 const ctrlEmployees = require('../controllers/employees');
+const ctrlTransactions = require('../controllers/transactions');
 
 router.get('/', ctrlHome.index);
 
@@ -42,5 +43,17 @@ router
     .get(ctrlEmployees.employeesReadOne)
     .put(ctrlEmployees.employeesUpdateOne)
     .delete(ctrlEmployees.employeesDeleteOne);
+
+// transactions
+router
+    .route('/transactions')
+    .get(ctrlTransactions.transactionsList)
+    .post(ctrlTransactions.transactionsCreate);
+
+router
+    .route('/transactions/:transactionid')
+    .get(ctrlTransactions.transactionsReadOne)
+    .put(ctrlTransactions.transactionsUpdateOne)
+    .delete(ctrlTransactions.transactionsDeleteOne);
 
 module.exports = router;
