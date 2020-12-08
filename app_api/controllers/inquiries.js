@@ -3,28 +3,37 @@ const Inquiry = mongoose.model('Inquiry');
 const User = mongoose.model('User');
 
 const getAuthor = (req, res, callback) => {
-    User
-        .findOne({
-            isAdmin: true
-        })
-        .exec((err, user) => {
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({
-                        "message": "User not found"
-                    });
-            } else if (err) {
-                console.log(err);
-                return res
-                    .status(404)
-                    .json(err);
-            }
-            callback(req, res, {
-                "id": user._id,
-                "username": user.username
+    if (req.body.username) {
+        User
+            .findOne({
+                isAdmin: true,
+                username: req.body.username
+            })
+            .exec((err, user) => {
+                if (!user) {
+                    return res
+                        .status(404)
+                        .json({
+                            "message": "User not found"
+                        });
+                } else if (err) {
+                    console.log(err);
+                    return res
+                        .status(404)
+                        .json(err);
+                }
+                callback(req, res, {
+                    "id": user._id,
+                    "username": user.username
+                });
             });
-        });
+    } else {
+        return res
+            .status(404)
+            .json({
+                "message": "User not found"
+            });
+    }
 };
 
 const inquiriesList = (req, res) => {
@@ -122,8 +131,6 @@ const inquiriesUpdateOne = (req, res) => {
                             .status(400)
                             .json(err);
                     }
-                    // inquiry.response.author.id = req.user._id;
-                    // inquiry.response.author.username = req.user.username;
                     inquiry.response.author = author;
                     inquiry.response.text = req.body.text;
                     inquiry.save((err) => {
