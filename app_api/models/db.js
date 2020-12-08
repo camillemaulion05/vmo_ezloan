@@ -66,3 +66,4 @@ require('./users');
 require('./inquiries');
 require('./employees');
 require('./transactions');
+require('./withdrawals');

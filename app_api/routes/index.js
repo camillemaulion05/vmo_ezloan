@@ -5,6 +5,7 @@ const ctrlUsers = require('../controllers/users');
 const ctrlInquiries = require('../controllers/inquiries');
 const ctrlEmployees = require('../controllers/employees');
 const ctrlTransactions = require('../controllers/transactions');
+const ctrlWithdrawals = require('../controllers/withdrawals');
 
 router.get('/', ctrlHome.index);
 
@@ -55,5 +56,17 @@ router
     .get(ctrlTransactions.transactionsReadOne)
     .put(ctrlTransactions.transactionsUpdateOne)
     .delete(ctrlTransactions.transactionsDeleteOne);
+
+// withdrawals
+router
+    .route('/withdrawals')
+    .get(ctrlWithdrawals.withdrawalsList)
+    .post(ctrlWithdrawals.withdrawalsCreate);
+
+router
+    .route('/withdrawals/:withdrawalid')
+    .get(ctrlWithdrawals.withdrawalsReadOne)
+    .put(ctrlWithdrawals.withdrawalsUpdateOne)
+    .delete(ctrlWithdrawals.withdrawalsDeleteOne);
 
 module.exports = router;
