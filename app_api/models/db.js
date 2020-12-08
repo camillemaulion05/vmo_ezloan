@@ -3,7 +3,8 @@ const readLine = require('readline');
 
 let dbURL = 'mongodb://127.0.0.1/vmo-ezloan';
 if (process.env.NODE_ENV === 'production') {
-    dbURL = process.env.DB_HOST || process.env.MONGODB_URI;
+    // dbURL = process.env.DB_HOST || process.env.MONGODB_URI;
+    dbURL = "mongodb+srv://camille:P@ssw0rd@vmo-ezloan.phft3.mongodb.net/local?retryWrites=true&w=majority";
 }
 
 const connect = () => {
