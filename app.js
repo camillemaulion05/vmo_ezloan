@@ -3,14 +3,14 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+
+// Connect to MongoDB.
 require('./app_api/models/db');
 
-const indexRouter = require('./app_server/routes/index');
-const apiRouter = require('./app_api/routes/index');
-
+// Create Express server.
 const app = express();
 
-// view engine setup
+// Express configuration.
 app.set('views', path.join(__dirname, 'app_server', 'views'));
 app.set('view engine', 'pug');
 
@@ -20,6 +20,8 @@ app.use(express.urlencoded({
   extended: false
 }));
 app.use(cookieParser());
+
+// Set Public Folder
 app.use('/', express.static(path.join(__dirname, 'public'), {
   maxAge: 31557600000
 }));
@@ -69,6 +71,9 @@ app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datata
   maxAge: 31557600000
 }));
 
+// Route Files
+const indexRouter = require('./app_server/routes/index');
+const apiRouter = require('./app_api/routes/index');
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
