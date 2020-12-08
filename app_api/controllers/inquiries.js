@@ -1,40 +1,5 @@
 const mongoose = require('mongoose');
 const Inquiry = mongoose.model('Inquiry');
-const User = mongoose.model('User');
-
-const getAuthor = (req, res, callback) => {
-    if (req.body.username) {
-        User
-            .findOne({
-                isAdmin: true,
-                username: req.body.username
-            })
-            .exec((err, user) => {
-                if (!user) {
-                    return res
-                        .status(404)
-                        .json({
-                            "message": "User not found"
-                        });
-                } else if (err) {
-                    console.log(err);
-                    return res
-                        .status(404)
-                        .json(err);
-                }
-                callback(req, res, {
-                    "id": user._id,
-                    "username": user.username
-                });
-            });
-    } else {
-        return res
-            .status(404)
-            .json({
-                "message": "User not found"
-            });
-    }
-};
 
 const inquiriesList = (req, res) => {
     Inquiry
@@ -105,46 +70,48 @@ const inquiriesReadOne = (req, res) => {
 };
 
 const inquiriesUpdateOne = (req, res) => {
-    getAuthor(req, res,
-        (req, res, author) => {
-            const {
-                inquiryid
-            } = req.params;
-            if (!inquiryid) {
+    const {
+        inquiryid
+    } = req.params;
+    if (!inquiryid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, inquiryid is required"
+            });
+    }
+    Inquiry
+        .findById(inquiryid)
+        .exec((err, inquiry) => {
+            if (!inquiry) {
                 return res
                     .status(404)
                     .json({
-                        "message": "Not found, inquiryid is required"
+                        "message": "inquiryid not found"
                     });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
             }
-            Inquiry
-                .findById(inquiryid)
-                .exec((err, inquiry) => {
-                    if (!inquiry) {
-                        return res
-                            .status(404)
-                            .json({
-                                "message": "inquiryid not found"
-                            });
-                    } else if (err) {
-                        return res
-                            .status(400)
-                            .json(err);
-                    }
-                    inquiry.response.author = author;
-                    inquiry.response.text = req.body.text;
-                    inquiry.save((err) => {
-                        if (err) {
-                            res
-                                .status(404)
-                                .json(err);
-                        } else {
-                            res
-                                .status(200)
-                                .json(inquiry);
-                        }
-                    });
-                });
+            inquiry.response = {
+                author: {
+                    id,
+                    username
+                },
+                text
+            } = req.body;
+            inquiry.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(inquiry);
+                }
+            });
         });
 };
 
