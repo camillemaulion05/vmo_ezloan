@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const withdrawalsSchema = new mongoose.Schema({
+const withdrawalSchema = new mongoose.Schema({
     withdrawalNum: String,
     amount: String,
     reason: String,
@@ -29,9 +29,9 @@ const withdrawalsSchema = new mongoose.Schema({
     }
 });
 
-withdrawalsSchema.methods.compute = function (amount) {
-    this.serviceFee = (Number(amount * 0.01)).toFixed(2);
-    this.newProceedsAmount = (Number(amount - (amount * 0.01))).toFixed(2);
+withdrawalSchema.methods.compute = function (amount) {
+    this.serviceFee = (amount * 0.01).toFixed(2);
+    this.newProceedsAmount = (amount - this.serviceFee).toFixed(2);
 };
 
-mongoose.model('Withdrawal', withdrawalsSchema);
+mongoose.model('Withdrawal', withdrawalSchema);

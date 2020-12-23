@@ -68,3 +68,4 @@ require('./employees');
 require('./transactions');
 require('./withdrawals');
 require('./borrowers');
+require('./loans');

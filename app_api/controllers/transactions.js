@@ -25,10 +25,10 @@ const transactionsCreate = (req, res) => {
         senderNum,
         receiverNum,
         referenceNo,
-        postBy
+        postedBy
     } = req.body);
     transaction.transactionNum = Date.now();
-    transaction.postDate = Date.now();
+    transaction.postedDate = Date.now();
     transaction.save((err) => {
         if (err) {
             return res
@@ -104,8 +104,8 @@ const transactionsUpdateOne = (req, res) => {
             transaction.senderNum = req.body.senderNum;
             transaction.receiverNum = req.body.receiverNum;
             transaction.referenceNo = req.body.referenceNo;
-            transaction.postBy = req.body.postBy;
-            transaction.postDate = Date.now();
+            transaction.postedBy = req.body.postedBy;
+            transaction.postedDate = Date.now();
             transaction.save((err) => {
                 if (err) {
                     res
