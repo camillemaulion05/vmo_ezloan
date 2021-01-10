@@ -21,13 +21,9 @@ const withdrawalsCreate = (req, res) => {
     const withdrawal = new Withdrawal({
         amount,
         reason,
-        requestBy,
-        status,
-        approvedBy,
-        transactionId
+        requestBy
     } = req.body);
     withdrawal.withdrawalNum = Date.now();
-    withdrawal.approvedDate = Date.now();
     withdrawal.compute(req.body.amount);
     withdrawal.save((err) => {
         if (err) {
@@ -102,10 +98,6 @@ const withdrawalsUpdateOne = (req, res) => {
             withdrawal.reason = req.body.reason;
             withdrawal.compute(req.body.amount);
             withdrawal.requestBy = req.body.requestBy;
-            withdrawal.status = req.body.status;
-            withdrawal.approvedDate = Date.now();
-            withdrawal.approvedBy = req.body.approvedBy;
-            withdrawal.transactionId = req.body.transactionId;
             withdrawal.save((err) => {
                 if (err) {
                     res
@@ -145,10 +137,57 @@ const withdrawalsDeleteOne = (req, res) => {
         });
 };
 
+
+const withdrawalsUpdateStatus = (req, res) => {
+    const {
+        withdrawalid
+    } = req.params;
+    if (!withdrawalid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, withdrawalid is required"
+            });
+    }
+    Withdrawal
+        .findById(withdrawalid)
+        .exec((err, withdrawal) => {
+            if (!withdrawal) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "withdrawalid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            withdrawal.status = req.body.status;
+            withdrawal.reviewedBy = req.body.reviewedBy;
+            withdrawal.reviewedDate = Date.now();
+            if ("Release" == req.body.status) {
+                withdrawal.transactionId = req.body.transactionId;
+            }
+            withdrawal.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(withdrawal);
+                }
+            });
+        });
+};
+
 module.exports = {
     withdrawalsList,
     withdrawalsCreate,
     withdrawalsReadOne,
     withdrawalsUpdateOne,
-    withdrawalsDeleteOne
+    withdrawalsDeleteOne,
+    withdrawalsUpdateStatus
 };

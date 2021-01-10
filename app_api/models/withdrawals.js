@@ -18,11 +18,11 @@ const withdrawalSchema = new mongoose.Schema({
         type: String,
         default: "Pending"
     },
-    approvedDate: Date,
-    approvedBy: {
+    reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
+    reviewedDate: Date,
     transactionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction' // Transaction of Cash Release

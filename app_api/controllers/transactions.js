@@ -24,11 +24,9 @@ const transactionsCreate = (req, res) => {
         message,
         senderNum,
         receiverNum,
-        referenceNo,
-        postedBy
+        referenceNo
     } = req.body);
     transaction.transactionNum = Date.now();
-    transaction.postedDate = Date.now();
     transaction.save((err) => {
         if (err) {
             return res

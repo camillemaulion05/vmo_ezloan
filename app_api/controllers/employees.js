@@ -20,30 +20,7 @@ const employeesList = (req, res) => {
 const employeesCreate = (req, res) => {
     const employee = new Employee({
         type,
-        profile: {
-            email,
-            emailVerificationToken,
-            emailVerified,
-            firstName,
-            middleName,
-            lastName,
-            gender,
-            birthday,
-            address: {
-                present: {
-                    address,
-                    city,
-                    zipCode
-                },
-                permanent: {
-                    address,
-                    city,
-                    zipCode
-                }
-            },
-            mobileNum,
-            mobileNumVerified
-        },
+        profile,
         userId,
     } = req.body);
     employee.employeeNum = Date.now();

@@ -32,7 +32,7 @@ router
 router
     .route('/inquiries/:inquiryid')
     .get(ctrlInquiries.inquiriesReadOne)
-    .put(ctrlInquiries.inquiriesUpdateOne)
+    .put(ctrlInquiries.inquiriesResponse)
     .delete(ctrlInquiries.inquiriesDeleteOne);
 
 // employees
@@ -71,6 +71,10 @@ router
     .put(ctrlWithdrawals.withdrawalsUpdateOne)
     .delete(ctrlWithdrawals.withdrawalsDeleteOne);
 
+router
+    .route('/withdrawals/:withdrawalid/status')
+    .put(ctrlWithdrawals.withdrawalsUpdateStatus);
+
 // borrowers
 router
     .route('/borrowers')
@@ -83,6 +87,18 @@ router
     .put(ctrlBorrowers.borrowersUpdateOne)
     .delete(ctrlBorrowers.borrowersDeleteOne);
 
+router
+    .route('/borrowers/:borrowerid/status')
+    .put(ctrlBorrowers.borrowersUpdateStatus);
+
+router
+    .route('/borrowers/:borrowerid/contributions')
+    .put(ctrlBorrowers.borrowersAddContributions);
+
+router
+    .route('/borrowers/:borrowerid/loanableAmount')
+    .put(ctrlBorrowers.borrowersUpdateLoanableAmount);
+
 // loans
 router
     .route('/loans')
@@ -94,5 +110,9 @@ router
     .get(ctrlLoans.loansReadOne)
     .put(ctrlLoans.loansUpdateOne)
     .delete(ctrlLoans.loansDeleteOne);
+
+router
+    .route('/loans/:loanid/status')
+    .put(ctrlLoans.loansUpdateStatus);
 
 module.exports = router;

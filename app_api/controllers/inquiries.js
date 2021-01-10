@@ -70,7 +70,7 @@ const inquiriesReadOne = (req, res) => {
         });
 };
 
-const inquiriesUpdateOne = (req, res) => {
+const inquiriesResponse = (req, res) => {
     const {
         inquiryid
     } = req.params;
@@ -95,11 +95,7 @@ const inquiriesUpdateOne = (req, res) => {
                     .status(400)
                     .json(err);
             }
-            inquiry.name = req.body.name;
-            inquiry.email = req.body.email;
-            inquiry.phone = req.body.phone;
-            inquiry.message = req.body.message;
-            inquiry.response = req.body.response;
+            inquiry.response = req.body;
             inquiry.response.createdAt = Date.now();
             inquiry.save((err) => {
                 if (err) {
@@ -144,6 +140,6 @@ module.exports = {
     inquiriesList,
     inquiriesCreate,
     inquiriesReadOne,
-    inquiriesUpdateOne,
+    inquiriesResponse,
     inquiriesDeleteOne
 };

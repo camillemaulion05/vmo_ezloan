@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const borrowerSchema = new mongoose.Schema({
     borrowerNum: String, // Date.now();
-    type: String, //Member, Non-Member,
-    status: String, // Basic, Pending for Review, Verified
+    type: {
+        type: String,
+        default: "Non-Member"
+    }, //Member, Non-Member
+    status: {
+        type: String,
+        default: "Basic"
+    }, // Basic, Complete, Verified
     profile: {
         email: String,
         emailVerificationToken: String,
@@ -170,20 +176,39 @@ const borrowerSchema = new mongoose.Schema({
     },
     employeeNum: String, // Members only
     maxLoanAmount: String, // Set by Loan Officer
+    loanableAmount: String, // depends
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
+    reviewedDate: Date,
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
     },
-    transactions: [{
+    contributions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction' // Transaction of Repayments and Contributions
+        ref: 'Transaction' // Transaction of Contributions
     }]
 }, {
     timestamps: true
 });
+
+borrowerSchema.methods.addContributions = function (contributions) {
+    contributions.forEach(add);
+
+    function add(contribution) {
+        this.contributions.push(contribution);
+        //update summary
+    }
+};
+
+borrowerSchema.methods.updateLoanableAmount = function (data) {
+    if (data.action == "debit") {
+        this.loanableAmount = this.loanableAmount - data.amount;
+    } else if (data.action == "credit") {
+        this.loanableAmount = this.loanableAmount + data.amount;
+    }
+};
 
 mongoose.model('Borrower', borrowerSchema);

@@ -26,7 +26,7 @@ const loansCreate = (req, res) => {
         borrowersId
     } = req.body);
     loan.loanNum = Date.now();
-    loan.compute(req.body.loanAmount, req.body.monthlyInterestRate, loanTerm);
+    loan.compute(req.body.loanAmount, req.body.monthlyInterestRate, req.body.loanTerm);
     loan.save((err) => {
         if (err) {
             return res
@@ -96,7 +96,12 @@ const loansUpdateOne = (req, res) => {
                     .status(400)
                     .json(err);
             }
-            loan.status = req.body.status;
+            loan.loanType = req.body.loanType;
+            loan.loanTerm = req.body.loanTerm;
+            loan.loanAmount = req.body.loanAmount;
+            loan.monthlyInterestRate = req.body.monthlyInterestRate;
+            loan.borrowersId = req.body.borrowersId;
+            loan.compute(req.body.loanAmount, req.body.monthlyInterestRate, req.body.loanTerm);
             loan.save((err) => {
                 if (err) {
                     res
@@ -136,10 +141,57 @@ const loansDeleteOne = (req, res) => {
         });
 };
 
+const loansUpdateStatus = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    }
+    Loan
+        .findById(loanid)
+        .exec((err, loan) => {
+            if (!loan) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "loanid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            loan.status = req.body.status;
+            loan.reviewedDate = Date.now();
+            loan.reviewedBy = req.body.reviewedBy;
+            if ("Release" == req.body.status) {
+                loan.transactionId = req.body.transactionId;
+                loan.updateDates();
+            }
+            loan.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(loan);
+                }
+            });
+        });
+};
+
 module.exports = {
     loansList,
     loansCreate,
     loansReadOne,
     loansUpdateOne,
-    loansDeleteOne
+    loansDeleteOne,
+    loansUpdateStatus
 };

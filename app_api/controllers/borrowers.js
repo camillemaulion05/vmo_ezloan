@@ -19,18 +19,13 @@ const borrowersList = (req, res) => {
 
 const borrowersCreate = (req, res) => {
     const borrower = new Borrower({
-        type,
-        status,
         profile,
         workBusinessInfo,
         gcashAccount,
         documents,
         beneficiaries,
         employeeNum,
-        maxLoanAmount,
-        reviewedBy,
-        userId,
-        transactions,
+        userId
     } = req.body);
     borrower.borrowerNum = Date.now();
     borrower.save((err) => {
@@ -110,10 +105,7 @@ const borrowersUpdateOne = (req, res) => {
             borrower.documents = req.body.documents;
             borrower.beneficiaries = req.body.beneficiaries;
             borrower.employeeNum = req.body.employeeNum;
-            borrower.maxLoanAmount = req.body.maxLoanAmount;
-            borrower.reviewedBy = req.body.reviewedBy;
             borrower.userId = req.body.userId;
-            borrower.transactions = req.body.transactions;
             borrower.save((err) => {
                 if (err) {
                     res
@@ -153,10 +145,139 @@ const borrowersDeleteOne = (req, res) => {
         });
 };
 
+const borrowersUpdateStatus = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    if (!borrowerid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, borrowerid is required"
+            });
+    }
+    Borrower
+        .findById(borrowerid)
+        .exec((err, borrower) => {
+            if (!borrower) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "borrowerid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            borrower.status = req.body.status;
+            if ("Verified" == req.body.status) {
+                borrower.maxLoanAmount = req.body.maxLoanAmount;
+                borrower.loanableAmount = req.body.maxLoanAmount;
+            }
+            borrower.reviewedBy = req.body.reviewedBy;
+            borrower.reviewedDate = Date.now();
+            borrower.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(borrower);
+                }
+            });
+        });
+};
+
+const borrowersAddContributions = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    if (!borrowerid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, borrowerid is required"
+            });
+    }
+    Borrower
+        .findById(borrowerid)
+        .exec((err, borrower) => {
+            if (!borrower) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "borrowerid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            borrower.addContributions(req.body);
+            borrower.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(borrower);
+                }
+            });
+        });
+};
+
+const borrowersUpdateLoanableAmount = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    if (!borrowerid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, borrowerid is required"
+            });
+    }
+    Borrower
+        .findById(borrowerid)
+        .exec((err, borrower) => {
+            if (!borrower) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "borrowerid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            borrower.updateLoanableAmount(req.body);
+            borrower.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(borrower);
+                }
+            });
+        });
+};
+
 module.exports = {
     borrowersList,
     borrowersCreate,
     borrowersReadOne,
     borrowersUpdateOne,
-    borrowersDeleteOne
+    borrowersDeleteOne,
+    borrowersUpdateStatus,
+    borrowersAddContributions,
+    borrowersUpdateLoanableAmount
 };

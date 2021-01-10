@@ -44,7 +44,11 @@ const loanSchema = new mongoose.Schema({
         monthlyPrincipal: String, //auto
         principalPaid: String, //recompute
         endingBalance: String, //auto
-        principalBalance: String //recompute
+        principalBalance: String, //recompute
+        repayments: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Transaction' // Transaction of Repayments
+        }]
     }],
     status: {
         type: String,
@@ -54,11 +58,11 @@ const loanSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    approvedDate: Date,
-    approvedBy: {
+    reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
+    reviewedDate: Date,
     transactionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction' // Transaction of Cash Release
@@ -66,7 +70,7 @@ const loanSchema = new mongoose.Schema({
     borrowersId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower' // Borrower
-    },
+    }
 });
 
 loanSchema.methods.compute = function (balance, monthlyRate, terms) {
@@ -74,7 +78,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
     monthlyRate = parseFloat(monthlyRate / 100.0);
 
     //Calculate the payment
-    var payment = balance * (monthlyRate / (1 - Math.pow(
+    const payment = balance * (monthlyRate / (1 - Math.pow(
         1 + monthlyRate, -terms)));
 
     this.loanTerm = terms;
@@ -100,6 +104,30 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
         this.loanPaymentSchedule.push(data);
     }
 
+};
+
+loanSchema.methods.updateDates = function () {
+    this.paymentStartDate = Date.now();
+    const terms = this.loanPaymentSchedule.length;
+    for (let i = 0; i < terms; i++) {
+        let d = new Date(this.paymentStartDate);
+        d.setFullYear(d.getFullYear(), d.getMonth() + 1 + i, d.getDate());
+        this.loanPaymentSchedule[i].dueDate = d;
+    }
+    this.paymentEndDate = this.loanPaymentSchedule[terms - 1].dueDate;
+};
+
+loanSchema.methods.addRepayment = function (date, amount) {
+    const paymentDate = new Date(date);
+    const add1Month = new Date(date);
+    add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
+    const newArray = this.loanPaymentSchedule.filter(function (schedule) {
+        return paymentDate <= new Date(schedule.dueDate) && add1Month > new Date(schedule.dueDate);
+    });
+    const scheduleToday = newArray[0];
+    // if (scheduleToday.scheduleNum == '1') {
+    //     this.loanPaymentSchedule[parseInt(scheduleToday.scheduleNum) - 1].interestAccrued = this.monthlyInterestRate * this.loanAmount;
+    // }
 };
 
 mongoose.model('Loan', loanSchema);
