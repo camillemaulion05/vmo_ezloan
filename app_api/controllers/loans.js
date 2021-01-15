@@ -187,7 +187,7 @@ const loansUpdateStatus = (req, res) => {
         });
 };
 
-const loansAddRepayment = (req, res) => {
+const loansRepaymentsUpdate = (req, res) => {
     const {
         loanid
     } = req.params;
@@ -227,6 +227,118 @@ const loansAddRepayment = (req, res) => {
         });
 };
 
+const loansRepaymentsList = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    }
+    Loan
+        .findById(loanid)
+        .exec((err, loan) => {
+            if (!loan) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "loan not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            } else {
+                return res
+                    .status(200)
+                    .json(loan.loanPaymentSchedule);
+            }
+        });
+};
+
+const loansRepaymentsReadOne = (req, res) => {
+    const {
+        loanid,
+        repaymentid
+    } = req.params;
+    if (!loanid && !repaymentid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, loanid and repaymentid is required"
+            });
+    }
+    Loan
+        .find({
+            _id: mongoose.Types.ObjectId(loanid),
+            "loanPaymentSchedule._id": mongoose.Types.ObjectId(repaymentid)
+        }, {
+            "loanPaymentSchedule.$": 1,
+            "_id": 0
+        })
+        .exec((err, loanPaymentSchedule) => {
+            if (!loanPaymentSchedule) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "loanPaymentSchedule not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            } else {
+                return res
+                    .status(200)
+                    .json(loanPaymentSchedule);
+            }
+        });
+};
+
+const loansSchedulesReadOne = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    }
+    const dateToday = new Date("2021-05-13T00:56:41.812Z");
+    Loan.find({
+            _id: mongoose.Types.ObjectId(loanid),
+            "loanPaymentSchedule.dueDate": {
+                $gte: dateToday
+            }
+        }, {
+            "loanPaymentSchedule.$": 1,
+            "_id": 0
+        })
+        .populate('requestedBy')
+        .exec((err, loanPaymentSchedule) => {
+            if (!loanPaymentSchedule) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "loan not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            } else {
+                return res
+                    .status(200)
+                    .json(loanPaymentSchedule);
+            }
+        });
+};
+
 module.exports = {
     loansList,
     loansCreate,
@@ -234,5 +346,8 @@ module.exports = {
     loansUpdateOne,
     loansDeleteOne,
     loansUpdateStatus,
-    loansAddRepayment
+    loansRepaymentsList,
+    loansRepaymentsUpdate,
+    loansRepaymentsReadOne,
+    loansSchedulesReadOne
 };

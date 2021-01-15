@@ -92,7 +92,7 @@ const loanSchema = new mongoose.Schema({
         type: String,
         default: "Pending"
     },
-    requestedBy: {
+    requestedDate: {
         type: Date,
         default: Date.now
     },
@@ -223,15 +223,4 @@ loanSchema.methods.addRepayment = function (date, amount, txnId) {
     }
 };
 
-loanSchema.methods.getRepayment = function (date, amount, txnId) {
-    const dateToday = new Date();
-    const add1Month = new Date(dateToday);
-    add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
-    const newArray = this.loanPaymentSchedule.filter(function (schedule) {
-        return paymentDate <= new Date(schedule.dueDate) && add1Month > new Date(schedule.dueDate);
-    });
-    if (newArray.length >= 1) {
-
-    }
-};
 mongoose.model('Loan', loanSchema);

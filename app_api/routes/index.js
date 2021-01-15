@@ -117,8 +117,17 @@ router
     .put(ctrlLoans.loansUpdateStatus);
 
 router
-    .route('/loans/:loanid/repayment')
-    .put(ctrlLoans.loansAddRepayment);
+    .route('/loans/:loanid/repayments')
+    .get(ctrlLoans.loansRepaymentsList)
+    .put(ctrlLoans.loansRepaymentsUpdate);
+
+router
+    .route('/loans/:loanid/repayments/:repaymentid')
+    .get(ctrlLoans.loansRepaymentsReadOne);
+
+router
+    .route('/loans/:loanid/schedule')
+    .get(ctrlLoans.loansSchedulesReadOne);
 
 // financial statements
 router
