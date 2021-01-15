@@ -187,11 +187,52 @@ const loansUpdateStatus = (req, res) => {
         });
 };
 
+const loansAddRepayment = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    }
+    Loan
+        .findById(loanid)
+        .exec((err, loan) => {
+            if (!loan) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "loanid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            loan.addRepayment(req.body.transactionDate, req.body.paymentAmount, req.body.transactionId);
+            loan.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(loan);
+                }
+            });
+        });
+};
+
 module.exports = {
     loansList,
     loansCreate,
     loansReadOne,
     loansUpdateOne,
     loansDeleteOne,
-    loansUpdateStatus
+    loansUpdateStatus,
+    loansAddRepayment
 };

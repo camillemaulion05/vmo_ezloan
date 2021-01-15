@@ -115,4 +115,8 @@ router
     .route('/loans/:loanid/status')
     .put(ctrlLoans.loansUpdateStatus);
 
+router
+    .route('/loans/:loanid/repayment')
+    .put(ctrlLoans.loansAddRepayment);
+
 module.exports = router;

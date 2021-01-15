@@ -6,11 +6,11 @@ const withdrawalSchema = new mongoose.Schema({
     reason: String,
     serviceFee: String, // 1% of requested amount
     newProceedsAmount: String, // = amount - serviceFee
-    requestBy: {
+    requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower'
     },
-    requestDate: {
+    requestedDate: {
         type: Date,
         default: Date.now
     },

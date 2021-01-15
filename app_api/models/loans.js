@@ -25,7 +25,8 @@ const loanSchema = new mongoose.Schema({
     newProceedsAmount: String, // = amount - serviceFee
     monthlyAmortization: String, // loanAmount * (monthlyInterestRate/(1-Math.pow(1+monthlyInterestRate, -loanTerm)));
     totalAmortization: String, // monthlyAmortization  * 12
-    totalInterestAccrued: String, // totalAmortization - loanAmount
+    totalInterest: String, // totalAmortization - loanAmount
+    totalInterestAccrued: String, // recompute
     paymentStartDate: Date, // Date approved
     paymentEndDate: Date, // Date approved + Loan terms
     totalPayments: String,
@@ -36,9 +37,10 @@ const loanSchema = new mongoose.Schema({
     loanPaymentSchedule: [{
         scheduleNum: String, //auto
         dueDate: Date, //if approved
-        paymentDate: String, //input
+        paymentDate: Date, //input
         paymentAmount: String, //input
-        interestAccrued: String, //auto
+        interest: String, //auto
+        interestAccrued: String, //recompute
         interestPaid: String, //recompute
         interestBalance: String, //recompute
         monthlyPrincipal: String, //auto
@@ -54,7 +56,7 @@ const loanSchema = new mongoose.Schema({
         type: String,
         default: "Pending"
     },
-    requestDate: {
+    requestedBy: {
         type: Date,
         default: Date.now
     },
@@ -67,7 +69,7 @@ const loanSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction' // Transaction of Cash Release
     },
-    borrowersId: {
+    requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower' // Borrower
     }
@@ -88,7 +90,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
     this.newProceedsAmount = (balance - this.serviceFee).toFixed(2);
     this.monthlyAmortization = payment.toFixed(2);
     this.totalAmortization = (payment * terms).toFixed(2);
-    this.totalInterestAccrued = (this.totalAmortization - this.loanAmount).toFixed(2);
+    this.totalInterest = (this.totalAmortization - this.loanAmount).toFixed(2);
     this.loanPaymentSchedule = [];
     for (var count = 0; count < terms; ++count) {
         var data = {};
@@ -96,7 +98,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
         var monthlyPrincipal = 0;
         data.scheduleNum = (count + 1);
         interest = balance * monthlyRate;
-        data.interestAccrued = interest.toFixed(2);
+        data.interest = interest.toFixed(2);
         monthlyPrincipal = payment - interest;
         data.monthlyPrincipal = monthlyPrincipal.toFixed(2);
         balance = balance - monthlyPrincipal;
@@ -117,17 +119,35 @@ loanSchema.methods.updateDates = function () {
     this.paymentEndDate = this.loanPaymentSchedule[terms - 1].dueDate;
 };
 
-loanSchema.methods.addRepayment = function (date, amount) {
+loanSchema.methods.addRepayment = function (date, amount, txnId) {
     const paymentDate = new Date(date);
     const add1Month = new Date(date);
     add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
     const newArray = this.loanPaymentSchedule.filter(function (schedule) {
         return paymentDate <= new Date(schedule.dueDate) && add1Month > new Date(schedule.dueDate);
     });
-    const scheduleToday = newArray[0];
-    // if (scheduleToday.scheduleNum == '1') {
-    //     this.loanPaymentSchedule[parseInt(scheduleToday.scheduleNum) - 1].interestAccrued = this.monthlyInterestRate * this.loanAmount;
-    // }
+    if (newArray.length >= 1) {
+        const repaymentSchedule = newArray[0];
+        const i = parseInt(repaymentSchedule.scheduleNum) - 1;
+        const ii = parseInt(repaymentSchedule.scheduleNum) - 2;
+        this.loanPaymentSchedule[i].paymentAmount = amount;
+        this.loanPaymentSchedule[i].paymentDate = paymentDate;
+        if (repaymentSchedule.scheduleNum == '1') {
+            this.loanPaymentSchedule[i].interestAccrued = ((this.monthlyInterestRate / 100) * this.loanAmount).toFixed(2);
+            this.loanPaymentSchedule[i].interestPaid = (Math.min(this.loanPaymentSchedule[i].interestAccrued, this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
+        } else {
+            this.loanPaymentSchedule[i].interestAccrued = ((this.monthlyInterestRate / 100) * this.loanPaymentSchedule[ii].principalBalance).toFixed(2);
+            this.loanPaymentSchedule[i].interestPaid = (Math.min(this.loanPaymentSchedule[i].interestAccrued + this.loanPaymentSchedule[ii].interestBalance, this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
+        }
+        this.loanPaymentSchedule[i].interestBalance = this.loanPaymentSchedule[i].interestAccrued - this.loanPaymentSchedule[i].interestPaid;
+        this.loanPaymentSchedule[i].principalPaid = this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid;
+        if (repaymentSchedule.scheduleNum == '1') {
+            this.loanPaymentSchedule[i].principalBalance = this.loanAmount - this.loanPaymentSchedule[i].principalPaid;
+        } else {
+            this.loanPaymentSchedule[i].principalBalance = this.loanPaymentSchedule[ii].principalBalance - this.loanPaymentSchedule[i].principalPaid;
+        }
+        this.loanPaymentSchedule[i].repayments.push(txnId);
+    }
 };
 
 mongoose.model('Loan', loanSchema);
