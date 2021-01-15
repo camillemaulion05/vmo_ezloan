@@ -4,7 +4,7 @@ const withdrawalSchema = new mongoose.Schema({
     withdrawalNum: String,
     amount: String,
     reason: String,
-    serviceFee: String, // 1% of requested amount
+    serviceFee: String, // 5% of requested amount
     newProceedsAmount: String, // = amount - serviceFee
     requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +30,7 @@ const withdrawalSchema = new mongoose.Schema({
 });
 
 withdrawalSchema.methods.compute = function (amount) {
-    this.serviceFee = (amount * 0.01).toFixed(2);
+    this.serviceFee = (amount * 0.05).toFixed(2);
     this.newProceedsAmount = (amount - this.serviceFee).toFixed(2);
 };
 
