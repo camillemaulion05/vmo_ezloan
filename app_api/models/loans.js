@@ -125,7 +125,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
     this.serviceFee = (balance * 0.01).toFixed(2); //1% service fee
     this.newProceedsAmount = (balance - this.serviceFee).toFixed(2);
     this.monthlyAmortization = payment.toFixed(2);
-    this.totalAmortization = (payment * terms).toFixed(2);
+    this.totalAmortization = (parseFloat(payment) * terms).toFixed(2);
     this.totalInterest = (this.totalAmortization - this.loanAmount).toFixed(2);
     this.loanPaymentSchedule = [];
     for (var count = 0; count < terms; ++count) {
@@ -135,7 +135,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
         data.scheduleNum = (count + 1);
         interest = balance * monthlyRate;
         data.interest = interest.toFixed(2);
-        principal = payment - interest;
+        principal = parseFloat(payment) - interest;
         data.principal = principal.toFixed(2);
         balance = balance - principal;
         data.principalBalance = balance.toFixed(2);
@@ -214,6 +214,11 @@ loanSchema.methods.addRepayment = function (date, amount, txnId) {
                 this.loanPaymentSchedule[c].principal = (this.loanPaymentSchedule[c].amountDue - this.loanPaymentSchedule[c].interest).toFixed(2);
                 this.loanPaymentSchedule[c].principalBalance = (this.loanPaymentSchedule[c - 1].principalBalance - this.loanPaymentSchedule[c].principal).toFixed(2);
             }
+        }
+
+        //update status
+        if (this.totalPayments == this.totalAmortization || parseFloat(this.principalRemaining) == 0.00) {
+            this.status = "Fully Paid";
         }
     }
 };
