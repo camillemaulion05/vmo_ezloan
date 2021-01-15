@@ -212,7 +212,7 @@ const loansAddRepayment = (req, res) => {
                     .status(400)
                     .json(err);
             }
-            loan.addRepayment(req.body.transactionDate, req.body.paymentAmount, req.body.transactionId);
+            loan.addRepayment(req.body.transactionDate, req.body.transactionAmount, req.body.transactionId);
             loan.save((err) => {
                 if (err) {
                     res

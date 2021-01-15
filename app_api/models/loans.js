@@ -26,27 +26,63 @@ const loanSchema = new mongoose.Schema({
     monthlyAmortization: String, // loanAmount * (monthlyInterestRate/(1-Math.pow(1+monthlyInterestRate, -loanTerm)));
     totalAmortization: String, // monthlyAmortization  * 12
     totalInterest: String, // totalAmortization - loanAmount
-    totalInterestAccrued: String, // recompute
     paymentStartDate: Date, // Date approved
     paymentEndDate: Date, // Date approved + Loan terms
-    totalPayments: String,
-    totalInterestPaid: String,
-    unpaidInterest: String,
-    totalPrincipalPaid: String,
-    principalRemaining: String,
+    totalPayments: {
+        type: String,
+        default: "0.00"
+    }, // recompute
+    totalInterestAccrued: {
+        type: String,
+        default: "0.00"
+    }, // recompute
+    totalInterestPaid: {
+        type: String,
+        default: "0.00"
+    }, // recompute
+    unpaidInterest: {
+        type: String,
+        default: "0.00"
+    }, // recompute
+    totalPrincipalPaid: {
+        type: String,
+        default: "0.00"
+    }, // recompute
+    principalRemaining: {
+        type: String,
+        default: "0.00"
+    }, // recompute
     loanPaymentSchedule: [{
         scheduleNum: String, //auto
         dueDate: Date, //if approved
         paymentDate: Date, //input
-        paymentAmount: String, //input
+        paymentAmount: {
+            type: String,
+            default: "0.00"
+        }, //input
         interest: String, //auto
-        interestAccrued: String, //recompute
-        interestPaid: String, //recompute
-        interestBalance: String, //recompute
+        interestAccrued: {
+            type: String,
+            default: "0.00"
+        }, //recompute
+        interestPaid: {
+            type: String,
+            default: "0.00"
+        }, //recompute
+        interestBalance: {
+            type: String,
+            default: "0.00"
+        }, //recompute
         monthlyPrincipal: String, //auto
-        principalPaid: String, //recompute
+        principalPaid: {
+            type: String,
+            default: "0.00"
+        }, //recompute
         endingBalance: String, //auto
-        principalBalance: String, //recompute
+        principalBalance: {
+            type: String,
+            default: "0.00"
+        }, //recompute
         repayments: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Transaction' // Transaction of Repayments
@@ -130,23 +166,34 @@ loanSchema.methods.addRepayment = function (date, amount, txnId) {
         const repaymentSchedule = newArray[0];
         const i = parseInt(repaymentSchedule.scheduleNum) - 1;
         const ii = parseInt(repaymentSchedule.scheduleNum) - 2;
-        this.loanPaymentSchedule[i].paymentAmount = amount;
+        this.loanPaymentSchedule[i].paymentAmount = parseFloat(this.loanPaymentSchedule[i].paymentAmount) + parseFloat(amount);
         this.loanPaymentSchedule[i].paymentDate = paymentDate;
         if (repaymentSchedule.scheduleNum == '1') {
             this.loanPaymentSchedule[i].interestAccrued = ((this.monthlyInterestRate / 100) * this.loanAmount).toFixed(2);
             this.loanPaymentSchedule[i].interestPaid = (Math.min(this.loanPaymentSchedule[i].interestAccrued, this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
         } else {
             this.loanPaymentSchedule[i].interestAccrued = ((this.monthlyInterestRate / 100) * this.loanPaymentSchedule[ii].principalBalance).toFixed(2);
-            this.loanPaymentSchedule[i].interestPaid = (Math.min(this.loanPaymentSchedule[i].interestAccrued + this.loanPaymentSchedule[ii].interestBalance, this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
+            this.loanPaymentSchedule[i].interestPaid = (Math.min(parseFloat(this.loanPaymentSchedule[i].interestAccrued) + parseFloat(this.loanPaymentSchedule[ii].interestBalance), this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
         }
-        this.loanPaymentSchedule[i].interestBalance = this.loanPaymentSchedule[i].interestAccrued - this.loanPaymentSchedule[i].interestPaid;
-        this.loanPaymentSchedule[i].principalPaid = this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid;
+        this.loanPaymentSchedule[i].interestBalance = (this.loanPaymentSchedule[i].interestAccrued - this.loanPaymentSchedule[i].interestPaid).toFixed(2);
+        this.loanPaymentSchedule[i].principalPaid = (this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid).toFixed(2);
         if (repaymentSchedule.scheduleNum == '1') {
-            this.loanPaymentSchedule[i].principalBalance = this.loanAmount - this.loanPaymentSchedule[i].principalPaid;
+            this.loanPaymentSchedule[i].principalBalance = (this.loanAmount - this.loanPaymentSchedule[i].principalPaid).toFixed(2);
         } else {
-            this.loanPaymentSchedule[i].principalBalance = this.loanPaymentSchedule[ii].principalBalance - this.loanPaymentSchedule[i].principalPaid;
+            this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[ii].principalBalance - this.loanPaymentSchedule[i].principalPaid).toFixed(2);
         }
         this.loanPaymentSchedule[i].repayments.push(txnId);
+        var sum = function (items, prop) {
+            return items.reduce(function (a, b) {
+                return parseFloat(a) + parseFloat(b[prop]);
+            }, 0);
+        };
+        this.totalPayments = (sum(this.loanPaymentSchedule, 'paymentAmount')).toFixed(2);
+        this.totalInterestAccrued = (sum(this.loanPaymentSchedule, 'interestAccrued')).toFixed(2);
+        this.totalInterestPaid = (sum(this.loanPaymentSchedule, 'interestPaid')).toFixed(2);
+        this.unpaidInterest = (parseFloat(this.totalInterestAccrued) - parseFloat(this.totalInterestPaid)).toFixed(2);
+        this.totalPrincipalPaid = (sum(this.loanPaymentSchedule, 'principalPaid')).toFixed(2);
+        this.principalRemaining = (this.loanAmount - this.totalPrincipalPaid).toFixed(2);
     }
 };
 
