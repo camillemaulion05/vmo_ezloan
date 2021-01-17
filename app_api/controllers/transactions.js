@@ -27,6 +27,10 @@ const transactionsCreate = (req, res) => {
         referenceNo
     } = req.body);
     transaction.transactionNum = Date.now();
+    //for dummy
+    transaction.postedBy = req.body.postedBy;
+    transaction.postedDate = req.body.postedDate;
+    transaction.transactionDate = req.body.transactionDate;
     transaction.save((err) => {
         if (err) {
             return res
@@ -102,6 +106,45 @@ const transactionsUpdateOne = (req, res) => {
             transaction.senderNum = req.body.senderNum;
             transaction.receiverNum = req.body.receiverNum;
             transaction.referenceNo = req.body.referenceNo;
+            transaction.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(transaction);
+                }
+            });
+        });
+};
+
+const transactionsPostOne = (req, res) => {
+    const {
+        transactionid
+    } = req.params;
+    if (!transactionid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, transactionid is required"
+            });
+    }
+    Transaction
+        .findById(transactionid)
+        .exec((err, transaction) => {
+            if (!transaction) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "transactionid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
             transaction.postedBy = req.body.postedBy;
             transaction.postedDate = Date.now();
             transaction.save((err) => {
@@ -148,5 +191,6 @@ module.exports = {
     transactionsCreate,
     transactionsReadOne,
     transactionsUpdateOne,
-    transactionsDeleteOne
+    transactionsDeleteOne,
+    transactionsPostOne
 };

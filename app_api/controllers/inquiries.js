@@ -22,8 +22,7 @@ const inquiriesCreate = (req, res) => {
         name,
         email,
         phone,
-        message,
-        response
+        message
     } = req.body);
     inquiry.inquiryNum = Date.now();
     inquiry.save((err) => {
@@ -70,7 +69,75 @@ const inquiriesReadOne = (req, res) => {
         });
 };
 
-const inquiriesResponse = (req, res) => {
+const inquiriesUpdateOne = (req, res) => {
+    const {
+        inquiryid
+    } = req.params;
+    if (!inquiryid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, inquiryid is required"
+            });
+    }
+    Inquiry
+        .findById(inquiryid)
+        .exec((err, inquiry) => {
+            if (!inquiry) {
+                return res
+                    .status(404)
+                    .json({
+                        "message": "inquiryid not found"
+                    });
+            } else if (err) {
+                return res
+                    .status(400)
+                    .json(err);
+            }
+            inquiry.name = req.body.name;
+            inquiry.email = req.body.email;
+            inquiry.phone = req.body.phone;
+            inquiry.message = req.body.message;
+            inquiry.save((err) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(inquiry);
+                }
+            });
+        });
+};
+
+const inquiriesDeleteOne = (req, res) => {
+    const {
+        inquiryid
+    } = req.params;
+    if (!inquiryid) {
+        return res
+            .status(404)
+            .json({
+                "message": "Not found, inquiryid is required"
+            });
+    }
+    Inquiry
+        .findByIdAndRemove(inquiryid)
+        .exec((err, inquiry) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json(err);
+            }
+            res
+                .status(204)
+                .json(null);
+        });
+};
+
+const inquiriesReply = (req, res) => {
     const {
         inquiryid
     } = req.params;
@@ -111,35 +178,11 @@ const inquiriesResponse = (req, res) => {
         });
 };
 
-const inquiriesDeleteOne = (req, res) => {
-    const {
-        inquiryid
-    } = req.params;
-    if (!inquiryid) {
-        return res
-            .status(404)
-            .json({
-                "message": "Not found, inquiryid is required"
-            });
-    }
-    Inquiry
-        .findByIdAndRemove(inquiryid)
-        .exec((err, inquiry) => {
-            if (err) {
-                return res
-                    .status(404)
-                    .json(err);
-            }
-            res
-                .status(204)
-                .json(null);
-        });
-};
-
 module.exports = {
     inquiriesList,
     inquiriesCreate,
     inquiriesReadOne,
-    inquiriesResponse,
-    inquiriesDeleteOne
+    inquiriesUpdateOne,
+    inquiriesDeleteOne,
+    inquiriesReply
 };

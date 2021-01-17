@@ -90,7 +90,7 @@ const loanSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        default: "Pending"
+        default: "Pending" // Loan Release, Fully Paid
     },
     requestedDate: {
         type: Date,

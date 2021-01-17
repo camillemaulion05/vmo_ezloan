@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
         default: Date.now
     },
     amount: String,
-    type: String, //Repayments of Loan, Cash Release, Contributions, Withdrawals, Membership Fee
+    type: String, //Loan Repayment, Cash Release, Contributions, Loan Release, Membership Fee
     message: String,
     senderNum: String,
     receiverNum: String,

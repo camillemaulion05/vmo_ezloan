@@ -166,7 +166,7 @@ const withdrawalsUpdateStatus = (req, res) => {
             withdrawal.status = req.body.status;
             withdrawal.reviewedBy = req.body.reviewedBy;
             withdrawal.reviewedDate = Date.now();
-            if ("Release" == req.body.status) {
+            if ("Cash Release" == req.body.status) {
                 withdrawal.transactionId = req.body.transactionId;
             }
             withdrawal.save((err) => {

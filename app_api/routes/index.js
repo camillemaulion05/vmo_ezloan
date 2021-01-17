@@ -33,8 +33,12 @@ router
 router
     .route('/inquiries/:inquiryid')
     .get(ctrlInquiries.inquiriesReadOne)
-    .put(ctrlInquiries.inquiriesResponse)
+    .put(ctrlInquiries.inquiriesUpdateOne)
     .delete(ctrlInquiries.inquiriesDeleteOne);
+
+router
+    .route('/inquiries/:inquiryid/reply')
+    .put(ctrlInquiries.inquiriesReply);
 
 // employees
 router
@@ -59,6 +63,10 @@ router
     .get(ctrlTransactions.transactionsReadOne)
     .put(ctrlTransactions.transactionsUpdateOne)
     .delete(ctrlTransactions.transactionsDeleteOne);
+
+router
+    .route('/transactions/:transactionid/post')
+    .put(ctrlTransactions.transactionsPostOne);
 
 // withdrawals
 router

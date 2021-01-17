@@ -169,7 +169,7 @@ const loansUpdateStatus = (req, res) => {
             loan.status = req.body.status;
             loan.reviewedDate = Date.now();
             loan.reviewedBy = req.body.reviewedBy;
-            if ("Release" == req.body.status) {
+            if ("Loan Release" == req.body.status) {
                 loan.transactionId = req.body.transactionId;
                 loan.updateDates();
             }

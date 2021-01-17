@@ -16,10 +16,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "Active"
     },
-    isAdmin: {
-        type: Boolean,
-        default: false
-    }
+    type: String, //Borrower, Employee, Admin
 }, {
     timestamps: true
 });
