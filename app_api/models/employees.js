@@ -11,7 +11,7 @@ const employeeSchema = new mongoose.Schema({
         middleName: String,
         lastName: String,
         gender: String, //Male, Female
-        birthday: String,
+        birthday: Date,
         address: {
             present: {
                 address: String,

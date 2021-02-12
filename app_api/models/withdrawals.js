@@ -1,36 +1,30 @@
 const mongoose = require('mongoose');
 
 const withdrawalSchema = new mongoose.Schema({
-    withdrawalNum: String,
+    withdrawalNum: String, // Date.now();
     amount: String,
     reason: String,
-    serviceFee: String, // 5% of requested amount
+    serviceFee: String, // 1% of requested amount
     newProceedsAmount: String, // = amount - serviceFee
     requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower'
     },
-    requestedDate: {
-        type: Date,
-        default: Date.now
-    },
     status: {
         type: String,
-        default: "Pending" // Cash Release, Approved
+        default: "Pending" // Cash Release, Approved, Revoked
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
-    reviewedDate: Date,
-    transactionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction' // Transaction of Cash Release
-    }
+    reviewedDate: Date
+}, {
+    timestamps: true
 });
 //minimum amount 500
 withdrawalSchema.methods.compute = function (amount) {
-    this.serviceFee = (amount * 0.05).toFixed(2);
+    this.serviceFee = (amount * 0.01).toFixed(2);
     this.newProceedsAmount = (amount - this.serviceFee).toFixed(2);
 };
 

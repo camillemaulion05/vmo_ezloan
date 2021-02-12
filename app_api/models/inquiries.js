@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const inquirySchema = new mongoose.Schema({
-    inquiryNum: String,
+    inquiryNum: String, //Date.now();
     name: String,
     email: String,
     phone: String,
     message: String,
     response: {
         createdAt: Date,
-        text: String,
-        authorId: {
+        message: String,
+        repliedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         }

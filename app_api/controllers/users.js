@@ -1,3 +1,4 @@
+const e = require('express');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
@@ -6,11 +7,11 @@ const usersList = (req, res) => {
         .find()
         .exec((err, users) => {
             if (err) {
-                return res
+                res
                     .status(404)
                     .json(err);
             } else {
-                return res
+                res
                     .status(200)
                     .json(users);
             }
@@ -21,6 +22,11 @@ const usersCreate = (req, res) => {
     const user = new User({
         username,
         password,
+        passwordResetToken,
+        passwordResetExpires,
+        lastLogin,
+        lastFailedLogin,
+        status,
         type
     } = req.body);
     user.userNum = Date.now();
@@ -28,25 +34,28 @@ const usersCreate = (req, res) => {
         username: req.body.username
     }, (err, existingUser) => {
         if (err) {
-            return next(err);
-        }
-        if (existingUser) {
-            return res
+            res
+                .status(404)
+                .json(err);
+        } else if (existingUser) {
+            res
                 .status(400)
                 .json({
                     "msg": "Account with that username already exists."
                 });
+        } else {
+            user.save((err) => {
+                if (err) {
+                    res
+                        .status(400)
+                        .json(err);
+                } else {
+                    res
+                        .status(201)
+                        .json(user);
+                }
+            });
         }
-        user.save((err) => {
-            if (err) {
-                return res
-                    .status(400)
-                    .json(err);
-            }
-            return res
-                .status(201)
-                .json(user);
-        });
     });
 };
 
@@ -55,31 +64,32 @@ const usersReadOne = (req, res) => {
         userid
     } = req.params;
     if (!userid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, userid is required"
             });
+    } else {
+        User
+            .findById(userid)
+            .exec((err, user) => {
+                if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "user not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(user);
+                }
+            });
     }
-    User
-        .findById(userid)
-        .exec((err, user) => {
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({
-                        "message": "user not found"
-                    });
-            } else if (err) {
-                return res
-                    .status(404)
-                    .json(err);
-            } else {
-                return res
-                    .status(200)
-                    .json(user);
-            }
-        });
 };
 
 const usersUpdateOne = (req, res) => {
@@ -87,37 +97,46 @@ const usersUpdateOne = (req, res) => {
         userid
     } = req.params;
     if (!userid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, userid is required"
             });
-    }
-    User.findById(userid, (err, user) => {
-        if (err) {
-            return res
-                .status(400)
-                .json(err);
-        }
-        user.username = req.body.username;
-        user.password = req.body.password;
-        user.passwordResetToken = req.body.passwordResetToken;
-        user.passwordResetExpires = req.body.passwordResetExpires;
-        user.lastLogin = req.body.lastLogin;
-        user.lastFailedLogin = req.body.lastFailedLogin;
-        user.status = req.body.status;
-        user.type = req.body.type;
-        user.save((err) => {
-            if (err) {
-                return res
-                    .status(400)
+    } else {
+        User.findById(userid, (err, user) => {
+            if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "user not found"
+                    });
+            } else if (err) {
+                res
+                    .status(404)
                     .json(err);
+            } else {
+                user.username = (req.body.username) ? req.body.username : user.username;
+                user.password = (req.body.password) ? req.body.password : user.password;
+                user.passwordResetToken = (req.body.passwordResetToken) ? req.body.passwordResetToken : user.passwordResetToken;
+                user.passwordResetExpires = (req.body.passwordResetExpires) ? req.body.passwordResetExpires : user.passwordResetExpires;
+                user.lastLogin = (req.body.lastLogin) ? req.body.lastLogin : user.lastLogin;
+                user.lastFailedLogin = (req.body.lastFailedLogin) ? req.body.lastFailedLogin : user.lastFailedLogin;
+                user.status = (req.body.status) ? req.body.status : user.status;
+                user.type = (req.body.type) ? req.body.type : user.type;
+                user.save((err) => {
+                    if (err) {
+                        res
+                            .status(400)
+                            .json(err);
+                    } else {
+                        res
+                            .status(200)
+                            .json(user);
+                    }
+                });
             }
-            res
-                .status(200)
-                .json(user);
         });
-    });
+    }
 };
 
 const usersDeleteOne = (req, res) => {
@@ -125,24 +144,32 @@ const usersDeleteOne = (req, res) => {
         userid
     } = req.params;
     if (!userid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, userid is required"
             });
+    } else {
+        User
+            .findByIdAndRemove(userid)
+            .exec((err, user) => {
+                if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "user not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
     }
-    User
-        .findByIdAndRemove(userid)
-        .exec((err, user) => {
-            if (err) {
-                return res
-                    .status(404)
-                    .json(err);
-            }
-            res
-                .status(204)
-                .json(null);
-        });
 };
 
 module.exports = {

@@ -18,7 +18,7 @@ const borrowerSchema = new mongoose.Schema({
         middleName: String,
         lastName: String,
         gender: String, //Male, Female
-        birthday: String,
+        birthday: Date,
         civilStat: String, //Single, Married, Widowed, Divorced
         dependents: String,
         educAttainment: String, //High School, Vocational/Technical, College, Post Graduate
@@ -147,31 +147,31 @@ const borrowerSchema = new mongoose.Schema({
             firstName: String,
             lastName: String,
             relationship: String,
-            birthday: String
+            birthday: Date
         },
         bene2: {
             firstName: String,
             lastName: String,
             relationship: String,
-            birthday: String
+            birthday: Date
         },
         bene3: {
             firstName: String,
             lastName: String,
             relationship: String,
-            birthday: String
+            birthday: Date
         },
         bene4: {
             firstName: String,
             lastName: String,
             relationship: String,
-            birthday: String
+            birthday: Date
         },
         bene5: {
             firstName: String,
             lastName: String,
             relationship: String,
-            birthday: String
+            birthday: Date
         }
     },
     employeeNum: String, // Members only
@@ -185,23 +185,10 @@ const borrowerSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
-    },
-    contributions: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction' // Transaction of Contributions
-    }]
+    }
 }, {
     timestamps: true
 });
-
-borrowerSchema.methods.addContributions = function (contributions) {
-    contributions.forEach(add);
-
-    function add(contribution) {
-        this.contributions.push(contribution);
-        //update summary
-    }
-};
 
 borrowerSchema.methods.updateLoanableAmount = function (data) {
     if (data.action == "debit") {

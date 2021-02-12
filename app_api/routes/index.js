@@ -36,10 +36,6 @@ router
     .put(ctrlInquiries.inquiriesUpdateOne)
     .delete(ctrlInquiries.inquiriesDeleteOne);
 
-router
-    .route('/inquiries/:inquiryid/reply')
-    .put(ctrlInquiries.inquiriesReply);
-
 // employees
 router
     .route('/employees')
@@ -64,10 +60,6 @@ router
     .put(ctrlTransactions.transactionsUpdateOne)
     .delete(ctrlTransactions.transactionsDeleteOne);
 
-router
-    .route('/transactions/:transactionid/post')
-    .put(ctrlTransactions.transactionsPostOne);
-
 // withdrawals
 router
     .route('/withdrawals')
@@ -80,10 +72,6 @@ router
     .put(ctrlWithdrawals.withdrawalsUpdateOne)
     .delete(ctrlWithdrawals.withdrawalsDeleteOne);
 
-router
-    .route('/withdrawals/:withdrawalid/status')
-    .put(ctrlWithdrawals.withdrawalsUpdateStatus);
-
 // borrowers
 router
     .route('/borrowers')
@@ -95,18 +83,6 @@ router
     .get(ctrlBorrowers.borrowersReadOne)
     .put(ctrlBorrowers.borrowersUpdateOne)
     .delete(ctrlBorrowers.borrowersDeleteOne);
-
-router
-    .route('/borrowers/:borrowerid/status')
-    .put(ctrlBorrowers.borrowersUpdateStatus);
-
-router
-    .route('/borrowers/:borrowerid/contributions')
-    .put(ctrlBorrowers.borrowersAddContributions);
-
-router
-    .route('/borrowers/:borrowerid/loanableAmount')
-    .put(ctrlBorrowers.borrowersUpdateLoanableAmount);
 
 // loans
 router
@@ -121,21 +97,17 @@ router
     .delete(ctrlLoans.loansDeleteOne);
 
 router
-    .route('/loans/:loanid/status')
-    .put(ctrlLoans.loansUpdateStatus);
+    .route('/loans/:loanid/schedules')
+    .get(ctrlLoans.loansSchedulesList)
+    .put(ctrlLoans.loansSchedulesUpdate);
 
 router
-    .route('/loans/:loanid/repayments')
-    .get(ctrlLoans.loansRepaymentsList)
-    .put(ctrlLoans.loansRepaymentsUpdate);
-
-router
-    .route('/loans/:loanid/repayments/:repaymentid')
-    .get(ctrlLoans.loansRepaymentsReadOne);
-
-router
-    .route('/loans/:loanid/schedule')
+    .route('/loans/:loanid/schedules/:scheduleid')
     .get(ctrlLoans.loansSchedulesReadOne);
+
+router
+    .route('/loans/:loanid/late')
+    .get(ctrlLoans.loansRepaymentsDue);
 
 // financial statements
 router

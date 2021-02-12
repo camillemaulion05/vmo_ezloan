@@ -6,11 +6,11 @@ const withdrawalsList = (req, res) => {
         .find()
         .exec((err, withdrawals) => {
             if (err) {
-                return res
+                res
                     .status(404)
                     .json(err);
             } else {
-                return res
+                res
                     .status(200)
                     .json(withdrawals);
             }
@@ -21,19 +21,23 @@ const withdrawalsCreate = (req, res) => {
     const withdrawal = new Withdrawal({
         amount,
         reason,
-        requestBy
+        requestBy,
+        status,
+        reviewedBy
     } = req.body);
     withdrawal.withdrawalNum = Date.now();
     withdrawal.compute(req.body.amount);
+    if (req.body.reviewedBy) withdrawal.reviewedDate = Date.now();
     withdrawal.save((err) => {
         if (err) {
-            return res
+            res
                 .status(400)
                 .json(err);
+        } else {
+            res
+                .status(201)
+                .json(withdrawal);
         }
-        return res
-            .status(201)
-            .json(withdrawal);
     });
 };
 
@@ -42,31 +46,32 @@ const withdrawalsReadOne = (req, res) => {
         withdrawalid
     } = req.params;
     if (!withdrawalid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, withdrawalid is required"
             });
+    } else {
+        Withdrawal
+            .findById(withdrawalid)
+            .exec((err, withdrawal) => {
+                if (!withdrawal) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "withdrawal not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(withdrawal);
+                }
+            });
     }
-    Withdrawal
-        .findById(withdrawalid)
-        .exec((err, withdrawal) => {
-            if (!withdrawal) {
-                return res
-                    .status(404)
-                    .json({
-                        "message": "withdrawal not found"
-                    });
-            } else if (err) {
-                return res
-                    .status(404)
-                    .json(err);
-            } else {
-                return res
-                    .status(200)
-                    .json(withdrawal);
-            }
-        });
 };
 
 const withdrawalsUpdateOne = (req, res) => {
@@ -74,42 +79,47 @@ const withdrawalsUpdateOne = (req, res) => {
         withdrawalid
     } = req.params;
     if (!withdrawalid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, withdrawalid is required"
             });
-    }
-    Withdrawal
-        .findById(withdrawalid)
-        .exec((err, withdrawal) => {
-            if (!withdrawal) {
-                return res
-                    .status(404)
-                    .json({
-                        "message": "withdrawalid not found"
-                    });
-            } else if (err) {
-                return res
-                    .status(400)
-                    .json(err);
-            }
-            withdrawal.amount = req.body.amount;
-            withdrawal.reason = req.body.reason;
-            withdrawal.compute(req.body.amount);
-            withdrawal.requestBy = req.body.requestBy;
-            withdrawal.save((err) => {
-                if (err) {
+    } else {
+        Withdrawal
+            .findById(withdrawalid)
+            .exec((err, withdrawal) => {
+                if (!withdrawal) {
                     res
                         .status(404)
+                        .json({
+                            "message": "withdrawalid not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(400)
                         .json(err);
                 } else {
-                    res
-                        .status(200)
-                        .json(withdrawal);
+                    withdrawal.amount = (req.body.amount) ? req.body.amount : withdrawal.amount;
+                    withdrawal.reason = (req.body.reason) ? req.body.reason : withdrawal.reason;
+                    withdrawal.compute(req.body.amount);
+                    withdrawal.requestBy = (req.body.requestBy) ? req.body.requestBy : withdrawal.requestBy;
+                    withdrawal.status = (req.body.status) ? req.body.status : withdrawal.status;
+                    withdrawal.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : withdrawal.reviewedBy;
+                    withdrawal.reviewedDate = (!req.body.reviewedBy || withdrawal.reviewedDate) ? withdrawal.reviewedDate : Date.now();
+                    withdrawal.save((err) => {
+                        if (err) {
+                            res
+                                .status(404)
+                                .json(err);
+                        } else {
+                            res
+                                .status(200)
+                                .json(withdrawal);
+                        }
+                    });
                 }
             });
-        });
+    }
 };
 
 const withdrawalsDeleteOne = (req, res) => {
@@ -117,70 +127,32 @@ const withdrawalsDeleteOne = (req, res) => {
         withdrawalid
     } = req.params;
     if (!withdrawalid) {
-        return res
+        res
             .status(404)
             .json({
                 "message": "Not found, withdrawalid is required"
             });
-    }
-    Withdrawal
-        .findByIdAndRemove(withdrawalid)
-        .exec((err, withdrawal) => {
-            if (err) {
-                return res
-                    .status(404)
-                    .json(err);
-            }
-            res
-                .status(204)
-                .json(null);
-        });
-};
-
-
-const withdrawalsUpdateStatus = (req, res) => {
-    const {
-        withdrawalid
-    } = req.params;
-    if (!withdrawalid) {
-        return res
-            .status(404)
-            .json({
-                "message": "Not found, withdrawalid is required"
-            });
-    }
-    Withdrawal
-        .findById(withdrawalid)
-        .exec((err, withdrawal) => {
-            if (!withdrawal) {
-                return res
-                    .status(404)
-                    .json({
-                        "message": "withdrawalid not found"
-                    });
-            } else if (err) {
-                return res
-                    .status(400)
-                    .json(err);
-            }
-            withdrawal.status = req.body.status;
-            withdrawal.reviewedBy = req.body.reviewedBy;
-            withdrawal.reviewedDate = Date.now();
-            if ("Cash Release" == req.body.status) {
-                withdrawal.transactionId = req.body.transactionId;
-            }
-            withdrawal.save((err) => {
-                if (err) {
+    } else {
+        Withdrawal
+            .findByIdAndRemove(withdrawalid)
+            .exec((err, withdrawal) => {
+                if (!withdrawal) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "withdrawal not found"
+                        });
+                } else if (err) {
                     res
                         .status(404)
                         .json(err);
                 } else {
                     res
-                        .status(200)
-                        .json(withdrawal);
+                        .status(204)
+                        .json(null);
                 }
             });
-        });
+    }
 };
 
 module.exports = {
@@ -188,6 +160,5 @@ module.exports = {
     withdrawalsCreate,
     withdrawalsReadOne,
     withdrawalsUpdateOne,
-    withdrawalsDeleteOne,
-    withdrawalsUpdateStatus
+    withdrawalsDeleteOne
 };

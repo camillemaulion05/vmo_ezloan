@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const loanSchema = new mongoose.Schema({
-    loanNum: String,
+    loanNum: String, // Date.now();
     loanType: String,
     //Appliance (Max 2yrs)
     //Auto Loan
@@ -82,33 +82,23 @@ const loanSchema = new mongoose.Schema({
         principalBalance: {
             type: String,
             default: "0.00"
-        }, //recompute
-        repayments: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Transaction' // Transaction of Repayments
-        }]
+        } //recompute
     }],
     status: {
         type: String,
         default: "Pending" // Loan Release, Fully Paid
-    },
-    requestedDate: {
-        type: Date,
-        default: Date.now
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date,
-    transactionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction' // Transaction of Cash Release
-    },
     requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower' // Borrower
     }
+}, {
+    timestamps: true
 });
 
 loanSchema.methods.compute = function (balance, monthlyRate, terms) {
@@ -156,7 +146,7 @@ loanSchema.methods.updateDates = function () {
     this.paymentEndDate = this.loanPaymentSchedule[terms - 1].dueDate;
 };
 
-loanSchema.methods.addRepayment = function (date, amount, txnId) {
+loanSchema.methods.addRepayment = function (date, amount) {
     const paymentDate = new Date(date);
     const add1Month = new Date(date);
     add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
@@ -184,7 +174,6 @@ loanSchema.methods.addRepayment = function (date, amount, txnId) {
         } else {
             this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid).toFixed(2);
         }
-        this.loanPaymentSchedule[i].repayments.push(txnId);
         var sum = function (items, prop) {
             return items.reduce(function (a, b) {
                 return parseFloat(a) + parseFloat(b[prop]);
