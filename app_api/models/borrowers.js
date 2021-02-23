@@ -176,7 +176,6 @@ const borrowerSchema = new mongoose.Schema({
     },
     employeeNum: String, // Members only
     maxLoanAmount: String, // Set by Loan Officer
-    loanableAmount: String, // depends
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
@@ -189,13 +188,5 @@ const borrowerSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-borrowerSchema.methods.updateLoanableAmount = function (data) {
-    if (data.action == "debit") {
-        this.loanableAmount = this.loanableAmount - data.amount;
-    } else if (data.action == "credit") {
-        this.loanableAmount = this.loanableAmount + data.amount;
-    }
-};
 
 mongoose.model('Borrower', borrowerSchema);

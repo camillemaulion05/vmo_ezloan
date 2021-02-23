@@ -62,10 +62,6 @@ const loanSchema = new mongoose.Schema({
         }, //input
         amountDue: String, //auto
         interest: String, //auto
-        interestAccrued: {
-            type: String,
-            default: "0.00"
-        }, //recompute
         interestPaid: {
             type: String,
             default: "0.00"
@@ -102,34 +98,40 @@ const loanSchema = new mongoose.Schema({
 });
 
 loanSchema.methods.compute = function (balance, monthlyRate, terms) {
+    function ROUND(num) {
+        let newNum = +(Math.round(parseFloat(num) + "e+2") + "e-2");
+        return (Number.isNaN(newNum)) ? (num.toFixed(2) == 0) ? 0.00 : num.toFixed(2) : newNum;
+    }
     balance = parseFloat(balance);
-    monthlyRate = parseFloat(monthlyRate / 100.0);
+    monthlyRate = monthlyRate / 100.0;
 
-    //Calculate the payment
-    const payment = balance * (monthlyRate / (1 - Math.pow(
-        1 + monthlyRate, -terms)));
+    let payment = ROUND(balance * (monthlyRate / (1 - Math.pow(
+        1 + monthlyRate, -terms))));
 
     this.loanTerm = terms;
-    this.loanAmount = balance.toFixed(2);
-    this.monthlyInterestRate = (monthlyRate * 100).toFixed(2);
-    this.serviceFee = (balance * 0.01).toFixed(2); //1% service fee
-    this.newProceedsAmount = (balance - this.serviceFee).toFixed(2);
-    this.monthlyAmortization = payment.toFixed(2);
-    this.totalAmortization = (parseFloat(payment) * terms).toFixed(2);
-    this.totalInterest = (this.totalAmortization - this.loanAmount).toFixed(2);
+    this.loanAmount = ROUND(balance);
+    this.principalRemaining = this.loanAmount;
+    this.monthlyInterestRate = ROUND(monthlyRate * 100);
+    this.serviceFee = ROUND(balance * 0.01); //1% service fee
+    this.newProceedsAmount = ROUND(balance - this.serviceFee);
+    this.monthlyAmortization = payment;
+    this.totalAmortization = 0;
+    this.totalInterest = 0;
     this.loanPaymentSchedule = [];
-    for (var count = 0; count < terms; ++count) {
-        var data = {};
-        var interest = 0;
-        var principal = 0;
-        data.scheduleNum = (count + 1);
-        interest = balance * monthlyRate;
-        data.interest = interest.toFixed(2);
-        principal = parseFloat(payment) - interest;
-        data.principal = principal.toFixed(2);
-        balance = balance - principal;
-        data.principalBalance = balance.toFixed(2);
-        data.amountDue = this.monthlyAmortization;
+    for (let count = 0; count < terms; ++count) {
+        let data = {};
+        data.scheduleNum = count + 1;
+        if (count < 1) {
+            data.amountDue = (data.scheduleNum == terms || payment > ROUND((1 + monthlyRate) * this.loanAmount)) ? ROUND((1 + monthlyRate) * this.loanAmount) : payment;
+        } else {
+            data.amountDue = (data.scheduleNum == terms || payment > ROUND((1 + monthlyRate) * this.loanPaymentSchedule[count - 1].principalBalance)) ? ROUND((1 + monthlyRate) * this.loanPaymentSchedule[count - 1].principalBalance) : payment;
+        }
+        this.totalAmortization = ROUND(parseFloat(this.totalAmortization) + data.amountDue);
+        data.interest = ROUND(balance * monthlyRate);
+        this.totalInterest = ROUND(parseFloat(this.totalInterest) + data.interest);
+        data.principal = ROUND(data.amountDue - data.interest);
+        balance = balance - data.principal;
+        data.principalBalance = ROUND(balance);
         this.loanPaymentSchedule.push(data);
     }
 
@@ -147,63 +149,61 @@ loanSchema.methods.updateDates = function () {
 };
 
 loanSchema.methods.addRepayment = function (date, amount) {
+    function ROUND(num) {
+        let newNum = +(Math.round(parseFloat(num) + "e+2") + "e-2");
+        return (Number.isNaN(newNum)) ? (num.toFixed(2) == 0) ? 0.00 : num.toFixed(2) : newNum;
+    }
+    amount = parseFloat(amount);
     const paymentDate = new Date(date);
     const add1Month = new Date(date);
     add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
-    const newArray = this.loanPaymentSchedule.filter(function (schedule) {
+    const schedules = this.loanPaymentSchedule.filter(function (schedule) {
         return paymentDate <= new Date(schedule.dueDate) && add1Month > new Date(schedule.dueDate);
     });
-    if (newArray.length >= 1) {
+    if (schedules.length >= 1) {
         const monthlyRate = parseFloat(this.monthlyInterestRate / 100);
-        const repaymentSchedule = newArray[0];
+        const repaymentSchedule = schedules[0];
         const scheduleNum = repaymentSchedule.scheduleNum;
-        const i = parseInt(scheduleNum) - 1;
-        this.loanPaymentSchedule[i].paymentAmount = parseFloat(this.loanPaymentSchedule[i].paymentAmount) + parseFloat(amount);
-        this.loanPaymentSchedule[i].paymentDate = paymentDate;
-        if (scheduleNum == '1') {
-            this.loanPaymentSchedule[i].interestAccrued = (monthlyRate * this.loanAmount).toFixed(2);
-            this.loanPaymentSchedule[i].interestPaid = (Math.min(this.loanPaymentSchedule[i].interestAccrued, this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
-        } else {
-            this.loanPaymentSchedule[i].interestAccrued = (monthlyRate * this.loanPaymentSchedule[i - 1].principalBalance).toFixed(2);
-            this.loanPaymentSchedule[i].interestPaid = (Math.min(parseFloat(this.loanPaymentSchedule[i].interestAccrued) + parseFloat(this.loanPaymentSchedule[i - 1].interestBalance), this.loanPaymentSchedule[i].paymentAmount)).toFixed(2);
+
+        this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount = ROUND(parseFloat(this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount) + amount);
+        this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentDate = paymentDate;
+
+        for (let i = (parseInt(scheduleNum) - 1); i < this.loanTerm; i++) {
+            if (this.loanPaymentSchedule[i].scheduleNum == '1') {
+                this.loanPaymentSchedule[i].amountDue = (this.loanPaymentSchedule[i].scheduleNum == this.loanTerm || this.monthlyAmortization > ROUND((1 + monthlyRate) * parseFloat(this.loanAmount))) ? ROUND((1 + monthlyRate) * parseFloat(this.loanAmount)) : this.monthlyAmortization;
+                this.loanPaymentSchedule[i].interest = ROUND(parseFloat(this.loanAmount) * monthlyRate);
+                this.loanPaymentSchedule[i].interestPaid = Math.min(this.loanPaymentSchedule[i].interest, this.loanPaymentSchedule[i].paymentAmount);
+                if (this.loanPaymentSchedule[i].paymentAmount > 0) this.loanPaymentSchedule[i].interestBalance = ROUND(this.loanPaymentSchedule[i].interest - this.loanPaymentSchedule[i].interestPaid);
+                this.loanPaymentSchedule[i].principalPaid = ROUND(this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid);
+                this.loanPaymentSchedule[i].principal = ROUND(this.loanPaymentSchedule[i].amountDue - this.loanPaymentSchedule[i].interest);
+                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].paymentAmount > 0) ? ROUND(this.loanAmount - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanAmount - this.loanPaymentSchedule[i].principal);
+
+            } else {
+                this.loanPaymentSchedule[i].amountDue = (this.loanPaymentSchedule[i].scheduleNum == this.loanTerm || this.monthlyAmortization > ROUND((1 + monthlyRate) * parseFloat(this.loanPaymentSchedule[i - 1].principalBalance))) ? ROUND((1 + monthlyRate) * parseFloat(this.loanPaymentSchedule[i - 1].principalBalance)) : this.monthlyAmortization;
+                this.loanPaymentSchedule[i].interest = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].principalBalance) * monthlyRate);
+                this.loanPaymentSchedule[i].interestPaid = Math.min(ROUND(parseFloat(this.loanPaymentSchedule[i].interest) + parseFloat(this.loanPaymentSchedule[i - 1].interestBalance)), this.loanPaymentSchedule[i].paymentAmount);
+                if (this.loanPaymentSchedule[i].paymentAmount > 0) this.loanPaymentSchedule[i].interestBalance = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].interestBalance) + parseFloat(this.loanPaymentSchedule[i].interest) - parseFloat(this.loanPaymentSchedule[i].interestPaid));
+                this.loanPaymentSchedule[i].principalPaid = ROUND(this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid);
+                this.loanPaymentSchedule[i].principal = ROUND(this.loanPaymentSchedule[i].amountDue - this.loanPaymentSchedule[i].interest);
+                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].paymentAmount > 0) ? ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principal);
+            }
         }
-        this.loanPaymentSchedule[i].interestBalance = (this.loanPaymentSchedule[i].interestAccrued - this.loanPaymentSchedule[i].interestPaid).toFixed(2);
-        this.loanPaymentSchedule[i].principalPaid = (this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid).toFixed(2);
-        if (scheduleNum == '1') {
-            this.loanPaymentSchedule[i].principalBalance = (this.loanAmount - this.loanPaymentSchedule[i].principalPaid).toFixed(2);
-        } else {
-            this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid).toFixed(2);
-        }
+
         var sum = function (items, prop) {
             return items.reduce(function (a, b) {
-                return parseFloat(a) + parseFloat(b[prop]);
+                if (b['paymentAmount'] > 0) {
+                    return ROUND(parseFloat(a) + parseFloat(b[prop]))
+                } else {
+                    return ROUND(parseFloat(a));
+                }
             }, 0);
         };
-        this.totalPayments = (sum(this.loanPaymentSchedule, 'paymentAmount')).toFixed(2);
-        this.totalInterestAccrued = (sum(this.loanPaymentSchedule, 'interestAccrued')).toFixed(2);
-        this.totalInterestPaid = (sum(this.loanPaymentSchedule, 'interestPaid')).toFixed(2);
-        this.unpaidInterest = (parseFloat(this.totalInterestAccrued) - parseFloat(this.totalInterestPaid)).toFixed(2);
-        this.totalPrincipalPaid = (sum(this.loanPaymentSchedule, 'principalPaid')).toFixed(2);
-        this.principalRemaining = (this.loanAmount - this.totalPrincipalPaid).toFixed(2);
-
-        //update subsequent schedule
-        for (var c = (i + 1); c < this.loanTerm; c++) {
-            if (this.loanPaymentSchedule[c].scheduleNum == this.loanTerm ||
-                this.monthlyAmortization > ((1 + monthlyRate) * this.loanPaymentSchedule[c - 1].principalBalance)) {
-                this.loanPaymentSchedule[c].amountDue = ((1 + monthlyRate) * this.loanPaymentSchedule[c - 1].principalBalance).toFixed(2);
-            } else {
-                this.loanPaymentSchedule[c].amountDue = this.monthlyAmortization;
-            }
-            if (this.loanPaymentSchedule[c].scheduleNum == '1') {
-                this.loanPaymentSchedule[c].interest = ((this.monthlyInterestRate / 100) * this.loanAmount).toFixed(2);
-                this.loanPaymentSchedule[c].principal = (this.loanPaymentSchedule[c].amountDue - this.loanPaymentSchedule[c].interest).toFixed(2);
-                this.loanPaymentSchedule[c].principalBalance = (this.loanAmount - this.loanPaymentSchedule[c].principal).toFixed(2);
-            } else {
-                this.loanPaymentSchedule[c].interest = (parseFloat(this.loanPaymentSchedule[c - 1].interestBalance) + (this.monthlyInterestRate / 100) * this.loanPaymentSchedule[c - 1].principalBalance).toFixed(2);
-                this.loanPaymentSchedule[c].principal = (this.loanPaymentSchedule[c].amountDue - this.loanPaymentSchedule[c].interest).toFixed(2);
-                this.loanPaymentSchedule[c].principalBalance = (this.loanPaymentSchedule[c - 1].principalBalance - this.loanPaymentSchedule[c].principal).toFixed(2);
-            }
-        }
+        this.totalPayments = sum(this.loanPaymentSchedule, 'paymentAmount');
+        this.totalInterestAccrued = sum(this.loanPaymentSchedule, 'interest');
+        this.totalInterestPaid = sum(this.loanPaymentSchedule, 'interestPaid');
+        this.unpaidInterest = ROUND(this.totalInterestAccrued - this.totalInterestPaid);
+        this.totalPrincipalPaid = sum(this.loanPaymentSchedule, 'principalPaid');
+        this.principalRemaining = ROUND(parseFloat(this.loanAmount) - parseFloat(this.totalPrincipalPaid));
 
         //update status
         if (this.totalPayments == this.totalAmortization || parseFloat(this.principalRemaining) == 0.00) {

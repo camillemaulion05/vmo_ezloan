@@ -28,7 +28,6 @@ const borrowersCreate = (req, res) => {
         beneficiaries,
         employeeNum,
         maxLoanAmount,
-        loanableAmount,
         reviewedBy,
         userId
     } = req.body);
@@ -113,10 +112,7 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
                     borrower.employeeNum = (req.body.employeeNum) ? req.body.employeeNum : borrower.employeeNum;
-                    if ("Verified" == borrower.status) {
-                        borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
-                        borrower.loanableAmount = (req.body.loanableAmount) ? req.body.loanableAmount : borrower.loanableAmount;
-                    }
+                    if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
                     borrower.reviewedDate = (!req.body.reviewedBy && borrower.reviewedDate) ? borrower.reviewedDate : Date.now();
                     borrower.userId = (req.body.userId) ? req.body.userId : borrower.userId;
