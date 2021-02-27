@@ -60,6 +60,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -93,6 +94,7 @@ const loansUpdateOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -177,6 +179,7 @@ const loansSchedulesUpdate = (req, res) => {
     } else {
         Loan
             .findById(loanid)
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -219,6 +222,7 @@ const loansSchedulesList = (req, res) => {
     } else {
         Loan
             .findById(loanid)
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -259,6 +263,7 @@ const loansSchedulesReadOne = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -301,7 +306,7 @@ const loansRepaymentsDue = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy')
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res

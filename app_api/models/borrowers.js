@@ -9,7 +9,7 @@ const borrowerSchema = new mongoose.Schema({
     status: {
         type: String,
         default: "Basic"
-    }, // Basic, Complete, Verified
+    }, // Basic, Complete/Processing, Verified
     profile: {
         email: String,
         emailVerificationToken: String,
@@ -48,7 +48,7 @@ const borrowerSchema = new mongoose.Schema({
         },
         homeOwnership: String, //Owned, Living with relative, Renting, Others
         monthlyHomeFee: String,
-        termOfStay: String,
+        yrsOfStay: String,
         carOwnership: String, // None, Owned
         monthlyCarLoanPayment: String,
         homePhoneName: String, // Owned, Relative, None, Other
@@ -109,11 +109,9 @@ const borrowerSchema = new mongoose.Schema({
         salaryDate: String,
         underAgency: Boolean
     },
-    borrowingMethod: {
-        name: String, //Bank or Gcash Name
-        branch: String,
-        accountType: String, //Personal Savings, Checking/Current, G-Cash
-        accountNo: String,
+    gcashAccount: {
+        name: String,
+        number: String,
         proof: {
             filename: String,
             contentType: String,

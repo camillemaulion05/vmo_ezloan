@@ -59,6 +59,7 @@ const employeesReadOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
+            .populate('userId', 'status')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -92,6 +93,7 @@ const employeesUpdateOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
+            .populate('userId', 'status')
             .exec((err, employee) => {
                 if (!employee) {
                     res

@@ -19,15 +19,13 @@ const withdrawalSchema = new mongoose.Schema({
     //Special Emergency
     //Travel
     //Wedding
-    serviceFee: String, // 1% of requested amount
-    newProceedsAmount: String, // = amount - serviceFee
     requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower'
     },
     status: {
         type: String,
-        default: "Pending" // Cash Release, Approved, Revoked
+        default: "Processing" // Cash Release, Declined, Approved
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,10 +35,5 @@ const withdrawalSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-withdrawalSchema.methods.compute = function (amount) {
-    this.serviceFee = (amount * 0.01).toFixed(2);
-    this.newProceedsAmount = (amount - this.serviceFee).toFixed(2);
-};
 
 mongoose.model('Withdrawal', withdrawalSchema);

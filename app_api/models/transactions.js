@@ -3,11 +3,20 @@ const mongoose = require('mongoose');
 const transactionSchema = new mongoose.Schema({
     transactionNum: String, // Date.now();
     amount: String,
-    type: String, //Loan Repayment, Withdrawals, Contributions, Loan Release, Membership Fee
+    type: String,
+    // Loan Repayments, Loan Release 
+    // Withdrawals
+    // Contributions
+    // Membership Fee
     message: String,
     senderNum: String,
     receiverNum: String,
     referenceNo: String,
+    proof: {
+        filename: String,
+        contentType: String,
+        file: Buffer
+    },
     postedDate: Date,
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +24,7 @@ const transactionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default: "Pending" //Pending, Posted
+        default: "Processing" //Posted
     },
     transferredBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,11 +32,11 @@ const transactionSchema = new mongoose.Schema({
     },
     loanId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Loan' //Loan Release, Repayments
+        ref: 'Loan' //Loan Repayments, Loan Release
     },
     withdrawalId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Withdrawal' //Cash Release
+        ref: 'Withdrawal' //Withdrawals
     }
 }, {
     timestamps: true

@@ -82,7 +82,7 @@ const loanSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        default: "Pending" // Loan Release, Fully Paid
+        default: "Processing" // Approved, Declined, Loan Release, Open, Fully Paid, Loan Debt 
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,

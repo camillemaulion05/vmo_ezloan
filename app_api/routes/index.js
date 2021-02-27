@@ -105,7 +105,7 @@ router
     .get(ctrlLoans.loansSchedulesReadOne);
 
 router
-    .route('/loans/:loanid/late')
+    .route('/loans/:loanid/due')
     .get(ctrlLoans.loansRepaymentsDue);
 
 module.exports = router;

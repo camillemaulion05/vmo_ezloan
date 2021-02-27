@@ -4,8 +4,6 @@ const Withdrawal = mongoose.model('Withdrawal');
 const withdrawalsList = (req, res) => {
     Withdrawal
         .find({}, {
-            "serviceFee": 0,
-            "newProceedsAmount": 0,
             "reviewedBy": 0,
             "reviewedDate": 0
         })
@@ -32,7 +30,6 @@ const withdrawalsCreate = (req, res) => {
         reviewedBy
     } = req.body);
     withdrawal.withdrawalNum = Date.now();
-    withdrawal.compute(req.body.amount);
     if (req.body.reviewedBy) withdrawal.reviewedDate = Date.now();
     withdrawal.save((err) => {
         if (err) {
@@ -60,6 +57,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
+            .populate('requestedBy', 'profile.firstName profile.lastName')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -93,6 +91,7 @@ const withdrawalsUpdateOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
+            .populate('requestedBy', 'profile.firstName profile.lastName')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -107,7 +106,6 @@ const withdrawalsUpdateOne = (req, res) => {
                 } else {
                     withdrawal.amount = (req.body.amount) ? req.body.amount : withdrawal.amount;
                     withdrawal.reason = (req.body.reason) ? req.body.reason : withdrawal.reason;
-                    withdrawal.compute(req.body.amount);
                     withdrawal.requestBy = (req.body.requestBy) ? req.body.requestBy : withdrawal.requestBy;
                     withdrawal.status = (req.body.status) ? req.body.status : withdrawal.status;
                     withdrawal.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : withdrawal.reviewedBy;

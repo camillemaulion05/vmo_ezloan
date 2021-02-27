@@ -14,13 +14,23 @@ const employeeSchema = new mongoose.Schema({
         birthday: Date,
         address: {
             present: {
-                address: String,
+                unitNo: String,
+                houseNo: String,
+                street: String,
+                subdivision: String,
+                barangay: String,
                 city: String,
+                province: String,
                 zipCode: String
             },
             permanent: {
-                address: String,
+                unitNo: String,
+                houseNo: String,
+                street: String,
+                subdivision: String,
+                barangay: String,
                 city: String,
+                province: String,
                 zipCode: String
             }
         },
