@@ -3,7 +3,16 @@ const Employee = mongoose.model('Employee');
 
 const employeesList = (req, res) => {
     Employee
-        .find()
+        .find({}, {
+            "profile.email": 1,
+            "profile.firstName": 1,
+            "profile.lastName": 1,
+            "profile.mobileNum": 1,
+            "type": 1,
+            "employeeNum": 1,
+            "userId": 1
+        })
+        .populate('userId', 'status')
         .exec((err, employees) => {
             if (err) {
                 res

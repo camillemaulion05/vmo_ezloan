@@ -78,7 +78,7 @@ const borrowerSchema = new mongoose.Schema({
         // Security/Guard/Maid,
         // Driver,
         // Self-Employed,
-        // Other
+        // Others
         monthlyIncome: String,
         annualIncome: String,
         salaryDate: String,
@@ -175,7 +175,10 @@ const borrowerSchema = new mongoose.Schema({
         }
     },
     employeeNum: String, // Members only
-    maxLoanAmount: String, // Set by Loan Officer
+    maxLoanAmount: {
+        type: String,
+        default: "0.00"
+    }, // Set by Loan Officer
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer

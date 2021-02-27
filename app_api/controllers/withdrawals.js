@@ -3,7 +3,13 @@ const Withdrawal = mongoose.model('Withdrawal');
 
 const withdrawalsList = (req, res) => {
     Withdrawal
-        .find()
+        .find({}, {
+            "serviceFee": 0,
+            "newProceedsAmount": 0,
+            "reviewedBy": 0,
+            "reviewedDate": 0
+        })
+        .populate('requestedBy', 'profile.firstName profile.lastName')
         .exec((err, withdrawals) => {
             if (err) {
                 res

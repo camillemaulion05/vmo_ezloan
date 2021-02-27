@@ -8,7 +8,6 @@ const ctrlTransactions = require('../controllers/transactions');
 const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
-const ctrlStatements = require('../controllers/statements');
 
 router.get('/', ctrlHome.index);
 
@@ -108,10 +107,5 @@ router
 router
     .route('/loans/:loanid/late')
     .get(ctrlLoans.loansRepaymentsDue);
-
-// financial statements
-router
-    .route('/statements')
-    .get(ctrlStatements.statementsList);
 
 module.exports = router;

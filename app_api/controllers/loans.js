@@ -3,7 +3,16 @@ const Loan = mongoose.model('Loan');
 
 const loansList = (req, res) => {
     Loan
-        .find()
+        .find({}, {
+            "loanNum": 1,
+            "loanType": 1,
+            "loanTerm": 1,
+            "loanAmount": 1,
+            "status": 1,
+            "createdAt": 1,
+            "requestedBy": 1
+        })
+        .populate('requestedBy', 'profile.firstName profile.lastName')
         .exec((err, loans) => {
             if (err) {
                 res

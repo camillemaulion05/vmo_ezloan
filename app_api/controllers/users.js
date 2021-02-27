@@ -4,7 +4,11 @@ const User = mongoose.model('User');
 
 const usersList = (req, res) => {
     User
-        .find()
+        .find({}, {
+            "password": 0,
+            "passwordResetToken": 0,
+            "passwordResetExpires": 0
+        })
         .exec((err, users) => {
             if (err) {
                 res

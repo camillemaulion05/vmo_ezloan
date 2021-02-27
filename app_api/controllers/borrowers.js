@@ -3,7 +3,19 @@ const Borrower = mongoose.model('Borrower');
 
 const borrowersList = (req, res) => {
     Borrower
-        .find()
+        .find({}, {
+            "type": 1,
+            "status": 1,
+            "maxLoanAmount": 1,
+            "borrowerNum": 1,
+            "profile.firstName": 1,
+            "profile.lastName": 1,
+            "profile.birthday": 1,
+            "profile.gender": 1,
+            "profile.mobileNum": 1,
+            "profile.email": 1,
+            "workBusinessInfo.occupationalType": 1
+        })
         .exec((err, borrowers) => {
             if (err) {
                 res
