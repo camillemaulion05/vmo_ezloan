@@ -14,7 +14,7 @@ const borrowersList = (req, res) => {
             "profile.gender": 1,
             "profile.mobileNum": 1,
             "profile.email": 1,
-            "workBusinessInfo.occupationalType": 1
+            "workBusinessInfo.occupationType": 1
         })
         .exec((err, borrowers) => {
             if (err) {
@@ -35,7 +35,7 @@ const borrowersCreate = (req, res) => {
         status,
         profile,
         workBusinessInfo,
-        gcashAccount,
+        borrowingMethod,
         documents,
         beneficiaries,
         employeeNum,
@@ -120,10 +120,9 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
                     borrower.profile = (req.body.profile) ? req.body.profile : borrower.profile;
                     borrower.workBusinessInfo = (req.body.workBusinessInfo) ? req.body.workBusinessInfo : borrower.workBusinessInfo;
-                    borrower.gcashAccount = (req.body.tygcashAccounte) ? req.body.gcashAccount : borrower.gcashAccount;
+                    borrower.borrowingMethod = (req.body.borrowingMethod) ? req.body.borrowingMethod : borrower.borrowingMethod;
                     borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
-                    borrower.employeeNum = (req.body.employeeNum) ? req.body.employeeNum : borrower.employeeNum;
                     if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
                     borrower.reviewedDate = (!req.body.reviewedBy && borrower.reviewedDate) ? borrower.reviewedDate : Date.now();

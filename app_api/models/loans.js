@@ -3,21 +3,21 @@ const mongoose = require('mongoose');
 const loanSchema = new mongoose.Schema({
     loanNum: String, // Date.now();
     loanType: String,
-    //Appliance (Max 2yrs)
+    //Appliance
     //Auto Loan
-    //Car Repair (Max 2yrs)
-    //Educational (Max 2yrs)
-    //Gadget Loan (Max 2yrs)
-    //Hospitalization-Wellness (Max 2yrs)
+    //Car Repair
+    //Educational
+    //Gadget Loan
+    //Hospitalization-Wellness
     //Housing
-    //House Repair (Max 2yrs)
+    //House Repair
     //Multi Purpose
-    //Petty Cash (Max 1yr)
+    //Petty Cash
     //Productive
-    //Providential (Max 2yrs)
-    //Special Emergency (Max 2yrs)
-    //Travel (Max 2yrs)
-    //Wedding (Max 2yrs)
+    //Providential
+    //Special Emergency
+    //Travel
+    //Wedding
     loanTerm: String,
     loanAmount: String,
     monthlyInterestRate: String,

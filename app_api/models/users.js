@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     lastFailedLogin: Date,
     status: {
         type: String,
-        default: "Active"
+        default: "Active" //Active, Inactive
     },
     type: String, //Borrower, Employee, Admin
 }, {

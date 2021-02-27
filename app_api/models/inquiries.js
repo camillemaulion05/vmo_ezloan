@@ -5,7 +5,7 @@ const inquirySchema = new mongoose.Schema({
     name: String,
     email: String,
     phone: String,
-    message: String,
+    message: String, //Inquiries, Feedback
     response: {
         createdAt: Date,
         message: String,

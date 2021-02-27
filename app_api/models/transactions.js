@@ -19,7 +19,7 @@ const transactionSchema = new mongoose.Schema({
     },
     transferredBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Borrower' //Contributions
+        ref: 'Borrower' //Contributions, Membership Fee
     },
     loanId: {
         type: mongoose.Schema.Types.ObjectId,

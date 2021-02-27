@@ -21,23 +21,34 @@ const borrowerSchema = new mongoose.Schema({
         birthday: Date,
         civilStat: String, //Single, Married, Widowed, Divorced
         dependents: String,
-        educAttainment: String, //High School, Vocational/Technical, College, Post Graduate
+        educAttainment: String, //High School, Vocational/Technical, College, Post Graduate, Others
         placeOfBirth: String,
+        nationality: String,
         address: {
             present: {
-                address: String,
+                unitNo: String,
+                houseNo: String,
+                street: String,
+                subdivision: String,
+                barangay: String,
                 city: String,
+                province: String,
                 zipCode: String
             },
             permanent: {
-                address: String,
+                unitNo: String,
+                houseNo: String,
+                street: String,
+                subdivision: String,
+                barangay: String,
                 city: String,
+                province: String,
                 zipCode: String
             }
         },
         homeOwnership: String, //Owned, Living with relative, Renting, Others
-        monthlyRentHomeLoanPayment: String,
-        yrsOfStay: String,
+        monthlyHomeFee: String,
+        termOfStay: String,
         carOwnership: String, // None, Owned
         monthlyCarLoanPayment: String,
         homePhoneName: String, // Owned, Relative, None, Other
@@ -45,16 +56,29 @@ const borrowerSchema = new mongoose.Schema({
         mobileNum: String,
         mobileNumVerified: Boolean,
         lineType: String, // Pre Paid, Post Paid
-        mobilePhoneOs: String, // Android, iOS, Blackberry
+        mobilePhoneOs: String, // Android, iOS, Blackberry, Others
         addMobileNum1: String,
         addMobileNum2: String,
         tin: String
     },
     workBusinessInfo: {
-        employmentType: String, //Regular, Probation, Contractual, Project Based, Part-Time, Self-Employed, Freelancer
         companyName: String,
         department: String,
-        companyIndustry: String,
+        officePhone: String,
+        officeAddress: {
+            unitNo: String,
+            houseNo: String,
+            street: String,
+            subdivision: String,
+            barangay: String,
+            city: String,
+            province: String,
+            zipCode: String
+        },
+        numOfEmployees: String,
+        tenure: Date,
+        employmentType: String, //Regular, Probation, Contractual, Project Based, Part-Time, Self-Employed, Freelancer
+        businessType: String,
         // BPO/Communications/IT/Mass Media,
         // Retail Sale/Restaurant/Hotel/Tourism/Other Service,
         // Transportation/Shipping/Real Estate,
@@ -67,7 +91,7 @@ const borrowerSchema = new mongoose.Schema({
         // Security,
         // Agriculture/Forestry/Fisheries/Mining, 
         // Others
-        occupationalType: String,
+        occupationType: String,
         // Management,
         // Marketing,
         // Sales,
@@ -79,15 +103,35 @@ const borrowerSchema = new mongoose.Schema({
         // Driver,
         // Self-Employed,
         // Others
+        position: String, // Director/Officer, EVP/SVP/GM, VP/MG, Others
         monthlyIncome: String,
         annualIncome: String,
         salaryDate: String,
-        officeAddress: String,
-        officeAddressZipcode: String,
-        officePhone: String,
-        numOfEmployees: String,
-        tenure: String,
-        position: String, // Director/Officer, EVP/SVP/GM, VP/MG, Others
+        underAgency: Boolean
+    },
+    borrowingMethod: {
+        name: String, //Bank or Gcash Name
+        branch: String,
+        accountType: String, //Personal Savings, Checking/Current, G-Cash
+        accountNo: String,
+        proof: {
+            filename: String,
+            contentType: String,
+            file: Buffer
+        }
+    },
+    documents: {
+        govIdType: String, //TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance
+        primaryIdFront: {
+            filename: String,
+            contentType: String,
+            file: Buffer
+        },
+        primaryIdBack: {
+            filename: String,
+            contentType: String,
+            file: Buffer
+        },
         companyIdFront: {
             filename: String,
             contentType: String,
@@ -108,25 +152,7 @@ const borrowerSchema = new mongoose.Schema({
             contentType: String,
             file: Buffer
         },
-        underAgency: Boolean
-    },
-    gcashAccount: {
-        name: String,
-        number: String,
-        proof: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        }
-    },
-    documents: {
-        govIdType: String, //TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance
-        primaryIdFront: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        primaryIdBack: {
+        proofOfTIN: {
             filename: String,
             contentType: String,
             file: Buffer
@@ -136,7 +162,7 @@ const borrowerSchema = new mongoose.Schema({
             contentType: String,
             file: Buffer
         },
-        proofOfTIN: {
+        signature: {
             filename: String,
             contentType: String,
             file: Buffer
@@ -174,7 +200,6 @@ const borrowerSchema = new mongoose.Schema({
             birthday: Date
         }
     },
-    employeeNum: String, // Members only
     maxLoanAmount: {
         type: String,
         default: "0.00"
@@ -187,7 +212,8 @@ const borrowerSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
-    }
+    },
+    termsandCondition: Boolean
 }, {
     timestamps: true
 });
