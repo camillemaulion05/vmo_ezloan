@@ -4,10 +4,11 @@ const transactionSchema = new mongoose.Schema({
     transactionNum: String, // Date.now();
     amount: String,
     type: String,
-    // Loan Repayments, Loan Release 
-    // Withdrawals
-    // Contributions
-    // Membership Fee
+    // Repayments - credit
+    // Release - debit
+    // Withdrawals - debit
+    // Contributions - credit
+    // Fees - credit
     message: String,
     senderNum: String,
     receiverNum: String,
@@ -26,13 +27,13 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         default: "Processing" //Posted
     },
-    transferredBy: {
+    borrowerId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Borrower' //Contributions, Membership Fee
+        ref: 'Borrower' //Contributions, Fees
     },
     loanId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Loan' //Loan Repayments, Loan Release
+        ref: 'Loan' //Repayments, Release
     },
     withdrawalId: {
         type: mongoose.Schema.Types.ObjectId,

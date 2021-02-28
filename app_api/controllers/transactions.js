@@ -4,6 +4,7 @@ const Transaction = mongoose.model('Transaction');
 const transactionsList = (req, res) => {
     Transaction
         .find()
+        .populate('borrowerId', 'profile.firstName profile.lastName type')
         .exec((err, transactions) => {
             if (err) {
                 res
@@ -27,7 +28,7 @@ const transactionsCreate = (req, res) => {
         referenceNo,
         postedBy,
         status,
-        transferredBy,
+        borrowerId,
         loanId,
         withdrawalId
     } = req.body);
@@ -59,6 +60,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
+            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -92,6 +94,7 @@ const transactionsUpdateOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
+            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -113,7 +116,7 @@ const transactionsUpdateOne = (req, res) => {
                     transaction.postedBy = (req.body.postedBy) ? req.body.postedBy : transaction.postedBy;
                     transaction.postedDate = (!req.body.postedBy || transaction.postedDate) ? transaction.postedDate : Date.now();
                     transaction.status = (req.body.status) ? req.body.status : transaction.status;
-                    transaction.transferredBy = (req.body.transferredBy) ? req.body.transferredBy : transaction.transferredBy;
+                    transaction.borrowerId = (req.body.borrowerId) ? req.body.borrowerId : transaction.borrowerId;
                     transaction.loanId = (req.body.loanId) ? req.body.loanId : transaction.loanId;
                     transaction.withdrawalId = (req.body.withdrawalId) ? req.body.withdrawalId : transaction.withdrawalId;
                     transaction.save((err) => {
@@ -165,10 +168,191 @@ const transactionsDeleteOne = (req, res) => {
     }
 };
 
+const transactionsPerType = (req, res) => {
+    const {
+        type
+    } = req.params;
+    if (!type) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, type is required"
+            });
+    } else {
+        Transaction
+            .find({
+                "type": type
+            })
+            .populate('borrowerId', 'profile.firstName profile.lastName type')
+            .exec((err, transactions) => {
+                if (!transactions) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "transactions not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsPerBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    if (!borrowerid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, borrowerid is required"
+            });
+    } else {
+        Transaction
+            .find({
+                "borrowerId": borrowerid
+            })
+            .exec((err, transactions) => {
+                if (!transactions) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "transactions not found"
+                        });
+                } else if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsSummary = (req, res) => {
+    const {
+        year
+    } = req.params;
+    if (!year) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, year is required"
+            });
+    } else {
+        let date1 = new Date('2020-01-01');
+        date1.setFullYear(year);
+        let date2 = new Date(date1);
+        date2.setFullYear(year + 1);
+        Transaction
+            .aggregate([{
+                    $match: {
+                        'postedDate': {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$type',
+                        total: {
+                            $sum: {
+                                $toDecimal: '$amount'
+                            }
+                        },
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
+            .exec((err, transactions) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const contributionsPerMember = (req, res) => {
+    const {
+        year
+    } = req.params;
+    if (!year) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, year is required"
+            });
+    } else {
+        let date1 = new Date('2020-01-01');
+        date1.setFullYear(year);
+        let date2 = new Date(date1);
+        date2.setFullYear(year + 1);
+        Transaction
+            .aggregate([{
+                    $match: {
+                        'postedDate': {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        },
+                        $or: [{
+                            'type': 'Contributions'
+                        }, {
+                            'type': 'Withdrawals'
+                        }]
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$borrowerId',
+                        shares: {
+                            $sum: {
+                                $toDecimal: '$amount'
+                            }
+                        }
+                    }
+                }
+            ])
+            .exec((err, transactions) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json(err);
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
 module.exports = {
     transactionsList,
     transactionsCreate,
     transactionsReadOne,
     transactionsUpdateOne,
-    transactionsDeleteOne
+    transactionsDeleteOne,
+    transactionsPerType,
+    transactionsPerBorrower,
+    transactionsSummary,
+    contributionsPerMember
 };

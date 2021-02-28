@@ -59,6 +59,22 @@ router
     .put(ctrlTransactions.transactionsUpdateOne)
     .delete(ctrlTransactions.transactionsDeleteOne);
 
+router
+    .route('/transactions/type/:type')
+    .get(ctrlTransactions.transactionsPerType);
+
+router
+    .route('/transactions/borrower/:borrowerid')
+    .get(ctrlTransactions.transactionsPerBorrower);
+
+router
+    .route('/transactions/summary/:year')
+    .get(ctrlTransactions.transactionsSummary);
+
+router
+    .route('/transactions/contributions/:year')
+    .get(ctrlTransactions.contributionsPerMember);
+
 // withdrawals
 router
     .route('/withdrawals')
@@ -107,5 +123,13 @@ router
 router
     .route('/loans/:loanid/due')
     .get(ctrlLoans.loansRepaymentsDue);
+
+router
+    .route('/loans/summary/:year')
+    .get(ctrlLoans.loansSummary);
+
+router
+    .route('/loans/report/:year')
+    .get(ctrlLoans.loansInterestReport);
 
 module.exports = router;
