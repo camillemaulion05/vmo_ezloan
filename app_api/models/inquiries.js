@@ -3,9 +3,15 @@ const mongoose = require('mongoose');
 const inquirySchema = new mongoose.Schema({
     inquiryNum: String, //Date.now();
     name: String,
-    email: String,
+    email: {
+        type: String,
+        required: true
+    },
     phone: String,
-    message: String, //Inquiries, Feedback
+    message: {
+        type: String,
+        required: true
+    }, //Inquiries, Feedback
     response: {
         createdAt: Date,
         message: String,

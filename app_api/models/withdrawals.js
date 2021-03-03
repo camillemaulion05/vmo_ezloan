@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 const withdrawalSchema = new mongoose.Schema({
     withdrawalNum: String, // Date.now();
-    amount: String,
+    amount: {
+        type: String,
+        required: true
+    },
     reason: String,
     //Appliance
     //Auto Loan

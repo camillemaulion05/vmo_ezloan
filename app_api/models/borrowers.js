@@ -11,14 +11,29 @@ const borrowerSchema = new mongoose.Schema({
         default: "Basic"
     }, // Basic, Complete/Processing, Verified
     profile: {
-        email: String,
+        email: {
+            type: String,
+            required: true
+        },
         emailVerificationToken: String,
         emailVerified: Boolean,
         firstName: String,
-        middleName: String,
-        lastName: String,
-        gender: String, //Male, Female
-        birthday: Date,
+        middleName: {
+            type: String,
+            required: true
+        },
+        lastName: {
+            type: String,
+            required: true
+        },
+        gender: {
+            type: String,
+            required: true
+        }, //Male, Female
+        birthday: {
+            type: String,
+            required: true
+        },
         civilStat: String, //Single, Married, Widowed, Divorced
         dependents: String,
         educAttainment: String, //High School, Vocational/Technical, College, Post Graduate, Others
@@ -53,7 +68,10 @@ const borrowerSchema = new mongoose.Schema({
         monthlyCarLoanPayment: String,
         homePhoneName: String, // Owned, Relative, None, Other
         homePhoneNum: String,
-        mobileNum: String,
+        mobileNum: {
+            type: String,
+            required: true
+        },
         mobileNumVerified: Boolean,
         lineType: String, // Pre Paid, Post Paid
         mobilePhoneOs: String, // Android, iOS, Blackberry, Others

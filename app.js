@@ -7,6 +7,10 @@ const logger = require('morgan');
 // Connect to MongoDB.
 require('./app_api/models/db');
 
+// Route Files
+const indexRouter = require('./app_server/routes/index');
+const apiRouter = require('./app_api/routes/index');
+
 // Create Express server.
 const app = express();
 
@@ -71,9 +75,6 @@ app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datata
   maxAge: 31557600000
 }));
 
-// Route Files
-const indexRouter = require('./app_server/routes/index');
-const apiRouter = require('./app_api/routes/index');
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 

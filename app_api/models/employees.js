@@ -2,14 +2,26 @@ const mongoose = require('mongoose');
 
 const employeeSchema = new mongoose.Schema({
     employeeNum: String, // Date.now();
-    type: String, // Loan Officer or Loan Processor
+    type: {
+        type: String,
+        required: true
+    }, // Loan Officer or Loan Processor
     profile: {
-        email: String,
+        email: {
+            type: String,
+            required: true
+        },
         emailVerificationToken: String,
         emailVerified: Boolean,
-        firstName: String,
+        firstName: {
+            type: String,
+            required: true
+        },
         middleName: String,
-        lastName: String,
+        lastName: {
+            type: String,
+            required: true
+        },
         gender: String, //Male, Female
         birthday: Date,
         address: {
@@ -34,7 +46,10 @@ const employeeSchema = new mongoose.Schema({
                 zipCode: String
             }
         },
-        mobileNum: String,
+        mobileNum: {
+            type: String,
+            required: true
+        },
         mobileNumVerified: Boolean
     },
     userId: {

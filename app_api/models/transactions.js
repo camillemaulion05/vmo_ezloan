@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
     transactionNum: String, // Date.now();
-    amount: String,
-    type: String,
+    amount: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
     // Repayments - credit
     // Release - debit
     // Withdrawals - debit
@@ -12,7 +18,10 @@ const transactionSchema = new mongoose.Schema({
     message: String,
     senderNum: String,
     receiverNum: String,
-    referenceNo: String,
+    referenceNo: {
+        type: String,
+        required: true
+    },
     proof: {
         filename: String,
         contentType: String,

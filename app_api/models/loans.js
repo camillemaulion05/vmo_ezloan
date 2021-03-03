@@ -18,9 +18,18 @@ const loanSchema = new mongoose.Schema({
     //Special Emergency
     //Travel
     //Wedding
-    loanTerm: String,
-    loanAmount: String,
-    monthlyInterestRate: String,
+    loanTerm: {
+        type: String,
+        required: true
+    },
+    loanAmount: {
+        type: String,
+        required: true
+    },
+    monthlyInterestRate: {
+        type: String,
+        required: true
+    },
     serviceFee: String, // 1% of requested amount
     newProceedsAmount: String, // = amount - serviceFee
     monthlyAmortization: String, // loanAmount * (monthlyInterestRate/(1-Math.pow(1+monthlyInterestRate, -loanTerm)));

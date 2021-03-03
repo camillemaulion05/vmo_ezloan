@@ -5,9 +5,13 @@ const userSchema = new mongoose.Schema({
     userNum: String, //Date.now();
     username: {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
-    password: String, //encrypted
+    password: {
+        type: String,
+        required: true
+    }, //encrypted
     passwordResetToken: String,
     passwordResetExpires: Date,
     lastLogin: Date,
@@ -16,7 +20,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "Active" //Active, Inactive
     },
-    type: String, //Borrower, Employee, Admin
+    type: {
+        type: String,
+        required: true
+    }, //Borrower, Employee, Admin
 }, {
     timestamps: true
 });
