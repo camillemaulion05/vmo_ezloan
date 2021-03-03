@@ -6,29 +6,26 @@ const withdrawalSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    reason: String,
-    //Appliance
-    //Auto Loan
-    //Car Repair
-    //Educational
-    //Gadget Loan
-    //Hospitalization-Wellness
-    //Housing
-    //House Repair
-    //Multi Purpose
-    //Petty Cash
-    //Productive
-    //Providential
-    //Special Emergency
-    //Travel
-    //Wedding
+    reason: {
+        type: String,
+        enum: [
+            "Emergency Claim",
+            "Death Claim",
+            "Disability Claim",
+            "Funeral Claim",
+            "Maternity Claim",
+            "Retirement Claim",
+            "Sickness Claim"
+        ]
+    },
     requestedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower'
     },
     status: {
         type: String,
-        default: "Processing" // Cash Release, Declined, Approved
+        default: "Processing",
+        enum: ["Processing", "Approved", "Declined", "Cash Release"]
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,

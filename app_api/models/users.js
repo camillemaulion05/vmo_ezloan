@@ -18,12 +18,14 @@ const userSchema = new mongoose.Schema({
     lastFailedLogin: Date,
     status: {
         type: String,
-        default: "Active" //Active, Inactive
+        default: "Active",
+        enum: ["Active", "Inactive"]
     },
     type: {
         type: String,
-        required: true
-    }, //Borrower, Employee, Admin
+        required: true,
+        enum: ["Borrower", "Employee", "Admin"]
+    }
 }, {
     timestamps: true
 });

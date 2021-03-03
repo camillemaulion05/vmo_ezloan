@@ -4,39 +4,49 @@ const borrowerSchema = new mongoose.Schema({
     borrowerNum: String, // Date.now();
     type: {
         type: String,
-        default: "Non-Member"
-    }, //Member, Non-Member
+        default: "Non-Member",
+        enum: ["Non-Member", "Member"]
+    },
     status: {
         type: String,
-        default: "Basic"
-    }, // Basic, Complete/Processing, Verified
+        default: "Basic",
+        enum: ["Basic", "Pending for Review", "Verified", "Declined"]
+    },
     profile: {
         email: {
             type: String,
+            unique: true,
             required: true
         },
         emailVerificationToken: String,
         emailVerified: Boolean,
-        firstName: String,
-        middleName: {
+        firstName: {
             type: String,
             required: true
         },
+        middleName: String,
         lastName: {
             type: String,
             required: true
         },
         gender: {
             type: String,
-            required: true
-        }, //Male, Female
+            required: true,
+            enum: ["Male", "Female"]
+        },
         birthday: {
-            type: String,
+            type: Date,
             required: true
         },
-        civilStat: String, //Single, Married, Widowed, Divorced
+        civilStat: {
+            type: String,
+            enum: ["Single", "Married", "Widowed", "Divorced"]
+        },
         dependents: String,
-        educAttainment: String, //High School, Vocational/Technical, College, Post Graduate, Others
+        educAttainment: {
+            type: String,
+            enum: ["High School", "Vocational/Technical", "College", "Post Graduate", "Others"]
+        },
         placeOfBirth: String,
         nationality: String,
         address: {
@@ -61,20 +71,35 @@ const borrowerSchema = new mongoose.Schema({
                 zipCode: String
             }
         },
-        homeOwnership: String, //Owned, Living with relative, Renting, Others
+        homeOwnership: {
+            type: String,
+            enum: ["Owned", "Living with relative", "Renting", "Others"]
+        },
         monthlyHomeFee: String,
         yrsOfStay: String,
-        carOwnership: String, // None, Owned
+        carOwnership: {
+            type: String,
+            enum: ["None", "Owned"]
+        },
         monthlyCarLoanPayment: String,
-        homePhoneName: String, // Owned, Relative, None, Other
+        homePhoneName: {
+            type: String,
+            enum: ["Owned", "Relative", "None", "Others"]
+        },
         homePhoneNum: String,
         mobileNum: {
             type: String,
             required: true
         },
         mobileNumVerified: Boolean,
-        lineType: String, // Pre Paid, Post Paid
-        mobilePhoneOs: String, // Android, iOS, Blackberry, Others
+        lineType: {
+            type: String,
+            enum: ["Pre Paid", "Post Paid"]
+        },
+        mobilePhoneOs: {
+            type: String,
+            enum: ["Android", "iOS", "Blackberry", "Others"]
+        },
         addMobileNum1: String,
         addMobileNum2: String,
         tin: String
@@ -93,35 +118,52 @@ const borrowerSchema = new mongoose.Schema({
             province: String,
             zipCode: String
         },
-        numOfEmployees: String,
+        numOfEmployees: {
+            type: String,
+            enum: ["1-10", "11-50", "51-100", "101-500", "501~"]
+        },
         tenure: Date,
-        employmentType: String, //Regular, Probation, Contractual, Project Based, Part-Time, Self-Employed, Freelancer
-        businessType: String,
-        // BPO/Communications/IT/Mass Media,
-        // Retail Sale/Restaurant/Hotel/Tourism/Other Service,
-        // Transportation/Shipping/Real Estate,
-        // Bank/Insurance/Finance,
-        // Government,
-        // Construction/Marker/Manufacturing,
-        // Trading/Export/Import/Wholesale,
-        // Electric/Gas/Waterworks,
-        // Medical/Education/School,
-        // Security,
-        // Agriculture/Forestry/Fisheries/Mining, 
-        // Others
-        occupationType: String,
-        // Management,
-        // Marketing,
-        // Sales,
-        // Office Worker,
-        // Professional/Technical,
-        // Service/Reception,
-        // Production Worker/Labor,
-        // Security/Guard/Maid,
-        // Driver,
-        // Self-Employed,
-        // Others
-        position: String, // Director/Officer, EVP/SVP/GM, VP/MG, Others
+        employmentType: {
+            type: String,
+            enum: ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+        },
+        businessType: {
+            type: String,
+            enum: [
+                "BPO/Communications/IT/Mass Media",
+                "Retail Sale/Restaurant/Hotel/Tourism/Other Service",
+                "Transportation/Shipping/Real Estate",
+                "Bank/Insurance/Finance",
+                "Government",
+                "Construction/Marker/Manufacturing",
+                "Trading/Export/Import/Wholesale",
+                "Electric/Gas/Waterworks",
+                "Medical/Education/School",
+                "Security",
+                "Agriculture/Forestry/Fisheries/Mining",
+                "Others"
+            ]
+        },
+        occupationType: {
+            type: String,
+            enum: [
+                "Management",
+                "Marketing",
+                "Sales",
+                "Office Worker",
+                "Professional/Technical",
+                "Service/Reception",
+                "Production Worker/Labor",
+                "Security/Guard/Maid",
+                "Driver",
+                "Self-Employed",
+                "Others"
+            ]
+        },
+        position: {
+            type: String,
+            enum: ["Director/Officer", "EVP/SVP/GM", "VP/MG", "Others"]
+        },
         monthlyIncome: String,
         annualIncome: String,
         salaryDate: String,
@@ -137,7 +179,10 @@ const borrowerSchema = new mongoose.Schema({
         }
     },
     documents: {
-        govIdType: String, //TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance
+        govIdType: {
+            type: String,
+            enum: ["TIN", "SSS", "GSIS", "UMID", "Passport", "Driver's License", "Postal ID", "Voter's ID", "PRC", "NBI Clearance"]
+        },
         primaryIdFront: {
             filename: String,
             contentType: String,
@@ -188,31 +233,46 @@ const borrowerSchema = new mongoose.Schema({
         bene1: {
             firstName: String,
             lastName: String,
-            relationship: String,
+            relationship: {
+                type: String,
+                enum: ["Parent", "Sibling", "Spouse", "Child"]
+            },
             birthday: Date
         },
         bene2: {
             firstName: String,
             lastName: String,
-            relationship: String,
+            relationship: {
+                type: String,
+                enum: ["Parent", "Sibling", "Spouse", "Child"]
+            },
             birthday: Date
         },
         bene3: {
             firstName: String,
             lastName: String,
-            relationship: String,
+            relationship: {
+                type: String,
+                enum: ["Parent", "Sibling", "Spouse", "Child"]
+            },
             birthday: Date
         },
         bene4: {
             firstName: String,
             lastName: String,
-            relationship: String,
+            relationship: {
+                type: String,
+                enum: ["Parent", "Sibling", "Spouse", "Child"]
+            },
             birthday: Date
         },
         bene5: {
             firstName: String,
             lastName: String,
-            relationship: String,
+            relationship: {
+                type: String,
+                enum: ["Parent", "Sibling", "Spouse", "Child"]
+            },
             birthday: Date
         }
     },

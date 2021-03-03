@@ -2,25 +2,30 @@ const mongoose = require('mongoose');
 
 const loanSchema = new mongoose.Schema({
     loanNum: String, // Date.now();
-    loanType: String,
-    //Appliance
-    //Auto Loan
-    //Car Repair
-    //Educational
-    //Gadget Loan
-    //Hospitalization-Wellness
-    //Housing
-    //House Repair
-    //Multi Purpose
-    //Petty Cash
-    //Productive
-    //Providential
-    //Special Emergency
-    //Travel
-    //Wedding
+    loanType: {
+        type: String,
+        enum: [
+            "Appliance",
+            "Auto Loan",
+            "Car Repair",
+            "Educational",
+            "Gadget Loan",
+            "Hospitalization-Wellness",
+            "Housing",
+            "House Repair",
+            "Multi Purpose",
+            "Petty Cash",
+            "Productive",
+            "Providential",
+            "Special Emergency",
+            "Travel",
+            "Wedding"
+        ]
+    },
     loanTerm: {
         type: String,
-        required: true
+        required: true,
+        enum: ["6", "12", "18", "24", "30", "36", "42", "48", "54", "60"]
     },
     loanAmount: {
         type: String,
@@ -91,7 +96,8 @@ const loanSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        default: "Processing" // Approved, Declined, Loan Release, Open, Fully Paid, Loan Debt 
+        default: "Processing",
+        enum: ["Processing", "Approved", "Declined", "Loan Release", "Open", "Fully Paid", "Loan Debt"]
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,

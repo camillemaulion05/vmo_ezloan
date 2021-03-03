@@ -4,11 +4,13 @@ const employeeSchema = new mongoose.Schema({
     employeeNum: String, // Date.now();
     type: {
         type: String,
-        required: true
-    }, // Loan Officer or Loan Processor
+        required: true,
+        enum: ["Loan Officer", "Loan Processor"]
+    },
     profile: {
         email: {
             type: String,
+            unique: true,
             required: true
         },
         emailVerificationToken: String,
@@ -22,8 +24,15 @@ const employeeSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        gender: String, //Male, Female
-        birthday: Date,
+        gender: {
+            type: String,
+            required: true,
+            enum: ["Male", "Female"]
+        },
+        birthday: {
+            type: Date,
+            required: true
+        },
         address: {
             present: {
                 unitNo: String,

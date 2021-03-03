@@ -8,13 +8,16 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        required: true
+        required: true,
+        enum: [
+            "Repayments",
+            "Release",
+            "Withdrawals",
+            "Contributions",
+            "Fees",
+            "Expenses"
+        ]
     },
-    // Repayments - credit
-    // Release - debit
-    // Withdrawals - debit
-    // Contributions - credit
-    // Fees - credit
     message: String,
     senderNum: String,
     receiverNum: String,
@@ -34,7 +37,8 @@ const transactionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default: "Processing" //Posted
+        default: "Processing",
+        enum: ["Processing, Posted"]
     },
     borrowerId: {
         type: mongoose.Schema.Types.ObjectId,
