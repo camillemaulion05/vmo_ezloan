@@ -2,12 +2,18 @@ const mongoose = require('mongoose');
 
 const inquirySchema = new mongoose.Schema({
     inquiryNum: String, //Date.now();
-    name: String,
+    name: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true
     },
-    phone: String,
+    phone: {
+        type: String,
+        required: true
+    },
     message: {
         type: String,
         required: true

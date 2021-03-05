@@ -1,23 +1,14 @@
 const mongoose = require('mongoose');
 const readLine = require('readline');
 
-let dbURL = 'mongodb://127.0.0.1/vmo-ezloan';
-if (process.env.NODE_ENV === 'production') {
-    dbURL = process.env.DB_HOST || process.env.MONGODB_URI;
-}
-
 const connect = () => {
-    setTimeout(() => mongoose.connect(dbURL, {
+    setTimeout(() => mongoose.connect(process.env.MONGODB_URI, {
+        useFindAndModify: false,
         useNewUrlParser: true,
         useCreateIndex: true,
         useUnifiedTopology: true
     }), 1000);
 }
-
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useUnifiedTopology', true);
 
 mongoose.connection.on('connected', () => {
     console.log('connected');
