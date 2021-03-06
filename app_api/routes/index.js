@@ -1,5 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('express-jwt');
+const auth = jwt({
+    secret: process.env.JWT_SECRET,
+    userProperty: 'payload',
+    algorithms: ['sha1', 'RS256', 'HS256']
+})
 const ctrlHome = require('../controllers/home');
 const ctrlUsers = require('../controllers/users');
 const ctrlInquiries = require('../controllers/inquiries');
@@ -8,128 +14,132 @@ const ctrlTransactions = require('../controllers/transactions');
 const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
+const ctrlAuth = require('../controllers/authentication');
+const middleware = require('../middlewares/authorization');
 
 router.get('/', ctrlHome.index);
 
 // users
 router
     .route('/users')
-    .get(ctrlUsers.usersList)
-    .post(ctrlUsers.usersCreate);
+    .get(auth, middleware.isAdmin, ctrlUsers.usersList);
 
 router
     .route('/users/:userid')
-    .get(ctrlUsers.usersReadOne)
-    .put(ctrlUsers.usersUpdateOne)
-    .delete(ctrlUsers.usersDeleteOne);
+    .get(auth, middleware.isSafe, ctrlUsers.usersReadOne)
+    .put(auth, middleware.isSafe, ctrlUsers.usersUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlUsers.usersDeleteOne);
 
 // inquiries
 router
     .route('/inquiries')
-    .get(ctrlInquiries.inquiriesList)
+    .get(auth, middleware.isAdmin, ctrlInquiries.inquiriesList)
     .post(ctrlInquiries.inquiriesCreate);
 
 router
     .route('/inquiries/:inquiryid')
-    .get(ctrlInquiries.inquiriesReadOne)
-    .put(ctrlInquiries.inquiriesUpdateOne)
-    .delete(ctrlInquiries.inquiriesDeleteOne);
+    .get(auth, middleware.isAdmin, ctrlInquiries.inquiriesReadOne)
+    .put(auth, middleware.isAdmin, ctrlInquiries.inquiriesUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlInquiries.inquiriesDeleteOne);
 
 // employees
 router
     .route('/employees')
-    .get(ctrlEmployees.employeesList)
-    .post(ctrlEmployees.employeesCreate);
+    .get(auth, middleware.isSafe, ctrlEmployees.employeesList)
+    .post(auth, middleware.isAdmin, ctrlEmployees.employeesCreate);
 
 router
     .route('/employees/:employeeid')
-    .get(ctrlEmployees.employeesReadOne)
-    .put(ctrlEmployees.employeesUpdateOne)
-    .delete(ctrlEmployees.employeesDeleteOne);
+    .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOne)
+    .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
 
 // transactions
 router
     .route('/transactions')
-    .get(ctrlTransactions.transactionsList)
-    .post(ctrlTransactions.transactionsCreate);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsList)
+    .post(auth, middleware.isSafe, ctrlTransactions.transactionsCreate);
 
 router
     .route('/transactions/:transactionid')
-    .get(ctrlTransactions.transactionsReadOne)
-    .put(ctrlTransactions.transactionsUpdateOne)
-    .delete(ctrlTransactions.transactionsDeleteOne);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsReadOne)
+    .put(auth, middleware.isSafe, ctrlTransactions.transactionsUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteOne);
 
 router
     .route('/transactions/type/:type')
-    .get(ctrlTransactions.transactionsPerType);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerType);
 
 router
     .route('/transactions/borrower/:borrowerid')
-    .get(ctrlTransactions.transactionsPerBorrower);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerBorrower);
 
 router
     .route('/transactions/summary/:year')
-    .get(ctrlTransactions.transactionsSummary);
+    .get(auth, middleware.isAdmin, ctrlTransactions.transactionsSummary);
 
 router
     .route('/transactions/contributions/:year')
-    .get(ctrlTransactions.contributionsPerMember);
+    .get(auth, middleware.isAdmin, ctrlTransactions.contributionsPerMember);
 
 // withdrawals
 router
     .route('/withdrawals')
-    .get(ctrlWithdrawals.withdrawalsList)
-    .post(ctrlWithdrawals.withdrawalsCreate);
+    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsList)
+    .post(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsCreate);
 
 router
     .route('/withdrawals/:withdrawalid')
-    .get(ctrlWithdrawals.withdrawalsReadOne)
-    .put(ctrlWithdrawals.withdrawalsUpdateOne)
-    .delete(ctrlWithdrawals.withdrawalsDeleteOne);
+    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsReadOne)
+    .put(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteOne);
 
 // borrowers
 router
     .route('/borrowers')
-    .get(ctrlBorrowers.borrowersList)
-    .post(ctrlBorrowers.borrowersCreate);
+    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersList)
+    .post(auth, middleware.isSafe, ctrlBorrowers.borrowersCreate);
 
 router
     .route('/borrowers/:borrowerid')
-    .get(ctrlBorrowers.borrowersReadOne)
-    .put(ctrlBorrowers.borrowersUpdateOne)
-    .delete(ctrlBorrowers.borrowersDeleteOne);
+    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOne)
+    .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
 
 // loans
 router
     .route('/loans')
-    .get(ctrlLoans.loansList)
-    .post(ctrlLoans.loansCreate);
+    .get(auth, middleware.isSafe, ctrlLoans.loansList)
+    .post(auth, middleware.isSafe, ctrlLoans.loansCreate);
 
 router
     .route('/loans/:loanid')
-    .get(ctrlLoans.loansReadOne)
-    .put(ctrlLoans.loansUpdateOne)
-    .delete(ctrlLoans.loansDeleteOne);
+    .get(auth, middleware.isSafe, ctrlLoans.loansReadOne)
+    .put(auth, middleware.isSafe, ctrlLoans.loansUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteOne);
 
 router
     .route('/loans/:loanid/schedules')
-    .get(ctrlLoans.loansSchedulesList)
-    .put(ctrlLoans.loansSchedulesUpdate);
+    .get(auth, middleware.isSafe, ctrlLoans.loansSchedulesList)
+    .put(auth, middleware.isSafe, ctrlLoans.loansSchedulesUpdate);
 
 router
     .route('/loans/:loanid/schedules/:scheduleid')
-    .get(ctrlLoans.loansSchedulesReadOne);
+    .get(auth, middleware.isSafe, ctrlLoans.loansSchedulesReadOne);
 
 router
     .route('/loans/:loanid/due')
-    .get(ctrlLoans.loansRepaymentsDue);
+    .get(auth, middleware.isSafe, ctrlLoans.loansRepaymentsDue);
 
 router
     .route('/loans/summary/:year')
-    .get(ctrlLoans.loansSummary);
+    .get(auth, middleware.isAdmin, ctrlLoans.loansSummary);
 
 router
     .route('/loans/report/:year')
-    .get(ctrlLoans.loansInterestReport);
+    .get(auth, middleware.isAdmin, ctrlLoans.loansInterestReport);
+
+router.post('/register', ctrlAuth.register);
+router.post('/login', ctrlAuth.login);
 
 module.exports = router;

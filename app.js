@@ -1,11 +1,23 @@
+const dotenv = require('dotenv');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const passport = require('passport');
+
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
+dotenv.config({
+  path: '.env'
+});
 
 // Connect to MongoDB.
 require('./app_api/models/db');
+
+// API keys and Passport configuration.
+require('./app_api/config/passport');
 
 // Route Files
 const indexRouter = require('./app_server/routes/index');
@@ -75,8 +87,26 @@ app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datata
   maxAge: 31557600000
 }));
 
+app.use(passport.initialize());
+
+app.use('/api', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+
+app.use((err, req, res, next) => {
+  if (err.name === 'UnauthorizedError') {
+    res
+      .status(401)
+      .json({
+        "message": err.name + ": " + err.message
+      });
+  }
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
