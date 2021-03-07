@@ -2,9 +2,15 @@ const dotenv = require('dotenv');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const passport = require('passport');
+const compression = require('compression');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const lusca = require('lusca');
+const MongoStore = require('connect-mongo').default;
+const flash = require('express-flash');
+const expressStatusMonitor = require('express-status-monitor');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -12,12 +18,6 @@ const passport = require('passport');
 dotenv.config({
   path: '.env'
 });
-
-// Connect to MongoDB.
-require('./app_api/models/db');
-
-// API keys and Passport configuration.
-require('./app_api/config/passport');
 
 // Route Files
 const indexRouter = require('./app_server/routes/index');
@@ -29,13 +29,56 @@ const app = express();
 // Express configuration.
 app.set('views', path.join(__dirname, 'app_server', 'views'));
 app.set('view engine', 'pug');
-
+app.use(expressStatusMonitor());
+app.use(compression());
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({
-  extended: false
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
 }));
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: process.env.SESSION_SECRET,
+  cookie: {
+    maxAge: 86400000
+  }, // 1 day in milliseconds
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    autoReconnect: true,
+  })
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+app.use((req, res, next) => {
+  if (req.path.match(/\/api/g)) {
+    // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
+    next();
+  } else {
+    lusca.csrf()(req, res, next);
+  }
+});
+app.use(lusca.xframe('SAMEORIGIN'));
+app.use(lusca.xssProtection(true));
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+app.use((req, res, next) => {
+  //After successful login, redirect back to the intended page
+  if (!req.user &&
+    req.path !== '/login' &&
+    req.path !== '/signup' &&
+    !req.path.match(/\./)) {
+    req.session.returnTo = req.originalUrl;
+  } else if (req.user && req.path === '/account') {
+    req.session.returnTo = req.originalUrl;
+  }
+  next();
+});
 
 // Set Public Folder
 app.use('/', express.static(path.join(__dirname, 'public'), {
@@ -87,11 +130,8 @@ app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datata
   maxAge: 31557600000
 }));
 
-app.use(passport.initialize());
-
 app.use('/api', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Headers', 'x-access-token, Origin, X-Requested-With, Content-Type, Accept, Authorization');
   next();
 });
 

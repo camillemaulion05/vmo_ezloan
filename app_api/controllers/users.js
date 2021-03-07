@@ -1,6 +1,6 @@
-const e = require('express');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const CryptoJS = require("crypto-js");
 
 const usersList = (req, res) => {
     User
@@ -45,7 +45,7 @@ const usersCreate = (req, res) => {
             res
                 .status(400)
                 .json({
-                    "msg": "Account with that username already exists."
+                    "message": "Account with that username already exists."
                 });
         } else {
             user.save((err) => {
@@ -176,10 +176,53 @@ const usersDeleteOne = (req, res) => {
     }
 };
 
+const usersAuthenticate = (req, res) => {
+    User.findOne({
+            username: req.body.username
+        })
+        .exec((err, user) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json(err);
+            } else if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found"
+                    });
+            } else {
+                let bytes = CryptoJS.AES.decrypt(req.body.password, process.env.CRYPTOJS_SECRET);
+                let plainPassword = bytes.toString(CryptoJS.enc.Utf8);
+                user.comparePassword(plainPassword, (err, isMatch) => {
+                    if (err) {
+                        res
+                            .status(404)
+                            .json(err);
+                    } else if (isMatch) {
+                        const token = user.generateJwt();
+                        res
+                            .status(200)
+                            .json({
+                                token
+                            });
+                    } else {
+                        res
+                            .status(401)
+                            .json({
+                                "message": "Invalid username or password."
+                            });
+                    }
+                });
+            }
+        });
+};
+
 module.exports = {
     usersList,
     usersCreate,
     usersReadOne,
     usersUpdateOne,
-    usersDeleteOne
+    usersDeleteOne,
+    usersAuthenticate
 };

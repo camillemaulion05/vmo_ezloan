@@ -56,47 +56,7 @@ $(function () {
             $(element).parents(".form-group").removeClass("has-error");
         },
         submitHandler: function (form) {
-            var token = $('form[name="contactForm"] input[name="_csrf"]').attr('value');
-            $.ajaxSetup({
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', token);
-                }
-            });
-            $.ajax({
-                url: "/inquiry",
-                type: "POST",
-                data: {
-                    name: $('form[name="contactForm"] input[name="name"]').val(),
-                    email: $('form[name="contactForm"] input[name="email"]').val(),
-                    phone: $('form[name="contactForm"] input[name="phone"]').val(),
-                    message: $('form[name="contactForm"] textarea[name="message"]').val()
-                },
-                cache: false,
-                success: function () {
-                    // Success message
-                    $('form[name="contactForm"] div#success').html("<div class='alert alert-success'>");
-                    $('form[name="contactForm"] div#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
-                        .append("</button>");
-                    $('form[name="contactForm"] div#success > .alert-success')
-                        .append("<strong>Your message has been sent. </strong>");
-                    $('form[name="contactForm"] div#success > .alert-success')
-                        .append('</div>');
-
-                    //clear all fields
-                    $('form[name="contactForm"]').trigger("reset");
-                },
-                error: function () {
-                    // Fail message
-                    $('form[name="contactForm"] div#success').html("<div class='alert alert-danger'>");
-                    $('form[name="contactForm"] div#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
-                        .append("</button>");
-                    $('form[name="contactForm"] div#success > .alert-danger').append("<strong>Sorry " + name + ", it seems that my mail server is not responding. Please try again later!");
-                    $('form[name="contactForm"] div#success > .alert-danger').append('</div>');
-                    //clear all fields
-                    $('form[name="contactForm"]').trigger("reset");
-                },
-            })
-            return false;
+            form.submit();
         }
     });
     $("form #forgotForm").validate({

@@ -1,3 +1,6 @@
+// Connect to MongoDB.
+require('../models/db');
+
 const express = require('express');
 const router = express.Router();
 const jwt = require('express-jwt');
@@ -14,21 +17,25 @@ const ctrlTransactions = require('../controllers/transactions');
 const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
-const ctrlAuth = require('../controllers/authentication');
 const middleware = require('../middlewares/authorization');
 
 router.get('/', ctrlHome.index);
+router.post('/encrypt', ctrlHome.encrypt);
+router.post('/decrypt', ctrlHome.decrypt);
 
 // users
 router
     .route('/users')
-    .get(auth, middleware.isAdmin, ctrlUsers.usersList);
+    .get(auth, middleware.isAdmin, ctrlUsers.usersList)
+    .post(ctrlUsers.usersCreate);
 
 router
     .route('/users/:userid')
     .get(auth, middleware.isSafe, ctrlUsers.usersReadOne)
     .put(auth, middleware.isSafe, ctrlUsers.usersUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlUsers.usersDeleteOne);
+
+router.post('/login', ctrlUsers.usersAuthenticate);
 
 // inquiries
 router
@@ -138,8 +145,5 @@ router
 router
     .route('/loans/report/:year')
     .get(auth, middleware.isAdmin, ctrlLoans.loansInterestReport);
-
-router.post('/register', ctrlAuth.register);
-router.post('/login', ctrlAuth.login);
 
 module.exports = router;
