@@ -38,15 +38,15 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(session({
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   cookie: {
     maxAge: 86400000
-  }, // 1 day in milliseconds
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    autoReconnect: true,
-  })
+  } // 1 day in milliseconds
+  // store: MongoStore.create({
+  //   mongoUrl: process.env.MONGODB_URI,
+  //   autoReconnect: true,
+  // })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
