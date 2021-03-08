@@ -8,7 +8,6 @@ const compression = require('compression');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const lusca = require('lusca');
-const MongoStore = require('connect-mongo').default;
 const flash = require('express-flash');
 const expressStatusMonitor = require('express-status-monitor');
 
@@ -39,14 +38,7 @@ app.use(bodyParser.urlencoded({
 app.use(session({
   resave: false,
   saveUninitialized: false,
-  secret: process.env.SESSION_SECRET,
-  cookie: {
-    maxAge: 86400000
-  } // 1 day in milliseconds
-  // store: MongoStore.create({
-  //   mongoUrl: process.env.MONGODB_URI,
-  //   autoReconnect: true,
-  // })
+  secret: process.env.SESSION_SECRET
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -83,51 +75,51 @@ app.use((req, res, next) => {
 app.use('/', express.static(path.join(__dirname, 'public'), {
   maxAge: 86400000
 }));
-// app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css'), {
-//   maxAge: 86400000
-// }));
-// app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/font-awesome/css'), {
-//   maxAge: 86400000
-// }));
-// app.use('/fonts', express.static(path.join(__dirname, 'node_modules/font-awesome/fonts'), {
-//   maxAge: 86400000
-// }));
-// app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/css'), {
-//   maxAge: 86400000
-// }));
-// app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-dt/css'), {
-//   maxAge: 86400000
-// }));
-// app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/css'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery-validation/dist'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery.easing/bower_components/jquery-easing-original'), {
-//   maxAge: 86400000
-// }));
-// app.use('/metismenu', express.static(path.join(__dirname, 'node_modules/metismenu/dist'), {
-//   maxAge: 86400000
-// }));
-// app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net/js'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), {
-//   maxAge: 86400000
-// }));
-// app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/js'), {
-//   maxAge: 86400000
-// }));
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css'), {
+  maxAge: 86400000
+}));
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/font-awesome/css'), {
+  maxAge: 86400000
+}));
+app.use('/fonts', express.static(path.join(__dirname, 'node_modules/font-awesome/fonts'), {
+  maxAge: 86400000
+}));
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/css'), {
+  maxAge: 86400000
+}));
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-dt/css'), {
+  maxAge: 86400000
+}));
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/css'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery-validation/dist'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery.easing/bower_components/jquery-easing-original'), {
+  maxAge: 86400000
+}));
+app.use('/metismenu', express.static(path.join(__dirname, 'node_modules/metismenu/dist'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net/js'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), {
+  maxAge: 86400000
+}));
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/js'), {
+  maxAge: 86400000
+}));
 
 app.use('/api', (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'x-access-token, Origin, X-Requested-With, Content-Type, Accept, Authorization');
