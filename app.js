@@ -20,7 +20,7 @@ dotenv.config({
 
 // Route Files
 const indexRouter = require('./app_server/routes/index');
-// const apiRouter = require('./app_api/routes/index');
+const apiRouter = require('./app_api/routes/index');
 
 // Create Express server.
 const app = express();
@@ -127,7 +127,7 @@ app.use('/api', (req, res, next) => {
 });
 
 app.use('/', indexRouter);
-// app.use('/api', apiRouter);
+app.use('/api', apiRouter);
 
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
