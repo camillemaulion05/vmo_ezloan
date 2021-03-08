@@ -2,11 +2,8 @@ const validator = require('validator');
 const nodemailer = require('nodemailer');
 const request = require('request');
 const apiOptions = {
-    server: 'http://localhost:4000'
+    server: process.env.BASE_URL
 };
-if (process.env.NODE_ENV === 'production') {
-    apiOptions.server = 'https://vmo-ezloan.herokuapp.com';
-}
 
 /**
  * POST /contact
