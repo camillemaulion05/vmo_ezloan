@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const Transaction = mongoose.model('Transaction');
+import {
+    model
+} from 'mongoose';
+const Transaction = model('Transaction');
 
 const transactionsList = (req, res) => {
     Transaction
@@ -345,7 +347,7 @@ const contributionsPerMember = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     transactionsList,
     transactionsCreate,
     transactionsReadOne,

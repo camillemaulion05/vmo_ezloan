@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  .container
+    .form-clean.login-form
+      form#loginForm(method='post')
+        input(type='hidden', name='_csrf', value=_csrf)
+        span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
+          i.fa.fa-circle.fa-stack-2x.text-primary
+          i.fa.fa-user.fa-stack-1x.fa-inverse
+        h2 Member Login
+        .row
+          .col-sm-12
+            .form-group
+              input#username.form-control(type='text' name='username' placeholder='Username' required='required')
+        .row
+          .col-sm-12
+            .form-group
+              input#password.form-control(type='password' name='password' placeholder='Password' required='required')
+        .row.is-flex
+          .col-sm-6
+            p.form-check-label
+              input(type='checkbox' onclick='showPassword()')
+              |  Show Password
+          .col-sm-6
+            a.forgot-link(href='/forgot') Forgot Password?
+        .row
+          .col-sm-12
+            .form-group
+              button.btn.btn-primary.btn-block(type='submit') Submit
+      .text-center
+        | Don&apos;t have an account? 
+        a(href='/signup') Sign up here!

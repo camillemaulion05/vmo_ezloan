@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import {
+    Schema,
+    model
+} from 'mongoose';
 
-const employeeSchema = new mongoose.Schema({
+const employeeSchema = new Schema({
     employeeNum: String, // Date.now();
     type: {
         type: String,
@@ -8,13 +11,6 @@ const employeeSchema = new mongoose.Schema({
         enum: ["Loan Officer", "Loan Processor"]
     },
     profile: {
-        email: {
-            type: String,
-            unique: true,
-            required: true
-        },
-        emailVerificationToken: String,
-        emailVerified: Boolean,
         firstName: {
             type: String,
             required: true
@@ -54,19 +50,14 @@ const employeeSchema = new mongoose.Schema({
                 province: String,
                 zipCode: String
             }
-        },
-        mobileNum: {
-            type: String,
-            required: true
-        },
-        mobileNumVerified: Boolean
+        }
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User"
     }
 }, {
     timestamps: true
 });
 
-mongoose.model('Employee', employeeSchema);
+model('Employee', employeeSchema);

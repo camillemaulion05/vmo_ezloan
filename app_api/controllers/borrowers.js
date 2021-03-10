@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const Borrower = mongoose.model('Borrower');
+import {
+    model
+} from 'mongoose';
+const Borrower = model('Borrower');
 
 const borrowersList = (req, res) => {
     Borrower
@@ -8,14 +10,13 @@ const borrowersList = (req, res) => {
             "status": 1,
             "maxLoanAmount": 1,
             "borrowerNum": 1,
-            "profile.email": 1,
             "profile.firstName": 1,
             "profile.lastName": 1,
             "profile.birthday": 1,
             "profile.gender": 1,
-            "profile.mobileNum": 1,
             "profile.birthday": 1
         })
+        .populate('userId', 'status', 'email', 'mobileNum')
         .exec((err, borrowers) => {
             if (err) {
                 res
@@ -71,6 +72,7 @@ const borrowersReadOne = (req, res) => {
     } else {
         Borrower
             .findById(borrowerid)
+            .populate('userId', 'status', 'email', 'mobileNum')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -104,6 +106,7 @@ const borrowersUpdateOne = (req, res) => {
     } else {
         Borrower
             .findById(borrowerid)
+            .populate('userId', 'status', 'email', 'mobileNum')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -176,7 +179,7 @@ const borrowersDeleteOne = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     borrowersList,
     borrowersCreate,
     borrowersReadOne,

@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const Withdrawal = mongoose.model('Withdrawal');
+import {
+    model
+} from 'mongoose';
+const Withdrawal = model('Withdrawal');
 
 const withdrawalsList = (req, res) => {
     Withdrawal
@@ -159,7 +161,7 @@ const withdrawalsDeleteOne = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     withdrawalsList,
     withdrawalsCreate,
     withdrawalsReadOne,

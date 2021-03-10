@@ -1,0 +1,44 @@
+extends ../layout
+
+block content
+  .container
+    .form-clean.login-form
+      form#forgotForm(method='post')
+        input(type='hidden', name='_csrf', value=_csrf)
+        span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
+          i.fa.fa-circle.fa-stack-2x.text-primary
+          i.fa.fa-key.fa-stack-1x.fa-inverse
+        h2 Forgot Your Password?
+        p.hint-text Enter your email address below and we will send you password reset instructions.
+        .row
+          .col-sm-12
+            .form-group
+              input#email.form-control(type='email' name='email' placeholder='Email')
+              em.help-block.text-danger
+        .row
+            .col-sm-12
+              .form-group
+                select#question.form-control.selectpicker(type='text' name='question')
+                  option(value="" selected="" disabled="") Security Question
+                  option(value="What is your close friend's name?") What is your close friend's name?
+                  option(value="What is your Driving License Number?") What is your Driving License Number?
+                  option(value="What is your favorite color?") What is your favorite color?
+                  option(value="What is your favorite pet`s name?") What is your favorite pet`s name?
+                  option(value="What is your favorite sports team?") What is your favorite sports team?
+                  option(value="What is your mother's maiden name?") What is your mother's maiden name?
+                  option(value="What is your Passport No.?") What is your Passport No.?
+                  option(value="What is your SSS No.?") What is your SSS No.?
+                  option(value="What was your first car?") What was your first car?
+                  option(value="Where did you first meet your spouse?") Where did you first meet your spouse?
+                  option(value="Who was your childhood hero?") Who was your childhood hero?
+                em.help-block.text-danger
+        .row
+          .col-sm-12
+            .form-group
+              input#answer.form-control(type='text' name='answer' placeholder='Answer')
+              em.help-block.text-danger
+        div(style='overflow:auto;')
+          div(style='float:right;')
+            a.btn.btn-danger(type='button' href='/login') Back
+            |  
+            button.btn.btn-primary(type='submit') Send

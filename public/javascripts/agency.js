@@ -14,7 +14,7 @@ $(function () {
         event.preventDefault();
     });
 
-    $('form[name="contactForm"]').validate({
+    $("form#contactForm").validate({
         rules: {
             name: "required",
             email: "required",
@@ -59,7 +59,7 @@ $(function () {
             form.submit();
         }
     });
-    $("form #forgotForm").validate({
+    $("form#forgotForm").validate({
         rules: {
             username: {
                 required: true,
@@ -96,7 +96,7 @@ $(function () {
             form.submit();
         }
     });
-    $("form #loginForm").validate({
+    $("form#loginForm").validate({
         rules: {
             username: {
                 required: true,
@@ -253,6 +253,6 @@ $('input[name="birthdate"]').attr("min", formatDate(dateNowMinusYrs(65)));
 $('input[name="birthdate"]').attr("max", formatDate(dateNowMinusYrs(21)));
 
 /*When clicking on Full hide fail/success boxes */
-$('form[name="contactForm"] input[name="name"]').focus(function () {
-    $('form[name="contactForm"] div#success').html('');
+$('form#contactForm input[name="name"]').focus(function () {
+    $('form#contactForm div#success').html('');
 });

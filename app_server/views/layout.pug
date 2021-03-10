@@ -8,7 +8,7 @@ html
     meta(name='author' content='Ma. Camille G. Maulion')
     meta(name='csrf-token', content=_csrf)
     title #{title} - VMO EZ Loan
-    link(rel='shortcut icon', href='#')
+    link(rel='shortcut icon', href='/favicon.ico')
     link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
     link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Montserrat:400,700')
@@ -30,7 +30,7 @@ html
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/jquery.easing.min.js')
     script(src='/javascripts/classie.js')
-    script(src='/javascripts/cbpAnimatedHeader.min.js')
+    script(src=(title === 'Home') ? '/javascripts/cbpAnimatedHeader.min.js' : undefined)
     script(src='/javascripts/methods.js')
     script(src='/javascripts/agency.js')
 

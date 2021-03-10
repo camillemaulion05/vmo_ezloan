@@ -1,8 +1,28 @@
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
+import {
+    promisify
+} from 'util';
+import {
+    genSalt,
+    hash as _hash,
+    compare
+} from 'bcrypt';
+import {
+    Schema,
+    model
+} from 'mongoose';
+import {
+    sign
+} from 'jsonwebtoken';
+import {
+    AES,
+    enc
+} from "crypto-js";
+import {
+    randomBytes
+} from 'crypto';
+const randomBytesAsync = promisify(randomBytes);
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     userNum: String, //Date.now();
     username: {
         type: String,
@@ -15,6 +35,24 @@ const userSchema = new mongoose.Schema({
     }, //encrypted
     passwordResetToken: String,
     passwordResetExpires: Date,
+    email: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    emailVerificationToken: String,
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    mobileNum: {
+        type: String,
+        required: true
+    },
+    mobileNumVerified: {
+        type: Boolean,
+        default: false
+    },
     lastLogin: Date,
     lastFailedLogin: Date,
     status: {
@@ -26,7 +64,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ["Borrower", "Employee", "Admin"]
-    }
+    },
+    security: [{
+        question: {
+            type: String,
+            enum: [
+                "What is your close friend's name?",
+                "What is your Driving License Number?",
+                "What is your favorite color?",
+                "What is your favorite pet`s name?",
+                "What is your favorite sports team?",
+                "What is your mother's maiden name?",
+                "What is your Passport No.?",
+                "What is your SSS No.?",
+                "What was your first car?",
+                "Where did you first meet your spouse?",
+                "Who was your childhood hero?"
+            ]
+        },
+        answer: String //encrypted
+    }]
 }, {
     timestamps: true
 });
@@ -39,11 +96,13 @@ userSchema.pre('save', function save(next) {
     if (!user.isModified('password')) {
         return next();
     }
-    bcrypt.genSalt(10, (err, salt) => {
+    let bytes = AES.decrypt(user.password, process.env.CRYPTOJS_SECRET);
+    let candidatePassword = bytes.toString(enc.Utf8);
+    genSalt(10, (err, salt) => {
         if (err) {
             return next(err);
         }
-        bcrypt.hash(user.password, salt, (err, hash) => {
+        _hash(candidatePassword, salt, (err, hash) => {
             if (err) {
                 return next(err);
             }
@@ -56,16 +115,61 @@ userSchema.pre('save', function save(next) {
 /**
  * Helper method for validating user's password.
  */
-userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+userSchema.methods.comparePassword = function (encryptedPassword, cb) {
+    let bytes = AES.decrypt(encryptedPassword, process.env.CRYPTOJS_SECRET);
+    let candidatePassword = bytes.toString(enc.Utf8);
+    compare(candidatePassword, this.password, (err, isMatch) => {
         cb(err, isMatch);
     });
+};
+
+/**
+ * Encrypt user's security answer.
+ */
+userSchema.methods.encryptSecurityAnswer = function () {
+    for (let i = 0; i < this.security.length; i++) {
+        let bytes = AES.decrypt(this.security[i].answer, process.env.CRYPTOJS_SECRET);
+        let candidateAnswer = bytes.toString(enc.Utf8);
+        genSalt(10, (err, salt) => {
+            _hash(candidateAnswer, salt, (err, hash) => {
+                this.security[i].answer = hash;
+            });
+        });
+    }
+};
+
+/**
+ * Helper method for validating user's security answer.
+ */
+userSchema.methods.compareSecurityAnswer = function (object, cb) {
+    for (let i = 0; i < this.security.length; i++) {
+        if (object.question === this.security[i].question) {
+            let bytes = AES.decrypt(object.answer, process.env.CRYPTOJS_SECRET);
+            let candidateAnswer = bytes.toString(enc.Utf8);
+            compare(candidateAnswer, this.security[i].answer, (err, isMatch) => {
+                cb(err, isMatch);
+            });
+        }
+    }
+};
+
+userSchema.methods.setPasswordRandomToken = function () {
+    const createRandomToken = randomBytesAsync(16)
+        .then((buf) => buf.toString('hex'));
+    user.passwordResetToken = createRandomToken;
+    user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+};
+
+userSchema.methods.setEmailRandomToken = function () {
+    const createRandomToken = randomBytesAsync(16)
+        .then((buf) => buf.toString('hex'));
+    user.emailVerificationToken = createRandomToken;
 };
 
 userSchema.methods.generateJwt = function () {
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + 1);
-    return jwt.sign({
+    return sign({
         _id: this._id,
         username: this.username,
         type: this.type,
@@ -73,4 +177,4 @@ userSchema.methods.generateJwt = function () {
     }, process.env.JWT_SECRET);
 };
 
-mongoose.model('User', userSchema);
+model('User', userSchema);

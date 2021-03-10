@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
+import {
+    model
+} from 'mongoose';
+const User = model('User');
 
 const isAdmin = (req, res, next) => {
     User.findById(req.payload._id).exec((err, user) => {
@@ -73,7 +75,7 @@ const isSafe = (req, res, next) => {
     });
 };
 
-module.exports = {
+export default {
     isAdmin,
     isModerator,
     isSafe

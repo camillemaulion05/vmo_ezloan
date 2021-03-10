@@ -172,9 +172,7 @@ block content
             ul.timeline
               li
                 .timeline-image
-                  span.fa-stack.fa-3x
-                    i.fa.fa-circle.fa-stack-2x.text-primary
-                    i.fa.fa-envelope.fa-stack-1x.fa-inverse
+                  img.rounded-circle.img-fluid(src='/images/1.jpg' alt='Signup')
                 .timeline-panel
                   .timeline-heading
                     h4 first
@@ -184,9 +182,7 @@ block content
                       | Sign up and fill out the necessary information needed in creating account. Your information must be true according to your identity.
               li.timeline-inverted
                 .timeline-image
-                  span.fa-stack.fa-3x
-                    i.fa.fa-circle.fa-stack-2x.text-primary
-                    i.fa.fa-thumbs-up.fa-stack-1x.fa-inverse
+                  img.rounded-circle.img-fluid(src='/images/2.jpg' alt='Documents')
                 .timeline-panel
                   .timeline-heading
                     h4 Second
@@ -196,9 +192,7 @@ block content
                       | Fully verify your account to get approved to your chosen loan. All you need is a valid ID, employment and TIN Proof.
               li
                 .timeline-image
-                  span.fa-stack.fa-3x
-                    i.fa.fa-circle.fa-stack-2x.text-primary
-                    i.fa.fa-clock-o.fa-stack-1x.fa-inverse
+                  img.rounded-circle.img-fluid(src='/images/3.jpg' alt='Loans')
                 .timeline-panel
                   .timeline-heading
                     h4 Third
@@ -209,9 +203,7 @@ block content
                       | deposit or Gcash Wallet.
               li.timeline-inverted
                 .timeline-image
-                  span.fa-stack.fa-3x
-                    i.fa.fa-circle.fa-stack-2x.text-primary
-                    i.fa.fa-compass.fa-stack-1x.fa-inverse
+                  img.rounded-circle.img-fluid(src='/images/4.png' alt='Repayment')
                 .timeline-panel
                   .timeline-heading
                     h4 Lastly
@@ -254,7 +246,7 @@ block content
             h3.section-subheading.text-muted Do you have any questions to ask please let us know.
         .row
           .col-lg-12
-            form(name='contactForm', method='POST', action='/inquiries')
+            form#contactForm(method='post')
               input(type='hidden', name='_csrf', value=_csrf)
               .row
                 .col-md-6

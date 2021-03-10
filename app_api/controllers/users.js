@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const CryptoJS = require("crypto-js");
+import {
+    model
+} from 'mongoose';
+const User = model('User');
 
 const usersList = (req, res) => {
     User
@@ -31,9 +32,11 @@ const usersCreate = (req, res) => {
         lastLogin,
         lastFailedLogin,
         status,
-        type
+        type,
+        security
     } = req.body);
     user.userNum = Date.now();
+    if (req.body.security) user.encryptSecurityAnswer();
     User.findOne({
         username: req.body.username
     }, (err, existingUser) => {
@@ -127,6 +130,8 @@ const usersUpdateOne = (req, res) => {
                 user.lastFailedLogin = (req.body.lastFailedLogin) ? req.body.lastFailedLogin : user.lastFailedLogin;
                 user.status = (req.body.status) ? req.body.status : user.status;
                 user.type = (req.body.type) ? req.body.type : user.type;
+                user.security = (req.body.security) ? req.body.security : user.security;
+                if (req.body.security) user.encryptSecurityAnswer();
                 user.save((err) => {
                     if (err) {
                         res
@@ -192,9 +197,7 @@ const usersAuthenticate = (req, res) => {
                         "message": "User not found"
                     });
             } else {
-                let bytes = CryptoJS.AES.decrypt(req.body.password, process.env.CRYPTOJS_SECRET);
-                let plainPassword = bytes.toString(CryptoJS.enc.Utf8);
-                user.comparePassword(plainPassword, (err, isMatch) => {
+                user.comparePassword(req.body.password, (err, isMatch) => {
                     if (err) {
                         res
                             .status(404)
@@ -218,11 +221,39 @@ const usersAuthenticate = (req, res) => {
         });
 };
 
-module.exports = {
+const usersSetPasswordToken = (req, res) => {
+    User.findOne({
+            "email": req.body.email,
+            "security.question": req.body.question
+        })
+        .exec((err, user) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json(err);
+            } else if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found"
+                    });
+            } else {
+                user.setPasswordRandomToken();
+                res
+                    .status(200)
+                    .json({
+                        'token': user.passwordResetToken
+                    });
+            }
+        });
+};
+
+export default {
     usersList,
     usersCreate,
     usersReadOne,
     usersUpdateOne,
     usersDeleteOne,
-    usersAuthenticate
+    usersAuthenticate,
+    usersSetPasswordToken
 };

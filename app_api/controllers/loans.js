@@ -1,5 +1,8 @@
-const mongoose = require('mongoose');
-const Loan = mongoose.model('Loan');
+import {
+    model,
+    Types
+} from 'mongoose';
+const Loan = model('Loan');
 
 const loansList = (req, res) => {
     Loan
@@ -256,8 +259,8 @@ const loansSchedulesReadOne = (req, res) => {
     } else {
         Loan
             .find({
-                _id: mongoose.Types.ObjectId(loanid),
-                "loanPaymentSchedule._id": mongoose.Types.ObjectId(scheduleid)
+                _id: Types.ObjectId(loanid),
+                "loanPaymentSchedule._id": Types.ObjectId(scheduleid)
             }, {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
@@ -293,10 +296,9 @@ const loansRepaymentsDue = (req, res) => {
                 "message": "Not found, loanid is required"
             });
     } else {
-        // const dateToday = new Date("2021-05-13T00:56:41.812Z");
         const dateToday = new Date();
         Loan.find({
-                _id: mongoose.Types.ObjectId(loanid),
+                _id: Types.ObjectId(loanid),
                 "loanPaymentSchedule.dueDate": {
                     $gte: dateToday
                 }
@@ -486,7 +488,7 @@ const loansInterestReport = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     loansList,
     loansCreate,
     loansReadOne,

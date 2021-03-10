@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import {
+    Schema,
+    model
+} from 'mongoose';
 
-const borrowerSchema = new mongoose.Schema({
+const borrowerSchema = new Schema({
     borrowerNum: String, // Date.now();
     type: {
         type: String,
@@ -13,13 +16,6 @@ const borrowerSchema = new mongoose.Schema({
         enum: ["Basic", "Pending for Review", "Verified", "Declined"]
     },
     profile: {
-        email: {
-            type: String,
-            unique: true,
-            required: true
-        },
-        emailVerificationToken: String,
-        emailVerified: Boolean,
         firstName: {
             type: String,
             required: true
@@ -87,11 +83,6 @@ const borrowerSchema = new mongoose.Schema({
             enum: ["Owned", "Relative", "None", "Others"]
         },
         homePhoneNum: String,
-        mobileNum: {
-            type: String,
-            required: true
-        },
-        mobileNumVerified: Boolean,
         lineType: {
             type: String,
             enum: ["Pre Paid", "Post Paid"]
@@ -281,12 +272,12 @@ const borrowerSchema = new mongoose.Schema({
         default: "0.00"
     }, // Set by Loan Officer
     reviewedBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date,
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User" // User account
     },
     termsandCondition: Boolean
@@ -294,4 +285,4 @@ const borrowerSchema = new mongoose.Schema({
     timestamps: true
 });
 
-mongoose.model('Borrower', borrowerSchema);
+model('Borrower', borrowerSchema);

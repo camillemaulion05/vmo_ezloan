@@ -1,18 +1,18 @@
-const mongoose = require('mongoose');
-const Employee = mongoose.model('Employee');
+import {
+    model
+} from 'mongoose';
+const Employee = model('Employee');
 
 const employeesList = (req, res) => {
     Employee
         .find({}, {
-            "profile.email": 1,
             "profile.firstName": 1,
             "profile.lastName": 1,
-            "profile.mobileNum": 1,
             "type": 1,
             "employeeNum": 1,
             "userId": 1
         })
-        .populate('userId', 'status')
+        .populate('userId', 'status', 'email', 'mobileNum')
         .exec((err, employees) => {
             if (err) {
                 res
@@ -59,7 +59,7 @@ const employeesReadOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status')
+            .populate('userId', 'status', 'email', 'mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -93,7 +93,7 @@ const employeesUpdateOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status')
+            .populate('userId', 'status', 'email', 'mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -158,7 +158,7 @@ const employeesDeleteOne = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     employeesList,
     employeesCreate,
     employeesReadOne,

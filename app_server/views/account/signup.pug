@@ -1,0 +1,90 @@
+extends ../layout
+
+block content
+  .container
+    .form-clean.signup-form
+      form#regForm(method='post')
+        input(type='hidden', name='_csrf', value=_csrf)
+        h2 Register
+        hr
+        .tab
+          p.header-text Create your account. It&apos;s free and only takes a minute.
+          .row
+            .col-sm-6
+              .form-group
+                input#firstName.form-control(type='text' name='firstName' placeholder='First Name')
+                em.help-block.text-danger
+            .col-sm-6
+              .form-group
+                input#lastName.form-control(type='text' name='lastName' placeholder='Last Name')
+                em.help-block.text-danger
+          .row
+            .col-sm-12
+              .form-group
+                input#username.form-control(type='text' name='username' placeholder='Username' minlength='8')
+                em.help-block.text-danger
+          .row
+            .col-sm-12
+              .form-group
+                input#password.form-control(type='password' name='password' placeholder='Password' minlength='8')
+                em.help-block.text-danger
+          .row
+            .col-sm-12
+              .form-group
+                input#confirmPassword.form-control(type='password' name='confirmPassword' placeholder='Confirm Password')
+                em.help-block.text-danger
+        .tab.hide
+          p.hint-text
+            | For your security, VMO EZ Loan wants to make sure it&rsquo;s really you. VMO EZ Loan will send a text message with a 6-digit verification code. 
+            em Standard rates apply
+          p#errorSendOtp.hint-text
+          .row
+            .col-sm-12
+              .form-group.input-group
+                span.input-group-addon +63
+                input#phone.form-control(type='text' name='phone' placeholder='Phone Number' minlength='10' maxlength='10')
+              em.text-danger
+        .tab.hide
+          p#sendOTP.hint-text
+          .row
+            .col-sm-12
+              .form-group
+                input#code.form-control(type='text' name='code' placeholder='Enter verification code' minlength='6' maxlength='6')
+                em.help-block.text-danger
+        .tab.hide
+          p.hint-text
+            span#user Username
+            | , welcome to VMO EZ Loan
+          .row
+            .col-sm-12
+              .form-group
+                input#email.form-control(type='email' name='email' placeholder='Email')
+                em.help-block.text-danger
+          .row
+            .col-sm-12
+              .form-group
+                input#birthdate.form-control(type='date' name='birthdate' placeholder='Birthday')
+                em.help-block.text-danger
+          .row
+            .col-sm-12
+              .form-group
+                select#gender.form-control.selectpicker(type='text' name='gender')
+                  option(value='' selected='' disabled='') Gender
+                  option(value='Female') Female
+                  option(value='Male') Male
+                  option(value='None') Rather not say
+                em.help-block.text-danger
+        div(style='overflow:auto;')
+          div(style='float:right;')
+            button#prevBtn.btn.btn-danger.hide(type='button') Previous
+            |  
+            button#nextBtn.btn.btn-primary(type='button' onclick='nextPrev(1,0)') Next
+        // Circles which indicates the steps of the form:
+        div(style='text-align:center;margin-top:30px;')
+          span.step
+          span.step
+          span.step
+          span.step
+      .text-center
+        | Already have an account? 
+        a(href='/login') Login here!

@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const Inquiry = mongoose.model('Inquiry');
+import {
+    model
+} from 'mongoose';
+const Inquiry = model('Inquiry');
 
 const inquiriesList = (req, res) => {
     Inquiry
@@ -154,7 +156,7 @@ const inquiriesDeleteOne = (req, res) => {
     }
 };
 
-module.exports = {
+export default {
     inquiriesList,
     inquiriesCreate,
     inquiriesReadOne,

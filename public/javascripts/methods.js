@@ -390,7 +390,7 @@ function sendOTP(currentTab) {
             }
         });
         $.ajax({
-            url: "/sms/sendOTP",
+            url: "/api/sendOTP",
             type: "POST",
             data: {
                 phone: $('input[name="phone"]').val(),
@@ -419,7 +419,7 @@ function validateOTP(currentTab) {
             }
         });
         $.ajax({
-            url: "/sms/validateOTP",
+            url: "/api/validateOTP",
             type: "POST",
             data: {
                 code: $('input[name="code"]').val(),

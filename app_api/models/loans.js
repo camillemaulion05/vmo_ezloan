@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import {
+    Schema,
+    model
+} from 'mongoose';
 
-const loanSchema = new mongoose.Schema({
+const loanSchema = new Schema({
     loanNum: String, // Date.now();
     loanType: {
         type: String,
@@ -100,12 +103,12 @@ const loanSchema = new mongoose.Schema({
         enum: ["Processing", "Approved", "Declined", "Loan Release", "Open", "Fully Paid", "Loan Debt"]
     },
     reviewedBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date,
     requestedBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Borrower' // Borrower
     }
 }, {
@@ -227,4 +230,4 @@ loanSchema.methods.addRepayment = function (date, amount) {
     }
 };
 
-mongoose.model('Loan', loanSchema);
+model('Loan', loanSchema);
