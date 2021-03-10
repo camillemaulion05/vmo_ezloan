@@ -224,7 +224,7 @@ const usersAuthenticate = (req, res) => {
 const usersSetPasswordToken = (req, res) => {
     User.findOne({
             "email": req.body.email,
-            "security.question": req.body.question
+            "security.question": req.body.security.question
         })
         .exec((err, user) => {
             if (err) {
@@ -238,12 +238,141 @@ const usersSetPasswordToken = (req, res) => {
                         "message": "User not found"
                     });
             } else {
-                user.setPasswordRandomToken();
+                user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
+                    if (err) {
+                        res
+                            .status(404)
+                            .json(err);
+                    } else if (isMatch) {
+                        user.setPasswordRandomToken();
+                        user.save((err) => {
+                            if (err) {
+                                res
+                                    .status(400)
+                                    .json(err);
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        'token': user.passwordResetToken
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(401)
+                            .json({
+                                "message": "Invalid email or answer to your security question."
+                            });
+                    }
+                });
+            }
+        });
+};
+
+const usersSetEmailToken = (req, res) => {
+    User.findOne({
+            "email": req.body.email
+        })
+        .exec((err, user) => {
+            if (err) {
                 res
-                    .status(200)
+                    .status(404)
+                    .json(err);
+            } else if (!user) {
+                res
+                    .status(404)
                     .json({
-                        'token': user.passwordResetToken
+                        "message": "User not found"
                     });
+            } else {
+                user.setEmailRandomToken();
+                user.save((err) => {
+                    if (err) {
+                        res
+                            .status(400)
+                            .json(err);
+                    } else {
+                        res
+                            .status(200)
+                            .json({
+                                'token': user.emailVerificationToken
+                            });
+                    }
+                });
+            }
+        });
+};
+
+const usersResetPassword = (req, res) => {
+    User.findOne({
+            "passwordResetToken": req.body.token
+        })
+        .where('passwordResetExpires').gt(Date.now())
+        .exec((err, user) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json(err);
+            } else if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found"
+                    });
+            } else {
+                user.password = req.body.password;
+                user.passwordResetToken = undefined;
+                user.passwordResetExpires = undefined;
+                user.save((err) => {
+                    if (err) {
+                        res
+                            .status(400)
+                            .json(err);
+                    } else {
+                        res
+                            .status(200)
+                            .json({
+                                'message': 'Success! Your password has been changed.'
+                            });
+                    }
+                });
+            }
+        });
+};
+
+const usersVerifyEmailToken = (req, res) => {
+    User.findOne({
+            "email": req.body.email,
+            "emailVerificationToken": req.body.token
+        })
+        .exec((err, user) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json(err);
+            } else if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found"
+                    });
+            } else {
+                user.emailVerificationToken = '';
+                user.emailVerified = true;
+                user.save((err) => {
+                    if (err) {
+                        res
+                            .status(400)
+                            .json(err);
+                    } else {
+                        res
+                            .status(200)
+                            .json({
+                                "message": "Thank you for verifying your email address."
+                            });
+                    }
+                });
             }
         });
 };
@@ -255,5 +384,8 @@ export default {
     usersUpdateOne,
     usersDeleteOne,
     usersAuthenticate,
-    usersSetPasswordToken
+    usersSetPasswordToken,
+    usersSetEmailToken,
+    usersResetPassword,
+    usersVerifyEmailToken
 };

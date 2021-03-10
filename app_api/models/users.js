@@ -141,10 +141,10 @@ userSchema.methods.encryptSecurityAnswer = function () {
 /**
  * Helper method for validating user's security answer.
  */
-userSchema.methods.compareSecurityAnswer = function (object, cb) {
+userSchema.methods.compareSecurityAnswer = function (security, cb) {
     for (let i = 0; i < this.security.length; i++) {
-        if (object.question === this.security[i].question) {
-            let bytes = AES.decrypt(object.answer, process.env.CRYPTOJS_SECRET);
+        if (security.question === this.security[i].question) {
+            let bytes = AES.decrypt(security.answer, process.env.CRYPTOJS_SECRET);
             let candidateAnswer = bytes.toString(enc.Utf8);
             compare(candidateAnswer, this.security[i].answer, (err, isMatch) => {
                 cb(err, isMatch);
