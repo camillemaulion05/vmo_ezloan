@@ -100,7 +100,7 @@ userSchema.pre('save', function save(next) {
 userSchema.methods.comparePassword = function (encryptedPassword, cb) {
     let bytes = CryptoJS.AES.decrypt(encryptedPassword, process.env.CRYPTOJS_CLIENT_SECRET);
     let candidatePassword = bytes.toString(CryptoJS.enc.Utf8);
-    compare(candidatePassword, this.password, (err, isMatch) => {
+    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
         cb(err, isMatch);
     });
 };

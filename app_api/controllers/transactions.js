@@ -66,7 +66,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId', 'profile.firstName profile.lastName type')
+            .populate('borrowerId', 'profile.firstName profile.lastName type userId')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -81,6 +81,13 @@ const transactionsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && transaction.borrowerId.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(transaction);
@@ -199,13 +206,7 @@ const transactionsPerType = (req, res) => {
             })
             .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transactions) => {
-                if (!transactions) {
-                    res
-                        .status(404)
-                        .json({
-                            "message": "Transaction not found."
-                        });
-                } else if (err) {
+                if (err) {
                     res
                         .status(404)
                         .json({
@@ -220,29 +221,36 @@ const transactionsPerType = (req, res) => {
     }
 };
 
-const transactionsPerBorrower = (req, res) => {
+const transactionsPerUser = (req, res) => {
     const {
-        borrowerid
+        userid
     } = req.params;
-    if (!borrowerid) {
+    if (!userid) {
         res
             .status(404)
             .json({
-                "message": "Not found, borrowerid is required"
+                "message": "Not found, userid is required"
             });
     } else {
         Transaction
-            .find({
-                "borrowerId": borrowerid
-            })
+            .aggregate([{
+                $lookup: {
+                    from: 'borrowers',
+                    localField: 'borrowerId',
+                    foreignField: '_id',
+                    as: 'borrower'
+                }
+            }, {
+                $match: {
+                    'borrower.userId': mongoose.Types.ObjectId(userid),
+                }
+            }, {
+                $project: {
+                    borrower: 0
+                }
+            }])
             .exec((err, transactions) => {
-                if (!transactions) {
-                    res
-                        .status(404)
-                        .json({
-                            "message": "Transaction not found."
-                        });
-                } else if (err) {
+                if (err) {
                     res
                         .status(404)
                         .json({
@@ -275,7 +283,7 @@ const transactionsSummary = (req, res) => {
         Transaction
             .aggregate([{
                     $match: {
-                        'postedDate': {
+                        postedDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         }
@@ -329,14 +337,14 @@ const contributionsPerMember = (req, res) => {
         Transaction
             .aggregate([{
                     $match: {
-                        'postedDate': {
+                        postedDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         },
                         $or: [{
-                            'type': 'Contributions'
+                            type: 'Contributions'
                         }, {
-                            'type': 'Withdrawals'
+                            type: 'Withdrawals'
                         }]
                     }
                 },
@@ -374,7 +382,7 @@ module.exports = {
     transactionsUpdateOne,
     transactionsDeleteOne,
     transactionsPerType,
-    transactionsPerBorrower,
+    transactionsPerUser,
     transactionsSummary,
     contributionsPerMember
 };

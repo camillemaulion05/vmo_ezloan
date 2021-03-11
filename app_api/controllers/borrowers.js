@@ -14,7 +14,7 @@ const borrowersList = (req, res) => {
             "profile.gender": 1,
             "profile.birthday": 1
         })
-        .populate('userId', 'status', 'email', 'mobileNum')
+        .populate('userId', 'status email mobileNum')
         .exec((err, borrowers) => {
             if (err) {
                 res
@@ -76,7 +76,7 @@ const borrowersReadOne = (req, res) => {
     } else {
         Borrower
             .findById(borrowerid)
-            .populate('userId', 'status', 'email', 'mobileNum')
+            .populate('userId', 'status email mobileNum')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -91,6 +91,13 @@ const borrowersReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(borrower);
@@ -112,7 +119,7 @@ const borrowersUpdateOne = (req, res) => {
     } else {
         Borrower
             .findById(borrowerid)
-            .populate('userId', 'status', 'email', 'mobileNum')
+            .populate('userId', 'status email mobileNum')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -127,6 +134,13 @@ const borrowersUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     borrower.type = (req.body.type) ? req.body.type : borrower.type;
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
                     borrower.profile = (req.body.profile) ? req.body.profile : borrower.profile;

@@ -61,34 +61,34 @@ router
 // employees
 router
     .route('/employees')
-    .get(auth, middleware.isSafe, ctrlEmployees.employeesList)
+    .get(auth, middleware.isAdmin, ctrlEmployees.employeesList)
     .post(auth, middleware.isAdmin, ctrlEmployees.employeesCreate);
 
 router
     .route('/employees/:employeeid')
-    .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOne)
+    .get(auth, middleware.isModerator, ctrlEmployees.employeesReadOne)
     .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
 
 // transactions
 router
     .route('/transactions')
-    .get(auth, middleware.isSafe, ctrlTransactions.transactionsList)
+    .get(auth, middleware.isModerator, ctrlTransactions.transactionsList)
     .post(auth, middleware.isSafe, ctrlTransactions.transactionsCreate);
 
 router
     .route('/transactions/:transactionid')
     .get(auth, middleware.isSafe, ctrlTransactions.transactionsReadOne)
-    .put(auth, middleware.isSafe, ctrlTransactions.transactionsUpdateOne)
+    .put(auth, middleware.isModerator, ctrlTransactions.transactionsUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteOne);
 
 router
     .route('/transactions/type/:type')
-    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerType);
+    .get(auth, middleware.isModerator, ctrlTransactions.transactionsPerType);
 
 router
-    .route('/transactions/borrower/:borrowerid')
-    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerBorrower);
+    .route('/transactions/users/:userid')
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerUser);
 
 router
     .route('/transactions/summary/:year')
@@ -101,19 +101,23 @@ router
 // withdrawals
 router
     .route('/withdrawals')
-    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsList)
+    .get(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsList)
     .post(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsCreate);
 
 router
     .route('/withdrawals/:withdrawalid')
     .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsReadOne)
-    .put(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsUpdateOne)
+    .put(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteOne);
+
+router
+    .route('/withdrawals/users/:userid')
+    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsPerUser);
 
 // borrowers
 router
     .route('/borrowers')
-    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersList)
+    .get(auth, middleware.isModerator, ctrlBorrowers.borrowersList)
     .post(auth, middleware.isSafe, ctrlBorrowers.borrowersCreate);
 
 router
@@ -125,19 +129,23 @@ router
 // loans
 router
     .route('/loans')
-    .get(auth, middleware.isSafe, ctrlLoans.loansList)
+    .get(auth, middleware.isModerator, ctrlLoans.loansList)
     .post(auth, middleware.isSafe, ctrlLoans.loansCreate);
 
 router
     .route('/loans/:loanid')
     .get(auth, middleware.isSafe, ctrlLoans.loansReadOne)
-    .put(auth, middleware.isSafe, ctrlLoans.loansUpdateOne)
+    .put(auth, middleware.isModerator, ctrlLoans.loansUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteOne);
+
+router
+    .route('/loans/users/:userid')
+    .get(auth, middleware.isSafe, ctrlLoans.loansPerUser);
 
 router
     .route('/loans/:loanid/schedules')
     .get(auth, middleware.isSafe, ctrlLoans.loansSchedulesList)
-    .put(auth, middleware.isSafe, ctrlLoans.loansSchedulesUpdate);
+    .put(auth, middleware.isModerator, ctrlLoans.loansSchedulesUpdate);
 
 router
     .route('/loans/:loanid/schedules/:scheduleid')
@@ -145,7 +153,11 @@ router
 
 router
     .route('/loans/:loanid/due')
-    .get(auth, middleware.isSafe, ctrlLoans.loansRepaymentsDue);
+    .get(auth, middleware.isSafe, ctrlLoans.loansDuePerLoan);
+
+router
+    .route('/loans/due/repayments')
+    .get(auth, middleware.isAdmin, ctrlLoans.loansDueRepayments);
 
 router
     .route('/loans/summary/:year')

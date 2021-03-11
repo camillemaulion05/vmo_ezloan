@@ -63,7 +63,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName')
+            .populate('requestedBy', 'profile.firstName profile.lastName userId')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -78,6 +78,13 @@ const withdrawalsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && withdrawal.requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(withdrawal);
@@ -173,10 +180,55 @@ const withdrawalsDeleteOne = (req, res) => {
     }
 };
 
+const withdrawalsPerUser = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        Withdrawal
+            .aggregate([{
+                $lookup: {
+                    from: 'borrowers',
+                    localField: 'requestedBy',
+                    foreignField: '_id',
+                    as: 'borrower'
+                }
+            }, {
+                $match: {
+                    'borrower.userId': mongoose.Types.ObjectId(userid),
+                }
+            }, {
+                $project: {
+                    borrower: 0
+                }
+            }])
+            .exec((err, withdrawals) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(withdrawals);
+                }
+            });
+    }
+};
+
 module.exports = {
     withdrawalsList,
     withdrawalsCreate,
     withdrawalsReadOne,
     withdrawalsUpdateOne,
-    withdrawalsDeleteOne
+    withdrawalsDeleteOne,
+    withdrawalsPerUser
 };

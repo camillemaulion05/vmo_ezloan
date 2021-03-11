@@ -7,12 +7,14 @@ const isAdmin = (req, res, next) => {
             res
                 .status(404)
                 .json({
-                    "message": "user not found"
+                    "message": "User not found."
                 });
         } else if (err) {
             res
                 .status(404)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else if (user.type != "Admin") {
             res
                 .status(403)
@@ -31,13 +33,15 @@ const isModerator = (req, res, next) => {
             res
                 .status(404)
                 .json({
-                    "message": "user not found"
+                    "message": "User not found."
                 });
         } else if (err) {
             res
                 .status(404)
-                .json(err);
-        } else if (user.type != "Employee" || user.type != "Admin") {
+                .json({
+                    "message": err._message
+                });
+        } else if (user.type != "Employee" && user.type != "Admin") {
             res
                 .status(403)
                 .json({
@@ -50,17 +54,24 @@ const isModerator = (req, res, next) => {
 };
 
 const isSafe = (req, res, next) => {
+    let arrayPath = req.path.split('/');
+    let apiPath = arrayPath[1];
+    let apiPath2 = arrayPath[2];
+    let method = req.method;
+    let params = arrayPath[arrayPath.length - 1];
     User.findById(req.payload._id).exec((err, user) => {
         if (!user) {
             res
                 .status(404)
                 .json({
-                    "message": "user not found"
+                    "message": "User not found."
                 });
         } else if (err) {
             res
                 .status(404)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else if (user.type != "Employee" && user.type != "Admin" && user.type != "Borrower") {
             res
                 .status(403)
@@ -68,6 +79,28 @@ const isSafe = (req, res, next) => {
                     "message": "You don\'t have permission to do that!"
                 });
         } else {
+            if (params && apiPath == 'users' && (method == 'GET' || method == "PUT")) {
+                if (user.type == "Employee" || user.type == "Borrower") {
+                    if (user._id != params) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                }
+            }
+            if (params && (apiPath == 'transactions' || apiPath == 'withdrawals' || apiPath == 'loans') && apiPath2 == 'users' && method == 'GET') {
+                if (user.type == "Borrower") {
+                    if (user._id != params) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                }
+            }
             next();
         }
     });

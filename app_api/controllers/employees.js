@@ -10,7 +10,7 @@ const employeesList = (req, res) => {
             "employeeNum": 1,
             "userId": 1
         })
-        .populate('userId', 'status', 'email', 'mobileNum')
+        .populate('userId', 'status email mobileNum')
         .exec((err, employees) => {
             if (err) {
                 res
@@ -63,7 +63,7 @@ const employeesReadOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status', 'email', 'mobileNum')
+            .populate('userId', 'status email mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -99,7 +99,7 @@ const employeesUpdateOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status', 'email', 'mobileNum')
+            .populate('userId', 'status email mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res

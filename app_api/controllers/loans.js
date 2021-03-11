@@ -66,7 +66,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -81,6 +81,13 @@ const loansReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && loan.requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loan);
@@ -304,7 +311,7 @@ const loansSchedulesReadOne = (req, res) => {
     }
 };
 
-const loansRepaymentsDue = (req, res) => {
+const loansDuePerLoan = (req, res) => {
     const {
         loanid
     } = req.params;
@@ -348,6 +355,32 @@ const loansRepaymentsDue = (req, res) => {
     }
 };
 
+const loansDueRepayments = (req, res) => {
+    const dateToday = new Date();
+    Loan.find({
+            "loanPaymentSchedule.dueDate": {
+                $gte: dateToday
+            }
+        }, {
+            "loanPaymentSchedule.$": 1,
+            "_id": 0
+        })
+        .populate('requestedBy', 'profile.firstName profile.lastName type')
+        .exec((err, loanPaymentSchedule) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json({
+                        "message": err._message
+                    });
+            } else {
+                res
+                    .status(200)
+                    .json(loanPaymentSchedule);
+            }
+        });
+};
+
 const loansSummary = (req, res) => {
     const {
         year
@@ -366,7 +399,7 @@ const loansSummary = (req, res) => {
         Loan
             .aggregate([{
                     $match: {
-                        'paymentStartDate': {
+                        paymentStartDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         }
@@ -424,17 +457,17 @@ const loansSummary = (req, res) => {
                     }
                 },
                 {
-                    "$project": {
-                        "_id": 1,
-                        "borrower.type": 1,
-                        "loanAmount": 1,
-                        "totalPrincipalPaid": 1,
-                        "principalRemaining": 1,
-                        "totalInterestPaid": 1,
-                        "unpaidInterest": 1,
-                        "totalPayments": 1,
-                        "serviceFee": 1,
-                        "count": 1
+                    $project: {
+                        _id: 1,
+                        'borrower.type': 1,
+                        loanAmount: 1,
+                        totalPrincipalPaid: 1,
+                        principalRemaining: 1,
+                        totalInterestPaid: 1,
+                        unpaidInterest: 1,
+                        totalPayments: 1,
+                        serviceFee: 1,
+                        count: 1
                     }
                 }
             ])
@@ -479,7 +512,7 @@ const loansInterestReport = (req, res) => {
                     }
                 }, {
                     $match: {
-                        'paymentStartDate': {
+                        paymentStartDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         },
@@ -513,6 +546,50 @@ const loansInterestReport = (req, res) => {
     }
 };
 
+const loansPerUser = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        Loan
+            .aggregate([{
+                $lookup: {
+                    from: 'borrowers',
+                    localField: 'requestedBy',
+                    foreignField: '_id',
+                    as: 'borrower'
+                }
+            }, {
+                $match: {
+                    'borrower.userId': mongoose.Types.ObjectId(userid),
+                }
+            }, {
+                $project: {
+                    borrower: 0,
+                    loanPaymentSchedule: 0
+                }
+            }])
+            .exec((err, loans) => {
+                if (err) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(loans);
+                }
+            });
+    }
+};
 module.exports = {
     loansList,
     loansCreate,
@@ -522,7 +599,9 @@ module.exports = {
     loansSchedulesList,
     loansSchedulesUpdate,
     loansSchedulesReadOne,
-    loansRepaymentsDue,
+    loansDuePerLoan,
+    loansDueRepayments,
     loansSummary,
-    loansInterestReport
+    loansInterestReport,
+    loansPerUser
 };
