@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const Borrower = model('Borrower');
+const mongoose = require('mongoose');
+const Borrower = mongoose.model('Borrower');
 
 const borrowersList = (req, res) => {
     Borrower
@@ -21,7 +19,9 @@ const borrowersList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -50,11 +50,15 @@ const borrowersCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(borrower);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -78,12 +82,14 @@ const borrowersReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "borrower not found"
+                            "message": "Borrower not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -112,12 +118,14 @@ const borrowersUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "borrowerid not found"
+                            "message": "Borrower not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     borrower.type = (req.body.type) ? req.body.type : borrower.type;
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
@@ -134,7 +142,9 @@ const borrowersUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -164,12 +174,14 @@ const borrowersDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "borrower not found"
+                            "message": "Borrower not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -179,7 +191,7 @@ const borrowersDeleteOne = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     borrowersList,
     borrowersCreate,
     borrowersReadOne,

@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const Inquiry = model('Inquiry');
+const mongoose = require('mongoose');
+const Inquiry = mongoose.model('Inquiry');
 
 const inquiriesList = (req, res) => {
     Inquiry
@@ -10,7 +8,9 @@ const inquiriesList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -33,11 +33,15 @@ const inquiriesCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(inquiry);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -60,12 +64,14 @@ const inquiriesReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "inquiry not found"
+                            "message": "Inquiry not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -93,12 +99,14 @@ const inquiriesUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "inquiryid not found"
+                            "message": "Inquiry not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     inquiry.name = (req.body.name) ? req.body.name : inquiry.name;
                     inquiry.email = (req.body.email) ? req.body.email : inquiry.email;
@@ -111,7 +119,9 @@ const inquiriesUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -141,12 +151,14 @@ const inquiriesDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "inquiry not found"
+                            "message": "Inquiry not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -156,7 +168,7 @@ const inquiriesDeleteOne = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     inquiriesList,
     inquiriesCreate,
     inquiriesReadOne,

@@ -1,29 +1,18 @@
-import {
-    Router
-} from 'express';
-const router = Router();
-import {
-    index,
-    postContact
-} from '../controllers/home';
-import {
-    getLogin,
-    getLogout,
-    getForgot,
-    getReset,
-    getSignup
-} from '../controllers/users';
+const express = require('express');
+const router = express.Router();
+const ctrlHome = require('../controllers/home');
+const ctrlUsers = require('../controllers/users');
 
-router.get('/', index);
-router.post('/', postContact);
-router.get('/login', getLogin);
+router.get('/', ctrlHome.index);
+router.post('/', ctrlHome.postContact);
+router.get('/login', ctrlUsers.getLogin);
 // router.post('/login', ctrlUsers.postLogin);
-router.get('/logout', getLogout);
-router.get('/forgot', getForgot);
-// router.post('/forgot', ctrlUsers.postForgot);
-router.get('/reset/:token', getReset);
+router.get('/logout', ctrlUsers.getLogout);
+router.get('/forgot', ctrlUsers.getForgot);
+router.post('/forgot', ctrlUsers.postForgot);
+// router.get('/reset/:token', ctrlUsers.getReset);
 // router.post('/reset/:token', ctrlUsers.postReset);
-router.get('/signup', getSignup);
+router.get('/signup', ctrlUsers.getSignup);
 // router.post('/signup', ctrlUsers.postSignup);
 
-export default router;
+module.exports = router;

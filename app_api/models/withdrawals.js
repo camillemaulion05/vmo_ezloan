@@ -1,9 +1,6 @@
-import {
-    Schema,
-    model
-} from 'mongoose';
+const mongoose = require('mongoose');
 
-const withdrawalSchema = new Schema({
+const withdrawalSchema = mongoose.Schema({
     withdrawalNum: String, // Date.now();
     amount: {
         type: String,
@@ -22,7 +19,7 @@ const withdrawalSchema = new Schema({
         ]
     },
     requestedBy: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower'
     },
     status: {
@@ -31,7 +28,7 @@ const withdrawalSchema = new Schema({
         enum: ["Processing", "Approved", "Declined", "Cash Release"]
     },
     reviewedBy: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date
@@ -39,4 +36,4 @@ const withdrawalSchema = new Schema({
     timestamps: true
 });
 
-model('Withdrawal', withdrawalSchema);
+mongoose.model('Withdrawal', withdrawalSchema);

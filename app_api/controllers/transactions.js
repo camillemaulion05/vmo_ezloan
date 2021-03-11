@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const Transaction = model('Transaction');
+const mongoose = require('mongoose');
+const Transaction = mongoose.model('Transaction');
 
 const transactionsList = (req, res) => {
     Transaction
@@ -11,7 +9,9 @@ const transactionsList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -40,11 +40,15 @@ const transactionsCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(transaction);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -68,12 +72,14 @@ const transactionsReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "transaction not found"
+                            "message": "Transaction not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -102,12 +108,14 @@ const transactionsUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "transactionid not found"
+                            "message": "Transaction not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     transaction.amount = (req.body.amount) ? req.body.amount : transaction.amount;
                     transaction.type = (req.body.type) ? req.body.type : transaction.type;
@@ -125,7 +133,9 @@ const transactionsUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -155,12 +165,14 @@ const transactionsDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "transaction not found"
+                            "message": "Transaction not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -191,12 +203,14 @@ const transactionsPerType = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "transactions not found"
+                            "message": "Transaction not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -226,12 +240,14 @@ const transactionsPerBorrower = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "transactions not found"
+                            "message": "Transaction not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -283,7 +299,9 @@ const transactionsSummary = (req, res) => {
                 if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -337,7 +355,9 @@ const contributionsPerMember = (req, res) => {
                 if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -347,7 +367,7 @@ const contributionsPerMember = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     transactionsList,
     transactionsCreate,
     transactionsReadOne,

@@ -1,11 +1,6 @@
-import {
-    AES,
-    enc
-} from "crypto-js";
+const CryptoJS = require("crypto-js");
 const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
-import {
-    createTransport
-} from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 const index = (req, res) => {
     return res
@@ -15,23 +10,74 @@ const index = (req, res) => {
         });
 };
 
-const encrypt = (req, res) => {
-    let cipherText = AES.encrypt(req.body.plainText, process.env.CRYPTOJS_SECRET).toString();
-    return res
-        .status(200)
-        .json({
-            "cipherText": cipherText
-        });
+const clientEncrypt = (req, res) => {
+    if (req.body.plainText) {
+        let cipherText = CryptoJS.AES.encrypt(req.body.plainText, process.env.CRYPTOJS_CLIENT_SECRET).toString();
+        return res
+            .status(200)
+            .json({
+                "cipherText": cipherText
+            });
+    } else {
+        return res
+            .status(400)
+            .json({
+                "message": "plainText is required."
+            });
+    }
 };
 
-const decrypt = (req, res) => {
-    let bytes = AES.decrypt(req.body.cipherText, process.env.CRYPTOJS_SECRET);
-    let originalText = bytes.toString(enc.Utf8);
-    return res
-        .status(200)
-        .json({
-            "plainText": originalText
-        });
+const clientDecrypt = (req, res) => {
+    if (req.body.cipherText) {
+        let bytes = CryptoJS.AES.decrypt(req.body.cipherText, process.env.CRYPTOJS_CLIENT_SECRET);
+        let originalText = bytes.toString(CryptoJS.enc.Utf8);
+        return res
+            .status(200)
+            .json({
+                "plainText": originalText
+            });
+    } else {
+        return res
+            .status(400)
+            .json({
+                "message": "cipherText is required."
+            });
+    }
+};
+
+const serverEncrypt = (req, res) => {
+    if (req.body.plainText) {
+        let cipherText = CryptoJS.AES.encrypt(req.body.plainText, process.env.CRYPTOJS_SERVER_SECRET).toString();
+        return res
+            .status(200)
+            .json({
+                "cipherText": cipherText
+            });
+    } else {
+        return res
+            .status(400)
+            .json({
+                "message": "plainText is required."
+            });
+    }
+};
+
+const serverDecrypt = (req, res) => {
+    if (req.body.cipherText) {
+        let bytes = CryptoJS.AES.decrypt(req.body.cipherText, process.env.CRYPTOJS_SERVER_SECRET);
+        let originalText = bytes.toString(CryptoJS.enc.Utf8);
+        return res
+            .status(200)
+            .json({
+                "plainText": originalText
+            });
+    } else {
+        return res
+            .status(400)
+            .json({
+                "message": "cipherText is required."
+            });
+    }
 };
 
 const createService = function () {
@@ -63,17 +109,18 @@ const sendOTP = function (req, res) {
                         "message": (verification.status == "pending") ? "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.phone).substring(6, 10) + ", please check." : "Sorry " + req.body.name + ", it seems that my sms server is not responding. Please try again later!"
                     });
             })
-            .catch(error => {
+            .catch(err => {
+                console.log('ERROR: Could not send OTP code.\n', err.message)
                 return res
                     .status(404)
                     .json({
                         "status": "error",
-                        "message": error.message
+                        "message": "Error sending the code. Please try again shortly."
                     });
             });
     } else {
         return res
-            .status(404)
+            .status(400)
             .json({
                 "status": "error",
                 "message": "Mobile number is required."
@@ -97,17 +144,18 @@ const validateOTP = function (req, res) {
                         "message": (verification_check.status == "approved") ? "Your mobile number is verified." : "You've entered a wrong code. Please try again."
                     });
             })
-            .catch(error => {
+            .catch(err => {
+                console.log('ERROR: Could not validateOTP code.\n', err.message)
                 return res
                     .status(404)
                     .json({
                         "status": "error",
-                        "message": error.message
+                        "message": "Error validating the code. Please try again shortly."
                     });
             });
     } else {
         return res
-            .status(404)
+            .status(400)
             .json({
                 "status": "error",
                 "message": "Mobile number and verification code is required."
@@ -120,74 +168,85 @@ const deleteService = function () {
 }
 
 const sendMail = async function (req, res) {
-    let transporter = createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASSWORD
-        }
-    });
-    let mailOptions = {
-        subject: req.body.subject,
-        text: req.body.message
-    };
-    if (req.body.sender) {
-        mailOptions.to = process.env.GMAIL_USER;
-        mailOptions.from = `${req.body.name} <${req.body.sender}>`;
-    }
-    if (req.body.receiver) {
-        mailOptions.to = req.body.receiver;
-        mailOptions.from = process.env.GMAIL_USER;
-    }
-    try {
-        await transporter.sendMail(mailOptions);
-        return res
-            .status(200)
-            .json({
-                "message": "Email has been sent successfully!"
-            });
-    } catch (err) {
-        if (err.message === 'self signed certificate in certificate chain') {
-            console.log('WARNING: Self signed certificate in certificate chain. Retrying with the self signed certificate. Use a valid certificate if in production.');
-            transporter = createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.GMAIL_USER,
-                    pass: process.env.GMAIL_PASSWORD
-                },
-                tls: {
-                    rejectUnauthorized: false
-                }
-            });
-            try {
-                await transporter.sendMail(mailOptions);
-                return res
-                    .status(200)
-                    .json({
-                        "message": "Email has been sent successfully!"
-                    });
-            } catch (err) {
-                console.log('ERROR: Could not send contact email.\n', err);
-                return res
-                    .status(404)
-                    .json({
-                        "message": "Error sending the message. Please try again shortly."
-                    });
+    if (req.body.message && req.body.subject && (req.body.sender || req.body.receiver)) {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.GMAIL_PASSWORD
             }
+        });
+        let mailOptions = {
+            subject: req.body.subject,
+            text: req.body.message
+        };
+        if (req.body.sender) {
+            mailOptions.to = process.env.GMAIL_USER;
+            mailOptions.from = `${req.body.name} <${req.body.sender}>`;
         }
-        console.log('ERROR: Could not send contact email.\n', err);
+        if (req.body.receiver) {
+            mailOptions.to = req.body.receiver;
+            mailOptions.from = process.env.GMAIL_USER;
+        }
+        try {
+            await transporter.sendMail(mailOptions);
+            return res
+                .status(200)
+                .json({
+                    "message": "Email has been sent successfully!"
+                });
+        } catch (err) {
+            if (err.message === 'self signed certificate in certificate chain') {
+                console.log('WARNING: Self signed certificate in certificate chain. Retrying with the self signed certificate. Use a valid certificate if in production.');
+                transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.GMAIL_USER,
+                        pass: process.env.GMAIL_PASSWORD
+                    },
+                    tls: {
+                        rejectUnauthorized: false
+                    }
+                });
+                try {
+                    await transporter.sendMail(mailOptions);
+                    return res
+                        .status(200)
+                        .json({
+                            "message": "Email has been sent successfully!"
+                        });
+                } catch (err) {
+                    console.log('ERROR: Could not send contact email.\n', err);
+                    return res
+                        .status(400)
+                        .json({
+                            "message": "Error sending the message. Please try again shortly."
+                        });
+                }
+            }
+            console.log('ERROR: Could not send email.\n', err);
+            return res
+                .status(400)
+                .json({
+                    "message": "Error sending the message. Please try again shortly."
+                });
+        }
+    } else {
         return res
-            .status(404)
+            .status(400)
             .json({
-                "message": "Error sending the message. Please try again shortly."
+                "status": "error",
+                "message": "Required fields are empty."
             });
     }
 }
 
-export default {
+module.exports = {
     index,
-    encrypt,
-    decrypt,
+    clientEncrypt,
+    clientDecrypt,
+    serverEncrypt,
+    serverDecrypt,
     createService,
     sendOTP,
     validateOTP,

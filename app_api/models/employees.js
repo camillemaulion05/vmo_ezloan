@@ -1,9 +1,6 @@
-import {
-    Schema,
-    model
-} from 'mongoose';
+const mongoose = require('mongoose');
 
-const employeeSchema = new Schema({
+const employeeSchema = mongoose.Schema({
     employeeNum: String, // Date.now();
     type: {
         type: String,
@@ -53,11 +50,11 @@ const employeeSchema = new Schema({
         }
     },
     userId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }
 }, {
     timestamps: true
 });
 
-model('Employee', employeeSchema);
+mongoose.model('Employee', employeeSchema);

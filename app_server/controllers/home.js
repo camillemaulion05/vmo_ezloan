@@ -1,9 +1,5 @@
-import {
-    isEmpty,
-    isEmail
-} from 'validator';
-import nodemailer from 'nodemailer';
-import request from 'request';
+const validator = require('validator');
+const request = require('request');
 const apiOptions = {
     server: process.env.BASE_URL
 };
@@ -22,13 +18,13 @@ const index = (req, res, next) => {
 const postContact = (req, res) => {
     const validationErrors = [];
 
-    if (isEmpty(req.body.name)) validationErrors.push({
+    if (validator.isEmpty(req.body.name)) validationErrors.push({
         msg: 'Please enter your name'
     });
-    if (!isEmail(req.body.email)) validationErrors.push({
+    if (!validator.isEmail(req.body.email)) validationErrors.push({
         msg: 'Please enter a valid email address.'
     });
-    if (isEmpty(req.body.message)) validationErrors.push({
+    if (validator.isEmpty(req.body.message)) validationErrors.push({
         msg: 'Please enter your message.'
     });
 
@@ -53,7 +49,6 @@ const postContact = (req, res) => {
             statusCode
         }, body) => {
             if (err) {
-                console.log('ERROR: Could not send contact email.\n', err);
                 req.flash('errors', {
                     msg: body.message
                 });
@@ -63,7 +58,12 @@ const postContact = (req, res) => {
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'POST',
-                    json: req.body
+                    json: {
+                        name: req.body.name,
+                        email: req.body.email,
+                        phone: req.body.phone,
+                        message: req.body.message
+                    }
                 };
                 request(
                     requestOptions,
@@ -71,7 +71,6 @@ const postContact = (req, res) => {
                         statusCode
                     }, body) => {
                         if (err) {
-                            console.log('ERROR: Could not send contact email.\n', err);
                             req.flash('errors', {
                                 msg: 'Error sending the message. Please try again shortly.'
                             });
@@ -89,7 +88,7 @@ const postContact = (req, res) => {
     );
 };
 
-export default {
+module.exports = {
     index,
     postContact
 };

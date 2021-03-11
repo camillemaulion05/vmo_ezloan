@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const Employee = model('Employee');
+const mongoose = require('mongoose');
+const Employee = mongoose.model('Employee');
 
 const employeesList = (req, res) => {
     Employee
@@ -17,7 +15,9 @@ const employeesList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -37,11 +37,15 @@ const employeesCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(employee);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -65,12 +69,14 @@ const employeesReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "employee not found"
+                            "message": "Employee not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -99,12 +105,14 @@ const employeesUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "employeeid not found"
+                            "message": "Employee not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     employee.type = (req.body.type) ? req.body.type : employee.type;
                     employee.profile = (req.body.profile) ? req.body.profile : employee.profile;
@@ -113,7 +121,9 @@ const employeesUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -143,12 +153,14 @@ const employeesDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "employee not found"
+                            "message": "Employee not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -158,7 +170,7 @@ const employeesDeleteOne = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     employeesList,
     employeesCreate,
     employeesReadOne,

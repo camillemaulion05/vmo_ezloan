@@ -1,9 +1,6 @@
-import {
-    Schema,
-    model
-} from 'mongoose';
+const mongoose = require('mongoose');
 
-const borrowerSchema = new Schema({
+const borrowerSchema = mongoose.Schema({
     borrowerNum: String, // Date.now();
     type: {
         type: String,
@@ -272,12 +269,12 @@ const borrowerSchema = new Schema({
         default: "0.00"
     }, // Set by Loan Officer
     reviewedBy: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date,
     userId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
     },
     termsandCondition: Boolean
@@ -285,4 +282,4 @@ const borrowerSchema = new Schema({
     timestamps: true
 });
 
-model('Borrower', borrowerSchema);
+mongoose.model('Borrower', borrowerSchema);

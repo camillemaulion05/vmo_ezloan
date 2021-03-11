@@ -1,9 +1,6 @@
-import {
-    Schema,
-    model
-} from 'mongoose';
+const mongoose = require('mongoose');
 
-const inquirySchema = new Schema({
+const inquirySchema = mongoose.Schema({
     inquiryNum: String, //Date.now();
     name: {
         type: String,
@@ -25,7 +22,7 @@ const inquirySchema = new Schema({
         createdAt: Date,
         message: String,
         repliedBy: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         }
     }
@@ -33,4 +30,4 @@ const inquirySchema = new Schema({
     timestamps: true
 });
 
-model('Inquiry', inquirySchema);
+mongoose.model('Inquiry', inquirySchema);

@@ -4,13 +4,9 @@
  * Module dependencies.
  */
 
-import app, {
-  set
-} from '../app';
+const app = require('../app');
 const debug = require('debug')('vmo-ezloan:server');
-import {
-  createServer
-} from 'http';
+const http = require('http');
 
 /**
  * Normalize a port into a number, string, or false.
@@ -77,13 +73,13 @@ const onListening = () => {
  */
 
 const port = normalizePort(process.env.PORT || '80');
-set('port', port);
+app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-const server = createServer(app);
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.

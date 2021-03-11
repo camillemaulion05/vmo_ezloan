@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const Withdrawal = model('Withdrawal');
+const mongoose = require('mongoose');
+const Withdrawal = mongoose.model('Withdrawal');
 
 const withdrawalsList = (req, res) => {
     Withdrawal
@@ -14,7 +12,9 @@ const withdrawalsList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -37,11 +37,15 @@ const withdrawalsCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(withdrawal);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -65,12 +69,14 @@ const withdrawalsReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "withdrawal not found"
+                            "message": "Withdrawals not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -99,12 +105,14 @@ const withdrawalsUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "withdrawalid not found"
+                            "message": "Withdrawals not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     withdrawal.amount = (req.body.amount) ? req.body.amount : withdrawal.amount;
                     withdrawal.reason = (req.body.reason) ? req.body.reason : withdrawal.reason;
@@ -116,7 +124,9 @@ const withdrawalsUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -146,12 +156,14 @@ const withdrawalsDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "withdrawal not found"
+                            "message": "Withdrawals not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -161,7 +173,7 @@ const withdrawalsDeleteOne = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     withdrawalsList,
     withdrawalsCreate,
     withdrawalsReadOne,

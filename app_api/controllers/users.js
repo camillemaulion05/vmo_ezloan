@@ -1,7 +1,12 @@
-import {
-    model
-} from 'mongoose';
-const User = model('User');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
+const {
+    promisify
+} = require('util');
+const crypto = require('crypto');
+const CryptoJS = require("crypto-js");
+
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 const usersList = (req, res) => {
     User
@@ -14,7 +19,9 @@ const usersList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -42,8 +49,10 @@ const usersCreate = (req, res) => {
     }, (err, existingUser) => {
         if (err) {
             res
-                .status(404)
-                .json(err);
+                .status(400)
+                .json({
+                    "message": err._message
+                });
         } else if (existingUser) {
             res
                 .status(400)
@@ -55,11 +64,15 @@ const usersCreate = (req, res) => {
                 if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(201)
-                        .json(user);
+                        .json({
+                            "message": "Created successfully."
+                        });
                 }
             });
         }
@@ -84,12 +97,14 @@ const usersReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "user not found"
+                            "message": "User not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -115,12 +130,14 @@ const usersUpdateOne = (req, res) => {
                 res
                     .status(404)
                     .json({
-                        "message": "user not found"
+                        "message": "User not found."
                     });
             } else if (err) {
                 res
-                    .status(404)
-                    .json(err);
+                    .status(400)
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 user.username = (req.body.username) ? req.body.username : user.username;
                 user.password = (req.body.password) ? req.body.password : user.password;
@@ -135,8 +152,10 @@ const usersUpdateOne = (req, res) => {
                 user.save((err) => {
                     if (err) {
                         res
-                            .status(400)
-                            .json(err);
+                            .status(404)
+                            .json({
+                                "message": err._message
+                            });
                     } else {
                         res
                             .status(200)
@@ -166,12 +185,14 @@ const usersDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "user not found"
+                            "message": "User not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -189,19 +210,23 @@ const usersAuthenticate = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else if (!user) {
                 res
                     .status(404)
                     .json({
-                        "message": "User not found"
+                        "message": "Invalid username or password."
                     });
             } else {
                 user.comparePassword(req.body.password, (err, isMatch) => {
                     if (err) {
                         res
                             .status(404)
-                            .json(err);
+                            .json({
+                                "message": err._message
+                            });
                     } else if (isMatch) {
                         const token = user.generateJwt();
                         res
@@ -211,7 +236,7 @@ const usersAuthenticate = (req, res) => {
                             });
                     } else {
                         res
-                            .status(401)
+                            .status(404)
                             .json({
                                 "message": "Invalid username or password."
                             });
@@ -223,46 +248,62 @@ const usersAuthenticate = (req, res) => {
 
 const usersSetPasswordToken = (req, res) => {
     User.findOne({
-            "email": req.body.email,
-            "security.question": req.body.security.question
+            "email": req.body.email
         })
         .exec((err, user) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else if (!user) {
                 res
                     .status(404)
                     .json({
-                        "message": "User not found"
+                        "message": "Invalid email or security questions or answer."
                     });
             } else {
                 user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
                     if (err) {
                         res
                             .status(404)
-                            .json(err);
+                            .json({
+                                "message": err._message
+                            });
                     } else if (isMatch) {
-                        user.setPasswordRandomToken();
-                        user.save((err) => {
-                            if (err) {
-                                res
-                                    .status(400)
-                                    .json(err);
-                            } else {
-                                res
-                                    .status(200)
-                                    .json({
-                                        'token': user.passwordResetToken
-                                    });
-                            }
-                        });
+                        const createRandomToken = randomBytesAsync(16)
+                            .then((buf) => buf.toString('hex'));
+
+                        createRandomToken
+                            .then((token) => {
+                                user.passwordResetToken = token;
+                                user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+                                let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                                user.save((err) => {
+                                    if (err) {
+                                        console.log(err);
+                                        res
+                                            .status(404)
+                                            .json({
+                                                "message": err._message
+                                            });
+                                    } else {
+                                        res
+                                            .status(200)
+                                            .json({
+                                                'token': encryptToken
+                                            });
+                                    }
+                                });
+                            })
+                            .catch(err);
+
                     } else {
                         res
-                            .status(401)
+                            .status(404)
                             .json({
-                                "message": "Invalid email or answer to your security question."
+                                "message": "Invalid email or security questions or answer."
                             });
                     }
                 });
@@ -278,47 +319,63 @@ const usersSetEmailToken = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else if (!user) {
                 res
                     .status(404)
                     .json({
-                        "message": "User not found"
+                        "message": "Invalid email or token."
                     });
             } else {
-                user.setEmailRandomToken();
-                user.save((err) => {
-                    if (err) {
-                        res
-                            .status(400)
-                            .json(err);
-                    } else {
-                        res
-                            .status(200)
-                            .json({
-                                'token': user.emailVerificationToken
-                            });
-                    }
-                });
+                const createRandomToken = randomBytesAsync(16)
+                    .then((buf) => buf.toString('hex'));
+
+                createRandomToken
+                    .then((token) => {
+                        user.emailVerificationToken = token;
+                        let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                        user.save((err) => {
+                            if (err) {
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        'token': encryptToken
+                                    });
+                            }
+                        });
+                    })
+                    .catch(err);
             }
         });
 };
 
 const usersResetPassword = (req, res) => {
+    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
     User.findOne({
-            "passwordResetToken": req.body.token
+            "passwordResetToken": originalToken
         })
         .where('passwordResetExpires').gt(Date.now())
         .exec((err, user) => {
             if (err) {
                 res
-                    .status(404)
-                    .json(err);
+                    .status(400)
+                    .json({
+                        "message": err._message
+                    });
             } else if (!user) {
                 res
                     .status(404)
                     .json({
-                        "message": "User not found"
+                        "message": "Invalid token or expired token."
                     });
             } else {
                 user.password = req.body.password;
@@ -327,8 +384,10 @@ const usersResetPassword = (req, res) => {
                 user.save((err) => {
                     if (err) {
                         res
-                            .status(400)
-                            .json(err);
+                            .status(404)
+                            .json({
+                                "message": err._message
+                            });
                     } else {
                         res
                             .status(200)
@@ -342,20 +401,23 @@ const usersResetPassword = (req, res) => {
 };
 
 const usersVerifyEmailToken = (req, res) => {
+    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
     User.findOne({
-            "email": req.body.email,
-            "emailVerificationToken": req.body.token
+            "emailVerificationToken": originalToken
         })
         .exec((err, user) => {
             if (err) {
                 res
-                    .status(404)
-                    .json(err);
+                    .status(400)
+                    .json({
+                        "message": err._message
+                    });
             } else if (!user) {
                 res
                     .status(404)
                     .json({
-                        "message": "User not found"
+                        "message": "Invalid token or expired token."
                     });
             } else {
                 user.emailVerificationToken = '';
@@ -363,8 +425,10 @@ const usersVerifyEmailToken = (req, res) => {
                 user.save((err) => {
                     if (err) {
                         res
-                            .status(400)
-                            .json(err);
+                            .status(404)
+                            .json({
+                                "message": err._message
+                            });
                     } else {
                         res
                             .status(200)
@@ -377,7 +441,7 @@ const usersVerifyEmailToken = (req, res) => {
         });
 };
 
-export default {
+module.exports = {
     usersList,
     usersCreate,
     usersReadOne,

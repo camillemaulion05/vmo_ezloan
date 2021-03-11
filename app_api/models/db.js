@@ -1,13 +1,8 @@
-import {
-    connect as _connect,
-    connection
-} from 'mongoose';
-import {
-    createInterface
-} from 'readline';
+const mongoose = require('mongoose');
+const readLine = require('readline');
 
 const connect = () => {
-    setTimeout(() => _connect(process.env.MONGODB_URI, {
+    setTimeout(() => mongoose.connect(process.env.MONGODB_URI, {
         useFindAndModify: false,
         useNewUrlParser: true,
         useCreateIndex: true,
@@ -15,21 +10,21 @@ const connect = () => {
     }), 1000);
 }
 
-connection.on('connected', () => {
+mongoose.connection.on('connected', () => {
     console.log('connected');
 });
 
-connection.on('error', err => {
+mongoose.connection.on('error', err => {
     console.log('error: ' + err);
     return connect();
 });
 
-connection.on('disconnected', () => {
+mongoose.connection.on('disconnected', () => {
     console.log('disconnected');
 });
 
 if (process.platform === 'win32') {
-    const rl = createInterface({
+    const rl = readLine.createInterface({
         input: process.stdin,
         output: process.stdout
     });
@@ -39,7 +34,7 @@ if (process.platform === 'win32') {
 }
 
 const gracefulShutdown = (msg, callback) => {
-    connection.close(() => {
+    mongoose.connection.close(() => {
         console.log(`Mongoose disconnected through ${msg}`);
         callback();
     });
@@ -63,10 +58,10 @@ process.on('SIGTERM', () => {
 
 connect();
 
-import './users';
-import './inquiries';
-import './employees';
-import './transactions';
-import './withdrawals';
-import './borrowers';
-import './loans';
+require('./users');
+require('./inquiries');
+require('./employees');
+require('./transactions');
+require('./withdrawals');
+require('./borrowers');
+require('./loans');

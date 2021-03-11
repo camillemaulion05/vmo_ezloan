@@ -1,9 +1,6 @@
-import {
-    Schema,
-    model
-} from 'mongoose';
+const mongoose = require('mongoose');
 
-const transactionSchema = new Schema({
+const transactionSchema = mongoose.Schema({
     transactionNum: String, // Date.now();
     amount: {
         type: String,
@@ -35,7 +32,7 @@ const transactionSchema = new Schema({
     },
     postedDate: Date,
     postedBy: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' //Loan Processor
     },
     status: {
@@ -44,19 +41,19 @@ const transactionSchema = new Schema({
         enum: ["Processing, Posted"]
     },
     borrowerId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Borrower' //Contributions, Fees
     },
     loanId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Loan' //Repayments, Release
     },
     withdrawalId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Withdrawal' //Withdrawals
     }
 }, {
     timestamps: true
 });
 
-model('Transaction', transactionSchema);
+mongoose.model('Transaction', transactionSchema);

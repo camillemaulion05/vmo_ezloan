@@ -1,7 +1,5 @@
-import {
-    model
-} from 'mongoose';
-const User = model('User');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
 
 const isAdmin = (req, res, next) => {
     User.findById(req.payload._id).exec((err, user) => {
@@ -63,7 +61,7 @@ const isSafe = (req, res, next) => {
             res
                 .status(404)
                 .json(err);
-        } else if (user.type != "Employee" || user.type != "Admin" || user.type != "Borrower") {
+        } else if (user.type != "Employee" && user.type != "Admin" && user.type != "Borrower") {
             res
                 .status(403)
                 .json({
@@ -75,7 +73,7 @@ const isSafe = (req, res, next) => {
     });
 };
 
-export default {
+module.exports = {
     isAdmin,
     isModerator,
     isSafe

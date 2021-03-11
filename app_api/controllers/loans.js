@@ -1,8 +1,5 @@
-import {
-    model,
-    Types
-} from 'mongoose';
-const Loan = model('Loan');
+const mongoose = require('mongoose');
+const Loan = mongoose.model('Loan');
 
 const loansList = (req, res) => {
     Loan
@@ -18,7 +15,9 @@ const loansList = (req, res) => {
             if (err) {
                 res
                     .status(404)
-                    .json(err);
+                    .json({
+                        "message": err._message
+                    });
             } else {
                 res
                     .status(200)
@@ -41,11 +40,15 @@ const loansCreate = (req, res) => {
         if (err) {
             res
                 .status(400)
-                .json(err);
+                .json({
+                    "message": err._message
+                });
         } else {
             res
                 .status(201)
-                .json(loan);
+                .json({
+                    "message": "Created successfully."
+                });
         }
     });
 };
@@ -69,12 +72,14 @@ const loansReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loan not found"
+                            "message": "Loan not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -103,12 +108,14 @@ const loansUpdateOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loanid not found"
+                            "message": "Loan not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     loan.loanType = (req.body.loanType) ? req.body.loanType : loan.loanType;
                     loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
@@ -124,7 +131,9 @@ const loansUpdateOne = (req, res) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -154,12 +163,14 @@ const loansDeleteOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loan not found"
+                            "message": "Loan not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(204)
@@ -188,19 +199,23 @@ const loansSchedulesUpdate = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loanid not found"
+                            "message": "Loan not found."
                         });
                 } else if (err) {
                     res
                         .status(400)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     loan.addRepayment(req.body.transactionDate, req.body.transactionAmount);
                     loan.save((err) => {
                         if (err) {
                             res
                                 .status(404)
-                                .json(err);
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
                             res
                                 .status(200)
@@ -230,12 +245,14 @@ const loansSchedulesList = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loan not found"
+                            "message": "Loan Schedules not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -259,8 +276,8 @@ const loansSchedulesReadOne = (req, res) => {
     } else {
         Loan
             .find({
-                _id: Types.ObjectId(loanid),
-                "loanPaymentSchedule._id": Types.ObjectId(scheduleid)
+                _id: mongoose.Types.ObjectId(loanid),
+                "loanPaymentSchedule._id": mongoose.Types.ObjectId(scheduleid)
             }, {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
@@ -270,12 +287,14 @@ const loansSchedulesReadOne = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loanPaymentSchedule not found"
+                            "message": "Loan Schedules not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -298,7 +317,7 @@ const loansRepaymentsDue = (req, res) => {
     } else {
         const dateToday = new Date();
         Loan.find({
-                _id: Types.ObjectId(loanid),
+                _id: mongoose.Types.ObjectId(loanid),
                 "loanPaymentSchedule.dueDate": {
                     $gte: dateToday
                 }
@@ -312,12 +331,14 @@ const loansRepaymentsDue = (req, res) => {
                     res
                         .status(404)
                         .json({
-                            "message": "loan not found"
+                            "message": "Loan not found."
                         });
                 } else if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -421,7 +442,9 @@ const loansSummary = (req, res) => {
                 if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -478,7 +501,9 @@ const loansInterestReport = (req, res) => {
                 if (err) {
                     res
                         .status(404)
-                        .json(err);
+                        .json({
+                            "message": err._message
+                        });
                 } else {
                     res
                         .status(200)
@@ -488,7 +513,7 @@ const loansInterestReport = (req, res) => {
     }
 };
 
-export default {
+module.exports = {
     loansList,
     loansCreate,
     loansReadOne,

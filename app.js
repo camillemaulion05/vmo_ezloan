@@ -1,54 +1,38 @@
-import {
-  config
-} from 'dotenv';
-import createError from 'http-errors';
-import express, {
-  static
-} from 'express';
-import {
-  join
-} from 'path';
-import logger from 'morgan';
-import {
-  initialize,
-  session as _session
-} from 'passport';
-import compression from 'compression';
-import session from 'express-session';
-import {
-  json,
-  urlencoded
-} from 'body-parser';
-import {
-  csrf,
-  xframe,
-  xssProtection
-} from 'lusca';
-import flash from 'express-flash';
-import expressStatusMonitor from 'express-status-monitor';
+const dotenv = require('dotenv');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
+const passport = require('passport');
+const compression = require('compression');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const lusca = require('lusca');
+const flash = require('express-flash');
+const expressStatusMonitor = require('express-status-monitor');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-config({
+dotenv.config({
   path: '.env'
 });
 
 // Route Files
-import indexRouter from './app_server/routes/index';
-import apiRouter from './app_api/routes/index';
+const indexRouter = require('./app_server/routes/index');
+const apiRouter = require('./app_api/routes/index');
 
 // Create Express server.
 const app = express();
 
 // Express configuration.
-app.set('views', join(__dirname, 'app_server', 'views'));
+app.set('views', path.join(__dirname, 'app_server', 'views'));
 app.set('view engine', 'pug');
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(logger('dev'));
-app.use(json());
-app.use(urlencoded({
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(session({
@@ -56,19 +40,19 @@ app.use(session({
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET
 }));
-app.use(initialize());
-app.use(_session());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
   if (req.path.match(/\/api/g)) {
     // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
     next();
   } else {
-    csrf()(req, res, next);
+    lusca.csrf()(req, res, next);
   }
 });
-app.use(xframe('SAMEORIGIN'));
-app.use(xssProtection(true));
+app.use(lusca.xframe('SAMEORIGIN'));
+app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
@@ -88,52 +72,52 @@ app.use((req, res, next) => {
 });
 
 // Set Public Folder
-app.use('/', static(join(__dirname, 'public'), {
+app.use('/', express.static(path.join(__dirname, 'public'), {
   maxAge: 86400000
 }));
-app.use('/stylesheets', static(join(__dirname, 'node_modules/bootstrap/dist/css'), {
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css'), {
   maxAge: 86400000
 }));
-app.use('/stylesheets', static(join(__dirname, 'node_modules/font-awesome/css'), {
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/font-awesome/css'), {
   maxAge: 86400000
 }));
-app.use('/fonts', static(join(__dirname, 'node_modules/font-awesome/fonts'), {
+app.use('/fonts', express.static(path.join(__dirname, 'node_modules/font-awesome/fonts'), {
   maxAge: 86400000
 }));
-app.use('/stylesheets', static(join(__dirname, 'node_modules/bootstrap-select/dist/css'), {
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/css'), {
   maxAge: 86400000
 }));
-app.use('/stylesheets', static(join(__dirname, 'node_modules/datatables.net-responsive-dt/css'), {
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-dt/css'), {
   maxAge: 86400000
 }));
-app.use('/stylesheets', static(join(__dirname, 'node_modules/datatables-bootstrap/css'), {
+app.use('/stylesheets', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/css'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/bootstrap/dist/js'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/jquery/dist'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/jquery-validation/dist'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery-validation/dist'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/jquery.easing/bower_components/jquery-easing-original'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery.easing/bower_components/jquery-easing-original'), {
   maxAge: 86400000
 }));
-app.use('/metismenu', static(join(__dirname, 'node_modules/metismenu/dist'), {
+app.use('/metismenu', express.static(path.join(__dirname, 'node_modules/metismenu/dist'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/bootstrap-select/dist/js'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/datatables.net/js'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net/js'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/datatables.net-responsive/js'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', static(join(__dirname, 'node_modules/datatables-bootstrap/js'), {
+app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/datatables-bootstrap/js'), {
   maxAge: 86400000
 }));
 
@@ -171,4 +155,4 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-export default app;
+module.exports = app;
