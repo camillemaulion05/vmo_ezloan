@@ -80,9 +80,19 @@ const postContact = (req, res) => {
                                 msg: 'Email has been sent successfully!'
                             });
                             return res.redirect('/#contact');
+                        } else {
+                            req.flash('errors', {
+                                msg: body.message
+                            });
+                            return res.redirect('/#contact');
                         }
                     }
                 );
+            } else {
+                req.flash('errors', {
+                    msg: body.message
+                });
+                return res.redirect('/#contact');
             }
         }
     );

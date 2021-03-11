@@ -1,7 +1,9 @@
 const validator = require('validator');
 const CryptoJS = require("crypto-js");
+const request = require('request');
+
 const apiOptions = {
-    server: process.env.BASE_URL
+    server: 'http://localhost:4000'
 };
 
 /**
@@ -62,7 +64,7 @@ const getForgot = (req, res) => {
  * POST /forgot
  * Create a random token, then the send user an email with a reset link.
  */
-const postForgot = (req, res, next) => {
+const postForgot = (req, res) => {
     const validationErrors = [];
     if (!validator.isEmail(req.body.email)) validationErrors.push({
         msg: 'Please enter a valid email address.'
@@ -75,7 +77,6 @@ const postForgot = (req, res, next) => {
     if (validator.isEmpty(req.body.answer)) validationErrors.push({
         msg: 'Please enter your answer.'
     });
-
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
         return res.redirect('/forgot');
@@ -107,17 +108,19 @@ const postForgot = (req, res, next) => {
                 });
                 return res.redirect('/forgot');
             } else if (statusCode === 200) {
+                let bytes = CryptoJS.AES.decrypt(body.token, process.env.CRYPTOJS_SERVER_SECRET);
+                let originalToken = bytes.toString(CryptoJS.enc.Utf8);
                 path = '/api/sendMail';
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'POST',
                     json: {
-                        sender: req.body.email,
+                        receiver: req.body.email,
                         subject: 'Reset your password on VMO EZ Loan',
                         message: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
-                        Please click on the following link, or paste this into your browser to complete the process:\n\n
-                        http://${req.headers.host}/reset/${body.token}\n\n
-                        If you did not request this, please ignore this email and your password will remain unchanged.\n`
+                            Please click on the following link, or paste this into your browser to complete the process:\n\n
+                            http://${req.headers.host}/reset/${originalToken}\n\n
+                            If you did not request this, please ignore this email and your password will remain unchanged.\n`
                     }
                 };
                 request(
@@ -135,12 +138,23 @@ const postForgot = (req, res, next) => {
                                 msg: `An e-mail has been sent to ${req.body.email} with further instructions.`
                             });
                             return res.redirect('/forgot');
+                        } else {
+                            req.flash('errors', {
+                                msg: body.message
+                            });
+                            return res.redirect('/forgot');
                         }
                     }
                 );
+            } else {
+                req.flash('errors', {
+                    msg: body.message
+                });
+                return res.redirect('/forgot');
             }
         }
     );
+
 };
 
 module.exports = {

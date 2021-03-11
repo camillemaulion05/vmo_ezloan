@@ -367,7 +367,7 @@ const usersResetPassword = (req, res) => {
         .exec((err, user) => {
             if (err) {
                 res
-                    .status(400)
+                    .status(404)
                     .json({
                         "message": err._message
                     });
@@ -409,7 +409,7 @@ const usersVerifyEmailToken = (req, res) => {
         .exec((err, user) => {
             if (err) {
                 res
-                    .status(400)
+                    .status(404)
                     .json({
                         "message": err._message
                     });
