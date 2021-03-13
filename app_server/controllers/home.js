@@ -47,10 +47,10 @@ const postContact = (req, res) => {
         requestOptions,
         (err, {
             statusCode
-        }, body) => {
+        }, inquiry) => {
             if (err) {
                 req.flash('errors', {
-                    msg: body.message
+                    msg: inquiry.message
                 });
                 return res.redirect('/#contact');
             } else if (statusCode === 200) {
@@ -69,7 +69,7 @@ const postContact = (req, res) => {
                     requestOptions,
                     (err, {
                         statusCode
-                    }, body) => {
+                    }, email) => {
                         if (err) {
                             req.flash('errors', {
                                 msg: 'Error sending the message. Please try again shortly.'
@@ -82,7 +82,7 @@ const postContact = (req, res) => {
                             return res.redirect('/#contact');
                         } else {
                             req.flash('errors', {
-                                msg: body.message
+                                msg: email.message
                             });
                             return res.redirect('/#contact');
                         }
@@ -90,7 +90,7 @@ const postContact = (req, res) => {
                 );
             } else {
                 req.flash('errors', {
-                    msg: body.message
+                    msg: inquiry.message
                 });
                 return res.redirect('/#contact');
             }

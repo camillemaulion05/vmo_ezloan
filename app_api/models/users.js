@@ -19,7 +19,6 @@ const userSchema = mongoose.Schema({
     passwordResetExpires: Date,
     email: {
         type: String,
-        unique: true,
         required: true
     },
     emailVerificationToken: String,
@@ -44,7 +43,7 @@ const userSchema = mongoose.Schema({
     },
     type: {
         type: String,
-        required: true,
+        default: "Borrower",
         enum: ["Borrower", "Employee", "Admin"]
     },
     security: [{

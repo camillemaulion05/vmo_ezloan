@@ -15,11 +15,12 @@ function showTab(n) {
         $(".signup-form #user").text($(".signup-form #firstName").val());
     } else if (n == 2) {
         $(".signup-form #prevBtn").attr("onclick", "nextPrev(-1,2)");
-        $(".signup-form #nextBtn").attr("onclick", "validateOTP(2)");
-        $(".signup-form #nextBtn").text("Verify");
+        $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,2)");
+        $(".signup-form #nextBtn").text("Next");
     } else if (n == 1) {
         $(".signup-form #prevBtn").attr("onclick", "nextPrev(-1,1)");
         $(".signup-form #nextBtn").attr("onclick", "sendOTP(1)");
+        $(".signup-form #nextBtn").text("Send");
         $(".signup-form #phone, #code").val("");
         $(".signup-form #code").parent().removeClass("has-error");
         $(".signup-form #code").next().text("");
@@ -39,8 +40,15 @@ function nextPrev(n, currentTab) {
     var x = $(".signup-form form > .tab");
     // Exit the function if any field in the current tab is invalid:
     if (n == 1 && !validateForm(currentTab)) return false;
-    // Hide the current tab:
-    $(".signup-form form .tab").eq(currentTab).addClass("hide");
+    // When end of the form
+    if (currentTab == (x.length - 1)) {
+        $("#loader").removeClass("hide");
+        $(".signup-form").addClass("hide");
+    } else {
+        // Hide the current tab:
+        $(".signup-form form .tab").eq(currentTab).addClass("hide");
+    }
+
     // Increase or decrease the current tab by 1:
     currentTab = currentTab + n;
     // if you have reached the end of the form...

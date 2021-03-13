@@ -3,6 +3,7 @@ extends ../layout
 block content
   include ../partials/flash
   .container
+    #loader.hide
     .form-clean.signup-form
       form#regForm(method='post')
         input(type='hidden', name='_csrf', value=_csrf)

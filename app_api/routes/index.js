@@ -42,9 +42,10 @@ router
 
 router.post('/login', ctrlUsers.usersAuthenticate);
 router.post('/passToken', ctrlUsers.usersSetPasswordToken);
+router.post('/validatePassToken', ctrlUsers.usersValidatePasswordToken);
 router.post('/emailToken', ctrlUsers.usersSetEmailToken);
 router.post('/reset', ctrlUsers.usersResetPassword);
-router.post('/verify', ctrlUsers.usersVerifyEmailToken);
+router.post('/validateEmailToken', ctrlUsers.usersVerifyEmailToken);
 
 // inquiries
 router

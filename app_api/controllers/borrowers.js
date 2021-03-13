@@ -46,8 +46,10 @@ const borrowersCreate = (req, res) => {
     } = req.body);
     borrower.borrowerNum = Date.now();
     if (req.body.reviewedBy) borrower.reviewedDate = Date.now();
+    if ("Borrower" == req.payload.type) borrower.userId = mongoose.Types.ObjectId(req.payload._id);
     borrower.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -57,7 +59,7 @@ const borrowersCreate = (req, res) => {
             res
                 .status(201)
                 .json({
-                    "message": "Created successfully."
+                    "firstName": borrower.profile.firstName
                 });
         }
     });

@@ -137,11 +137,19 @@ const validateOTP = function (req, res) {
                 code: req.body.code
             })
             .then(verification_check => {
+                if (verification_check.status != "approved" && !verification_check.valid) {
+                    return res
+                        .status(400)
+                        .json({
+                            "status": verification_check.status,
+                            "message": "You've entered a wrong code. Please try again."
+                        });
+                }
                 return res
                     .status(200)
                     .json({
                         "status": verification_check.status,
-                        "message": (verification_check.status == "approved") ? "Your mobile number is verified." : "You've entered a wrong code. Please try again."
+                        "message": "Your mobile number is verified."
                     });
             })
             .catch(err => {
@@ -150,7 +158,7 @@ const validateOTP = function (req, res) {
                     .status(404)
                     .json({
                         "status": "error",
-                        "message": "Error validating the code. Please try again shortly."
+                        "message": "The requested resource was not found."
                     });
             });
     } else {

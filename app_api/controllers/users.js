@@ -13,7 +13,9 @@ const usersList = (req, res) => {
         .find({}, {
             "password": 0,
             "passwordResetToken": 0,
-            "passwordResetExpires": 0
+            "passwordResetExpires": 0,
+            "emailVerificationToken": 0,
+            "security": 0
         })
         .exec((err, users) => {
             if (err) {
@@ -36,6 +38,11 @@ const usersCreate = (req, res) => {
         password,
         passwordResetToken,
         passwordResetExpires,
+        email,
+        emailVerificationToken,
+        emailVerified,
+        mobileNum,
+        mobileNumVerified,
         lastLogin,
         lastFailedLogin,
         status,
@@ -68,10 +75,12 @@ const usersCreate = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    const token = user.generateJwt();
                     res
                         .status(201)
                         .json({
-                            "message": "Created successfully."
+                            'username': user.username,
+                            'token': token
                         });
                 }
             });
@@ -143,6 +152,11 @@ const usersUpdateOne = (req, res) => {
                 user.password = (req.body.password) ? req.body.password : user.password;
                 user.passwordResetToken = (req.body.passwordResetToken) ? req.body.passwordResetToken : user.passwordResetToken;
                 user.passwordResetExpires = (req.body.passwordResetExpires) ? req.body.passwordResetExpires : user.passwordResetExpires;
+                user.email = (req.body.email) ? req.body.email : user.email;
+                user.emailVerificationToken = (req.body.emailVerificationToken) ? req.body.emailVerificationToken : user.emailVerificationToken;
+                user.emailVerified = (req.body.emailVerified) ? req.body.emailVerified : user.emailVerified;
+                user.mobileNum = (req.body.mobileNum) ? req.body.mobileNum : user.mobileNum;
+                user.mobileNumVerified = (req.body.mobileNumVerified) ? req.body.mobileNumVerified : user.mobileNumVerified;
                 user.lastLogin = (req.body.lastLogin) ? req.body.lastLogin : user.lastLogin;
                 user.lastFailedLogin = (req.body.lastFailedLogin) ? req.body.lastFailedLogin : user.lastFailedLogin;
                 user.status = (req.body.status) ? req.body.status : user.status;
@@ -232,7 +246,8 @@ const usersAuthenticate = (req, res) => {
                         res
                             .status(200)
                             .json({
-                                token
+                                'username': user.username,
+                                'token': token
                             });
                     } else {
                         res
@@ -282,7 +297,6 @@ const usersSetPasswordToken = (req, res) => {
                                 let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
                                 user.save((err) => {
                                     if (err) {
-                                        console.log(err);
                                         res
                                             .status(404)
                                             .json({
@@ -375,7 +389,7 @@ const usersResetPassword = (req, res) => {
                 res
                     .status(404)
                     .json({
-                        "message": "Invalid token or expired token."
+                        "message": 'Password reset token is invalid or has expired.'
                     });
             } else {
                 user.password = req.body.password;
@@ -392,7 +406,9 @@ const usersResetPassword = (req, res) => {
                         res
                             .status(200)
                             .json({
-                                'message': 'Success! Your password has been changed.'
+                                'message': 'Success! Your password has been changed.',
+                                'email': user.email,
+                                'username': user.username
                             });
                     }
                 });
@@ -441,6 +457,36 @@ const usersVerifyEmailToken = (req, res) => {
         });
 };
 
+const usersValidatePasswordToken = (req, res) => {
+    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+    User.findOne({
+            "passwordResetToken": originalToken
+        })
+        .where('passwordResetExpires').gt(Date.now())
+        .exec((err, user) => {
+            if (err) {
+                res
+                    .status(404)
+                    .json({
+                        "message": err._message
+                    });
+            } else if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": 'Password reset token is invalid or has expired.'
+                    });
+            } else {
+                res
+                    .status(200)
+                    .json({
+                        'message': 'Valid Token! You can now change your password.'
+                    });
+            }
+        });
+};
+
 module.exports = {
     usersList,
     usersCreate,
@@ -451,5 +497,6 @@ module.exports = {
     usersSetPasswordToken,
     usersSetEmailToken,
     usersResetPassword,
-    usersVerifyEmailToken
+    usersVerifyEmailToken,
+    usersValidatePasswordToken
 };

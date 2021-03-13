@@ -33,6 +33,7 @@ const employeesCreate = (req, res) => {
         userId,
     } = req.body);
     employee.employeeNum = Date.now();
+    if ("Employee" == req.payload.type) employee.userId = req.payload._id;
     employee.save((err) => {
         if (err) {
             res
