@@ -145,7 +145,7 @@ const postSignup = (req, res, next) => {
         }, body) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'OTP Code is invalid or has expired.'
+                    msg: 'The verification code you entered is not correct. Please try again.'
                 });
                 return res.redirect('/signup');
             } else if (statusCode === 200) {

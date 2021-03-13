@@ -142,7 +142,7 @@ const validateOTP = function (req, res) {
                         .status(400)
                         .json({
                             "status": verification_check.status,
-                            "message": "You've entered a wrong code. Please try again."
+                            "message": 'The verification code you entered is not correct. Please try again.'
                         });
                 }
                 return res
