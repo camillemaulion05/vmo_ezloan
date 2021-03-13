@@ -279,48 +279,56 @@ const usersSetPasswordToken = (req, res) => {
                         "message": "Invalid email or security questions or answer."
                     });
             } else {
-                user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
-                    if (err) {
-                        res
-                            .status(404)
-                            .json({
-                                "message": err._message
-                            });
-                    } else if (isMatch) {
-                        const createRandomToken = randomBytesAsync(16)
-                            .then((buf) => buf.toString('hex'));
-
-                        createRandomToken
-                            .then((token) => {
-                                user.passwordResetToken = token;
-                                user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-                                let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
-                                user.save((err) => {
-                                    if (err) {
-                                        res
-                                            .status(404)
-                                            .json({
-                                                "message": err._message
-                                            });
-                                    } else {
-                                        res
-                                            .status(200)
-                                            .json({
-                                                'token': encryptToken
-                                            });
-                                    }
+                if (user.security.length > 0) {
+                    user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
+                        if (err) {
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
                                 });
-                            })
-                            .catch(err);
+                        } else if (isMatch) {
+                            const createRandomToken = randomBytesAsync(16)
+                                .then((buf) => buf.toString('hex'));
 
-                    } else {
-                        res
-                            .status(404)
-                            .json({
-                                "message": "Invalid email or security questions or answer."
-                            });
-                    }
-                });
+                            createRandomToken
+                                .then((token) => {
+                                    user.passwordResetToken = token;
+                                    user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+                                    let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                                    user.save((err) => {
+                                        if (err) {
+                                            res
+                                                .status(404)
+                                                .json({
+                                                    "message": err._message
+                                                });
+                                        } else {
+                                            res
+                                                .status(200)
+                                                .json({
+                                                    'token': encryptToken
+                                                });
+                                        }
+                                    });
+                                })
+                                .catch(err);
+
+                        } else {
+                            res
+                                .status(404)
+                                .json({
+                                    "message": "Invalid email or security questions or answer."
+                                });
+                        }
+                    });
+                } else {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Security questions are not yet setup."
+                        });
+                }
             }
         });
 };
