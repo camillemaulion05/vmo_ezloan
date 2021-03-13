@@ -217,53 +217,15 @@ const borrowerSchema = mongoose.Schema({
             file: Buffer
         }
     },
-    beneficiaries: { // Members only
-        bene1: {
-            firstName: String,
-            lastName: String,
-            relationship: {
-                type: String,
-                enum: ["Parent", "Sibling", "Spouse", "Child"]
-            },
-            birthday: Date
+    beneficiaries: [{
+        firstName: String,
+        lastName: String,
+        relationship: {
+            type: String,
+            enum: ["Parent", "Sibling", "Spouse", "Child"]
         },
-        bene2: {
-            firstName: String,
-            lastName: String,
-            relationship: {
-                type: String,
-                enum: ["Parent", "Sibling", "Spouse", "Child"]
-            },
-            birthday: Date
-        },
-        bene3: {
-            firstName: String,
-            lastName: String,
-            relationship: {
-                type: String,
-                enum: ["Parent", "Sibling", "Spouse", "Child"]
-            },
-            birthday: Date
-        },
-        bene4: {
-            firstName: String,
-            lastName: String,
-            relationship: {
-                type: String,
-                enum: ["Parent", "Sibling", "Spouse", "Child"]
-            },
-            birthday: Date
-        },
-        bene5: {
-            firstName: String,
-            lastName: String,
-            relationship: {
-                type: String,
-                enum: ["Parent", "Sibling", "Spouse", "Child"]
-            },
-            birthday: Date
-        }
-    },
+        birthday: Date
+    }], // Members only
     maxLoanAmount: {
         type: String,
         default: "0.00"

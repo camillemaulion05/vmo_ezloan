@@ -50,7 +50,7 @@ const postLogin = (req, res, next) => {
                 return next(err);
             }
             req.flash('success', {
-                msg: 'Welcome to VMO EZ Loan!'
+                msg: 'Success! You are logged in.'
             });
             res.redirect('/account');
         });
