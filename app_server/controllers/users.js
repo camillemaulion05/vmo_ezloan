@@ -3,7 +3,7 @@ const CryptoJS = require("crypto-js");
 const request = require('request');
 const passport = require('passport');
 const apiOptions = {
-    server: 'http://localhost:4000'
+    server: process.env.BASE_URL
 };
 
 /**
