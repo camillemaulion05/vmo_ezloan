@@ -1,22 +1,18 @@
-footer
+// Footer
+footer.footer
   .container
-    .row
-      .col-md-4
-        span.copyright Copyright &copy; VMO EZ Loan 2020
-      .col-md-4
-        ul.list-inline.social-buttons
-          li
-            a(href='#')
-              i.fa.fa-twitter
-          li
-            a(href='#')
-              i.fa.fa-facebook
-          li
-            a(href='#')
-              i.fa.fa-linkedin
-      .col-md-4
-        ul.list-inline.quicklinks
-          li
-            a(href='#') Privacy Policy
-          li
-            a(href='#') Terms of Use
+    .row.align-items-center
+      - let now = new Date
+      - let theYear=now.getYear()
+      - if (theYear < 1900) theYear=theYear+1900
+      .col-lg-4.text-lg-left Copyright &copy; VMO EZ Loan #{theYear}
+      .col-lg-4.my-3.my-lg-0.quicklinks
+        a.btn.btn-dark.btn-social.mx-2(href='#!')
+          i.fab.fa-twitter
+        a.btn.btn-dark.btn-social.mx-2(href='#!')
+          i.fab.fa-facebook-f
+        a.btn.btn-dark.btn-social.mx-2(href='#!')
+          i.fab.fa-linkedin-in
+      .col-lg-4.text-lg-right
+        a.mr-3(href='#!') Privacy Policy
+        a(href='#!') Terms of Use

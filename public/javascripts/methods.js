@@ -1,12 +1,12 @@
 function showTab(n) {
     // This function will display the specified tab of the form...
-    $(".signup-form form .tab").eq(n).removeClass("hide");
+    $(".signup-form form .tab").eq(n).removeClass("d-none");
     var x = $(".signup-form form > .tab");
     //... and fix the Previous/Next buttons:
     if (n == 0) {
-        $(".signup-form #prevBtn").addClass("hide");
+        $(".signup-form #prevBtn").addClass("d-none");
     } else {
-        $(".signup-form #prevBtn").removeClass("hide");
+        $(".signup-form #prevBtn").removeClass("d-none");
     }
     if (n == (x.length - 1)) {
         $(".signup-form #prevBtn").attr("onclick", "nextPrev(-2,3)");
@@ -21,12 +21,11 @@ function showTab(n) {
         $(".signup-form #prevBtn").attr("onclick", "nextPrev(-1,1)");
         $(".signup-form #nextBtn").attr("onclick", "sendOTP(1)");
         $(".signup-form #nextBtn").text("Send");
-        $(".signup-form #phone, #code").val("");
-        $(".signup-form #code").parent().removeClass("has-error");
-        $(".signup-form #code").next().text("");
-        $(".signup-form #sendOTP, .signup-form #errorSendOtp").text("");
+        $(".signup-form #code").val("");
+        $(".signup-form #sendOTP").text("");
     } else {
-        $(".signup-form #errorSendOtp").text("");
+        $(".signup-form #errorSendOtp").hide();
+        $(".signup-form #phone").val("");
         $(".signup-form #password, .signup-form #confirmPassword").val("");
         $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,0)");
         $(".signup-form #nextBtn").text("Next");
@@ -41,12 +40,13 @@ function nextPrev(n, currentTab) {
     // Exit the function if any field in the current tab is invalid:
     if (n == 1 && !validateForm(currentTab)) return false;
     // When end of the form
-    if (currentTab == (x.length - 1)) {
-        $("#loader").removeClass("hide");
-        $(".signup-form").addClass("hide");
+
+    if (currentTab == (x.length - 1) && Math.sign(n) == 1) {
+        $("#loader").show();
+        $(".signup-form").addClass("d-none");
     } else {
         // Hide the current tab:
-        $(".signup-form form .tab").eq(currentTab).addClass("hide");
+        $(".signup-form form .tab").eq(currentTab).addClass("d-none");
     }
 
     // Increase or decrease the current tab by 1:
@@ -72,34 +72,27 @@ function validateForm(currentTab) {
         // If a field is empty...
         if (y[i].value == "") {
             // add an "invalid" class to the field:
-            $(y[i]).parent().addClass("has-error");
+            $(y[i]).addClass('is-invalid');
             $(y[i]).next().text("This is required.");
-            if ($(y[i]).parent().hasClass("input-group")) {
-                $(y[i]).parent().next().text("This is required.");
-            }
             // and set the current valid status to false
             valid = false;
         } else {
-            // add an "invalid" class to the field:
-            $(y[i]).parent().removeClass("has-error");
-            if ($(y[i]).parent().hasClass("input-group")) {
-                $(y[i]).parent().next().text("");
-            }
+            // remove an "invalid" class to the field:
+            $(y[i]).removeClass('is-invalid');
+            $(y[i]).next().text("");
+
             // and set the current valid status to false
             if (y[i].id == "username" || y[i].id == "password" || y[i].id == "phone" || y[i].id == "code") {
                 if (y[i].value.length < y[i].minLength) {
                     valid = false;
-                    $(y[i]).parent().addClass("has-error");
-                    if (y[i].id == "phone") {
-                        $(y[i]).parent().next().text('Length is short, minimum ' + y[i].minLength + ' required.');
-                    } else {
-                        $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + ' required.');
-                    }
+                    if (y[i].id == "phone") $(".signup-form #errorSendOtp").hide();
+                    $(y[i]).addClass('is-invalid');
+                    $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + ' required.');
                 }
             }
             if (y[i].id == "confirmPassword" && y[i].value != $('#password').val()) {
                 valid = false;
-                $(y[i]).parent().addClass("has-error");
+                $(y[i]).addClass('is-invalid');
                 $(y[i]).next().text("Passwords Do Not Match!");
             }
         }
@@ -108,13 +101,13 @@ function validateForm(currentTab) {
     for (i = 0; i < z.length; i++) {
         if (z[i].value == "") {
             // add an "invalid" class to the field:
-            $(z[i]).parent().addClass("has-error");
+            $(z[i]).addClass('is-invalid');
             $(z[i]).next().text("This is required.");
             // and set the current valid status to false
             valid = false;
         } else {
             // add an "invalid" class to the field:
-            $(z[i]).parent().removeClass("has-error");
+            $(z[i]).removeClass('is-invalid');
             $(z[i]).next().text("");
             // and set the current valid status to false
         }
@@ -216,7 +209,7 @@ function formatMsgs(f) {
 
 function formatUsername(f) {
     return f
-        .replace(/[^A-z0-9_]/ig, "")
+        .replace(/[^A-z0-9]/ig, "")
         .replace(/\^/g, "")
         .replace(/\[/g, "")
         .replace(/\`/g, "")
@@ -249,7 +242,7 @@ function formatPass(f) {
 function checkMinLength(name, minLength) {
     if ($("input").attr("id", name).val().length > 0) {
         if ($("input").attr("id", name).val().length < minLength) {
-            $("input").attr("id", name).parent().addClass("has-error");
+            $("input").attr("id", name).parent().addClass("is-invalid");
             if (name == "phone") {
                 $("input").attr("id", name).parent().next().text('Length is short, minimum ' + minLength + ' required.');
             } else {
@@ -262,7 +255,7 @@ function checkMinLength(name, minLength) {
 function checkMaxLength(name, maxLength) {
     if ($("input").attr("id", name).val().length > 0) {
         if ($("input").attr("id", name).val().length > maxLength) {
-            $("input").attr("id", name).parent().addClass("has-error");
+            $("input").attr("id", name).parent().addClass("is-invalid");
             if (name == "phone") {
                 $("input").attr("id", name).parent().next().text('Length is not valid, maximum ' + maxLength + ' allowed.');
             } else {
@@ -277,7 +270,7 @@ function checkPass() {
     var password2 = $(".signup-form #confirmPassword").val();
     if (password && password2) {
         if (password !== password2.value) {
-            $(".signup-form #confirmPassword").parent().addClass("has-error");
+            $(".signup-form #confirmPassword").parent().addClass("is-invalid");
             $(".signup-form #confirmPassword").next().text("Passwords Do Not Match!");
         } else {
             $(".signup-form #confirmPassword").next().text("");
@@ -406,42 +399,13 @@ function sendOTP(currentTab) {
             },
             cache: false,
             success: function (data) {
-                if (data.status == "pending") {
-                    $("#sendOTP").text(data.message);
-                    nextPrev(1, currentTab);
-                } else {
-                    $("#errorSendOtp").text(data.message);
-                }
-            }
-        });
-    }
-
-}
-
-function validateOTP(currentTab) {
-    if (validateForm(currentTab)) {
-        var token = $('input[name="_csrf"]').attr('value');
-        $.ajaxSetup({
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', token);
-            }
-        });
-        $.ajax({
-            url: "/api/validateOTP",
-            type: "POST",
-            data: {
-                code: $('input[name="code"]').val(),
-                phone: $('input[name="phone"]').val()
+                $("#sendOTP").text(data.message);
+                nextPrev(1, currentTab);
             },
-            cache: false,
-            success: function (data) {
-                if (data.status == "approved") {
-                    nextPrev(1, currentTab);
-                } else {
-                    $('input[name="code"]').parent().addClass("has-error");
-                    $('input[name="code"]').next().text(data.message);
-                }
+            error: function (xhr, status, error) {
+                $("#errorSendOtp").show().text(xhr.responseJSON.message);
             }
         });
     }
+
 }

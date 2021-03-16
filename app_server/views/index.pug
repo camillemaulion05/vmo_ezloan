@@ -1,278 +1,337 @@
 extends layout
 
 block content
-    header
-      .container
-        .intro-text
-          .intro-lead-in Calculate Your Loan.
-          .container
-            .row.is-flex
-              .col-xs-12.col-md-9.container-first
-                input(type='hidden' name='interest' value='4.563')
-                .form-group
-                  label.header-label
-                    | I want to borrow: 
-                    span.output-text
-                      | &#x20B1; 
-                      output(for='range') 5,000
-                  .container-flex
-                    button#minus.range-btn -
-                    input.slider(type='range' min='5000' max='100000' step='500' name="range" value='5000')
-                    button#plus.range-btn +
-                .row
-                  label.header-label Payment Terms:
-                .form-group
-                  .container-flex
-                    .col-xs-12.col-md-6.radio-container.radio-container-checked
-                      input#six.hide(type='radio' name='loan-period' value='6' checked='checked')
-                      label(for='six')
-                        span  6 months
-                    .col-xs-12.col-md-6.radio-container
-                      input#twelve.hide(type='radio' name='loan-period' value='12')
-                      label(for='twelve')
-                        span  12 months (repeat loans only)
-              .col-xs-12.col-md-3.container-second
-                .repayment-label
-                  | Monthly Repayment
-                .repayment-output
-                  span &#x20B1; 
-                  span#repayment 971
-                div
-                  .form-group
-                    a.btn.btn-xl(href='/signup') Apply Now
-            .message-header
-              | DISCLAIMER: Loan amount, monthly amortization &amp; applied rate shall be confirmed in your loan docs. Loan approval shall be subject to the submission of required docs., VMO EZ Loan&apos;s credit policies &amp; procedures.
-    section#products
+  //Masthead
+  header.masthead
+    .container
+      .masthead-subheading Calculate Your Loan.
       .container
         .row
-          .col-lg-12.text-center
-            h2.section-heading
-              | You can achieve your financial goals. 
+          .col-xs-12.col-md-9.container-first
+            input(type='hidden' name='interest' value='5')
+            .form-group
+              label.header-label
+                | I want to borrow: 
+                span.output-text
+                  | &#x20B1; 
+                  output(for='range') 5,000
+              .container-flex
+                button#minus.range-btn.btn-secondary -
+                input.slider(type='range' min='5000' max='100000' step='500' name='range' value='5000')
+                button#plus.range-btn.btn-secondary +
+            .form-group
+              label.header-label Payment Terms:
+            .btn-group.btn-group-toggle.col-lg-12(data-toggle='buttons')
+              .col-xs-12.col-md-6
+                label.btn.btn-secondary.active.btn-block
+                  input#six(type='radio' name='loan-period' value='6' autocomplete='off' checked='')
+                  |  6 months
+              .col-xs-12.col-md-6
+                label.btn.btn-secondary.btn-block
+                  input#twelve(type='radio' name='loan-period' value='12' autocomplete='off')
+                  |  12 months (repeat loans only)
+          .col-xs-12.col-md-3.container-second
+            .repayment-label Monthly Repayment
+            .repayment-output
+              span &#x20B1; 
+              span#repayment 971
+            div
+              .form-group
+                a.btn.btn-xl(href='/signup') Apply Now
+      .message-header
+        | DISCLAIMER: Loan amount, monthly amortization &amp; applied rate shall be confirmed in your loan docs. Loan approval shall be subject to the submission of required docs., VMO EZ Loan&apos;s credit policies &amp; procedures.
+  // Products
+  section#products.page-section
+    .container
+      .text-center
+        h2.section-heading.text-uppercase PRODUCTS
+        h3.section-subheading.text-muted Browse through our different loan packages that may suit your needs.
+      .container
+        #carousel-example.carousel.slide(data-ride='carousel')
+          .carousel-inner.row.w-100.mx-auto(role='listbox')
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3.active
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/01-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Educational
+                  .portfolio-caption-subheading.text-muted Pay for tuition, books and supplies, and living expenses. 
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/02-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Travel
+                  .portfolio-caption-subheading.text-muted Ready for Holiday?
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/03-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Gadget
+                  .portfolio-caption-subheading.text-muted Get the latest technology.
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/04-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Wedding
+                  .portfolio-caption-subheading.text-muted Make it Unforgettable.
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/05-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading House Repair
+                  .portfolio-caption-subheading.text-muted Renovating or refurnishing your home can be a costly endeavour.
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/06-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Productive
+                  .portfolio-caption-subheading.text-muted Make things happen.
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/07-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Hospitalization
+                  .portfolio-caption-subheading.text-muted Health Care
+            .carousel-item.col-12.col-sm-6.col-md-4.col-lg-3
+              .portfolio-item
+                img.img-fluid.mx-auto.d-block(src='/images/products/08-thumbnail.jpg' alt='')
+                .portfolio-caption
+                  .portfolio-caption-heading Multi Purpose
+                  .portfolio-caption-subheading.text-muted Other Needs
+          a.carousel-control-prev(href='#carousel-example' role='button' data-slide='prev')
+            i.fas.fa-arrow-left(aria-hidden='true')
+            span.sr-only Previous
+          a.carousel-control-next(href='#carousel-example' role='button' data-slide='next')
+            i.fas.fa-arrow-right(aria-hidden='true')
+            span.sr-only Next
+  // Qualifications
+  section#qualifications.page-section.bg-light
+    .container
+      .text-center
+        h2.section-heading.text-uppercase WHO ARE QUALIFIED?
+        h3.section-subheading.text-muted See if you meet the qualifications below
+      .row.text-center
+        .col-md-3.col-sm-6
+          span.fa-stack.fa-4x
+            i.fas.fa-circle.fa-stack-2x.text-primary
+            i.fas.fa-user.fa-stack-1x.fa-inverse
+          h4.my-3 Filipino, 21 to 65 yrs. old
+          p.text-muted You must be a Filipino citizen ranging from 21 to 65 yrs. old.
+        .col-md-3.col-sm-6
+          span.fa-stack.fa-4x
+            i.fas.fa-circle.fa-stack-2x.text-primary
+            i.far.fa-id-badge.fa-stack-1x.fa-inverse
+          h4.my-3 Employed
+          p.text-muted Working tenure for at least 3 months.
+        .col-md-3.col-sm-6
+          span.fa-stack.fa-4x
+            i.fas.fa-circle.fa-stack-2x.text-primary
+            i.far.fa-money-bill-alt.fa-stack-1x.fa-inverse
+          h4.my-3 Salary range
+          p.text-muted &#x20B1;7,000 per month.
+        .col-md-3.col-sm-6
+          span.fa-stack.fa-4x
+            i.fas.fa-circle.fa-stack-2x.text-primary
+            i.fas.fa-phone.fa-stack-1x.fa-inverse
+          h4.my-3 Contact
+          p.text-muted Has an existing company landline phone &amp; personal mobile.
+  // Requirements
+  section#requirements.page-section
+    .container
+      .text-center
+        h2.section-heading.text-uppercase What are the Requirements?
+        h3.section-subheading.text-muted COMPLETE ALL 3
+      .row.text-center
+        .col-md-4.col-sm-12
+          span.fa-layers.fa-fw.fa-stack.fa-4x
+            i.fas.fa-square.fa-stack-2x.text-danger
+            span.fa-layers-text.fa-inverse.font-weight-bold 1
+          h4.my-3 1 Valid Govt. Issued ID
+          p.text-muted must contain present address
+          p
+            a(data-toggle='collapse' href='#validIds' role='button' aria-expanded='false' aria-controls='collapseExample')
+              | List of Valid Govt. ID&prime;s
+          #validIds.collapse
+            p
+              | TIN 
               br
-              |  We can help.
-            h3.section-subheading.text-muted Enjoy low interest rates and easy payment terms on your financing needs such as:
-        .row.text-center
-          .col-md-3.col-sm-6
-            .thumbnail
-              img(src='/images/potential-1.jpg')
-              .caption
-                h4 Education
-              p
-                a.btn.btn-primary(href='/signup') Apply Now
-          .col-md-3.col-sm-6
-            .thumbnail
-              img(src='/images/potential-4.jpg')
-              .caption
-                h4 Emergencies
-              p
-                a.btn.btn-primary(href='/signup') Apply Now
-          .col-md-3.col-sm-6
-            .thumbnail
-              img(src='/images/potential-3.jpg')
-              .caption
-                h4 Home Improvements
-              p
-                a.btn.btn-primary(href='/signup') Apply Now
-          .col-md-3.col-sm-6
-            .thumbnail
-              img(src='/images/potential-2.jpg')
-              .caption
-                h4 Travel
-              p
-                a.btn.btn-primary(href='/signup') Apply Now
-    section#qualifications.bg-light-gray
-      .container
-        .row
-          .col-lg-12.text-center
-            h2.section-heading Who are Qualified?
-            h3.section-subheading.text-muted See if you meet the qualifications below
-        .row.is-flex.text-center
-          .col-md-3.col-sm-6.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-circle.fa-stack-2x.text-primary
-              i.fa.fa-user.fa-stack-1x.fa-inverse
-            h4.service-heading Filipino, 21 to 65 yrs. old
-            p.text-muted You must be a Filipino citizen ranging from 21 to 65 yrs. old
-          .col-md-3.col-sm-6.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-circle.fa-stack-2x.text-primary
-              i.fa.fa-id-badge.fa-stack-1x.fa-inverse
-            h4.service-heading Employed
-            p.text-muted Working tenure for at least 3 months.
-          .col-md-3.col-sm-6.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-circle.fa-stack-2x.text-primary
-              i.fa.fa-money.fa-stack-1x.fa-inverse
-            h4.service-heading Salary range
-            p.text-muted &#x20B1;7,000 per month
-          .col-md-3.col-sm-6.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-circle.fa-stack-2x.text-primary
-              i.fa.fa-phone.fa-stack-1x.fa-inverse
-            h4.service-heading Contact
-            p.text-muted Has an existing company landline phone &amp; personal mobile
-    section#requirements
-      .container
-        .row
-          .col-lg-12.text-center
-            h2.section-heading What are the Requirements?
-            h3.section-subheading.text-muted COMPLETE ALL 3
-        .row.is-flex.text-center
-          .col-md-4.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-square.fa-stack-2x.text-secondary
-              strong.fa-stack-1x.fa-inverse
-                | 1
-            h4.service-heading 1 Valid Govt. Issued ID
-            p.text-muted must contain present address
-            a#checkValidIds.text-link List of Valid Govt. ID&prime;s
-            hr
-            #validIds.hide
-              p TIN
-              p SSS
-              p GSIS
-              p UMID
-              p Passport
-              p Driver&rsquo;s License
-              p Postal ID
-              p Voter&rsquo;s ID
-              p PRC
-              p NBI Clearance
-          .col-md-4.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-square.fa-stack-2x.text-secondary
-              strong.fa-stack-1x.fa-inverse
-                | 2
-            h4.service-heading Employment Proof
-            p.text-muted
-              | Orig. (2) months latest payslip OR BIR2316 (ITR)
-              | Orig. Certificate of Employment Issued within 3 months OR Employee ID
-          .col-md-4.col-xs-12
-            span.fa-stack.fa-4x
-              i.fa.fa-square.fa-stack-2x.text-secondary
-              strong.fa-stack-1x.fa-inverse
-                | 3
-            h4.service-heading TIN Proof
-            p.text-muted Any Document or ID with TIN
-            a#checkTIN.text-link TIN Proof Samples
-            hr
-            #validTIN.hide
-              p TIN Card
-              p Recent BIR2316
-              p Company ID
-              p Payslip
-    section#about.bg-light-gray
-      .container
-        .row
-          .col-lg-12.text-center
-            h2.section-heading How to Apply?
-            h3.section-subheading.text-muted Easy requirements, no collateral, no co-maker, fast approval!
-        .row
-          .col-lg-12
-            ul.timeline
-              li
-                .timeline-image
-                  img.rounded-circle.img-fluid(src='/images/1.jpg' alt='Signup')
-                .timeline-panel
-                  .timeline-heading
-                    h4 first
-                    h4.subheading Fill-Up Your Details
-                  .timeline-body
-                    p.text-muted
-                      | Sign up and fill out the necessary information needed in creating account. Your information must be true according to your identity.
-              li.timeline-inverted
-                .timeline-image
-                  img.rounded-circle.img-fluid(src='/images/2.jpg' alt='Documents')
-                .timeline-panel
-                  .timeline-heading
-                    h4 Second
-                    h4.subheading Submit your documents
-                  .timeline-body
-                    p.text-muted
-                      | Fully verify your account to get approved to your chosen loan. All you need is a valid ID, employment and TIN Proof.
-              li
-                .timeline-image
-                  img.rounded-circle.img-fluid(src='/images/3.jpg' alt='Loans')
-                .timeline-panel
-                  .timeline-heading
-                    h4 Third
-                    h4.subheading Get Your Funds
-                  .timeline-body
-                    p.text-muted
-                      | Your money goes straight to your bank account via direct
-                      | deposit or Gcash Wallet.
-              li.timeline-inverted
-                .timeline-image
-                  img.rounded-circle.img-fluid(src='/images/4.png' alt='Repayment')
-                .timeline-panel
-                  .timeline-heading
-                    h4 Lastly
-                    h4.subheading Repay Your Loan
-                  .timeline-body
-                    p.text-muted Repayment is split monthly.
-    section#faqs
-      .container
-        .row
-          .col-lg-12.text-center
-            h2.section-heading Frequently Asked Questions (FAQs)
-            h3.section-subheading.text-muted
-        .row.is-flex.text-left
-          .col-md-4.col-sm-12
-            .faq-box
-              .faq-header
-                h4.heading How much money can I borrow?
+              |  SSS 
+              br
+              |  GSIS 
+              br
+              |  UMID 
+              br
+              |  Passport 
+              br
+              |  Driver&rsquo;s License 
+              br
+              |  Postal ID 
+              br
+              |  Voter&rsquo;s ID 
+              br
+              |  PRC 
+              br
+              |  NBI Clearance
+        .col-md-4.col-sm-12
+          span.fa-layers.fa-fw.fa-stack.fa-4x
+            i.fas.fa-square.fa-stack-2x.text-danger
+            span.fa-layers-text.fa-inverse.font-weight-bold 2
+          h4.my-3 Employment Proof
+          p.text-muted
+            | Orig. (2) months latest payslip OR BIR2316 (ITR) Orig. Certificate of Employment Issued within 3 months OR Employee ID.
+        .col-md-4.col-sm-12
+          span.fa-layers.fa-fw.fa-stack.fa-4x
+            i.fas.fa-square.fa-stack-2x.text-danger
+            span.fa-layers-text.fa-inverse.font-weight-bold 3
+          h4.my-3 TIN Proof
+          p.text-muted Any Document or ID with TIN
+          p
+            a(data-toggle='collapse' href='#validTIN' role='button' aria-expanded='false' aria-controls='collapseExample')
+              | TIN Proof Samples
+          #validTIN.collapse
+            p
+              | TIN Card 
+              br
+              |  Recent BIR2316 
+              br
+              |  Company ID 
+              br
+              |  Payslip
+  // About
+  section#about.page-section.bg-light
+    .container
+      .text-center
+        h2.section-heading.text-uppercase How to Apply?
+        h3.section-subheading.text-muted Easy requirements, no collateral, no co-maker, fast approval!
+      ul.timeline
+        li
+          .timeline-image
+            img.rounded-circle.img-fluid(src='/images/about/1.jpg' alt='')
+          .timeline-panel
+            .timeline-heading
+              h4 First
+              h4.subheading Fill-Up Your Details
+            .timeline-body
+              p.text-muted
+                | Sign up and fill out the necessary information needed in creating account. Your information must be true according to your identity.
+        li.timeline-inverted
+          .timeline-image
+            img.rounded-circle.img-fluid(src='/images/about/2.jpg' alt='')
+          .timeline-panel
+            .timeline-heading
+              h4 Second
+              h4.subheading Submit your documents
+            .timeline-body
+              p.text-muted
+                | Fully verify your account to get approved to your chosen loan. All you need is a valid ID, employment and TIN Proof.
+        li
+          .timeline-image
+            img.rounded-circle.img-fluid(src='/images/about/3.jpg' alt='')
+          .timeline-panel
+            .timeline-heading
+              h4 Third
+              h4.subheading Get Your Funds
+            .timeline-body
+              p.text-muted Your money goes straight to your Gcash Wallet.
+        li.timeline-inverted
+          .timeline-image
+            img.rounded-circle.img-fluid(src='/images/about/4.png' alt='')
+          .timeline-panel
+            .timeline-heading
+              h4 Lastly
+              h4.subheading Repay Your Loan
+            .timeline-body
+              p.text-muted Repayment is split monthly.
+  // FAQs
+  section#faqs.page-section
+    .container
+      .text-center
+        h2.section-heading.text-uppercase Frequently Asked Questions (FAQs)
+      .row
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq1' role='button' aria-expanded='true' aria-controls='collapseExample' style='color: black;') What type of Loan does VMO EZ loan offer?
+            #faq1.collapse.show
               .faq-body
-                p
+                p.text-muted VMO EZ Loan offers Low Interest Personal Loans.
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq2' role='button' aria-expanded='true' aria-controls='collapseExample' style='color: black;') How much money can I borrow?
+            #faq2.collapse.show
+              .faq-body
+                p.text-muted
                   | Up to PHP500,000 * However, the amount that you can borrow varies depending on the results of the examination.
-          .col-md-4.col-sm-12
-            .faq-box
-              .faq-header
-                h4.heading How much is the interest rate?
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq3' role='button' aria-expanded='true' aria-controls='collapseExample' style='color: black;') How much is the interest rate?
+            #faq3.collapse.show
               .faq-body
-                p
-                  | Interest rate per month is diminishing from 4.563% &ndash; 3.315% if you pay early after the release of your SOA or at least the minimum of 8% of Outstanding Principal Balance. (No more processing fee for repeat borrowers)
-          .col-md-4.col-sm-12
-            .faq-box
-              .faq-header
-                h4.heading How long is the loan process?
+                p.text-muted
+                  | Continuing Interest of 5% per month against Outstanding Balance after the loan terms.
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq4' role='button' aria-expanded='false' aria-controls='collapseExample' style='color: black;') Are there any deductions to your loan amount?
+            #faq4.collapse
               .faq-body
-                p
-                  | Loan process is within the day at its shortest but it still depends on the evaluation.
-    section#contact
-      .container
-        .row
-          .col-lg-12.text-center
-            h2.section-heading Contact Us
-            h3.section-subheading.text-muted Do you have any questions to ask please let us know.
-        .row
-          .col-lg-12
-            form#contactForm(method='post')
-              input(type='hidden', name='_csrf', value=_csrf)
-              .row
-                .col-md-6
-                  .form-group
-                    input.form-control(type='text' placeholder='Your Name *' name='name')
-                  .form-group
-                    input.form-control(type='email' placeholder='Your Email *' name='email')
-                  .form-group.input-group
-                    span.input-group-addon +63
-                    input.form-control(type='text' placeholder='Your Phone *' name='phone' maxlength='10')
-                .col-md-6
-                  .form-group
-                    textarea.form-control(placeholder='Your Message *' name='message')
-                .clearfix
-                .col-lg-12.text-center
-                  #success
-                    if messages.success
-                      .alert.alert-success
-                        button.close(type='button' data-dismiss='alert' aria-hidden='true')
-                          i.fa.fa-times-circle
-                        for success in messages.success
-                          strong= success.msg
-                    if messages.errors
-                      .alert.alert-danger
-                        button.close(type='button' data-dismiss='alert' aria-hidden='true')
-                          i.fa.fa-times-circle
-                        for error in messages.errors
-                          strong= error.msg
-                  button.btn.btn-xl(type='submit') Send Message
+                p.text-muted Service Fee (1% of loan amount).
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq5' role='button' aria-expanded='false' aria-controls='collapseExample' style='color: black;') How fast is the loan process?
+            #faq5.collapse
+              .faq-body
+                p.text-muted
+                  | Loan process is within the day at its shortest but it still depends on your credit evaluation.
+        .col-md-4.col-sm-12
+          .faq-box
+            .faq-header
+              h5
+                a(data-toggle='collapse' href='#faq6' role='button' aria-expanded='false' aria-controls='collapseExample' style='color: black;') How will I know if my loan application has been approved?
+            #faq6.collapse
+              .faq-body
+                p.text-muted Once approved, you will receive a confirmation via SMS.
+  // Contact
+  section#contact.page-section
+    .container
+      .text-center
+        h2.section-heading.text-uppercase Contact Us
+        h3.section-subheading.text-muted Do you have any questions to ask please let us know..
+      form#contactForm(method='post' novalidate='novalidate')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .row.align-items-stretch.mb-5
+          .col-md-6
+            .form-group
+              input.form-control(name='name' type='text' placeholder='Your Name *')
+            .form-group
+              input.form-control(name='email' type='email' placeholder='Your Email *')
+            .form-group.mb-md-0
+              .input-group.mb-3
+                .input-group-prepend
+                  span#basic-addon1.input-group-text +63
+                input.form-control(name='phone' type='text' placeholder='Your Phone *')
+          .col-md-6
+            .form-group.form-group-textarea.mb-md-0
+              textarea.form-control(name='message' placeholder='Your Message *')
+        .text-center
+          #success
+            if messages.success
+              .alert.alert-success
+                button.close(type='button' data-dismiss='alert' aria-hidden='true')
+                  i.fa.fa-times-circle
+                for success in messages.success
+                  strong= success.msg
+            if messages.errors
+              .alert.alert-danger
+                button.close(type='button' data-dismiss='alert' aria-hidden='true')
+                  i.fa.fa-times-circle
+                for error in messages.errors
+                  strong= error.msg
+          button.btn.btn-xl(type='submit') Send Message

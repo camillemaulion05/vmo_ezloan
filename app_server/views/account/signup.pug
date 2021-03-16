@@ -3,7 +3,7 @@ extends ../layout
 block content
   include ../partials/flash
   .container
-    #loader.hide
+    #loader
     .form-clean.signup-form
       form#regForm(method='post')
         input(type='hidden', name='_csrf', value=_csrf)
@@ -15,45 +15,47 @@ block content
             .col-sm-6
               .form-group
                 input#firstName.form-control(type='text' name='firstName' placeholder='First Name')
-                em.help-block.text-danger
+                em.invalid-feedback 
             .col-sm-6
               .form-group
                 input#lastName.form-control(type='text' name='lastName' placeholder='Last Name')
-                em.help-block.text-danger
+                em.invalid-feedback 
           .row
             .col-sm-12
               .form-group
                 input#username.form-control(type='text' name='username' placeholder='Username' minlength='8')
-                em.help-block.text-danger
+                em.invalid-feedback 
           .row
             .col-sm-12
               .form-group
                 input#password.form-control(type='password' name='password' placeholder='Password' minlength='8')
-                em.help-block.text-danger
+                em.invalid-feedback 
           .row
             .col-sm-12
               .form-group
                 input#confirmPassword.form-control(type='password' name='confirmPassword' placeholder='Confirm Password')
-                em.help-block.text-danger
-        .tab.hide
+                em.invalid-feedback 
+        .tab.d-none
           p.hint-text
             | For your security, VMO EZ Loan wants to make sure it&rsquo;s really you. VMO EZ Loan will send a text message with a 6-digit verification code. 
             em Standard rates apply
-          p#errorSendOtp.hint-text
           .row
             .col-sm-12
-              .form-group.input-group
-                span.input-group-addon +63
-                input#phone.form-control(type='text' name='phone' placeholder='Phone Number' minlength='10' maxlength='10')
-              em.text-danger
-        .tab.hide
+              .form-group.mb-md-0
+                .input-group.mb-3
+                  .input-group-prepend
+                    span#basic-addon1.input-group-text +63
+                  input#phone.form-control(type='text' name='phone' placeholder='Phone Number' minlength='10' maxlength='10')
+                  em.invalid-feedback 
+                  em#errorSendOtp.error-text
+        .tab.d-none
           p#sendOTP.hint-text
           .row
             .col-sm-12
               .form-group
                 input#code.form-control(type='text' name='code' placeholder='Enter verification code' minlength='6' maxlength='6')
-                em.help-block.text-danger
-        .tab.hide
+                em.invalid-feedback 
+        .tab.d-none
           p.hint-text
             span#user Username
             | , welcome to VMO EZ Loan
@@ -61,12 +63,12 @@ block content
             .col-sm-12
               .form-group
                 input#email.form-control(type='email' name='email' placeholder='Email')
-                em.help-block.text-danger
+                em.invalid-feedback 
           .row
             .col-sm-12
               .form-group
                 input#birthdate.form-control(type='date' name='birthdate' placeholder='Birthday')
-                em.help-block.text-danger
+                em.invalid-feedback 
           .row
             .col-sm-12
               .form-group
@@ -74,10 +76,10 @@ block content
                   option(value='' selected='' disabled='') Gender
                   option(value='Female') Female
                   option(value='Male') Male
-                em.help-block.text-danger
+                em.invalid-feedback 
         div(style='overflow:auto;')
           div(style='float:right;')
-            button#prevBtn.btn.btn-danger.hide(type='button') Previous
+            button#prevBtn.btn.btn-danger.d-none(type='button') Previous
             |  
             button#nextBtn.btn.btn-primary(type='button' onclick='nextPrev(1,0)') Next
         // Circles which indicates the steps of the form:

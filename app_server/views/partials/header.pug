@@ -1,29 +1,27 @@
-.nav.navbar.navbar-default(class=(title == 'Home') ? 'navbar-fixed-top' : 'navbar-shrink')
+// Navigation
+nav.navbar.navbar-expand-lg(id=(title == 'Home') ? 'mainNav' : 'secondNav' class=(title == 'Home') ? 'navbar-dark fixed-top' : 'navbar-light navbar-shrink') 
   .container
-    .navbar-header.page-scroll
-      button.navbar-toggle.collapsed(type='button' data-toggle='collapse' data-target='#bs-example-navbar-collapse-1' aria-expanded='false' aria-controls='navbar')
-        span.sr-only Toggle navigation
-        span.icon-bar
-        span.icon-bar
-        span.icon-bar
-      a.navbar-brand.page-scroll(href=(title == 'Home') ? '#page-top' : '/' style='display: flex;align-items: center;')
-        img(src='/images/logo.png' alt='VMO EZ Loan' style='height: 40px; width: 40px;')
-        span  VMO EZ Loan
-    #bs-example-navbar-collapse-1.collapse.navbar-collapse
-      ul.nav.navbar-nav.navbar-right
+    a.navbar-brand(href=(title == 'Home') ? '#page-top' : '/' class=(title == 'Home' ? 'js-scroll-trigger' : '') style='display: flex;align-items: center;')
+      img(src='/images/logo.png' alt='VMO EZ Loan' style='height: 40px; width: 40px;')
+      span  VMO EZ Loan
+    button.navbar-toggler.navbar-toggler-right(type='button' data-toggle='collapse' data-target='#navbarResponsive' aria-controls='navbarResponsive' aria-expanded='false' aria-label='Toggle navigation')
+      | Menu
+      i.fas.fa-bars.ml-1
+    #navbarResponsive.collapse.navbar-collapse
+      ul.navbar-nav.text-uppercase.ml-auto
         if title === 'Home'
-          li
-            a.page-scroll(href='#products') Products
-          li
-            a.page-scroll(href='#qualifications') Qualifications
-          li
-            a.page-scroll(href='#requirements') Requirements
-          li
-            a.page-scroll(href='#about') About
-          li
-            a.page-scroll(href='#faqs') FAQs
-          li
-            a.page-scroll(href='#contact') Contact
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#products') Products
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#qualifications') Qualifications
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#requirements') Requirements
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#about') About
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#faqs') FAQs
+          li.nav-item
+            a.nav-link.js-scroll-trigger(href='#contact') Contact
         else
           if !user
             li.nav-item(class=(title === 'Login') ? 'active' : undefined)
@@ -32,6 +30,6 @@
               a.nav-link(href='/signup') Create Account
           else
             li.nav-item
-              a(href='#') Signed In As #{user.username}
+              a.nav-link(href='#') Signed In As #{user.username}
             li.nav-item
               a.nav-link(href='/logout') Logout

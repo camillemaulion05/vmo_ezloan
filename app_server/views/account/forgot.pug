@@ -4,18 +4,20 @@ block content
   include ../partials/flash
   .container
     .form-clean.login-form
-      form#forgotForm(method='post')
+      form#forgotForm(method='post' novalidate='novalidate')
         input(type='hidden', name='_csrf', value=_csrf)
-        span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
-          i.fa.fa-circle.fa-stack-2x.text-primary
-          i.fa.fa-key.fa-stack-1x.fa-inverse
-        h2 Forgot Your Password?
+        .row.text-center
+          span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
+            i.fa.fa-circle.fa-stack-2x.text-primary
+            i.fa.fa-key.fa-stack-1x.fa-inverse
+        .row
+          .col-sm-12
+            h2.section-heading.text-uppercase Forgot Your Password?
         p.hint-text Enter your email address below and we will send you password reset instructions.
         .row
           .col-sm-12
             .form-group
               input#email.form-control(type='email' name='email' placeholder='Email')
-              em.help-block.text-danger
         .row
             .col-sm-12
               .form-group
@@ -32,12 +34,10 @@ block content
                   option(value="What was your first car?") What was your first car?
                   option(value="Where did you first meet your spouse?") Where did you first meet your spouse?
                   option(value="Who was your childhood hero?") Who was your childhood hero?
-                em.help-block.text-danger
         .row
           .col-sm-12
             .form-group
               input#answer.form-control(type='text' name='answer' placeholder='Answer')
-              em.help-block.text-danger
         div(style='overflow:auto;')
           div(style='float:right;')
             a.btn.btn-danger(type='button' href='/login') Back

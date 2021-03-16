@@ -28,10 +28,22 @@ const postLogin = (req, res, next) => {
     if (validator.isEmpty(req.body.username)) validationErrors.push({
         msg: 'Username cannot be blank.'
     });
+    if (!validator.isAlphanumeric(req.body.username)) validationErrors.push({
+        msg: 'Username must be alphanumeric.'
+    });
+    if (!validator.isLength(req.body.username, {
+            min: 8
+        })) validationErrors.push({
+        msg: 'Username must be at least 8 characters long'
+    });
     if (validator.isEmpty(req.body.password)) validationErrors.push({
         msg: 'Password cannot be blank.'
     });
-
+    if (!validator.isLength(req.body.password, {
+            min: 8
+        })) validationErrors.push({
+        msg: 'Password must be at least 8 characters long'
+    });
     if (validationErrors.length) {
         console.log(validationErrors);
         req.flash('errors', validationErrors);
@@ -92,6 +104,17 @@ const postSignup = (req, res, next) => {
     if (validator.isEmpty(req.body.username)) validationErrors.push({
         msg: 'Username cannot be blank.'
     });
+    if (!validator.isAlphanumeric(req.body.username)) validationErrors.push({
+        msg: 'Username must be alphanumeric.'
+    });
+    if (!validator.isLength(req.body.username, {
+            min: 8
+        })) validationErrors.push({
+        msg: 'Username must be at least 8 characters long'
+    });
+    if (validator.isEmpty(req.body.password)) validationErrors.push({
+        msg: 'Password cannot be blank.'
+    });
     if (!validator.isLength(req.body.password, {
             min: 8
         })) validationErrors.push({
@@ -111,6 +134,9 @@ const postSignup = (req, res, next) => {
     });
     if (validator.isEmpty(req.body.birthdate)) validationErrors.push({
         msg: 'Birthday cannot be blank.'
+    });
+    if (!validator.isDate(req.body.birthdate)) validationErrors.push({
+        msg: 'Enter a valid date.'
     });
     if (validator.isEmpty(req.body.gender)) validationErrors.push({
         msg: 'Gender cannot be blank.'
@@ -400,6 +426,9 @@ const getReset = (req, res, next) => {
 const postReset = (req, res, next) => {
     console.log(JSON.stringify(req.body));
     const validationErrors = [];
+    if (validator.isEmpty(req.body.password)) validationErrors.push({
+        msg: 'Password cannot be blank.'
+    });
     if (!validator.isLength(req.body.password, {
             min: 8
         })) validationErrors.push({
