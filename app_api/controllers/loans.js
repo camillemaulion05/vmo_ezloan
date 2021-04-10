@@ -13,6 +13,7 @@ const loansList = (req, res) => {
         .populate('requestedBy', 'profile.firstName profile.lastName type')
         .exec((err, loans) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -28,7 +29,7 @@ const loansList = (req, res) => {
 
 const loansCreate = (req, res) => {
     const loan = new Loan({
-        loanType,
+        purposeOfLoan,
         loanTerm,
         loanAmount,
         monthlyInterestRate,
@@ -38,6 +39,7 @@ const loansCreate = (req, res) => {
     loan.compute(req.body.loanAmount, req.body.monthlyInterestRate, req.body.loanTerm);
     loan.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -66,7 +68,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -75,6 +77,7 @@ const loansReadOne = (req, res) => {
                             "message": "Loan not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -118,13 +121,14 @@ const loansUpdateOne = (req, res) => {
                             "message": "Loan not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    loan.loanType = (req.body.loanType) ? req.body.loanType : loan.loanType;
+                    loan.purposeOfLoan = (req.body.purposeOfLoan) ? req.body.purposeOfLoan : loan.purposeOfLoan;
                     loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
                     loan.loanAmount = (req.body.loanAmount) ? req.body.loanAmount : loan.loanAmount;
                     loan.monthlyInterestRate = (req.body.monthlyInterestRate) ? req.body.monthlyInterestRate : loan.monthlyInterestRate;
@@ -136,6 +140,7 @@ const loansUpdateOne = (req, res) => {
                     if ("Loan Release" == req.body.status) loan.updateDates();
                     loan.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -173,6 +178,7 @@ const loansDeleteOne = (req, res) => {
                             "message": "Loan not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -209,6 +215,7 @@ const loansSchedulesUpdate = (req, res) => {
                             "message": "Loan not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
@@ -218,6 +225,7 @@ const loansSchedulesUpdate = (req, res) => {
                     loan.addRepayment(req.body.transactionDate, req.body.transactionAmount);
                     loan.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -255,6 +263,7 @@ const loansSchedulesList = (req, res) => {
                             "message": "Loan Schedules not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -297,6 +306,7 @@ const loansSchedulesReadOne = (req, res) => {
                             "message": "Loan Schedules not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -341,6 +351,7 @@ const loansDuePerLoan = (req, res) => {
                             "message": "Loan not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -368,6 +379,7 @@ const loansDueRepayments = (req, res) => {
         .populate('requestedBy', 'profile.firstName profile.lastName type')
         .exec((err, loanPaymentSchedule) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -473,6 +485,7 @@ const loansSummary = (req, res) => {
             ])
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -532,6 +545,7 @@ const loansInterestReport = (req, res) => {
             ])
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -577,6 +591,7 @@ const loansPerUser = (req, res) => {
             }])
             .exec((err, loans) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({

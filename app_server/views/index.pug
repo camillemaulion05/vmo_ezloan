@@ -236,7 +236,7 @@ block content
               h4 Third
               h4.subheading Get Your Funds
             .timeline-body
-              p.text-muted Your money goes straight to your Gcash Wallet.
+              p.text-muted Your money goes straight to your G-Cash Wallet/Bank Account.
         li.timeline-inverted
           .timeline-image
             img.rounded-circle.img-fluid(src='/images/about/4.png' alt='')
@@ -308,20 +308,20 @@ block content
     .container
       .text-center
         h2.section-heading.text-uppercase Contact Us
-        h3.section-subheading.text-muted Do you have any questions to ask please let us know..
+        h3.section-subheading.text-muted 
+          | Drop us a line! We will reach out to you &amp; answer all your questions personally.
+          br
+          | Recurring questions will be added to the FAQ section.
       form#contactForm(method='post' novalidate='novalidate')
         input(type='hidden', name='_csrf', value=_csrf)
         .row.align-items-stretch.mb-5
           .col-md-6
             .form-group
-              input.form-control(name='name' type='text' placeholder='Your Name *')
+              input.form-control(name='firstName' type='text' placeholder='Your First Name *' autocomplete='off')
             .form-group
-              input.form-control(name='email' type='email' placeholder='Your Email *')
+              input.form-control(name='lastName' type='text' placeholder='Your Last Name *' autocomplete='off')
             .form-group.mb-md-0
-              .input-group.mb-3
-                .input-group-prepend
-                  span#basic-addon1.input-group-text +63
-                input.form-control(name='phone' type='text' placeholder='Your Phone *')
+              input.form-control(name='email' type='email' placeholder='Your Email *' autocomplete='off')
           .col-md-6
             .form-group.form-group-textarea.mb-md-0
               textarea.form-control(name='message' placeholder='Your Message *')

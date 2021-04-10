@@ -4,15 +4,18 @@ const Employee = mongoose.model('Employee');
 const employeesList = (req, res) => {
     Employee
         .find({}, {
+            "employeeNum": 1,
+            "type": 1,
             "profile.firstName": 1,
             "profile.lastName": 1,
-            "type": 1,
-            "employeeNum": 1,
+            "profile.mobileNum": 1,
+            "profile.email": 1,
+            "profile.employeeID": 1,
             "userId": 1
         })
-        .populate('userId', 'status email mobileNum')
         .exec((err, employees) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -31,11 +34,13 @@ const employeesCreate = (req, res) => {
         type,
         profile,
         userId,
+        signature
     } = req.body);
     employee.employeeNum = Date.now();
     if ("Employee" == req.payload.type) employee.userId = req.payload._id;
     employee.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -64,7 +69,6 @@ const employeesReadOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status email mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -73,6 +77,7 @@ const employeesReadOne = (req, res) => {
                             "message": "Employee not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -100,7 +105,6 @@ const employeesUpdateOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
-            .populate('userId', 'status email mobileNum')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -109,6 +113,7 @@ const employeesUpdateOne = (req, res) => {
                             "message": "Employee not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
@@ -118,8 +123,10 @@ const employeesUpdateOne = (req, res) => {
                     employee.type = (req.body.type) ? req.body.type : employee.type;
                     employee.profile = (req.body.profile) ? req.body.profile : employee.profile;
                     employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
+                    employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
                     employee.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -157,6 +164,7 @@ const employeesDeleteOne = (req, res) => {
                             "message": "Employee not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({

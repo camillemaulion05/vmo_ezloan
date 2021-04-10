@@ -7,6 +7,7 @@ const transactionsList = (req, res) => {
         .populate('borrowerId', 'profile.firstName profile.lastName type')
         .exec((err, transactions) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -38,6 +39,7 @@ const transactionsCreate = (req, res) => {
     if (req.body.postedBy) transaction.postedDate = Date.now();
     transaction.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -66,7 +68,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId', 'profile.firstName profile.lastName type userId')
+            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -75,6 +77,7 @@ const transactionsReadOne = (req, res) => {
                             "message": "Transaction not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -118,6 +121,7 @@ const transactionsUpdateOne = (req, res) => {
                             "message": "Transaction not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
@@ -138,6 +142,7 @@ const transactionsUpdateOne = (req, res) => {
                     transaction.withdrawalId = (req.body.withdrawalId) ? req.body.withdrawalId : transaction.withdrawalId;
                     transaction.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -175,6 +180,7 @@ const transactionsDeleteOne = (req, res) => {
                             "message": "Transaction not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -207,6 +213,7 @@ const transactionsPerType = (req, res) => {
             .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -251,6 +258,7 @@ const transactionsPerUser = (req, res) => {
             }])
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -305,6 +313,7 @@ const transactionsSummary = (req, res) => {
             ])
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -361,6 +370,7 @@ const contributionsPerMember = (req, res) => {
             ])
             .exec((err, transactions) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({

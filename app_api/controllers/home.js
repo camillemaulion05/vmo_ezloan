@@ -94,11 +94,11 @@ const createService = function () {
 }
 
 const sendOTP = function (req, res) {
-    if (req.body.phone) {
+    if (req.body.mobileNum) {
         client.verify.services(process.env.TWILIO_SERVICESID)
             .verifications
             .create({
-                to: '+63' + req.body.phone,
+                to: '+63' + req.body.mobileNum,
                 channel: 'sms'
             })
             .then(verification => {
@@ -106,7 +106,7 @@ const sendOTP = function (req, res) {
                     .status(200)
                     .json({
                         "status": verification.status,
-                        "message": (verification.status == "pending") ? "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.phone).substring(6, 10) + ", please check." : "Sorry " + req.body.name + ", it seems that my sms server is not responding. Please try again later!"
+                        "message": (verification.status == "pending") ? "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.mobileNum).substring(6, 10) + ", please check." : "Sorry " + req.body.name + ", it seems that my sms server is not responding. Please try again later!"
                     });
             })
             .catch(err => {
@@ -129,11 +129,11 @@ const sendOTP = function (req, res) {
 }
 
 const validateOTP = function (req, res) {
-    if (req.body.phone && req.body.code) {
+    if (req.body.mobileNum && req.body.code) {
         client.verify.services(process.env.TWILIO_SERVICESID)
             .verificationChecks
             .create({
-                to: "+63" + req.body.phone,
+                to: "+63" + req.body.mobileNum,
                 code: req.body.code
             })
             .then(verification_check => {

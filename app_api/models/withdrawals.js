@@ -9,13 +9,17 @@ const withdrawalSchema = mongoose.Schema({
     reason: {
         type: String,
         enum: [
-            "Emergency Claim",
-            "Death Claim",
-            "Disability Claim",
-            "Funeral Claim",
-            "Maternity Claim",
-            "Retirement Claim",
-            "Sickness Claim"
+            "Living Cost",
+            "Educational",
+            "Medical/Hospitalization",
+            "Purchasing Appliance",
+            "Travel/Vacation",
+            "Entertainment",
+            "Own Business",
+            "Wedding",
+            "House Repair",
+            "Repayments",
+            "Others"
         ]
     },
     requestedBy: {

@@ -5,7 +5,7 @@ const employeeSchema = mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ["Loan Officer", "Loan Processor"]
+        enum: ["Loan Officer", "Loan Processor", "HRD Authorized Officer"]
     },
     profile: {
         firstName: {
@@ -22,7 +22,7 @@ const employeeSchema = mongoose.Schema({
             required: true,
             enum: ["Male", "Female"]
         },
-        birthday: {
+        dateOfBirth: {
             type: Date,
             required: true
         },
@@ -47,11 +47,33 @@ const employeeSchema = mongoose.Schema({
                 province: String,
                 zipCode: String
             }
-        }
+        },
+        mobileNum: {
+            type: String,
+            required: true
+        },
+        mobileNumVerified: {
+            type: Boolean,
+            default: false
+        },
+        email: {
+            type: String,
+            required: true
+        },
+        emailVerificationToken: String,
+        emailVerified: {
+            type: Boolean,
+            default: false
+        },
+        employeeID: String
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    signature: {
+        type: String,
+        default: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCADIAZADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//Z"
     }
 }, {
     timestamps: true

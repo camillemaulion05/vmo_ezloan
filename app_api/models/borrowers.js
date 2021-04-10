@@ -27,13 +27,13 @@ const borrowerSchema = mongoose.Schema({
             required: true,
             enum: ["Male", "Female"]
         },
-        birthday: {
+        dateOfBirth: {
             type: Date,
             required: true
         },
-        civilStat: {
+        maritalStat: {
             type: String,
-            enum: ["Single", "Married", "Widowed", "Divorced"]
+            enum: ["Single", "Married", "Widow/er", "Legally Seperated", "Annuled"]
         },
         dependents: String,
         educAttainment: {
@@ -66,31 +66,30 @@ const borrowerSchema = mongoose.Schema({
         },
         homeOwnership: {
             type: String,
-            enum: ["Owned", "Living with relative", "Renting", "Others"]
-        },
-        monthlyHomeFee: String,
-        yrsOfStay: String,
-        carOwnership: {
-            type: String,
-            enum: ["None", "Owned"]
-        },
-        monthlyCarLoanPayment: String,
-        homePhoneName: {
-            type: String,
-            enum: ["Owned", "Relative", "None", "Others"]
+            enum: ["Owned", "Rented/Boarder", "Living with Parents/Relatives", "Others"]
         },
         homePhoneNum: String,
-        lineType: {
+        mobileNum: {
             type: String,
-            enum: ["Pre Paid", "Post Paid"]
+            required: true
         },
-        mobilePhoneOs: {
-            type: String,
-            enum: ["Android", "iOS", "Blackberry", "Others"]
+        mobileNumVerified: {
+            type: Boolean,
+            default: false
         },
         addMobileNum1: String,
         addMobileNum2: String,
-        tin: String
+        tin: String,
+        email: {
+            type: String,
+            required: true
+        },
+        emailVerificationToken: String,
+        emailVerified: {
+            type: Boolean,
+            default: false
+        },
+        nameOfSpouse: String //For Members Only
     },
     workBusinessInfo: {
         companyName: String,
@@ -106,14 +105,26 @@ const borrowerSchema = mongoose.Schema({
             province: String,
             zipCode: String
         },
-        numOfEmployees: {
-            type: String,
-            enum: ["1-10", "11-50", "51-100", "101-500", "501~"]
-        },
-        tenure: Date,
+        dateHired: Date,
         employmentType: {
             type: String,
             enum: ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+        },
+        occupationType: {
+            type: String,
+            enum: [
+                "Management",
+                "Marketing",
+                "Sales",
+                "Office Worker",
+                "Professional/Technical",
+                "Service/Reception",
+                "Production Worker/Labor",
+                "Security/Guard/Maid",
+                "Driver",
+                "Self Employee/Freelance",
+                "Others"
+            ]
         },
         businessType: {
             type: String,
@@ -132,100 +143,43 @@ const borrowerSchema = mongoose.Schema({
                 "Others"
             ]
         },
-        occupationType: {
-            type: String,
-            enum: [
-                "Management",
-                "Marketing",
-                "Sales",
-                "Office Worker",
-                "Professional/Technical",
-                "Service/Reception",
-                "Production Worker/Labor",
-                "Security/Guard/Maid",
-                "Driver",
-                "Self-Employed",
-                "Others"
-            ]
-        },
         position: {
             type: String,
-            enum: ["Director/Officer", "EVP/SVP/GM", "VP/MG", "Others"]
+            enum: ["Director/Executive", "Supervisor", "Officer", "Staff", "None"]
         },
         monthlyIncome: String,
-        annualIncome: String,
-        salaryDate: String,
-        underAgency: Boolean
+        employeeID: String, //For Members Only
     },
-    gcashAccount: {
+    account: {
         name: String,
-        number: String,
-        proof: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        }
-    },
-    documents: {
-        govIdType: {
+        branch: String,
+        typeOfAccount: {
             type: String,
-            enum: ["TIN", "SSS", "GSIS", "UMID", "Passport", "Driver's License", "Postal ID", "Voter's ID", "PRC", "NBI Clearance"]
+            enum: ["Savings", "Checking/Current", "G-Cash"]
         },
-        primaryIdFront: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        primaryIdBack: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        companyIdFront: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        companyIdBack: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        payslip1: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        payslip2: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        proofOfTIN: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        selfiewithId: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        },
-        signature: {
-            filename: String,
-            contentType: String,
-            file: Buffer
-        }
+        number: String
     },
+    signature: {
+        type: String,
+        default: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCADIAZADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//Z"
+    },
+    documents: [{
+        type: {
+            type: String,
+            enum: ["Identification Card", "Company Id", "Certificate of Employment", "Payslip", "BIR 2316", "TIN Proof", "Selfie with ID", "Others"]
+        },
+        filename: String,
+        contentType: String,
+        file: Buffer
+    }],
     beneficiaries: [{
-        firstName: String,
-        lastName: String,
+        fullName: String,
         relationship: {
             type: String,
             enum: ["Parent", "Sibling", "Spouse", "Child"]
         },
         birthday: Date
-    }], // Members only
+    }], //For Members Only
     maxLoanAmount: {
         type: String,
         default: "0.00"
@@ -235,11 +189,19 @@ const borrowerSchema = mongoose.Schema({
         ref: 'Employee' // Loan Officer
     },
     reviewedDate: Date,
+    hrCertifiedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee' // HRD Authorized Officer
+    },
+    hrCertifiedDate: Date,
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
     },
-    termsandCondition: Boolean
+    sharesPerPayDay: {
+        type: String,
+        default: "300.00"
+    }
 }, {
     timestamps: true
 });

@@ -18,8 +18,11 @@ const index = (req, res, next) => {
 const postContact = (req, res) => {
     const validationErrors = [];
 
-    if (validator.isEmpty(req.body.name)) validationErrors.push({
-        msg: 'Please enter your name'
+    if (validator.isEmpty(req.body.firstName)) validationErrors.push({
+        msg: 'Please enter your first name'
+    });
+    if (validator.isEmpty(req.body.lastName)) validationErrors.push({
+        msg: 'Please enter your last name'
     });
     if (!validator.isEmail(req.body.email)) validationErrors.push({
         msg: 'Please enter a valid email address.'
@@ -37,7 +40,7 @@ const postContact = (req, res) => {
         url: `${apiOptions.server}${path}`,
         method: 'POST',
         json: {
-            name: req.body.name,
+            name: req.body.firstName + " " + req.body.lastName,
             sender: req.body.email,
             subject: 'Contact Form | VMO EZ Loan',
             message: req.body.message
@@ -59,9 +62,9 @@ const postContact = (req, res) => {
                     url: `${apiOptions.server}${path}`,
                     method: 'POST',
                     json: {
-                        name: req.body.name,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
                         email: req.body.email,
-                        phone: req.body.phone,
                         message: req.body.message
                     }
                 };

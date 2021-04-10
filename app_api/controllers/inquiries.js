@@ -6,6 +6,7 @@ const inquiriesList = (req, res) => {
         .find()
         .exec((err, inquiries) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -21,9 +22,9 @@ const inquiriesList = (req, res) => {
 
 const inquiriesCreate = (req, res) => {
     const inquiry = new Inquiry({
-        name,
+        firstName,
+        lastName,
         email,
-        phone,
         message,
         response
     } = req.body);
@@ -31,6 +32,7 @@ const inquiriesCreate = (req, res) => {
     if (req.body.response) inquiry.response.createdAt = Date.now();
     inquiry.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -67,6 +69,7 @@ const inquiriesReadOne = (req, res) => {
                             "message": "Inquiry not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -102,21 +105,23 @@ const inquiriesUpdateOne = (req, res) => {
                             "message": "Inquiry not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    inquiry.name = (req.body.name) ? req.body.name : inquiry.name;
+                    inquiry.firstName = (req.body.firstName) ? req.body.firstName : inquiry.firstName;
+                    inquiry.lastName = (req.body.lastName) ? req.body.lastName : inquiry.lastName;
                     inquiry.email = (req.body.email) ? req.body.email : inquiry.email;
-                    inquiry.phone = (req.body.phone) ? req.body.phone : inquiry.phone;
                     inquiry.message = (req.body.message) ? req.body.message : inquiry.message;
                     inquiry.response.message = (req.body.response && req.body.response.message) ? req.body.response.message : inquiry.response.message;
                     inquiry.response.repliedBy = (req.body.response && req.body.response.repliedBy) ? req.body.response.repliedBy : inquiry.response.repliedBy;
                     inquiry.response.createdAt = (!req.body.response || inquiry.response.createdAt) ? inquiry.response.createdAt : Date.now();
                     inquiry.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -154,6 +159,7 @@ const inquiriesDeleteOne = (req, res) => {
                             "message": "Inquiry not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({

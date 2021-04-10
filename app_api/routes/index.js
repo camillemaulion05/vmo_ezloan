@@ -43,9 +43,7 @@ router
 router.post('/login', ctrlUsers.usersAuthenticate);
 router.post('/passToken', ctrlUsers.usersSetPasswordToken);
 router.post('/validatePassToken', ctrlUsers.usersValidatePasswordToken);
-router.post('/emailToken', ctrlUsers.usersSetEmailToken);
 router.post('/reset', ctrlUsers.usersResetPassword);
-router.post('/validateEmailToken', ctrlUsers.usersVerifyEmailToken);
 
 // inquiries
 router
@@ -126,6 +124,11 @@ router
     .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOne)
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
+
+router.get('/email', ctrlBorrowers.borrowersGetEmail);
+router.post('/email', ctrlBorrowers.borrowersSetEmailToken);
+router.post('/emailToken', ctrlBorrowers.borrowersSetEmailToken);
+router.post('/validateEmailToken', ctrlBorrowers.borrowersVerifyEmailToken);
 
 // loans
 router

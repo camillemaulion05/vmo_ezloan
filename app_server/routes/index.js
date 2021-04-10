@@ -20,4 +20,13 @@ router.post('/signup', ctrlUsers.postSignup);
  * Account routes.
  */
 router.get('/account', ctrlUsers.getAccount);
+// router.get('/security', ctrlUsers.getSecurity);
+// router.get('/verifications', ctrlUsers.getVerifications);
+// router.get('/verifications/personal', ctrlUsers.getVerificationsPersonal);
+// router.get('/verifications/address', ctrlUsers.getVerificationsAddress);
+// router.get('/verifications/financial', ctrlUsers.getVerificationsFinancial);
+// router.get('/verifications/documents', ctrlUsers.getVerificationsDocuments);
+// router.get('/verifications/kyc', ctrlUsers.getVerificationsKYC);
+// router.get('/verifications/form', ctrlUsers.getVerificationsForm);
+// router.get('/loans', ctrlUsers.getLoan);
 module.exports = router;

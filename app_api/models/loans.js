@@ -2,24 +2,20 @@ const mongoose = require('mongoose');
 
 const loanSchema = mongoose.Schema({
     loanNum: String, // Date.now();
-    loanType: {
+    purposeOfLoan: {
         type: String,
         enum: [
-            "Appliance",
-            "Auto Loan",
-            "Car Repair",
+            "Living Cost",
             "Educational",
-            "Gadget Loan",
-            "Hospitalization-Wellness",
-            "Housing",
+            "Medical/Hospitalization",
+            "Purchasing Appliance",
+            "Travel/Vacation",
+            "Entertainment",
+            "Own Business",
+            "Wedding",
             "House Repair",
-            "Multi Purpose",
-            "Petty Cash",
-            "Productive",
-            "Providential",
-            "Special Emergency",
-            "Travel",
-            "Wedding"
+            "Repayments",
+            "Others"
         ]
     },
     loanTerm: {

@@ -25,7 +25,7 @@ function showTab(n) {
         $(".signup-form #sendOTP").text("");
     } else {
         $(".signup-form #errorSendOtp").hide();
-        $(".signup-form #phone").val("");
+        $(".signup-form #mobileNum").val("");
         $(".signup-form #password, .signup-form #confirmPassword").val("");
         $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,0)");
         $(".signup-form #nextBtn").text("Next");
@@ -82,12 +82,12 @@ function validateForm(currentTab) {
             $(y[i]).next().text("");
 
             // and set the current valid status to false
-            if (y[i].id == "username" || y[i].id == "password" || y[i].id == "phone" || y[i].id == "code") {
+            if (y[i].id == "username" || y[i].id == "password" || y[i].id == "mobileNum" || y[i].id == "code") {
                 if (y[i].value.length < y[i].minLength) {
                     valid = false;
-                    if (y[i].id == "phone") $(".signup-form #errorSendOtp").hide();
+                    if (y[i].id == "mobileNum") $(".signup-form #errorSendOtp").hide();
                     $(y[i]).addClass('is-invalid');
-                    $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + ' required.');
+                    $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + 'characters required.');
                 }
             }
             if (y[i].id == "confirmPassword" && y[i].value != $('#password').val()) {
@@ -243,10 +243,10 @@ function checkMinLength(name, minLength) {
     if ($("input").attr("id", name).val().length > 0) {
         if ($("input").attr("id", name).val().length < minLength) {
             $("input").attr("id", name).parent().addClass("is-invalid");
-            if (name == "phone") {
-                $("input").attr("id", name).parent().next().text('Length is short, minimum ' + minLength + ' required.');
+            if (name == "mobileNum") {
+                $("input").attr("id", name).parent().next().text('Length is short, minimum ' + minLength + 'digits required.');
             } else {
-                $("input").attr("id", name).parent().text('Length is short, minimum ' + minLength + ' required.');
+                $("input").attr("id", name).parent().text('Length is short, minimum ' + minLength + 'characters required.');
             }
         }
     }
@@ -256,10 +256,10 @@ function checkMaxLength(name, maxLength) {
     if ($("input").attr("id", name).val().length > 0) {
         if ($("input").attr("id", name).val().length > maxLength) {
             $("input").attr("id", name).parent().addClass("is-invalid");
-            if (name == "phone") {
-                $("input").attr("id", name).parent().next().text('Length is not valid, maximum ' + maxLength + ' allowed.');
+            if (name == "mobileNum") {
+                $("input").attr("id", name).parent().next().text('Length is not valid, maximum ' + maxLength + 'digits allowed.');
             } else {
-                $("input").attr("id", name).parent().text('Length is not valid, maximum ' + maxLength + ' allowed.');
+                $("input").attr("id", name).parent().text('Length is not valid, maximum ' + maxLength + 'characters allowed.');
             }
         }
     }
@@ -280,10 +280,10 @@ function checkPass() {
 
 function getAge(dateString) {
     let today = new Date();
-    let birthDate = new Date(dateString);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    let dateOfBirth = new Date(dateString);
+    let age = today.getFullYear() - dateOfBirth.getFullYear();
+    let m = today.getMonth() - dateOfBirth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dateOfBirth.getDate())) {
         age--;
     }
     return age;
@@ -394,7 +394,7 @@ function sendOTP(currentTab) {
             url: "/api/sendOTP",
             type: "POST",
             data: {
-                phone: $('input[name="phone"]').val(),
+                mobileNum: $('input[name="mobileNum"]').val(),
                 name: $('input[name="firstName"]').val()
             },
             cache: false,

@@ -17,23 +17,6 @@ const userSchema = mongoose.Schema({
     }, //encrypted
     passwordResetToken: String,
     passwordResetExpires: Date,
-    email: {
-        type: String,
-        required: true
-    },
-    emailVerificationToken: String,
-    emailVerified: {
-        type: Boolean,
-        default: false
-    },
-    mobileNum: {
-        type: String,
-        required: true
-    },
-    mobileNumVerified: {
-        type: Boolean,
-        default: false
-    },
     lastLogin: Date,
     lastFailedLogin: Date,
     status: {
@@ -64,7 +47,11 @@ const userSchema = mongoose.Schema({
             ]
         },
         answer: String //encrypted
-    }]
+    }],
+    twoFactorAuthentication: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true
 });

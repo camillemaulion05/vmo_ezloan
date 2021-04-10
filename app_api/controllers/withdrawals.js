@@ -10,6 +10,7 @@ const withdrawalsList = (req, res) => {
         .populate('requestedBy', 'profile.firstName profile.lastName')
         .exec((err, withdrawals) => {
             if (err) {
+                console.log(err);
                 res
                     .status(404)
                     .json({
@@ -35,6 +36,7 @@ const withdrawalsCreate = (req, res) => {
     if (req.body.reviewedBy) withdrawal.reviewedDate = Date.now();
     withdrawal.save((err) => {
         if (err) {
+            console.log(err);
             res
                 .status(400)
                 .json({
@@ -63,7 +65,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -72,6 +74,7 @@ const withdrawalsReadOne = (req, res) => {
                             "message": "Withdrawals not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -115,6 +118,7 @@ const withdrawalsUpdateOne = (req, res) => {
                             "message": "Withdrawals not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(400)
                         .json({
@@ -129,6 +133,7 @@ const withdrawalsUpdateOne = (req, res) => {
                     withdrawal.reviewedDate = (!req.body.reviewedBy || withdrawal.reviewedDate) ? withdrawal.reviewedDate : Date.now();
                     withdrawal.save((err) => {
                         if (err) {
+                            console.log(err);
                             res
                                 .status(404)
                                 .json({
@@ -166,6 +171,7 @@ const withdrawalsDeleteOne = (req, res) => {
                             "message": "Withdrawals not found."
                         });
                 } else if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({
@@ -210,6 +216,7 @@ const withdrawalsPerUser = (req, res) => {
             }])
             .exec((err, withdrawals) => {
                 if (err) {
+                    console.log(err);
                     res
                         .status(404)
                         .json({

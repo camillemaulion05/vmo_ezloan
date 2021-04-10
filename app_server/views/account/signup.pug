@@ -45,7 +45,7 @@ block content
                 .input-group.mb-3
                   .input-group-prepend
                     span#basic-addon1.input-group-text +63
-                  input#phone.form-control(type='text' name='phone' placeholder='Phone Number' minlength='10' maxlength='10')
+                  input#mobileNum.form-control(type='text' name='mobileNum' placeholder='Mobile Number' minlength='10' maxlength='10')
                   em.invalid-feedback 
                   em#errorSendOtp.error-text
         .tab.d-none
@@ -67,8 +67,9 @@ block content
           .row
             .col-sm-12
               .form-group
-                input#birthdate.form-control(type='date' name='birthdate' placeholder='Birthday')
+                input#dateOfBirth.form-control(type='date' name='dateOfBirth' placeholder='Birthday')
                 em.invalid-feedback 
+                p.label-text Your birthday
           .row
             .col-sm-12
               .form-group

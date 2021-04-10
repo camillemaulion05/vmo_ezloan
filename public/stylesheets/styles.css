@@ -11069,6 +11069,11 @@ output {
   text-align: left;
 }
 
+.form-clean .label-text {
+  color: #999;
+  text-align: left;
+}
+
 .form-clean .error-text {
   display: none;
   margin-top: 0.25rem;

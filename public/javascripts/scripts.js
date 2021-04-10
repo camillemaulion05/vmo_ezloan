@@ -77,23 +77,15 @@
 
     $("form#contactForm").validate({
         rules: {
-            name: "required",
+            firstName: "required",
+            lastName: "required",
             email: "required",
-            phone: {
-                required: true,
-                minlength: 10,
-                maxlength: 10
-            },
             message: "required"
         },
         messages: {
-            name: "Please enter your name.",
+            firstName: "Please enter your first name.",
+            lastName: "Please enter your last name.",
             email: "Please enter your email address.",
-            phone: {
-                required: "Please enter your phone number.",
-                minlength: "Length is short, minimum 10 digits required.",
-                maxlength: "Length is not valid, maximum 10 digits allowed."
-            },
             message: "Please enter a message."
         },
         errorElement: 'em',
@@ -114,12 +106,18 @@
 
     $("form#forgotForm").validate({
         rules: {
-            email: "required",
+            username: {
+                required: true,
+                minlength: 8
+            },
             question: "required",
             answer: "required"
         },
         messages: {
-            email: "Please enter your email address.",
+            username: {
+                required: "Please enter your username.",
+                minlength: "Length is short, minimum 8 characters required."
+            },
             question: "Please select your security question.",
             answer: "Please enter your answer."
         },
@@ -153,11 +151,11 @@
         messages: {
             username: {
                 required: "Please enter your username.",
-                minlength: "Length is short, minimum 8 digits required."
+                minlength: "Length is short, minimum 8 characters required."
             },
             password: {
                 required: "Please enter your password.",
-                minlength: "Length is short, minimum 8 digits required."
+                minlength: "Length is short, minimum 8 characters required."
             },
         },
         errorElement: 'em',
@@ -229,9 +227,9 @@
     });
 
     //form-validations
-    $('input[name="phone"]').on("keyup change blur", function () {
-        var phone = this.value;
-        if (phone.charAt(0) != '9') {
+    $('input[name="mobile"]').on("keyup change blur", function () {
+        var mobile = this.value;
+        if (mobile.charAt(0) != '9') {
             this.value = '';
         };
         formatNumber(this.value);
@@ -262,8 +260,8 @@
         $(this).val(formatNumber($(this).val()));
     });
 
-    $('input[name="birthdate"]').attr("min", formatDate(dateNowMinusYrs(65)));
-    $('input[name="birthdate"]').attr("max", formatDate(dateNowMinusYrs(21)));
+    $('input[name="dateOfBirth"]').attr("min", formatDate(dateNowMinusYrs(65)));
+    $('input[name="dateOfBirth"]').attr("max", formatDate(dateNowMinusYrs(21)));
 
     /*When clicking on Full hide fail/success boxes */
     $('form#contactForm input[name="name"]').focus(function () {
