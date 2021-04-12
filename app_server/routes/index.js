@@ -48,11 +48,17 @@ router.post('/upload/pic', passportConfig.isAuthenticated, multerConfig.upload.s
     csrf: true
 }), ctrlAccount.postProfilePic);
 
-router.post('/verifyMobileNum', ctrlAccount.postVerifyMobileNum);
-router.get('/verifyEmail', ctrlAccount.getVerifyEmail);
-router.get('/verifyEmail/:token', ctrlAccount.getVerifyEmailToken);
+router.post('/verifyMobileNum', passportConfig.isAuthenticated, ctrlAccount.postVerifyMobileNum);
+router.get('/verifyEmail', passportConfig.isAuthenticated, ctrlAccount.getVerifyEmail);
+router.get('/verifyEmail/:token', passportConfig.isAuthenticated, ctrlAccount.getVerifyEmailToken);
 
-router.get('/security', ctrlAccount.getSecurity);
+router
+    .route('/security')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getSecurity)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postSecurity);
+
+router.post('/security/questions', ctrlAccount.postSecurityQuestions);
+
 router.get('/verifications', ctrlAccount.getVerifications);
 router.get('/personal', ctrlAccount.getVerificationsPersonal);
 router.get('/address', ctrlAccount.getVerificationsAddress);

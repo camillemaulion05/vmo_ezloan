@@ -44,6 +44,7 @@ router.post('/login', ctrlUsers.usersAuthenticate);
 router.post('/setPassToken', ctrlUsers.usersSetPasswordToken);
 router.post('/validatePassToken', ctrlUsers.usersValidatePasswordToken);
 router.post('/reset', ctrlUsers.usersResetPassword);
+router.post('/change/:userid', auth, middleware.isSafe, ctrlUsers.usersChangePassword);
 
 // inquiries
 router
@@ -131,8 +132,8 @@ router
     .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
 
 router.post('/borrowers/email', ctrlBorrowers.borrowersGetEmailByUser);
-router.get('/borrowers/setEmailToken/:userid', ctrlBorrowers.borrowersSetEmailToken);
-router.post('/borrowers/validateEmailToken', ctrlBorrowers.borrowersVerifyEmailToken);
+router.get('/borrowers/setEmailToken/:userid', auth, middleware.isSafe, ctrlBorrowers.borrowersSetEmailToken);
+router.post('/borrowers/validateEmailToken', auth, middleware.isSafe, ctrlBorrowers.borrowersVerifyEmailToken);
 
 router
     .route('/borrowers/users/:userid')

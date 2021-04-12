@@ -9,8 +9,9 @@ const apiOptions = {
  * GET /account
  * Profile page.
  */
-const getAccount = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+
+function getUserDetails(req, res, filename, title) {
+    path = ((req.user.type == "Borrower") ? '/api/borrowers/users/' : '/api/employees/users/') + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -23,60 +24,40 @@ const getAccount = (req, res) => {
         requestOptions,
         (err, {
             statusCode
-        }, borrower) => {
+        }, user) => {
             if (err) {
                 req.flash('errors', {
                     msg: 'There was an error in loading your account.'
                 });
                 return res.redirect('/login');
             } else if (statusCode === 200) {
-                res.render('account/index', {
-                    title: 'Account Management',
-                    borrower: borrower
+                if (title.indexOf("Security") != -1) {
+                    for (let i = 0; i < (user.userId.security).length; i++) {
+                        let bytes = CryptoJS.AES.decrypt((user.userId.security)[i].answer, process.env.CRYPTOJS_SERVER_SECRET);
+                        (user.userId.security)[i].answer = bytes.toString(CryptoJS.enc.Utf8);
+                    }
+                }
+                res.render(filename, {
+                    title: title,
+                    user: user
                 });
             } else {
                 req.flash('errors', {
-                    msg: borrower.message
+                    msg: user.message
                 });
                 return res.redirect('/login');
             }
         }
     );
+}
+
+
+const getAccount = (req, res) => {
+    getUserDetails(req, res, 'account/index', 'Account Management');
 };
 
 const getProfile = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, borrower) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error in loading your profile.'
-                });
-                return res.redirect('/login');
-            } else if (statusCode === 200) {
-                res.render('account/profile', {
-                    title: 'Account Management - Profile',
-                    borrower: borrower
-                });
-            } else {
-                req.flash('errors', {
-                    msg: borrower.message
-                });
-                return res.redirect('/login');
-            }
-        }
-    );
+    getUserDetails(req, res, 'account/profile', 'Account Management - Profile');
 };
 
 const postProfile = (req, res) => {
@@ -115,7 +96,7 @@ const postProfile = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/signup');
+        return res.redirect('/profile');
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
@@ -198,6 +179,10 @@ const postProfilePic = (req, res) => {
     if (validator.isEmpty(req.file.filename)) validationErrors.push({
         msg: 'Profile picture cannot be blank.'
     });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/profile');
+    }
     path = '/api/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -239,6 +224,10 @@ const postVerifyMobileNum = (req, res) => {
     if (validator.isEmpty(req.body.code)) validationErrors.push({
         msg: 'Code cannot be blank.'
     });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/profile');
+    }
     let path = '/api/validateOTP';
     let requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -422,45 +411,165 @@ const getVerifyEmailToken = (req, res) => {
 };
 
 const getSecurity = (req, res) => {
-    res.render('account/security', {
-        title: 'Account Management - Security'
+    getUserDetails(req, res, 'account/security', 'Account Management - Security');
+};
+
+const postSecurity = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.currentPassword)) validationErrors.push({
+        msg: 'Current Password cannot be blank.'
     });
+    if (!validator.isLength(req.body.currentPassword, {
+            min: 8
+        })) validationErrors.push({
+        msg: 'Current Password must be at least 8 characters long'
+    });
+    if (validator.isEmpty(req.body.newPassword)) validationErrors.push({
+        msg: 'Current Password cannot be blank.'
+    });
+    if (!validator.isLength(req.body.newPassword, {
+            min: 8
+        })) validationErrors.push({
+        msg: 'Current Password must be at least 8 characters long'
+    });
+    if (req.body.newPassword !== req.body.confirmPassword) validationErrors.push({
+        msg: 'Passwords do not match'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/security');
+    }
+    path = '/api/change/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            currentPassword: CryptoJS.AES.encrypt(req.body.currentPassword, process.env.CRYPTOJS_CLIENT_SECRET).toString(),
+            newPassword: CryptoJS.AES.encrypt(req.body.newPassword, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your password.  Please try again later.'
+                });
+                return res.redirect('/security');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Success! Your password has been changed.'
+                });
+                return res.redirect('/security');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/security');
+            }
+        }
+    );
+};
+
+const postSecurityQuestions = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.question1)) validationErrors.push({
+        msg: 'Question 1 cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.answer1)) validationErrors.push({
+        msg: 'Answer 1 cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.question2)) validationErrors.push({
+        msg: 'Question 2 cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.answer2)) validationErrors.push({
+        msg: 'Answer 2 cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.question3)) validationErrors.push({
+        msg: 'Question 3 cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.answer3)) validationErrors.push({
+        msg: 'Answer 3 cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/security');
+    }
+    path = '/api/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            security: [{
+                    question: req.body.question1,
+                    answer: CryptoJS.AES.encrypt(req.body.answer1, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+                },
+                {
+                    question: req.body.question2,
+                    answer: CryptoJS.AES.encrypt(req.body.answer2, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+                },
+                {
+                    question: req.body.question3,
+                    answer: CryptoJS.AES.encrypt(req.body.answer3, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+                }
+            ]
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your security questions.  Please try again later.'
+                });
+                return res.redirect('/security');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Password Recovery Questions has been updated.'
+                });
+                return res.redirect('/security');
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('/security');
+            }
+        }
+    );
 };
 
 const getVerifications = (req, res) => {
-    res.render('account/verifications', {
-        title: 'Account Management - Verifications'
-    });
+    getUserDetails(req, res, 'account/verifications', 'Account Management - Verifications');
 };
 
 const getVerificationsPersonal = (req, res) => {
-    res.render('account/personal', {
-        title: 'Account Management - Verifications - Personal Information'
-    });
+    getUserDetails(req, res, 'account/personal', 'Account Management - Verifications - Personal Information');
 };
 
 const getVerificationsAddress = (req, res) => {
-    res.render('account/address', {
-        title: 'Account Management - Verifications - Address'
-    });
+    getUserDetails(req, res, 'account/address', 'Account Management - Verifications - Address');
 };
 
 const getVerificationsFinancial = (req, res) => {
-    res.render('account/financial', {
-        title: 'Account Management - Verifications - Financial Questionnaire'
-    });
+    getUserDetails(req, res, 'account/financial', 'Account Management - Verifications - Financial Questionnaire');
 };
 
 const getVerificationsDocuments = (req, res) => {
-    res.render('account/documents', {
-        title: 'Account Management - Verifications - Identity Documentation'
-    });
+    getUserDetails(req, res, 'account/documents', 'Account Management - Verifications - Identity Documentation');
 };
 
 const getVerificationsDeclaration = (req, res) => {
-    res.render('account/declaration', {
-        title: 'Account Management - Verifications - KYC Declaration'
-    });
+    getUserDetails(req, res, 'account/declaration', 'Account Management - Verifications - KYC Declaration');
 };
 
 const getVerificationsForm = (req, res) => {
@@ -485,6 +594,8 @@ module.exports = {
     getVerifyEmail,
     getVerifyEmailToken,
     getSecurity,
+    postSecurity,
+    postSecurityQuestions,
     getVerifications,
     getVerificationsPersonal,
     getVerificationsAddress,

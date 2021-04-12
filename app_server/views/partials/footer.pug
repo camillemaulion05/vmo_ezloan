@@ -45,7 +45,7 @@ else
               .form-row
                 .form-group
                   input(type='hidden', name='_csrf', value=_csrf)
-                  input(type='hidden', name='mobileNum', value=borrower.profile.mobileNum)
+                  input(type='hidden', name='mobileNum', value=user.profile.mobileNum)
                   input#inputCode.form-control(type='text' placeholder='Enter code' name='code')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel

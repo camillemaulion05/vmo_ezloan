@@ -35,19 +35,19 @@ else
         img(src='/img/logo.png' style='height: 40px; width: 40px;')
       .sidebar-brand-text VMO EZ Loan
     hr.sidebar-divider.my-0
-    li.nav-item
+    li.nav-item(class=(title.indexOf("Profile") != -1) ? 'active' : undefined)
       a.nav-link(href='/profile')
         i.fas.fa-user-circle
         span Profile
-    li.nav-item
+    li.nav-item(class=(title.indexOf("Security") != -1) ? 'active' : undefined)
       a.nav-link(href='/security')
         i.fas.fa-cogs
         span Security
-    li.nav-item
+    li.nav-item(class=(title.indexOf("Verifications") != -1) ? 'active' : undefined)
       a.nav-link(href='/verifications')
         i.fas.fa-check-circle
         span Verifications
-    li.nav-item
+    li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
       a.nav-link(href='/loans')
         i.fas.fa-balance-scale
         span Loans

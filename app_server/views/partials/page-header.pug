@@ -5,5 +5,12 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
         .col-auto.mb-3
           h1.page-header-title
             .page-header-icon
-              i.fas.fa-user-circle
+              if title.indexOf("Profile") != -1
+                i.fas.fa-user-circle
+              if title.indexOf("Security") != -1
+                i.fas.fa-cogs
+              if title.indexOf("Verifications") != -1
+                i.fas.fa-check-circle
+              if title.indexOf("Loans") != -1
+                i.fas.fa-balance-scale
             |  #{title}

@@ -4,8 +4,8 @@ nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shado
   ul.navbar-nav.ml-auto
     li.nav-item.dropdown.no-arrow
       a.nav-link.dropdown-toggle(href='/profile')
-        span.mr-2.small #{borrower.userId.username}
-        img.img-profile.rounded-circle(src=(borrower.userId.picture) ? '/uploads/' + borrower.userId.picture  : (borrower.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
+        span.mr-2.small #{user.userId.username}
+        img.img-profile.rounded-circle(src=(user.userId.picture) ? '/uploads/' + user.userId.picture  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
     .topbar-divider.d-none.d-sm-block
     li.nav-item.dropdown.no-arrow
       a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')

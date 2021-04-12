@@ -39,6 +39,7 @@ html
     script(src='/js/datatables.js')
     script(src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js')
     script(src='/js/jquery.signature.js')
+
     if title.indexOf("Profile") != -1
       script.
           $(function () {
@@ -72,8 +73,33 @@ html
                 });
               });
           });
+
+    if title.indexOf("Security") != -1
+      script.
+          $(function () {
+              $('select#inputQuestion2 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
+              $('select#inputQuestion3 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
+              $('select#inputQuestion1 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
+              $('select#inputQuestion3 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
+              $('select#inputQuestion1 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
+              $('select#inputQuestion2 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
+              $('select#inputQuestion1').change(function () {
+                  $('select#inputQuestion2 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
+                  $('select#inputQuestion3 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
+              });
+              $('select#inputQuestion2').change(function () {
+                  $('select#inputQuestion1 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
+                  $('select#inputQuestion3 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
+              });
+              $('select#inputQuestion3').change(function () {
+                  $('select#inputQuestion1 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
+                  $('select#inputQuestion2 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
+              });
+          });
+
     if title.indexOf("Verifications") != -1
       script(src='/js/chart-pie.js')
+
     if title.indexOf("Financial Questionnaire") != -1
       script.
         $(function () {

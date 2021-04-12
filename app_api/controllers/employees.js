@@ -240,7 +240,7 @@ const employeesReadOneByUser = (req, res) => {
                 "updatedAt": 0,
                 "__v": 0
             })
-            .populate('userId', 'username picture')
+            .populate('userId', 'username lastLogin lastFailedLogin status security picture')
             .exec((err, employee) => {
                 if (!employee) {
                     res

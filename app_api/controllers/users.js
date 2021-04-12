@@ -43,7 +43,6 @@ const usersCreate = (req, res) => {
         status,
         type,
         security,
-        twoFactorAuthentication,
         picture
     } = req.body);
     user.userNum = Date.now();
@@ -159,7 +158,6 @@ const usersUpdateOne = (req, res) => {
                 user.type = (req.body.type) ? req.body.type : user.type;
                 user.security = (req.body.security) ? req.body.security : user.security;
                 if (req.body.security) user.encryptSecurityAnswer();
-                user.twoFactorAuthentication = (req.body.twoFactorAuthentication) ? req.body.twoFactorAuthentication : user.twoFactorAuthentication;
                 user.picture = (req.body.picture) ? req.body.picture : user.picture;
                 user.save((err) => {
                     if (err) {
@@ -260,8 +258,6 @@ const usersAuthenticate = (req, res) => {
                                     .json({
                                         'id': user._id,
                                         'type': user.type,
-                                        'lastLogin': user.lastLogin,
-                                        'lastFailedLogin': user.lastFailedLogin,
                                         'token': token
                                     });
                             }
@@ -449,6 +445,74 @@ const usersResetPassword = (req, res) => {
         });
 };
 
+const usersChangePassword = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        User
+            .findById(userid)
+            .exec((err, user) => {
+                if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "User not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    user.comparePassword(req.body.currentPassword, (err, isMatch) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else if (isMatch) {
+                            user.password = req.body.newPassword;
+                            user.save((err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res
+                                        .status(404)
+                                        .json({
+                                            "message": err._message
+                                        });
+                                } else {
+                                    const token = user.generateJwt();
+                                    res
+                                        .status(200)
+                                        .json({
+                                            'message': 'Success! Your password has been changed.'
+                                        });
+                                }
+                            });
+                        } else {
+                            res
+                                .status(404)
+                                .json({
+                                    "message": "Invalid current password."
+                                });
+                        }
+                    });
+                }
+            });
+    }
+};
+
 module.exports = {
     usersList,
     usersCreate,
@@ -458,5 +522,6 @@ module.exports = {
     usersAuthenticate,
     usersSetPasswordToken,
     usersValidatePasswordToken,
-    usersResetPassword
+    usersResetPassword,
+    usersChangePassword
 };

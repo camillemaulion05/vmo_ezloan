@@ -48,10 +48,6 @@ const userSchema = mongoose.Schema({
         },
         answer: String //encrypted
     }],
-    twoFactorAuthentication: {
-        type: Boolean,
-        default: false
-    },
     picture: String
 }, {
     timestamps: true
@@ -98,12 +94,8 @@ userSchema.methods.comparePassword = function (encryptedPassword, cb) {
 userSchema.methods.encryptSecurityAnswer = function () {
     for (let i = 0; i < this.security.length; i++) {
         let bytes = CryptoJS.AES.decrypt(this.security[i].answer, process.env.CRYPTOJS_CLIENT_SECRET);
-        let candidateAnswer = bytes.toString(CryptoJS.enc.Utf8);
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(candidateAnswer, salt, (err, hash) => {
-                this.security[i].answer = hash;
-            });
-        });
+        let originalAnswer = bytes.toString(CryptoJS.enc.Utf8);
+        this.security[i].answer = CryptoJS.AES.encrypt(originalAnswer, process.env.CRYPTOJS_SERVER_SECRET).toString();
     }
 };
 
@@ -115,9 +107,15 @@ userSchema.methods.compareSecurityAnswer = function (security, cb) {
         if (security.question === this.security[i].question) {
             let bytes = CryptoJS.AES.decrypt(security.answer, process.env.CRYPTOJS_CLIENT_SECRET);
             let candidateAnswer = bytes.toString(CryptoJS.enc.Utf8);
-            bcrypt.compare(candidateAnswer, this.security[i].answer, (err, isMatch) => {
-                cb(err, isMatch);
-            });
+
+            let bytes2 = CryptoJS.AES.decrypt(this.security[i].answer, process.env.CRYPTOJS_SERVER_SECRET);
+            let originalAnswer = bytes2.toString(CryptoJS.enc.Utf8);
+
+            if (candidateAnswer == originalAnswer) {
+                cb(false, true);
+            } else {
+                cb(false, false);
+            }
         }
     }
 };

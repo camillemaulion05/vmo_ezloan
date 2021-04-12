@@ -13,7 +13,7 @@ block content
                 .card.mb-4
                   .card-header Profile Picture
                   .card-body.text-center
-                    img.img-account-profile.rounded-circle.mb-2(src=(borrower.userId.picture) ? '/uploads/' + borrower.userId.picture  : (borrower.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
+                    img.img-account-profile.rounded-circle.mb-2(src=(user.userId.picture) ? '/uploads/' + user.userId.picture  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
                     .small.font-italic.text-muted.mb-4 JPG or PNG no larger than 5 MB
                     span.btn.btn-primary.btn-file
                       | Upload new image
@@ -28,14 +28,14 @@ block content
                       input(type='hidden', name='_csrf', value=_csrf)
                       .form-group
                         label.small.mb-1(for='username') Username (how your name will appear to other users on the site)
-                        input#username.form-control(type='text' placeholder='Enter your username' name='username' value=borrower.userId.username)
+                        input#username.form-control(type='text' placeholder='Enter your username' name='username' value=user.userId.username)
                       .form-row
                         .form-group.col-md-6
                           label.small.mb-1(for='firstName') First name
-                          input#firstName.form-control(type='text' placeholder='Enter your first name' name='firstName' value=borrower.profile.firstName)
+                          input#firstName.form-control(type='text' placeholder='Enter your first name' name='firstName' value=user.profile.firstName)
                         .form-group.col-md-6
                           label.small.mb-1(for='lastName') Last name
-                          input#lastName.form-control(type='text' placeholder='Enter your last name' name='lastName' value=borrower.profile.lastName)
+                          input#lastName.form-control(type='text' placeholder='Enter your last name' name='lastName' value=user.profile.lastName)
                       .form-row
                         .form-group.col-md-6
                           label.small.mb-1(for='gender') Gender
@@ -43,7 +43,7 @@ block content
                             option(value='' selected='' disabled='') Gender
                             - let gender = ['Female', 'Male']
                             for x in gender
-                              if (x == borrower.profile.gender) 
+                              if (x == user.profile.gender) 
                                 option(value=x selected) #{x}
                               else
                                 option(value=x) #{x}
@@ -51,15 +51,15 @@ block content
                           label.small.mb-1(for='dateOfBirth') Birthdate
                           - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                           - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-                          - let date = (new Date(borrower.profile.dateOfBirth)).toString().split(' ');
+                          - let date = (new Date(user.profile.dateOfBirth)).toString().split(' ');
                           - let dateOfBirth =  date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2];
                           input#dateOfBirth.form-control(type='date' placeholder='Enter your birthday' name='dateOfBirth' value=dateOfBirth)
                       .form-row
                         .form-group.col-md-6
                           label.small.mb-1(for='email') Email address
-                          input#email.form-control(type='email' placeholder='Enter your email address' name='email' value=borrower.profile.email)
+                          input#email.form-control(type='email' placeholder='Enter your email address' name='email' value=user.profile.email)
                           .text-danger.font-italic
-                            if (!borrower.profile.emailVerified)
+                            if (!user.profile.emailVerified)
                               | Unverified:  
                               a(href='/verifyEmail') Send verification email
                         .form-group.col-md-6
@@ -67,10 +67,10 @@ block content
                           .input-group
                             .input-group-prepend
                               span.input-group-text +63
-                            input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' value=borrower.profile.mobileNum)
+                            input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' value=user.profile.mobileNum)
                           .text-danger.font-italic
-                            if (!borrower.profile.mobileNumVerified)
+                            if (!user.profile.mobileNumVerified)
                               | Unverified:  
-                              a#verifyMobileNum(href=(borrower.profile.firstName + '/' + borrower.profile.mobileNum) data-toggle='modal' data-target='#') Send verification code
+                              a#verifyMobileNum(href=(user.profile.firstName + '/' + user.profile.mobileNum) data-toggle='modal' data-target='#') Send verification code
                       button.btn.btn-primary(type='submit') Save changes
       include ../partials/page-footer
