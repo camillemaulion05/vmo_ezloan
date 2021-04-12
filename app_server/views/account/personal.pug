@@ -1,0 +1,116 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+      #content.landing
+        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
+          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
+            i.fa.fa-bars
+          ul.navbar-nav.ml-auto
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='/profile')
+                span.mr-2.small camille0510
+                img.img-profile.rounded-circle(src='img/profile-1.png')
+            .topbar-divider.d-none.d-sm-block
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
+                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
+                | Logout
+        main
+          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
+            .container-fluid
+              .page-header-content
+                .row.align-items-center.justify-content-between.pt-3
+                  .col-auto.mb-3
+                    h1.page-header-title
+                      .page-header-icon
+                        i.fas.fa-check-circle
+                      | Account Settings - Verifications - Personal Information
+          .container-fluid
+            .card.mb-4
+              .card-body
+                #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                  .row.justify-content-center
+                    .col-xxl-6.col-xl-8
+                      h3.text-primary Personal Information
+                      h5.card-title Enter your personal details
+                      form
+                        .form-row
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputFirstName') First name
+                            input#inputFirstName.form-control(type='text' placeholder='Enter your first name' value='Valerie')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputMiddleName') Middle name
+                            input#inputMiddleName.form-control(type='text' placeholder='Enter your middle name' value='Luna')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputLastName') Last name
+                            input#inputLastName.form-control(type='text' placeholder='Enter your last name' value='Luna')
+                        .form-row
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputGender') Gender
+                            select#inputGender.form-control.selectpicker(type='text' name='gender')
+                              option(value='' selected='' disabled='') Gender
+                              option(value='Female' selected='true') Female
+                              option(value='Male') Male
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputBirthday') Birthdate
+                            input#inputBirthday.form-control(type='date' name='birthdate' placeholder='Enter your birthday' value='1988-09-05')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputCivilStat') Civil Status
+                            select#inputCivilStat.form-control.selectpicker(type='text' name='gender')
+                              option(value='' selected='' disabled='') Civil Status
+                              option(value='Single') Single
+                              option(value='Married') Married
+                              option(value='Widow/er') Widow/er
+                              option(value='Legally Seperated') Legally Seperated
+                              option(value='Annuled') Annuled
+                        .form-row
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputDependents') No. of dependents
+                            input#inputDependents.form-control(type='text' placeholder='Enter no. of dependents' value='0')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputEducAttainement') Educational Attainment
+                            select#inputEducAttainement.form-control.selectpicker(type='text')
+                              option(value='' selected='' disabled='') Educational Attainment
+                              option(value='High School') High School
+                              option(value='Vocational/Technical') Vocational/Technical
+                              option(value='College') College
+                              option(value='Post Graduate') Post Graduate
+                              option(value='Others') Others
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputPlaceOfBirth') Place of Birth
+                            input#inputPlaceOfBirth.form-control(type='text' name='phone' placeholder='Enter your place of birth' value='San Pedro Laguna')
+                        .form-row
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='nationality') Nationality
+                            input#nationality.form-control(type='text' name='nationality' placeholder='Enter your nationality' value='Filipino')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputHomePhoneNumber') Home Phone Number
+                            .input-group
+                              .input-group-prepend
+                                span.input-group-text +63
+                              input#inputHomePhoneNumber.form-control(type='text' placeholder='Enter your mobile number' value='464307992')
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='inputMobileNumberSub') Mobile Number
+                            .input-group
+                              .input-group-prepend
+                                span.input-group-text +63
+                              input#inputMobileNumberSub.form-control(type='text' placeholder='Enter your sub mobile number' value='9774753175')
+                        .form-row
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='tin') TIN ID
+                            input#tin.form-control(type='text' name='tin' placeholder='Enter your TIN ID' value='111-111-111-111')
+                          .form-group.col-md-8.mb-md-0
+                            label.small.mb-1(for='inputEmailAddress') Email address
+                            input#inputEmailAddress.form-control(type='email' placeholder='Enter your email address' value='name@example.com')
+                        hr.my-4
+                        .d-flex.justify-content-between
+                          a.btn.btn-light(type='button' href='/verifications') Back
+                          button.btn.btn-primary(type='submit') Submit
+      footer.sticky-footer.bg-white
+        .container.my-auto
+          .copyright.text-center.my-auto
+            - let now = new Date
+            - let theYear=now.getYear()
+            - if (theYear < 1900) theYear=theYear+1900
+            span Copyright &copy; VMO EZ Loan #{theYear}

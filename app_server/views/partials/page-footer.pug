@@ -1,0 +1,7 @@
+footer.sticky-footer.bg-white
+  .container.my-auto
+    .copyright.text-center.my-auto
+      - let now = new Date
+      - let theYear=now.getYear()
+      - if (theYear < 1900) theYear=theYear+1900
+      span Copyright &copy; VMO EZ Loan #{theYear}

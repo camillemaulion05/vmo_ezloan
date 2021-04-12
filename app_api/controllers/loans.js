@@ -321,7 +321,7 @@ const loansSchedulesReadOne = (req, res) => {
     }
 };
 
-const loansDuePerLoan = (req, res) => {
+const loansDueListByLoan = (req, res) => {
     const {
         loanid
     } = req.params;
@@ -366,7 +366,7 @@ const loansDuePerLoan = (req, res) => {
     }
 };
 
-const loansDueRepayments = (req, res) => {
+const loansDueRepaymentsList = (req, res) => {
     const dateToday = new Date();
     Loan.find({
             "loanPaymentSchedule.dueDate": {
@@ -560,7 +560,7 @@ const loansInterestReport = (req, res) => {
     }
 };
 
-const loansPerUser = (req, res) => {
+const loansListByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -614,9 +614,9 @@ module.exports = {
     loansSchedulesList,
     loansSchedulesUpdate,
     loansSchedulesReadOne,
-    loansDuePerLoan,
-    loansDueRepayments,
+    loansDueListByLoan,
+    loansDueRepaymentsList,
     loansSummary,
     loansInterestReport,
-    loansPerUser
+    loansListByUser
 };

@@ -195,7 +195,7 @@ const transactionsDeleteOne = (req, res) => {
     }
 };
 
-const transactionsPerType = (req, res) => {
+const transactionsListByType = (req, res) => {
     const {
         type
     } = req.params;
@@ -228,7 +228,7 @@ const transactionsPerType = (req, res) => {
     }
 };
 
-const transactionsPerUser = (req, res) => {
+const transactionsListByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -328,7 +328,7 @@ const transactionsSummary = (req, res) => {
     }
 };
 
-const contributionsPerMember = (req, res) => {
+const contributionsListByMember = (req, res) => {
     const {
         year
     } = req.params;
@@ -391,8 +391,8 @@ module.exports = {
     transactionsReadOne,
     transactionsUpdateOne,
     transactionsDeleteOne,
-    transactionsPerType,
-    transactionsPerUser,
+    transactionsListByType,
+    transactionsListByUser,
     transactionsSummary,
-    contributionsPerMember
+    contributionsListByMember
 };

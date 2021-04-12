@@ -4,13 +4,16 @@ block content
   include ../partials/flash
   .container
     .form-clean.login-form
-      form#resetForm(method='post')
+      form#resetForm(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
-        span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
-          i.fa.fa-circle.fa-stack-2x.text-primary
-          i.fa.fa-key.fa-stack-1x.fa-inverse
-        h2 Reset your password
-        p.hint-text Please choose a new password to finish signing in.
+        .row.text-center
+          span.fa-stack.fa-4x(style='margin: 0 auto 30px;')
+            i.fa.fa-circle.fa-stack-2x.text-primary
+            i.fa.fa-key.fa-stack-1x.fa-inverse
+        .row
+          .col-sm-12
+            h2.section-heading.text-uppercase Reset your password
+            p.hint-text Please choose a new password.
         .row
           .col-sm-12
             .form-group

@@ -186,7 +186,7 @@ const withdrawalsDeleteOne = (req, res) => {
     }
 };
 
-const withdrawalsPerUser = (req, res) => {
+const withdrawalsListByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -237,5 +237,5 @@ module.exports = {
     withdrawalsReadOne,
     withdrawalsUpdateOne,
     withdrawalsDeleteOne,
-    withdrawalsPerUser
+    withdrawalsListByUser
 };

@@ -1,0 +1,191 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+      #content.landing
+        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
+          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
+            i.fa.fa-bars
+          ul.navbar-nav.ml-auto
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='/profile')
+                span.mr-2.small camille0510
+                img.img-profile.rounded-circle(src='img/profile-1.png')
+            .topbar-divider.d-none.d-sm-block
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
+                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
+                | Logout
+        main
+          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
+            .container-fluid
+              .page-header-content
+                .row.align-items-center.justify-content-between.pt-3
+                  .col-auto.mb-3
+                    h1.page-header-title
+                      .page-header-icon
+                        i.fas.fa-check-circle
+                      | Account Settings - Verifications - Financial Questionnaire
+          .container-fluid
+            .card.mb-4
+              .card-body
+                #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                  .row.justify-content-center
+                    .col-xxl-6.col-xl-8
+                      form
+                        fieldset
+                          legend.text-primary Bank or G-Cash Information
+                          .form-group.md-4
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='financialOptions' id='' value='Bank Transfer' checked='')
+                              label.form-check-label(for='') Bank Transfer
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='financialOptions' id='' value='G-Cash')
+                              label.form-check-label(for='') G-Cash
+                          .bank
+                            .form-row
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Name of Bank
+                                input.form-control(id='' type='text' placeholder='Enter name of bank' value='')
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Branch
+                                input.form-control(id='' type='text' placeholder='Enter branch' value='')
+                            .form-row
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Type of Account
+                                select.form-control.selectpicker(id='' type='text' name='accountType')
+                                  option(value='' selected='' disabled='') Type of Account
+                                  option(value='Savings') Savings
+                                  option(value='Cheking') Cheking/Current
+                              .form-group.col-md-6.mb-md-0
+                                 label.small.mb-1(for='') Account No.
+                                 input.form-control(id='' type='text' placeholder='Enter your account no.' value='')
+                          .gcash
+                            .form-row
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Account name of G-Cash
+                                input.form-control(id='' type='text' placeholder='Enter your gcash name' value='')
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Account No.
+                                input.form-control(id='' type='text' placeholder='Enter your account no.' value='')
+                        hr.my-4
+                        fieldset
+                          legend.text-primary Work / Business Information
+                          .form-row
+                            .form-group.col-md-12
+                              label.small.mb-1(for='') Company Name
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Department
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Office Phone No.
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Employment Status
+                              select.form-control.selectpicker(type='text')
+                                option(value='' selected='' disabled='') Employment Status
+                                option(value='Regular') Regular
+                                option(value='Probation') Probation
+                                option(value='Contractual') Contractual
+                                option(value='Project Based') Project Based
+                                option(value='Part-Time') Part-Time
+                                option(value='Project') Self-Employed/Freelancer
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Occupation Type
+                              select.form-control.selectpicker(type='text')
+                                option(value='' selected='' disabled='') Occupation Type
+                                option(value='Management') Management
+                                option(value='Marketing') Marketing
+                                option(value='Sales') Sales
+                                option(value='Office Worker') Office Worker
+                                option(value='Professional/Technical') Professional/Technical
+                                option(value='Service/Reception') Service/Reception
+                                option(value='Production Worker/Labor') Production Worker/Labor
+                                option(value='Security/Guard/Maid') Security/Guard/Maid
+                                option(value='Driver') Driver
+                                option(value='Self Employee/Freelance') Self Employee/Freelance
+                                option(value='Others') Others
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Business Type
+                              select.form-control.selectpicker(type='text')
+                                option(value='' selected='' disabled='') Business Type
+                                option(value='BPO/Communications/IT/Mass Media') BPO/Communications/IT/Mass Media
+                                option(value='Retail Sale/Restaurant/Hotel/Tourism/Other Service') Retail Sale/Restaurant/Hotel/Tourism/Other Service
+                                option(value='Transportation/Shipping/Real Estate') Transportation/Shipping/Real Estate
+                                option(value='Bank/Insurance/Finance') Bank/Insurance/Finance
+                                option(value='Government') Government
+                                option(value='Construction/Marker/Manufacturing') Construction/Marker/Manufacturing
+                                option(value='Trading/Export/Import/Wholesale') Trading/Export/Import/Wholesale
+                                option(value='Electric/Gas/Waterworks') Electric/Gas/Waterworks
+                                option(value='Medical/Education/School') Medical/Education/School
+                                option(value='Security') Security
+                                option(value='Agriculture/Forestry/Fisheries/Mining') Agriculture/Forestry/Fisheries/Mining
+                                option(value='Others') Other
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Position
+                              select.form-control.selectpicker(type='text' name='' id='' data-live-search='true')
+                                option(value='' selected='' disabled='') Position 
+                                option(value='Director/Executive') Director/Executive
+                                option(value='Supervisor') Supervisor
+                                option(value='Officer') Officer
+                                option(value='Staff') Staff
+                                option(value='None') None
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Date Hired
+                              input.form-control(type='date' name='' id='')
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Monthly Income
+                              .input-group
+                                .input-group-prepend
+                                  span.input-group-text ₱
+                                input.form-control(type='text' aria-label='Monthly Income')
+                                .input-group-append
+                                  span.input-group-text .00
+                        hr.my-4
+                        fieldset
+                          legend.text-primary Workplace Address
+                          p Please specify your work/office address.
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Unit/Room No./Floor Building Name
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Lot/Block/House No.
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Street
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Subdivision Village
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Barangay Clearance/Utility Bill
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') City/Municipality
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Province
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Zip Code
+                              input.form-control(id='' type='text' placeholder='' value='')
+                        hr.my-4
+                        .d-flex.justify-content-between
+                          a.btn.btn-light(type='button' href='/verifications') Back
+                          button.btn.btn-primary(type='submit') Submit
+      footer.sticky-footer.bg-white
+        .container.my-auto
+          .copyright.text-center.my-auto
+            - let now = new Date
+            - let theYear=now.getYear()
+            - if (theYear < 1900) theYear=theYear+1900
+            span Copyright &copy; VMO EZ Loan #{theYear}

@@ -1,0 +1,38 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+      #content.landing
+        include ../partials/page-topbar
+        main
+          .container-fluid
+            .container
+              .page-header-content.pt-4
+                .row.align-items-center.justify-content-between
+                  .col-auto.mt-4
+                    h1.page-header-title(style="font-family: 'Kaushan Script';font-weight: bold;")
+                      | Hi, #{borrower.profile.firstName} #{borrower.profile.lastName}
+                    if (user.lastLogin)
+                      .page-header-subtitle
+                        | Your last login was on: #{user.lastLogin}
+                    if (user.lastFailedLogin)
+                      .page-header-subtitle
+                        | Your last failed login was on: #{user.lastFailedLogin}
+                    br
+                    br
+                    h4(style=' font-weight: bold;') Welcome to VMO EZ Loan!
+                    br
+                    h5
+                      | In this challenging time, get the financial boost you 
+                      br
+                      |  need with our low-interest personal loan.
+                    br
+                    a.btn.btn-primary.p-3(href='#!')
+                      | Apply Now!
+      //- footer.sticky-footer.bg-white
+      //-   .container.my-auto
+      //-     .copyright.text-center.my-auto
+      //-       - let now = new Date
+      //-       - let theYear=now.getYear()
+      //-       - if (theYear < 1900) theYear=theYear+1900
+      //-       span Copyright &copy; VMO EZ Loan #{theYear}

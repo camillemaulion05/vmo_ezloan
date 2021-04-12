@@ -14,7 +14,7 @@ const getLogin = (req, res) => {
     if (req.user) {
         return res.redirect('/account');
     }
-    res.render('account/login', {
+    res.render('user/login', {
         title: 'Login'
     });
 };
@@ -89,7 +89,7 @@ const getSignup = (req, res) => {
     if (req.user) {
         return res.redirect('/account');
     }
-    res.render('account/signup', {
+    res.render('user/signup', {
         title: 'Signup'
     });
 };
@@ -190,7 +190,7 @@ const postSignup = (req, res, next) => {
                     }, user) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'System Maintenance. Please try again later.'
+                                msg: 'There was an error in creating your account.'
                             });
                             return res.redirect('/signup');
                         } else if (statusCode === 201) {
@@ -220,19 +220,14 @@ const postSignup = (req, res, next) => {
                                 }, borrower) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'System Maintenance. Please try again later.'
+                                            msg: 'There was an error in creating your account profile.'
                                         });
                                         return res.redirect('/signup');
                                     } else if (statusCode === 201) {
-                                        req.logIn(user, (err) => {
-                                            if (err) {
-                                                return next(err);
-                                            }
-                                            req.flash("success", {
-                                                msg: "Successfully Signed Up! Nice to meet you " + borrower.firstName
-                                            });
-                                            res.redirect('/account');
+                                        req.flash("success", {
+                                            msg: "Successfully Signed Up! Please login your credentials. "
                                         });
+                                        return res.redirect('/login');
                                     } else {
                                         req.flash('errors', {
                                             msg: borrower.message
@@ -267,7 +262,7 @@ const getForgot = (req, res) => {
     if (req.isAuthenticated()) {
         return res.redirect('/account');
     }
-    res.render('account/forgot', {
+    res.render('user/forgot', {
         title: 'Forgot Pass'
     });
 };
@@ -299,7 +294,7 @@ const postForgot = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('/forgot');
     }
-    let path = '/api/passToken';
+    let path = '/api/setPassToken';
     let requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'POST',
@@ -322,12 +317,12 @@ const postForgot = (req, res) => {
                 });
                 return res.redirect('/forgot');
             } else if (statusCode === 200) {
-                path = '/api/email';
+                path = ((user.type == "Borrower") ? '/api/borrowers/email' : '/api/employees/email');
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
-                    method: 'GET',
+                    method: 'POST',
                     json: {
-                        userId: user.userId
+                        userid: user.userid
                     }
                 };
                 request(
@@ -389,7 +384,7 @@ const postForgot = (req, res) => {
                 );
             } else {
                 req.flash('errors', {
-                    msg: borrower.message
+                    msg: user.message
                 });
                 return res.redirect('/forgot');
             }
@@ -434,7 +429,7 @@ const getReset = (req, res, next) => {
                 });
                 return res.redirect('/forgot');
             } else if (statusCode === 200) {
-                res.render('account/reset', {
+                res.render('user/reset', {
                     title: 'Reset Pass'
                 });
             } else {
@@ -492,12 +487,12 @@ const postReset = (req, res, next) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/email';
+                path = ((user.type == "Borrower") ? '/api/borrowers/email' : '/api/employees/email');
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
-                    method: 'GET',
+                    method: 'POST',
                     json: {
-                        userId: user.userId
+                        userid: user.userid
                     }
                 };
                 request(
@@ -562,16 +557,6 @@ const postReset = (req, res, next) => {
     );
 };
 
-/**
- * GET /account
- * Profile page.
- */
-const getAccount = (req, res) => {
-    res.render('account/profile', {
-        title: 'Account Management'
-    });
-};
-
 module.exports = {
     getLogin,
     postLogin,
@@ -581,6 +566,5 @@ module.exports = {
     getForgot,
     postForgot,
     getReset,
-    postReset,
-    getAccount
+    postReset
 };

@@ -43,7 +43,8 @@ const usersCreate = (req, res) => {
         status,
         type,
         security,
-        twoFactorAuthentication
+        twoFactorAuthentication,
+        picture
     } = req.body);
     user.userNum = Date.now();
     if (req.body.security) user.encryptSecurityAnswer();
@@ -159,6 +160,7 @@ const usersUpdateOne = (req, res) => {
                 user.security = (req.body.security) ? req.body.security : user.security;
                 if (req.body.security) user.encryptSecurityAnswer();
                 user.twoFactorAuthentication = (req.body.twoFactorAuthentication) ? req.body.twoFactorAuthentication : user.twoFactorAuthentication;
+                user.picture = (req.body.picture) ? req.body.picture : user.picture;
                 user.save((err) => {
                     if (err) {
                         console.log(err);
@@ -242,19 +244,47 @@ const usersAuthenticate = (req, res) => {
                                 "message": err._message
                             });
                     } else if (isMatch) {
-                        const token = user.generateJwt();
-                        res
-                            .status(200)
-                            .json({
-                                'username': user.username,
-                                'token': token
-                            });
+                        user.lastLogin = Date.now();
+                        user.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                const token = user.generateJwt();
+                                res
+                                    .status(200)
+                                    .json({
+                                        'id': user._id,
+                                        'type': user.type,
+                                        'lastLogin': user.lastLogin,
+                                        'lastFailedLogin': user.lastFailedLogin,
+                                        'token': token
+                                    });
+                            }
+                        });
+
                     } else {
-                        res
-                            .status(404)
-                            .json({
-                                "message": "Invalid username or password."
-                            });
+                        user.lastFailedLogin = Date.now();
+                        user.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": "Invalid username or password."
+                                    });
+                            }
+                        });
                     }
                 });
             }
@@ -312,7 +342,8 @@ const usersSetPasswordToken = (req, res) => {
                                                 .status(200)
                                                 .json({
                                                     'token': encryptToken,
-                                                    'userId': encryptUserId
+                                                    'userid': encryptUserId,
+                                                    'type': user.type
                                                 });
                                         }
                                     });
@@ -408,8 +439,9 @@ const usersResetPassword = (req, res) => {
                             .status(200)
                             .json({
                                 'message': 'Success! Your password has been changed.',
-                                'userId': encryptUserId,
-                                'username': user.username
+                                'userid': encryptUserId,
+                                'username': user.username,
+                                'type': user.type
                             });
                     }
                 });

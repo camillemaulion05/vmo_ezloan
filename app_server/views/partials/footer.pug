@@ -1,18 +1,67 @@
 // Footer
-footer.footer
-  .container
-    .row.align-items-center
-      - let now = new Date
-      - let theYear=now.getYear()
-      - if (theYear < 1900) theYear=theYear+1900
-      .col-lg-4.text-lg-left Copyright &copy; VMO EZ Loan #{theYear}
-      .col-lg-4.my-3.my-lg-0.quicklinks
-        a.btn.btn-dark.btn-social.mx-2(href='#!')
-          i.fab.fa-twitter
-        a.btn.btn-dark.btn-social.mx-2(href='#!')
-          i.fab.fa-facebook-f
-        a.btn.btn-dark.btn-social.mx-2(href='#!')
-          i.fab.fa-linkedin-in
-      .col-lg-4.text-lg-right
-        a.mr-3(href='#!') Privacy Policy
-        a(href='#!') Terms of Use
+if title.indexOf("Account Management") === -1
+  footer.footer
+    .container
+      .row.align-items-center
+        - let now = new Date
+        - let theYear=now.getYear()
+        - if (theYear < 1900) theYear=theYear+1900
+        .col-lg-4.text-lg-left Copyright &copy; VMO EZ Loan #{theYear}
+        .col-lg-4.my-3.my-lg-0.quicklinks
+          a.btn.btn-dark.btn-social.mx-2(href='#!')
+            i.fab.fa-twitter
+          a.btn.btn-dark.btn-social.mx-2(href='#!')
+            i.fab.fa-facebook-f
+          a.btn.btn-dark.btn-social.mx-2(href='#!')
+            i.fab.fa-linkedin-in
+        .col-lg-4.text-lg-right
+          a.mr-3(href='#!') Privacy Policy
+          a(href='#!') Terms of Use
+else
+  a.scroll-to-top.rounded(href='#page-top')
+    i.fas.fa-angle-up
+  #logoutModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='logoutModalLabel' aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          h5#logoutModalLabel.modal-title Ready to Leave?
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body Select "Logout" below if you are ready to end your current session.
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          a.btn.btn-primary(href='/logout') Logout
+  if title.indexOf("Profile") != -1
+    #codeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='codeModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#codeModalLabel.modal-title Mobile Number Verification
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form(method='POST' action='/verifyMobileNum')
+            .modal-body
+              p VMO EZ Loan will send a text message with a 6-digit verification code.
+              .form-row
+                .form-group
+                  input(type='hidden', name='_csrf', value=_csrf)
+                  input(type='hidden', name='mobileNum', value=borrower.profile.mobileNum)
+                  input#inputCode.form-control(type='text' placeholder='Enter code' name='code')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Verify
+  if title.indexOf("KYC Declaration") != -1
+    #signatureModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='signatureModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#signatureModalLabel.modal-title Signature
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form
+            .modal-body
+              .text-center
+                #sig
+            .modal-footer
+              button#clear.btn.btn-secondary(type='button') Clear
+              button#redrawButton.btn.btn-primary(type='button' data-dismiss='modal') Done

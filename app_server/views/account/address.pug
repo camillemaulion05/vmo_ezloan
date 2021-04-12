@@ -1,0 +1,125 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+      #content.landing
+        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
+          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
+            i.fa.fa-bars
+          ul.navbar-nav.ml-auto
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='/profile')
+                span.mr-2.small camille0510
+                img.img-profile.rounded-circle(src='img/profile-1.png')
+            .topbar-divider.d-none.d-sm-block
+            li.nav-item.dropdown.no-arrow
+              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
+                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
+                | Logout
+        main
+          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
+            .container-fluid
+              .page-header-content
+                .row.align-items-center.justify-content-between.pt-3
+                  .col-auto.mb-3
+                    h1.page-header-title
+                      .page-header-icon
+                        i.fas.fa-check-circle
+                      | Account Settings - Verifications - Address
+          .container-fluid
+            .card.mb-4
+              .card-body
+                #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                  .row.justify-content-center
+                    .col-xxl-6.col-xl-8
+                      form
+                        fieldset
+                          legend.text-primary Present Address
+                          label.small.mb-1(for='homeOwnership') Home Ownership
+                          .form-group.md-4
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Owned')
+                              label.form-check-label(for='') Owned
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Rented/Boarder')
+                              label.form-check-label(for='') Rented/Boarder
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Living with Parents/Relatives')
+                              label.form-check-label(for='') Living with Parents/Relatives
+                            .form-check.form-check-inline
+                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Others')
+                              label.form-check-label(for='') Others
+                          .form-row
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Unit/Room No./Floor Building Name
+                                input.form-control(id='' type='text' placeholder='' value='')
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Lot/Block/House No.
+                                input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Street
+                                input.form-control(id='' type='text' placeholder='' value='')
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Subdivision Village
+                                input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') Barangay Clearance/Utility Bill
+                                input.form-control(id='' type='text' placeholder='' value='')
+                              .form-group.col-md-6
+                                label.small.mb-1(for='') City/Municipality
+                                input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Province
+                                input.form-control(id='' type='text' placeholder='' value='')
+                              .form-group.col-md-6.mb-md-0
+                                label.small.mb-1(for='') Zip Code
+                                input.form-control(id='' type='text' placeholder='' value='')
+                          hr.my-4
+                        fieldset
+                          legend.text-primary Permanent Address
+                          .custom-control.custom-checkbox
+                            input#checkProductUpdates.custom-control-input(type='checkbox' checked='')
+                            label.custom-control-label(for='checkProductUpdates')
+                              | Check if same with present address
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Unit/Room No./Floor Building Name
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Lot/Block/House No.
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Street
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Subdivision Village
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') Barangay Clearance/Utility Bill
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6
+                              label.small.mb-1(for='') City/Municipality
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          .form-row
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Province
+                              input.form-control(id='' type='text' placeholder='' value='')
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Zip Code
+                              input.form-control(id='' type='text' placeholder='' value='')
+                          hr.my-4
+                          .d-flex.justify-content-between
+                            a.btn.btn-light(type='button' href='/verifications') Back
+                            button.btn.btn-primary(type='submit') Submit
+      footer.sticky-footer.bg-white
+        .container.my-auto
+          .copyright.text-center.my-auto
+            - let now = new Date
+            - let theYear=now.getYear()
+            - if (theYear < 1900) theYear=theYear+1900
+            span Copyright &copy; VMO EZ Loan #{theYear}

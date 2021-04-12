@@ -51,7 +51,8 @@ const userSchema = mongoose.Schema({
     twoFactorAuthentication: {
         type: Boolean,
         default: false
-    }
+    },
+    picture: String
 }, {
     timestamps: true
 });

@@ -44,7 +44,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path.match(/\/api/g)) {
+  if (req.path.match(/\/api/g) || req.path.match(/\/upload/g)) {
     // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
     next();
   } else {
@@ -75,19 +75,25 @@ app.use((req, res, next) => {
 app.use('/', express.static(path.join(__dirname, 'public'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/js'), {
+app.use('/', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {
+app.use('/', express.static(path.join(__dirname, 'node_modules/bootstrap/dist'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery-validation/dist'), {
+app.use('/', express.static(path.join(__dirname, 'node_modules/datatables.net'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {
   maxAge: 86400000
 }));
-app.use('/javascripts', express.static(path.join(__dirname, 'node_modules/jquery.easing'), {
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery-validation/dist'), {
+  maxAge: 86400000
+}));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery.easing'), {
+  maxAge: 86400000
+}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   maxAge: 86400000
 }));
 

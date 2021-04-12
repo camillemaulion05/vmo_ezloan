@@ -4,7 +4,7 @@ block content
   include ../partials/flash
   .container
     .form-clean.login-form
-      form#loginForm(method='post' novalidate='novalidate')
+      form#loginForm(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
         .row.text-center
           span.fa-stack.fa-4x(style='margin: 0 auto 30px;')

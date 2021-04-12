@@ -155,8 +155,40 @@ const borrowersUpdateOne = (req, res) => {
                     }
                     borrower.type = (req.body.type) ? req.body.type : borrower.type;
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
-                    borrower.profile = (req.body.profile) ? req.body.profile : borrower.profile;
-                    borrower.workBusinessInfo = (req.body.workBusinessInfo) ? req.body.workBusinessInfo : borrower.workBusinessInfo;
+
+                    borrower.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : borrower.profile.firstName;
+                    borrower.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : borrower.profile.middleName;
+                    borrower.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : borrower.profile.lastName;
+                    borrower.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : borrower.profile.gender;
+                    borrower.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : borrower.profile.dateOfBirth;
+                    borrower.profile.maritalStat = (req.body.profile && req.body.profile.maritalStat) ? req.body.profile.maritalStat : borrower.profile.maritalStat;
+                    borrower.profile.dependents = (req.body.profile && req.body.profile.dependents) ? req.body.profile.dependents : borrower.profile.dependents;
+                    borrower.profile.educAttainment = (req.body.profile && req.body.profile.educAttainment) ? req.body.profile.educAttainment : borrower.profile.educAttainment;
+                    borrower.profile.placeOfBirth = (req.body.profile && req.body.profile.placeOfBirth) ? req.body.profile.placeOfBirth : borrower.profile.placeOfBirth;
+                    borrower.profile.nationality = (req.body.profile && req.body.profile.nationality) ? req.body.profile.nationality : borrower.profile.nationality;
+                    borrower.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : borrower.profile.address;
+                    borrower.profile.homeOwnership = (req.body.profile && req.body.profile.homeOwnership) ? req.body.profile.homeOwnership : borrower.profile.homeOwnership;
+                    borrower.profile.homePhoneNum = (req.body.profile && req.body.profile.homePhoneNum) ? req.body.profile.homePhoneNum : borrower.profile.homePhoneNum;
+                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (borrower.profile.mobileNumVerified && req.body.profile.mobileNum && borrower.profile.mobileNum == req.body.profile.mobileNum) ? true : false;
+                    borrower.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : borrower.profile.mobileNum;
+                    borrower.profile.tin = (req.body.profile && req.body.profile.tin) ? req.body.profile.tin : borrower.profile.tin;
+                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (borrower.profile.emailVerified && req.body.profile.email && borrower.profile.email == req.body.profile.email) ? true : false;
+                    borrower.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : borrower.profile.email;
+                    borrower.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : borrower.profile.emailVerificationToken;
+                    borrower.profile.nameOfSpouse = (req.body.profile && req.body.profile.nameOfSpouse) ? req.body.profile.nameOfSpouse : borrower.profile.nameOfSpouse;
+
+                    borrower.workBusinessInfo.companyName = (req.body.workBusinessInfo && req.body.workBusinessInfo.companyName) ? req.body.workBusinessInfo.companyName : borrower.workBusinessInfo.companyName;
+                    borrower.workBusinessInfo.department = (req.body.workBusinessInfo && req.body.workBusinessInfo.department) ? req.body.workBusinessInfo.department : borrower.workBusinessInfo.department;
+                    borrower.workBusinessInfo.officePhone = (req.body.workBusinessInfo && req.body.workBusinessInfo.officePhone) ? req.body.workBusinessInfo.officePhone : borrower.workBusinessInfo.officePhone;
+                    borrower.workBusinessInfo.officeAddress = req.body.workBusinessInfo && (req.body.workBusinessInfo.officeAddress) ? req.body.workBusinessInfo.officeAddress : borrower.workBusinessInfo.officeAddress;
+                    borrower.workBusinessInfo.dateHired = (req.body.workBusinessInfo && req.body.workBusinessInfo.dateHired) ? req.body.workBusinessInfo.dateHired : borrower.workBusinessInfo.dateHired;
+                    borrower.workBusinessInfo.employmentType = (req.body.workBusinessInfo && req.body.workBusinessInfo.employmentType) ? req.body.workBusinessInfo.employmentType : borrower.workBusinessInfo.employmentType;
+                    borrower.workBusinessInfo.occupationType = (req.body.workBusinessInfo && req.body.workBusinessInfo.occupationType) ? req.body.workBusinessInfo.occupationType : borrower.workBusinessInfo.occupationType;
+                    borrower.workBusinessInfo.businessType = (req.body.workBusinessInfo && req.body.workBusinessInfo.businessType) ? req.body.workBusinessInfo.businessType : borrower.workBusinessInfo.businessType;
+                    borrower.workBusinessInfo.position = (req.body.workBusinessInfo && req.body.workBusinessInfo.position) ? req.body.workBusinessInfo.position : borrower.workBusinessInfo.position;
+                    borrower.workBusinessInfo.monthlyIncome = (req.body.workBusinessInfo && req.body.workBusinessInfo.monthlyIncome) ? req.body.workBusinessInfo.monthlyIncome : borrower.workBusinessInfo.monthlyIncome;
+                    borrower.workBusinessInfo.employeeID = (req.body.workBusinessInfo && req.body.workBusinessInfo.employeeID) ? req.body.workBusinessInfo.employeeID : borrower.workBusinessInfo.employeeID;
+
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
                     borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
                     borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
@@ -223,8 +255,8 @@ const borrowersDeleteOne = (req, res) => {
     }
 };
 
-const borrowersGetEmail = (req, res) => {
-    let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
+const borrowersGetEmailByUser = (req, res) => {
+    let bytes = CryptoJS.AES.decrypt(req.body.userid, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
     Borrower.findOne({
             'userId': mongoose.Types.ObjectId(originalUserId),
@@ -254,58 +286,69 @@ const borrowersGetEmail = (req, res) => {
 };
 
 const borrowersSetEmailToken = (req, res) => {
-    Borrower.findOne({
-            "profile.email": req.body.email
-        })
-        .exec((err, borrower) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!borrower) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "Email not found."
-                    });
-            } else {
-                const createRandomToken = randomBytesAsync(16)
-                    .then((buf) => buf.toString('hex'));
-
-                createRandomToken
-                    .then((token) => {
-                        borrower.profile.emailVerificationToken = token;
-                        let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
-                        borrower.save((err) => {
-                            if (err) {
-                                console.log(err);
-                                res
-                                    .status(404)
-                                    .json({
-                                        "message": err._message
-                                    });
-                            } else {
-                                res
-                                    .status(200)
-                                    .json({
-                                        'token': encryptToken
-                                    });
-                            }
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        Borrower
+            .findOne({
+                'userId': mongoose.Types.ObjectId(userid),
+            })
+            .exec((err, borrower) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
                         });
-                    })
-                    .catch(err);
-            }
-        });
+                } else if (!borrower) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Email not found."
+                        });
+                } else {
+                    const createRandomToken = randomBytesAsync(16)
+                        .then((buf) => buf.toString('hex'));
+
+                    createRandomToken
+                        .then((token) => {
+                            borrower.profile.emailVerificationToken = token;
+                            let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                            borrower.save((err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res
+                                        .status(404)
+                                        .json({
+                                            "message": err._message
+                                        });
+                                } else {
+                                    res
+                                        .status(200)
+                                        .json({
+                                            'token': encryptToken,
+                                            'email': borrower.profile.email
+                                        });
+                                }
+                            });
+                        })
+                        .catch(err);
+                }
+            });
+    }
 };
 
 const borrowersVerifyEmailToken = (req, res) => {
-    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_SERVER_SECRET);
-    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
     Borrower.findOne({
-            "profile.emailVerificationToken": originalToken
+            "userId": mongoose.Types.ObjectId(req.body.userid)
         })
         .exec((err, borrower) => {
             if (err) {
@@ -322,28 +365,192 @@ const borrowersVerifyEmailToken = (req, res) => {
                         "message": "Invalid token or expired token."
                     });
             } else {
-                borrower.profile.emailVerificationToken = '';
-                borrower.profile.emailVerified = true;
-                borrower.save((err) => {
-                    if (err) {
-                        console.log(err);
-                        res
-                            .status(404)
-                            .json({
-                                "message": err._message
-                            });
-                    } else {
-                        res
-                            .status(200)
-                            .json({
-                                "message": "Thank you for verifying your email address."
-                            });
-                    }
-                });
+                let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+                let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                if (borrower.profile.emailVerificationToken == originalToken) {
+                    borrower.profile.emailVerificationToken = '';
+                    borrower.profile.emailVerified = true;
+                    borrower.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(200)
+                                .json({
+                                    "message": "Thank you for verifying your email address."
+                                });
+                        }
+                    });
+                } else {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Invalid token or expired token."
+                        });
+                }
             }
         });
 };
 
+const borrowersReadOneByUser = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        Borrower
+            .findOne({
+                'userId': mongoose.Types.ObjectId(userid),
+            }, {
+                "createdAt:": 0,
+                "reviewedDate": 0,
+                "updatedAt": 0,
+                "__v": 0
+            })
+            .populate('userId', 'username picture')
+            .exec((err, borrower) => {
+                if (!borrower) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Borrower not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    res
+                        .status(200)
+                        .json(borrower);
+                }
+            });
+    }
+};
+
+
+const borrowersUpdateOneByUser = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    if (!userid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, userid is required"
+            });
+    } else {
+        Borrower
+            .findOne({
+                'userId': mongoose.Types.ObjectId(userid),
+            })
+            .exec((err, borrower) => {
+                if (!borrower) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Borrower not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    borrower.type = (req.body.type) ? req.body.type : borrower.type;
+                    borrower.status = (req.body.status) ? req.body.status : borrower.status;
+
+                    borrower.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : borrower.profile.firstName;
+                    borrower.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : borrower.profile.middleName;
+                    borrower.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : borrower.profile.lastName;
+                    borrower.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : borrower.profile.gender;
+                    borrower.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : borrower.profile.dateOfBirth;
+                    borrower.profile.maritalStat = (req.body.profile && req.body.profile.maritalStat) ? req.body.profile.maritalStat : borrower.profile.maritalStat;
+                    borrower.profile.dependents = (req.body.profile && req.body.profile.dependents) ? req.body.profile.dependents : borrower.profile.dependents;
+                    borrower.profile.educAttainment = (req.body.profile && req.body.profile.educAttainment) ? req.body.profile.educAttainment : borrower.profile.educAttainment;
+                    borrower.profile.placeOfBirth = (req.body.profile && req.body.profile.placeOfBirth) ? req.body.profile.placeOfBirth : borrower.profile.placeOfBirth;
+                    borrower.profile.nationality = (req.body.profile && req.body.profile.nationality) ? req.body.profile.nationality : borrower.profile.nationality;
+                    borrower.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : borrower.profile.address;
+                    borrower.profile.homeOwnership = (req.body.profile && req.body.profile.homeOwnership) ? req.body.profile.homeOwnership : borrower.profile.homeOwnership;
+                    borrower.profile.homePhoneNum = (req.body.profile && req.body.profile.homePhoneNum) ? req.body.profile.homePhoneNum : borrower.profile.homePhoneNum;
+                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (borrower.profile.mobileNumVerified && req.body.profile.mobileNum && borrower.profile.mobileNum == req.body.profile.mobileNum) ? true : false;
+                    borrower.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : borrower.profile.mobileNum;
+                    borrower.profile.tin = (req.body.profile && req.body.profile.tin) ? req.body.profile.tin : borrower.profile.tin;
+                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (borrower.profile.emailVerified && req.body.profile.email && borrower.profile.email == req.body.profile.email) ? true : false;
+                    borrower.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : borrower.profile.email;
+                    borrower.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : borrower.profile.emailVerificationToken;
+                    borrower.profile.nameOfSpouse = (req.body.profile && req.body.profile.nameOfSpouse) ? req.body.profile.nameOfSpouse : borrower.profile.nameOfSpouse;
+
+                    borrower.workBusinessInfo.companyName = (req.body.workBusinessInfo && req.body.workBusinessInfo.companyName) ? req.body.workBusinessInfo.companyName : borrower.workBusinessInfo.companyName;
+                    borrower.workBusinessInfo.department = (req.body.workBusinessInfo && req.body.workBusinessInfo.department) ? req.body.workBusinessInfo.department : borrower.workBusinessInfo.department;
+                    borrower.workBusinessInfo.officePhone = (req.body.workBusinessInfo && req.body.workBusinessInfo.officePhone) ? req.body.workBusinessInfo.officePhone : borrower.workBusinessInfo.officePhone;
+                    borrower.workBusinessInfo.officeAddress = req.body.workBusinessInfo && (req.body.workBusinessInfo.officeAddress) ? req.body.workBusinessInfo.officeAddress : borrower.workBusinessInfo.officeAddress;
+                    borrower.workBusinessInfo.dateHired = (req.body.workBusinessInfo && req.body.workBusinessInfo.dateHired) ? req.body.workBusinessInfo.dateHired : borrower.workBusinessInfo.dateHired;
+                    borrower.workBusinessInfo.employmentType = (req.body.workBusinessInfo && req.body.workBusinessInfo.employmentType) ? req.body.workBusinessInfo.employmentType : borrower.workBusinessInfo.employmentType;
+                    borrower.workBusinessInfo.occupationType = (req.body.workBusinessInfo && req.body.workBusinessInfo.occupationType) ? req.body.workBusinessInfo.occupationType : borrower.workBusinessInfo.occupationType;
+                    borrower.workBusinessInfo.businessType = (req.body.workBusinessInfo && req.body.workBusinessInfo.businessType) ? req.body.workBusinessInfo.businessType : borrower.workBusinessInfo.businessType;
+                    borrower.workBusinessInfo.position = (req.body.workBusinessInfo && req.body.workBusinessInfo.position) ? req.body.workBusinessInfo.position : borrower.workBusinessInfo.position;
+                    borrower.workBusinessInfo.monthlyIncome = (req.body.workBusinessInfo && req.body.workBusinessInfo.monthlyIncome) ? req.body.workBusinessInfo.monthlyIncome : borrower.workBusinessInfo.monthlyIncome;
+                    borrower.workBusinessInfo.employeeID = (req.body.workBusinessInfo && req.body.workBusinessInfo.employeeID) ? req.body.workBusinessInfo.employeeID : borrower.workBusinessInfo.employeeID;
+
+                    borrower.account = (req.body.account) ? req.body.account : borrower.account;
+                    borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
+                    borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
+                    borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
+                    if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
+                    borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
+                    borrower.reviewedDate = (!req.body.reviewedBy && borrower.reviewedDate) ? borrower.reviewedDate : Date.now();
+                    borrower.hrCertifiedBy = (req.body.hrCertifiedBy) ? req.body.hrCertifiedBy : borrower.hrCertifiedBy;
+                    borrower.hrCertifiedDate = (!req.body.hrCertifiedBy && borrower.hrCertifiedDate) ? borrower.hrCertifiedDate : Date.now();
+                    borrower.userId = (req.body.userId) ? req.body.userId : borrower.userId;
+                    borrower.sharesPerPayDay = (req.body.sharesPerPayDay) ? req.body.sharesPerPayDay : borrower.sharesPerPayDay;
+                    borrower.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(200)
+                                .json(borrower);
+                        }
+                    });
+                }
+            });
+    }
+};
 
 module.exports = {
     borrowersList,
@@ -351,7 +558,9 @@ module.exports = {
     borrowersReadOne,
     borrowersUpdateOne,
     borrowersDeleteOne,
-    borrowersGetEmail,
+    borrowersGetEmailByUser,
     borrowersSetEmailToken,
-    borrowersVerifyEmailToken
+    borrowersVerifyEmailToken,
+    borrowersReadOneByUser,
+    borrowersUpdateOneByUser
 };

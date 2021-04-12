@@ -77,8 +77,6 @@ const borrowerSchema = mongoose.Schema({
             type: Boolean,
             default: false
         },
-        addMobileNum1: String,
-        addMobileNum2: String,
         tin: String,
         email: {
             type: String,
@@ -168,9 +166,7 @@ const borrowerSchema = mongoose.Schema({
             type: String,
             enum: ["Identification Card", "Company Id", "Certificate of Employment", "Payslip", "BIR 2316", "TIN Proof", "Selfie with ID", "Others"]
         },
-        filename: String,
-        contentType: String,
-        file: Buffer
+        filename: String
     }],
     beneficiaries: [{
         fullName: String,

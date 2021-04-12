@@ -1,0 +1,19 @@
+.container-fluid
+  if messages.errors
+    .alert.alert-danger
+      button.close(type='button', data-dismiss='alert')
+        i.fa.fa-times-circle
+      for error in messages.errors
+        | #{error.msg}
+  if messages.info
+    .alert.alert-info
+      button.close(type='button', data-dismiss='alert')
+        i.fa.fa-times-circle
+      for info in messages.info
+        | #{info.msg}
+  if messages.success
+    .alert.alert-success
+      button.close(type='button', data-dismiss='alert')
+        i.fa.fa-times-circle
+      for success in messages.success
+        | #{success.msg}

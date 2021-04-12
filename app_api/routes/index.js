@@ -41,7 +41,7 @@ router
     .delete(auth, middleware.isAdmin, ctrlUsers.usersDeleteOne);
 
 router.post('/login', ctrlUsers.usersAuthenticate);
-router.post('/passToken', ctrlUsers.usersSetPasswordToken);
+router.post('/setPassToken', ctrlUsers.usersSetPasswordToken);
 router.post('/validatePassToken', ctrlUsers.usersValidatePasswordToken);
 router.post('/reset', ctrlUsers.usersResetPassword);
 
@@ -69,6 +69,11 @@ router
     .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
 
+router
+    .route('/employees/users/:userid')
+    .get(auth, middleware.isModerator, ctrlEmployees.employeesReadOneByUser)
+    .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOneByUser);
+
 // transactions
 router
     .route('/transactions')
@@ -83,11 +88,11 @@ router
 
 router
     .route('/transactions/type/:type')
-    .get(auth, middleware.isModerator, ctrlTransactions.transactionsPerType);
+    .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
 
 router
     .route('/transactions/users/:userid')
-    .get(auth, middleware.isSafe, ctrlTransactions.transactionsPerUser);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByUser);
 
 router
     .route('/transactions/summary/:year')
@@ -95,7 +100,7 @@ router
 
 router
     .route('/transactions/contributions/:year')
-    .get(auth, middleware.isAdmin, ctrlTransactions.contributionsPerMember);
+    .get(auth, middleware.isAdmin, ctrlTransactions.contributionsListByMember);
 
 // withdrawals
 router
@@ -111,7 +116,7 @@ router
 
 router
     .route('/withdrawals/users/:userid')
-    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsPerUser);
+    .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsListByUser);
 
 // borrowers
 router
@@ -125,10 +130,15 @@ router
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
 
-router.get('/email', ctrlBorrowers.borrowersGetEmail);
-router.post('/email', ctrlBorrowers.borrowersSetEmailToken);
-router.post('/emailToken', ctrlBorrowers.borrowersSetEmailToken);
-router.post('/validateEmailToken', ctrlBorrowers.borrowersVerifyEmailToken);
+router.post('/borrowers/email', ctrlBorrowers.borrowersGetEmailByUser);
+router.get('/borrowers/setEmailToken/:userid', ctrlBorrowers.borrowersSetEmailToken);
+router.post('/borrowers/validateEmailToken', ctrlBorrowers.borrowersVerifyEmailToken);
+
+router
+    .route('/borrowers/users/:userid')
+    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOneByUser)
+    .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOneByUser);
+
 
 // loans
 router
@@ -144,7 +154,7 @@ router
 
 router
     .route('/loans/users/:userid')
-    .get(auth, middleware.isSafe, ctrlLoans.loansPerUser);
+    .get(auth, middleware.isSafe, ctrlLoans.loansListByUser);
 
 router
     .route('/loans/:loanid/schedules')
@@ -157,11 +167,11 @@ router
 
 router
     .route('/loans/:loanid/due')
-    .get(auth, middleware.isSafe, ctrlLoans.loansDuePerLoan);
+    .get(auth, middleware.isSafe, ctrlLoans.loansDueListByLoan);
 
 router
     .route('/loans/due/repayments')
-    .get(auth, middleware.isAdmin, ctrlLoans.loansDueRepayments);
+    .get(auth, middleware.isAdmin, ctrlLoans.loansDueRepaymentsList);
 
 router
     .route('/loans/summary/:year')

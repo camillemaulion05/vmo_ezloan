@@ -1,0 +1,141 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, shrink-to-fit=no')
+    meta(name='description' content='Loan System')
+    meta(name='author' content='Ma. Camille G. Maulion')
+    meta(name='csrf-token', content=_csrf)
+    title #{title} - VMO EZ Loan
+    link(rel='shortcut icon', href='/favicon.ico')
+    link(href='/css/all.css' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet' type='text/css')
+    link(href='/css/dataTables.bootstrap4.min.css' rel='stylesheet')
+    link(href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/south-street/jquery-ui.css' rel='stylesheet' type='text/css')
+    link(href='/css/sb-admin-2.css' rel='stylesheet')
+    block head
+
+  body#page-top
+    
+    #wrapper
+      include partials/header
+      block content
+      include partials/footer
+
+    script(src='/js/jquery.min.js')
+    script(src='/js/jquery.validate.min.js')
+    script(src='/js/bootstrap.bundle.min.js')
+    script(src='/js/jquery.easing.min.js')
+    script(src='/js/methods.js')
+    script(src='/js/sb-admin-2.js')
+    script(src='/js/chart.min.js')
+    script(src='/js/jquery.dataTables.min.js')
+    script(src='/js/dataTables.bootstrap4.min.js')
+    script(src='/js/datatables.js')
+    script(src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js')
+    script(src='/js/jquery.signature.js')
+    if title.indexOf("Profile") != -1
+      script.
+          $(function () {
+              $('input[name="profilePic"]').change(function () {
+                  $("form#profilePicForm").submit();
+              });
+              $('a#verifyMobileNum').click(function () {
+                let path = ($('a#verifyMobileNum').prop('href')).split('/');
+                let mobileNum = path[path.length-1];
+                let firstName = path[path.length-2];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/api/sendOTP",
+                    type: "POST",
+                    data: {
+                        mobileNum: mobileNum,
+                        name: firstName
+                    },
+                    cache: false,
+                    success: function (data) {
+                        $('#codeModal').modal('show'); 
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
+              });
+          });
+    if title.indexOf("Verifications") != -1
+      script(src='/js/chart-pie.js')
+    if title.indexOf("Financial Questionnaire") != -1
+      script.
+        $(function () {
+          let radioChecked = function () {
+            if ($('input[name="financialOptions"]:checked')[0].value == "Bank Transfer") {
+              $('.bank').show();
+              $('.gcash').hide();
+            } else if ($('input[name="financialOptions"]:checked')[0].value == "G-Cash") {
+              $('.gcash').show();
+              $('.bank').hide();
+            }
+          };
+          radioChecked();
+          $("input[type=radio]").on("click", radioChecked);
+        });
+
+    if title.indexOf("Identity Documentation") != -1
+      script.
+        $(function () {
+          let radioChecked = function () {
+            if ($('input[name="identity2Options"]:checked')[0].value == "Company") {
+              $('.company-id').show();
+              $('.coe').hide();
+            } else if ($('input[name="identity2Options"]:checked')[0].value == "COE") {
+              $('.coe').show();
+              $('.company-id').hide();
+            }
+            if ($('input[name="identity3Options"]:checked')[0].value == "Payslip") {
+              $('.payslip').show();
+              $('.bir').hide();
+            } else if ($('input[name="identity3Options"]:checked')[0].value == "BIR") {
+              $('.bir').show();
+              $('.payslip').hide();
+            }
+          };
+          radioChecked();
+          $("input[type=radio]").on("click", radioChecked);
+        });
+
+    if title.indexOf("KYC Declaration") != -1
+      script.
+        $(function () {
+          var sig = $('#sig').signature();
+          $('#clear').click(function () {
+            sig.signature('clear');
+          });
+          $('#redrawButton').click(function () {
+            $('#signatureJSON').val(sig.signature('toJSON'));
+            var signature = JSON.parse($('#signatureJSON').val());
+              if (signature.lines.length > 0) {
+                $('#redrawSignature').removeClass('d-none');
+                $('#redrawSignature').signature('enable').
+                signature('draw', $('#signatureJSON').val()).
+                signature('disable');
+                $('#defaultSignature').addClass('d-none');
+                $('#redrawSignature :first-child').attr("data-toggle", "modal");
+                $('#redrawSignature :first-child').attr("data-target", "#signatureModal");
+              }
+              else {
+                $('#defaultSignature').removeClass('d-none');
+                $('#redrawSignature').addClass('d-none');
+              }
+          });
+          $('#redrawSignature').signature({ disabled: true });
+        });
