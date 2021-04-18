@@ -428,7 +428,7 @@ const borrowersReadOneByUser = (req, res) => {
                 "updatedAt": 0,
                 "__v": 0
             })
-            .populate('userId', 'username lastLogin lastFailedLogin status security picture')
+            .populate('userId reviewedBy', 'username lastLogin lastFailedLogin status security picture profile.firstName profile.lastName signature')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res

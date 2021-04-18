@@ -62,6 +62,7 @@ router.post('/security/questions', passportConfig.isAuthenticated, ctrlAccount.p
 router.get('/verifications', passportConfig.isAuthenticated, ctrlAccount.getVerifications);
 router.get('/verifications/submit', passportConfig.isAuthenticated, ctrlAccount.getVerificationsSubmit);
 router.get('/verifications/cancel', passportConfig.isAuthenticated, ctrlAccount.getVerificationsCancel);
+router.get('/verifications/download', passportConfig.isAuthenticated, ctrlAccount.getVerificationsDownload);
 
 router
     .route('/personal')

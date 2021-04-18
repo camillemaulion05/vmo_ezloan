@@ -1,6 +1,7 @@
 const validator = require('validator');
 const CryptoJS = require("crypto-js");
 const request = require('request');
+const PdfPrinter = require('pdfmake');
 const apiOptions = {
     server: process.env.BASE_URL
 };
@@ -9,6 +10,13 @@ const apiOptions = {
  * GET /account
  * Profile page.
  */
+
+function parseDate(date) {
+    let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    let d = (new Date(date)).toString().split(' ');
+    return (date) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+}
 
 function getUserDetails(req, res, filename, title) {
     path = ((req.user.type == "Borrower") ? '/api/borrowers/users/' : '/api/employees/users/') + (req.user.id).toString();
@@ -626,6 +634,1447 @@ const getVerificationsCancel = (req, res) => {
     );
 };
 
+const getVerificationsDownload = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('/verifications');
+            } else if (statusCode === 200) {
+                var fonts = {
+                    Roboto: {
+                        normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+                        bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+                        italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+                        bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+                    },
+                    Fontello: {
+                        normal: __basedir + '/public/fonts/fontello.ttf'
+                    }
+                }
+                let printer = new PdfPrinter(fonts);
+                let unchecked = '';
+                let checked = '';
+                let dateOfBirth = parseDate(user.profile.dateOfBirth);
+                let dateHired = parseDate(user.workBusinessInfo.dateHired);
+                let dateNow = parseDate(new Date);
+                let reviewedDate = parseDate(user.reviewedDate);
+                var docDefinition = {
+                    content: [{
+                            text: 'VMO EZ LOAN',
+                            style: 'header'
+                        },
+                        {
+                            text: [
+                                'NON-MEMBERSHIP APPLICATION FORM\n\n'
+                            ],
+                            style: 'subheader'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', '*', '*'],
+                                body: [
+                                    [{
+                                        text: 'PERSONAL INFORMATION',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black',
+                                        colSpan: 3,
+                                    }, {}, {}],
+                                    [{
+                                            text: 'FIRST NAME',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'MIDDLE NAME',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'LAST NAME',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.profile.firstName,
+                                            style: 'medium',
+                                            border: [true, false, false, true]
+                                        },
+                                        {
+                                            text: user.profile.middleName,
+                                            style: 'medium',
+                                            border: [true, false, false, true]
+                                        },
+                                        {
+                                            text: user.profile.lastName,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'GENDER',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'DATE OF BIRTH\n(mm/dd/yyyy)',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'MARITAL STATUS',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: 'NO. OF DEPENDENTS',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        },
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.gender == "Male") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Male\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.gender == "Female") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Female'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            text: dateOfBirth,
+                                            style: 'medium',
+                                            border: [true, false, false, true]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.maritalStat == "Single") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Single\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.maritalStat == "Married") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Married\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.maritalStat == "Widow/er") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Widow/er'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.maritalStat == "Legally Seperated") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Legally Seperated\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.maritalStat == "Annuled") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Annuled'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            text: user.profile.dependents,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        },
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'EDUCATIONAL ATTAINMENT',
+                                            style: 'small',
+                                            border: [true, false, false, false],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: 'PLACE OF BIRTH (CITY/MUNICIPALITY, PROVINCE)',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: 'NATIONALITY',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 2
+                                        }, {},
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.educAttainment == "High School") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  High School\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.educAttainment == "College") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  College\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.educAttainment == "Others") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Others'
+                                                    }, ]
+                                                }
+                                            ],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.educAttainment == "Vocational/Technical") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Vocational/Technical\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.educAttainment == "Post Graduate") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Post Graduate'
+                                                    }, ]
+                                                }
+                                            ],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: user.profile.placeOfBirth,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: user.profile.nationality,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: [{
+                                                    text: 'PRESENT ADDRESS',
+                                                    style: 'item'
+                                                },
+                                                {
+                                                    text: '\t(Unit No., House No., Street No., Subdivision,  Barangay, City, Province)',
+                                                    style: 'small'
+                                                }
+                                            ],
+                                            border: [true, false, true, false],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: 'ZIP CODE',
+                                            style: 'small',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.profile.address.present.unitNo + ' ' + user.profile.address.present.houseNo + ' ' + user.profile.address.present.street + ' ' + user.profile.address.present.subdivision + ' ' + user.profile.address.present.barangay + ' ' + user.profile.address.present.city + ' ' + user.profile.address.present.province,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: user.profile.address.present.zipCode,
+                                            style: 'medium',
+                                            border: [false, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: [{
+                                                    text: 'PERMANENT ADDRESS',
+                                                    style: 'item'
+                                                },
+                                                {
+                                                    text: '\t(Unit No., House No., Street No., Subdivision,  Barangay, City, Province)',
+                                                    style: 'small'
+                                                }
+                                            ],
+                                            border: [true, false, true, false],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: 'ZIP CODE',
+                                            style: 'small',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.profile.address.permanent.unitNo + ' ' + user.profile.address.permanent.houseNo + ' ' + user.profile.address.permanent.street + ' ' + user.profile.address.permanent.subdivision + ' ' + user.profile.address.permanent.barangay + ' ' + user.profile.address.permanent.city + ' ' + user.profile.address.permanent.province,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: user.profile.address.permanent.zipCode,
+                                            style: 'medium',
+                                            border: [false, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'HOME OWNERSHIP',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: 'HOME PHONE NO.',
+                                            style: 'small',
+                                            border: [false, false, true, false]
+                                        },
+                                        {
+                                            text: 'MOBILE/CELLPHONE NO.',
+                                            style: 'small',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.profile.homeOwnership == "Owned") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Owned\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.homeOwnership == "Rented/Boarder") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Rented/Boarder\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.profile.homeOwnership == "Others") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Others'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, true, true],
+                                            text: [{
+                                                text: (user.profile.homeOwnership == "Living with Parents/Relatives") ? checked : unchecked,
+                                                style: 'icon'
+                                            }, {
+                                                text: '  Living with Parents/Relatives'
+                                            }, ]
+                                        },
+                                        {
+                                            text: '+(63) ' + user.profile.homePhoneNum,
+                                            style: 'medium',
+                                            border: [false, false, true, true]
+                                        },
+                                        {
+                                            text: '+(63) ' + user.profile.mobileNum,
+                                            style: 'medium',
+                                            border: [false, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'TAX IDENTIFICATION NUMBER',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        },
+                                        {
+                                            text: 'E-MAIL ADDRESS',
+                                            style: 'small',
+                                            border: [false, false, true, false],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                    [{
+                                            text: user.profile.tin,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        },
+                                        {
+                                            text: user.profile.email,
+                                            style: 'medium',
+                                            border: [false, false, true, true],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                        text: 'WORK / BUSINESS INFORMATION',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black',
+                                        colSpan: 4
+                                    }, {}, {}, {}],
+                                    [{
+                                            text: 'COMPANY NAME',
+                                            style: 'small',
+                                            border: [true, false, false, false],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: 'Department',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'OFFICE PHONE NO.',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.workBusinessInfo.companyName,
+                                            style: 'medium',
+                                            border: [true, false, false, true],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: user.workBusinessInfo.department,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        },
+                                        {
+                                            text: '+(63) ' + user.workBusinessInfo.officePhone,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: [{
+                                                    text: 'OFFICE ADDRESS',
+                                                    style: 'item'
+                                                },
+                                                {
+                                                    text: '\t(Unit No., House No., Street No., Subdivision,  Barangay, City, Province)',
+                                                    style: 'small'
+                                                }
+                                            ],
+                                            border: [true, false, true, false],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: 'ZIP CODE',
+                                            style: 'small',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.workBusinessInfo.officeAddress.unitNo + ' ' + user.workBusinessInfo.officeAddress.houseNo + ' ' + user.workBusinessInfo.officeAddress.street + ' ' + user.workBusinessInfo.officeAddress.subdivision + ' ' + user.workBusinessInfo.officeAddress.barangay + ' ' + user.workBusinessInfo.officeAddress.city + ' ' + user.workBusinessInfo.officeAddress.province,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 5
+                                        }, {}, {}, {}, {},
+                                        {
+                                            text: user.workBusinessInfo.officeAddress.zipCode,
+                                            style: 'medium',
+                                            border: [false, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'EMPLOYMENT STATUS',
+                                            style: 'small',
+                                            border: [true, false, false, false],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: 'OCCUPATION TYPE',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Regular") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Regular\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Probation") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Probation\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Contractual") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Contractual'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Project Based") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Project Based\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Part-Time") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Part-Time\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.employmentType == "Self-Employed/Freelancer") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Self-Employed/Freelancer'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Management") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Management\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Marketing") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Marketing\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Sales") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Sales\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Office Worker") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Office Worker\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Professional/Technical") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Professional/Technical\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Others") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Others'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, true, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Service/Reception") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Service/Reception\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Production Worker/Labor") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Production Worker/Labor\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Security/Guard/Maid") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Security/Guard/Maid\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Driver") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Driver\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.occupationType == "Self Employee/Freelance") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Self Employee/Freelance'
+                                                    }, ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+
+                        {
+                            table: {
+                                widths: ['*', '*'],
+                                body: [
+                                    [{
+                                        text: 'BUSINESS TYPE',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "BPO/IT/Communication/Mass Media") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  BPO/IT/Communication/Mass Media\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Transportation/Shipping/Real Estate") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Transportation/Shipping/Real Estate\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Government") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Government\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Trading/Export/Import/Wholesale") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Trading/Export/Import/Wholesale\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Medical/Education/School") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Medical/Education/School\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Agriculture/Forestry/Fisheries/Mining") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Agriculture/Forestry/Fisheries/Mining'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, true, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Retail Sale/Restaurant/Hotel/Tourism/Other Service") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Retail Sale/Restaurant/Hotel/Tourism/Other Service\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Bank/Insurance/Finance") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Bank/Insurance/Finance\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Construction/Maker/Manufacturing") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Construction/Maker/Manufacturing\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Electric/Gas/Waterworks") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Electric/Gas/Waterworks\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Security") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Security\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.businessType == "Others") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Others'
+                                                    }, ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'POSITION',
+                                            style: 'small',
+                                            border: [true, false, false, false],
+                                            colSpan: 2
+                                        }, {},
+                                        {
+                                            text: 'DATE HIRED\n(mm/dd/yyyy)',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        },
+                                        {
+                                            text: 'MONTHLY INCOME',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.position == "Director/Executive") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Director/Executive\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.position == "Officer") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Officer\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.position == "None") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  None'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.position == "Supervisor") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Supervisor\n'
+                                                    }, ]
+                                                },
+                                                {
+                                                    text: [{
+                                                        text: (user.workBusinessInfo.position == "Staff") ? checked : unchecked,
+                                                        style: 'icon'
+                                                    }, {
+                                                        text: '  Staff'
+                                                    }, ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            text: dateHired,
+                                            style: 'medium',
+                                            border: [true, false, false, true]
+                                        },
+                                        {
+                                            text: user.workBusinessInfo.monthlyIncome,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        }
+                                    ]
+                                ]
+                            },
+                            pageBreak: 'after'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', '*'],
+                                body: [
+                                    [{
+                                        text: 'DOCUMENTS',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black',
+                                        colSpan: 2,
+                                    }, {}],
+                                    [{
+                                        text: 'IDENTIFICATION CARD',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                            image: __basedir + '/uploads/' + user.documents.primaryIdFront,
+                                            width: 240,
+                                            border: [true, false, false, false],
+                                            alignment: 'center'
+                                        },
+                                        {
+                                            image: __basedir + '/uploads/' + user.documents.primaryIdBack,
+                                            width: 240,
+                                            border: [false, false, true, false],
+                                            alignment: 'center'
+                                        }
+                                    ],
+                                    [{
+                                        text: 'COMPANY ID / COE',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                            image: __basedir + '/uploads/' + user.documents.companyIdFront,
+                                            width: 240,
+                                            border: [true, false, false, false],
+                                            alignment: 'center'
+                                        },
+                                        {
+                                            image: __basedir + '/uploads/' + user.documents.companyIdBack,
+                                            width: 240,
+                                            border: [false, false, true, false],
+                                            alignment: 'center'
+                                        }
+                                    ],
+                                    [{
+                                        text: 'PAYSLIP / BIR 2316',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        image: __basedir + '/uploads/' + user.documents.payslip1,
+                                        width: 250,
+                                        border: [true, false, true, false],
+                                        alignment: 'center',
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        text: 'TIN PROOF',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        image: __basedir + '/uploads/' + user.documents.tinProof,
+                                        width: 250,
+                                        border: [true, false, true, false],
+                                        alignment: 'center',
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        text: 'SELFIE WITH ID',
+                                        style: 'small',
+                                        border: [true, false, true, false],
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        image: __basedir + '/uploads/' + user.documents.selfiewithId,
+                                        width: 250,
+                                        border: [true, false, true, false],
+                                        alignment: 'center',
+                                        colSpan: 2
+                                    }, {}],
+                                    [{
+                                        text: '   ',
+                                        style: 'medium',
+                                        border: [true, false, true, true],
+                                        colSpan: 2
+                                    }, {}]
+                                ]
+                            },
+                            pageBreak: 'after'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', '*'],
+                                body: [
+                                    [{
+                                        text: 'BANK / G-CASH INFORMATION',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black',
+                                        colSpan: 2,
+                                    }, {}],
+                                    [{
+                                            text: 'NAME OF BANK/NAME OF G-CASH',
+                                            style: 'small',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: 'BRANCH',
+                                            style: 'small',
+                                            border: [true, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: user.account.name,
+                                            style: 'medium',
+                                            border: [true, false, false, true]
+                                        },
+                                        {
+                                            text: user.account.branch,
+                                            style: 'medium',
+                                            border: [true, false, true, true]
+                                        }
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 0,
+                                widths: ['*', '*', '*', '*', '*'],
+                                body: [
+                                    [{
+                                            text: 'TYPE OF ACCOUNT',
+                                            style: 'small',
+                                            border: [true, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: 'ACCOUNT NO.',
+                                            style: 'small',
+                                            border: [true, false, true, false],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                    [{
+                                            style: 'item',
+                                            border: [true, false, false, true],
+                                            text: [{
+                                                text: (user.account.type == "Savings") ? checked : unchecked,
+                                                style: 'icon'
+                                            }, {
+                                                text: '  Savings'
+                                            }, ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                text: (user.account.type == "Checking/Current") ? checked : unchecked,
+                                                style: 'icon'
+                                            }, {
+                                                text: '  Checking/Current'
+                                            }, ]
+                                        },
+                                        {
+                                            style: 'item',
+                                            border: [false, false, false, true],
+                                            text: [{
+                                                text: (user.account.type == "G-Cash") ? checked : unchecked,
+                                                style: 'icon'
+                                            }, {
+                                                text: '  G-Cash'
+                                            }, ]
+                                        },
+                                        {
+                                            text: user.account.number,
+                                            style: 'medium',
+                                            border: [true, false, true, true],
+                                            colSpan: 2
+                                        }, {}
+                                    ],
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*'],
+                                body: [
+                                    [{
+                                        text: 'DECLARATION',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black'
+                                    }],
+                                    [{
+                                        text: 'I certify that all information provided in this Application Form is true and correct.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I agree that VMO EZ Loan will send SMS and email for reminder. VMO EZ Loan is not responsible for the security administration on the phone and email account. It is the borrower’s responsibility.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'VMO EZ Loan may deny the application as a result of credit check, but VMO EZ Loan will not have the obligation to disclose the reason of denial or to return my application and other submitted documents.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I agree that VMO EZ Loan may obtain the Borrower’s personal information from credit information center, third parties or any other relevant source of information for purposes of the credit check, confirmation of employment or other risk management and disclose the personal information pursuant to applicable laws and regulations. I also agree to waive my rights under R.A. 1405.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I hereby acknowledge and authorize: (1) the regular submission and disclosure of my basic credit data (as defined under Republic Act No. 9510 and its Implementing Rules and Regulations to the Credit Information Corporation ("CIC") as well as  any updates; and (2) the sharing of my basic credit data with other lenders authorized by the CIC and credit reporting agencies duly accredited by the CIC.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I declare that my family and I are not a person in a foreign country, who is an important position in heads of state, government, central bank or similar institution (including cases where applicable in the past).',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I consent to the processing of my personal information and sensitive personal information contained in this application in accordance with Republic Act No. 10173 or the Data Privacy Act, for the purpose of processing my loan application and implementation of the Loan Agreement.',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }],
+                                    [{
+                                        text: 'I agree that notwithstanding the execution of a Loan Agreement, the obligations of the parties therein, including the release of the loan amount by VMO EZ Loan and payment of the principal amount of  the loan and interest, shall be effective only upon approval by VMO EZ Loan of my loan application. \n',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        alignment: 'justify'
+                                    }]
+                                ]
+                            }
+                        },
+                        {
+                            table: {
+                                widths: ['*', '*', '*', '*', '*', '*', ],
+                                body: [
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            image: user.signature,
+                                            fit: [100, 100],
+                                            alignment: 'center',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: '',
+                                            border: [false, false, false, false]
+                                        },
+                                        {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: (user.profile.firstName).toUpperCase() + ' ' + (user.profile.lastName).toUpperCase(),
+                                            alignment: 'center',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+
+                                        }, {}, {},
+                                        {
+                                            text: dateNow,
+                                            alignment: 'center',
+                                            border: [false, false, false, false]
+                                        },
+                                        {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: '\t\t\tSIGNATURE OVER PRINTED NAME\t\t\t',
+                                            decoration: 'overline',
+                                            italics: true,
+                                            alignment: 'center',
+                                            style: 'item',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: '\t\t\tDATE\t\t\t',
+                                            decoration: 'overline',
+                                            italics: true,
+                                            style: 'item',
+                                            alignment: 'center',
+                                            border: [false, false, false, false]
+                                        }, {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                        text: '\n',
+                                        border: [true, false, true, true],
+                                        colSpan: 6
+                                    }, {}, {}, {}, {}, {}]
+                                ]
+                            },
+                        }, {
+                            table: {
+                                headerRows: 1,
+                                widths: ['*', '*', '*', '*', '*', '*', ],
+                                body: [
+                                    [{
+                                        text: 'FOR VMO EZLOAN USE ONLY',
+                                        style: 'tableHeader',
+                                        alignment: 'center',
+                                        fillColor: 'black',
+                                        colSpan: 6
+                                    }, {}, {}, {}, {}, {}],
+                                    [{
+                                        text: 'REVIEWED BY:',
+                                        style: 'item',
+                                        border: [true, false, true, false],
+                                        colSpan: 6
+                                    }, {}, {}, {}, {}, {}],
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            image: (user.reviewedBy && user.reviewedBy.signature) ? user.reviewedBy.signature : 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCADIAZADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//Z',
+                                            fit: [100, 100],
+                                            alignment: 'center',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: '',
+                                            border: [false, false, false, false]
+                                        },
+                                        {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: (user.reviewedBy && user.reviewedBy.profile.firstName && user.reviewedBy.profile.lastName) ? user.reviewedBy.profile.firstName + ' ' + user.reviewedBy.profile.lastName : '',
+                                            alignment: 'center',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: reviewedDate,
+                                            alignment: 'center',
+                                            border: [false, false, false, false]
+                                        },
+                                        {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                            text: '',
+                                            border: [true, false, false, false]
+                                        },
+                                        {
+                                            text: '\t\t\tSIGNATURE OVER PRINTED NAME\t\t\t',
+                                            decoration: 'overline',
+                                            italics: true,
+                                            alignment: 'center',
+                                            style: 'item',
+                                            border: [false, false, false, false],
+                                            colSpan: 3
+                                        }, {}, {},
+                                        {
+                                            text: '\t\t\tDATE\t\t\t',
+                                            decoration: 'overline',
+                                            italics: true,
+                                            style: 'item',
+                                            alignment: 'center',
+                                            border: [false, false, false, false]
+                                        }, {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        }
+                                    ],
+                                    [{
+                                        text: '\n',
+                                        border: [true, false, true, true],
+                                        colSpan: 6
+                                    }, {}, {}, {}, {}, {}]
+                                ]
+                            }
+                        }
+                    ],
+                    styles: {
+                        icon: {
+                            font: 'Fontello'
+                        },
+                        header: {
+                            fontSize: 15,
+                            bold: true,
+                            alignment: 'center'
+                        },
+                        subheader: {
+                            fontSize: 9,
+                            alignment: 'center'
+                        },
+                        medium: {
+                            fontSize: 11,
+                            alignment: 'left'
+                        },
+                        item: {
+                            fontSize: 9,
+                            alignment: 'left'
+                        },
+                        small: {
+                            fontSize: 7,
+                            alignment: 'left'
+                        },
+                        tableHeader: {
+                            fontSize: 12,
+                            bold: true,
+                            alignment: 'center',
+                            color: 'white',
+                            fillColor: 'black'
+                        },
+                        signature: {
+                            margin: [0, 200, 0, 0]
+                        }
+                    }
+                };
+                // Make sure the browser knows this is a PDF.
+                res.set('Content-Type', 'application/pdf');
+                res.set('Content-Disposition', `attachment; filename=form.pdf`);
+                res.set('Content-Description: File Transfer');
+                res.set('Cache-Control: no-cache');
+                // Create the PDF and pipe it to the response object.
+                var pdfDoc = printer.createPdfKitDocument(docDefinition);
+                pdfDoc.pipe(res);
+                pdfDoc.end();
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('/verifications');
+            }
+        }
+    );
+};
+
 const getVerificationsPersonal = (req, res) => {
     getUserDetails(req, res, 'account/personal', 'Account Management - Verifications - Personal Information');
 };
@@ -986,6 +2435,7 @@ module.exports = {
     getVerifications,
     getVerificationsCancel,
     getVerificationsSubmit,
+    getVerificationsDownload,
     getVerificationsPersonal,
     postVerificationsPersonal,
     getVerificationsAddress,

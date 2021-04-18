@@ -32,11 +32,14 @@ block content
                         - let signatureStat = (user.signature)  ? 'Completed' : 'Incomplete'
                         if user.status == "Pending for Review"
                           p.text-primary Your application to Full verfication level is under review.
-                          a.btn.btn-primary.p-2(href='/verifications/cancel')
+                          a.btn.btn-primary.p-2.mr-2(href='/verifications/cancel')
                             | Cancel Verification Request
                         else if user.status == "Basic" && profileStat == 'Completed' && addressStat == 'Completed' && workStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
-                          a.btn.btn-primary.p-2(href='/verifications/submit')
+                          a.btn.btn-primary.p-2.mr-2(href='/verifications/submit')
                             | Submit Verification Request
+                        if profileStat == 'Completed' && addressStat == 'Completed' && workStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
+                          a.btn.btn-success.p-2.mr-2(href='/verifications/download')
+                            | Download Application Form
               .col-xl-4
                 .card.mb-4
                   .card-body

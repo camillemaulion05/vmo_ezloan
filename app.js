@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const lusca = require('lusca');
 const flash = require('express-flash');
 const expressStatusMonitor = require('express-status-monitor');
+global.__basedir = __dirname;
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
