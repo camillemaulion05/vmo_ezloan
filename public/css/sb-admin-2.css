@@ -11333,10 +11333,6 @@ body.sidebar-toggled footer.sticky-footer {
   color: #212832;
 }
 
-.card-img {
-  padding: 20px;
-}
-
 /* Styles for signature plugin v1.2.0. */
 .kbw-signature {
 	display: inline-block;
@@ -11347,6 +11343,9 @@ body.sidebar-toggled footer.sticky-footer {
 }
 .kbw-signature-disabled {
 	opacity: 0.7;
+}
+.img-link {
+  cursor: pointer;
 }
 
 /* Styles for button upload file */

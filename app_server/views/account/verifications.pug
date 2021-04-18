@@ -3,29 +3,10 @@ extends ../layout2
 block content
   #content-wrapper.d-flex.flex-column
       #content.landing
-        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
-          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
-            i.fa.fa-bars
-          ul.navbar-nav.ml-auto
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='/profile')
-                span.mr-2.small camille0510
-                img.img-profile.rounded-circle(src='img/profile-1.png')
-            .topbar-divider.d-none.d-sm-block
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
-                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
-                | Logout
+        include ../partials/page-topbar
         main
-          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
-            .container-fluid
-              .page-header-content
-                .row.align-items-center.justify-content-between.pt-3
-                  .col-auto.mb-3
-                    h1.page-header-title
-                      .page-header-icon
-                        i.fas.fa-check-circle
-                      | Account Settings - Verifications
+          include ../partials/page-header
+          include ../partials/page-flash
           .container-fluid
             .row
               .col-xl-8
@@ -33,7 +14,7 @@ block content
                   .card-body.p-5
                     .row.align-items-center.justify-content-between
                       .col
-                        h2.text-primary Verification - Ma Camille Maulion
+                        h2.text-primary Verification - #{user.profile.firstName} #{user.profile.lastName}
                         p.text-gray-700
                           | Here you can monitor your progress towards verification.
                           br
@@ -44,9 +25,18 @@ block content
                           | Questions? Check out our verification 
                           span.text-primary FAQ
                           | .
-                        p.text-primary Your application to Full verfication level is under review.
-                        a.btn.btn-primary.p-2(href='#!')
-                          | Cancel Verfication Request
+                        - let profileStat = (user.profile && user.profile.firstName && user.profile.middleName && user.profile.lastName && user.profile.gender && user.profile.dateOfBirth && user.profile.maritalStat && user.profile.dependents && user.profile.educAttainment && user.profile.placeOfBirth && user.profile.nationality && user.profile.homePhoneNum && user.profile.mobileNum && user.profile.tin && user.profile.email) ? 'Completed' : 'Incomplete'
+                        - let addressStat = (user.profile && user.profile.address && user.profile.address.sameAddress && user.profile.address.present && user.profile.address.present.unitNo && user.profile.address.present.houseNo && user.profile.address.present.street && user.profile.address.present.subdivision && user.profile.address.present.barangay && user.profile.address.present.city && user.profile.address.present.province && user.profile.address.present.zipCode && user.profile.address.permanent && user.profile.address.permanent.unitNo && user.profile.address.permanent.houseNo && user.profile.address.permanent.street && user.profile.address.permanent.subdivision && user.profile.address.permanent.barangay && user.profile.address.permanent.city && user.profile.address.permanent.province && user.profile.address.permanent.zipCode) ? 'Completed' : 'Incomplete'
+                        - let workStat = (user.workBusinessInfo && user.workBusinessInfo.companyName && user.workBusinessInfo.department && user.workBusinessInfo.officePhone && user.workBusinessInfo.officeAddress && user.workBusinessInfo.officeAddress.unitNo && user.workBusinessInfo.officeAddress.houseNo && user.workBusinessInfo.officeAddress.street && user.workBusinessInfo.officeAddress.subdivision && user.workBusinessInfo.officeAddress.barangay && user.workBusinessInfo.officeAddress.city && user.workBusinessInfo.officeAddress.province && user.workBusinessInfo.officeAddress.zipCode && user.workBusinessInfo.dateHired && user.workBusinessInfo.employmentType && user.workBusinessInfo.occupationType && user.workBusinessInfo.businessType && user.workBusinessInfo.position && user.workBusinessInfo.monthlyIncome && user.account && user.account.name && user.account.branch && user.account.type && user.account.number) ? 'Completed' : 'Incomplete'
+                        - let documentsStat = (user.documents && user.documents.primaryIdFront && user.documents.primaryIdBack && (user.documents.companyIdFront && user.documents.companyIdBack || user.documents.coe) && (user.documents.payslip1 && user.documents.payslip2 || user.documents.bir) && user.documents.tinProof && user.documents.selfiewithId) ? 'Completed' : 'Incomplete'
+                        - let signatureStat = (user.signature)  ? 'Completed' : 'Incomplete'
+                        if user.status == "Pending for Review"
+                          p.text-primary Your application to Full verfication level is under review.
+                          a.btn.btn-primary.p-2(href='/verifications/cancel')
+                            | Cancel Verification Request
+                        else if user.status == "Basic" && profileStat == 'Completed' && addressStat == 'Completed' && workStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
+                          a.btn.btn-primary.p-2(href='/verifications/submit')
+                            | Submit Verification Request
               .col-xl-4
                 .card.mb-4
                   .card-body
@@ -57,7 +47,10 @@ block content
                         .chartjs-size-monitor-shrink
                           div
                       .doughnut-inside-text
-                        h3.text-primary Basic
+                        if user.status == "Basic" || user.status == "Pending for Review"
+                          h3#userStatus.text-primary Basic
+                        else
+                          h3#userStatus.text-primary #{user.status}
                         p Verification Level
                       canvas#myVerificationChart.chartjs-render-monitor(width='796' height='306' style='display: block; height: 245px; width: 637px;')
             .row
@@ -71,7 +64,7 @@ block content
                         h5 Personal Information
                         .text-muted.small
                           | Status: 
-                          span.text-primary Completed
+                          span.text-primary #{profileStat}
               .col-xl-4.mb-4
                 a.card.lift(href='/address')
                   .card-body.d-flex.justify-content-center.flex-column
@@ -82,19 +75,7 @@ block content
                         h5 Address
                         .text-muted.small
                           | Status: 
-                          span.text-primary Completed
-              .col-xl-4.mb-4
-                a.card.lift(href='/documents')
-                  .card-body.d-flex.justify-content-center.flex-column
-                    .d-flex.align-items-center.justify-content-between
-                      .mr-3
-                        .mb-2
-                          i.fas.fa-id-card.fa-2x
-                        h5 Identity Documentation
-                        .text-muted.small
-                          | Status: 
-                          span.text-primary Completed
-            .row
+                          span.text-primary #{addressStat}
               .col-xl-4.mb-4
                 a.card.lift(href='/financial')
                   .card-body.d-flex.justify-content-center.flex-column
@@ -105,7 +86,19 @@ block content
                         h5 Financial Questionnaire
                         .text-muted.small
                           | Status: 
-                          span.text-primary Completed
+                          span.text-primary #{workStat}
+            .row
+              .col-xl-4.mb-4
+                a.card.lift(href='/documents')
+                  .card-body.d-flex.justify-content-center.flex-column
+                    .d-flex.align-items-center.justify-content-between
+                      .mr-3
+                        .mb-2
+                          i.fas.fa-id-card.fa-2x
+                        h5 Identity Documentation
+                        .text-muted.small
+                          | Status: 
+                          span.text-primary #{documentsStat}
               .col-xl-4.mb-4
                 a.card.lift(href='/declaration')
                   .card-body.d-flex.justify-content-center.flex-column
@@ -116,11 +109,5 @@ block content
                         h5 KYC Declaration
                         .text-muted.small
                           | Status: 
-                          span.text-primary Completed
-      footer.sticky-footer.bg-white
-        .container.my-auto
-          .copyright.text-center.my-auto
-            - let now = new Date
-            - let theYear=now.getYear()
-            - if (theYear < 1900) theYear=theYear+1900
-            span Copyright &copy; VMO EZ Loan #{theYear}
+                          span.text-primary #{signatureStat}
+      include ../partials/page-footer

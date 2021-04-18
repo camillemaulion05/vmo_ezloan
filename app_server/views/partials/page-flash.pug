@@ -4,7 +4,7 @@
       button.close(type='button', data-dismiss='alert')
         i.fa.fa-times-circle
       for error in messages.errors
-        | #{error.msg}
+        | #{error.msg} 
   if messages.info
     .alert.alert-info
       button.close(type='button', data-dismiss='alert')

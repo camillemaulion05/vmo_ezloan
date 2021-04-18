@@ -552,24 +552,411 @@ const getVerifications = (req, res) => {
     getUserDetails(req, res, 'account/verifications', 'Account Management - Verifications');
 };
 
+const getVerificationsSubmit = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            status: 'Pending for Review'
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your verification status.  Please try again later.'
+                });
+                return res.redirect('/verifications');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Verification status has been updated.'
+                });
+                return res.redirect('/verifications');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/verifications');
+            }
+        }
+    );
+};
+
+const getVerificationsCancel = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            status: 'Basic'
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your verification status.  Please try again later.'
+                });
+                return res.redirect('/verifications');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Verification status has been updated.'
+                });
+                return res.redirect('/verifications');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/verifications');
+            }
+        }
+    );
+};
+
 const getVerificationsPersonal = (req, res) => {
     getUserDetails(req, res, 'account/personal', 'Account Management - Verifications - Personal Information');
+};
+
+const postVerificationsPersonal = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.firstName)) validationErrors.push({
+        msg: 'First Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.lastName)) validationErrors.push({
+        msg: 'Last Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.gender)) validationErrors.push({
+        msg: 'Gender cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Birthday cannot be blank.'
+    });
+    if (!validator.isDate(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Enter a valid date.'
+    });
+    if (!validator.isEmail(req.body.email)) validationErrors.push({
+        msg: 'Please enter a valid email address.'
+    });
+    if (validator.isEmpty(req.body.mobileNum)) validationErrors.push({
+        msg: 'Mobile number cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/profile');
+    }
+    req.body.email = validator.normalizeEmail(req.body.email, {
+        gmail_remove_dots: false
+    });
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            profile: {
+                firstName: req.body.firstName,
+                middleName: req.body.middleName,
+                lastName: req.body.lastName,
+                gender: req.body.gender,
+                dateOfBirth: req.body.dateOfBirth,
+                maritalStat: req.body.maritalStat,
+                dependents: req.body.dependents,
+                educAttainment: req.body.educAttainment,
+                placeOfBirth: req.body.placeOfBirth,
+                nationality: req.body.nationality,
+                homePhoneNum: req.body.homePhoneNum,
+                mobileNum: req.body.mobileNum,
+                tin: req.body.tin,
+                email: req.body.email
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your personal information.  Please try again later.'
+                });
+                return res.redirect('/personal');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Personal information has been updated.'
+                });
+                return res.redirect('/personal');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/personal');
+            }
+        }
+    );
 };
 
 const getVerificationsAddress = (req, res) => {
     getUserDetails(req, res, 'account/address', 'Account Management - Verifications - Address');
 };
 
+const postVerificationsAddress = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            profile: {
+                address: {
+                    sameAddress: (req.body.sameAddress == 'true') ? true : false,
+                    present: {
+                        unitNo: req.body.unitNo,
+                        houseNo: req.body.houseNo,
+                        street: req.body.street,
+                        subdivision: req.body.subdivision,
+                        barangay: req.body.barangay,
+                        city: req.body.city,
+                        province: req.body.province,
+                        zipCode: req.body.zipCode
+                    },
+                    permanent: {
+                        unitNo: (req.body.sameAddress == 'true') ? req.body.unitNo : req.body.unitNo2,
+                        houseNo: (req.body.sameAddress == 'true') ? req.body.houseNo : req.body.houseNo2,
+                        street: (req.body.sameAddress == 'true') ? req.body.street : req.body.street2,
+                        subdivision: (req.body.sameAddress == 'true') ? req.body.subdivision : req.body.subdivision2,
+                        barangay: (req.body.sameAddress == 'true') ? req.body.barangay : req.body.barangay2,
+                        city: (req.body.sameAddress == 'true') ? req.body.city : req.body.city2,
+                        province: (req.body.sameAddress == 'true') ? req.body.province : req.body.province2,
+                        zipCode: (req.body.sameAddress == 'true') ? req.body.zipCode : req.body.zipCode2
+                    }
+                },
+                homeOwnership: req.body.homeOwnership
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your address information.  Please try again later.'
+                });
+                return res.redirect('/address');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Address information has been updated.'
+                });
+                return res.redirect('/address');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/address');
+            }
+        }
+    );
+};
+
 const getVerificationsFinancial = (req, res) => {
     getUserDetails(req, res, 'account/financial', 'Account Management - Verifications - Financial Questionnaire');
+};
+
+const postVerificationsFinancial = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            workBusinessInfo: {
+                companyName: req.body.companyName,
+                department: req.body.department,
+                officePhone: req.body.officePhone,
+                officeAddress: {
+                    unitNo: req.body.unitNo,
+                    houseNo: req.body.houseNo,
+                    street: req.body.street,
+                    subdivision: req.body.subdivision,
+                    barangay: req.body.barangay,
+                    city: req.body.city,
+                    province: req.body.province,
+                    zipCode: req.body.zipCode
+                },
+                dateHired: req.body.dateHired,
+                employmentType: req.body.employmentType,
+                occupationType: req.body.occupationType,
+                businessType: req.body.businessType,
+                position: req.body.position,
+                monthlyIncome: req.body.monthlyIncome,
+                employeeID: req.body.employeeID,
+            },
+            account: {
+                name: (req.body.mop == "Bank Transfer") ? req.body.bankName : req.body.bankName2,
+                branch: (req.body.mop == "Bank Transfer") ? req.body.branch : "",
+                type: (req.body.mop == "Bank Transfer") ? req.body.accountType : req.body.mop,
+                number: (req.body.mop == "Bank Transfer") ? req.body.accountNum : req.body.accountNum2
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your work/business information.  Please try again later.'
+                });
+                return res.redirect('/financial');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Work/Business information has been updated.'
+                });
+                return res.redirect('/financial');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/financial');
+            }
+        }
+    );
 };
 
 const getVerificationsDocuments = (req, res) => {
     getUserDetails(req, res, 'account/documents', 'Account Management - Verifications - Identity Documentation');
 };
 
+const postVerificationsDocuments = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            documents: {
+                primaryIdFront: (req.files.primaryIdFront) ? req.files.primaryIdFront[0].filename : '',
+                primaryIdBack: (req.files.primaryIdBack) ? req.files.primaryIdBack[0].filename : '',
+                companyIdFront: (req.files.companyIdFront) ? req.files.companyIdFront[0].filename : '',
+                companyIdBack: (req.files.companyIdBack) ? req.files.companyIdBack[0].filename : '',
+                coe: (req.files.coe) ? req.files.coe[0].filename : '',
+                payslip1: (req.files.payslip1) ? req.files.payslip1[0].filename : '',
+                payslip2: (req.files.payslip2) ? req.files.payslip2[0].filename : '',
+                bir: (req.files.bir) ? req.files.bir[0].filename : '',
+                tinProof: (req.files.tinProof) ? req.files.tinProof[0].filename : '',
+                selfiewithId: (req.files.selfiewithId) ? req.files.selfiewithId[0].filename : ''
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your documents.  Please try again later.'
+                });
+                return res.redirect('/documents');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Documents have been updated.'
+                });
+                return res.redirect('/documents');
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('/documents');
+            }
+        }
+    );
+};
+
 const getVerificationsDeclaration = (req, res) => {
     getUserDetails(req, res, 'account/declaration', 'Account Management - Verifications - KYC Declaration');
+};
+
+const postVerificationsDeclaration = (req, res) => {
+    console.log(req.body);
+    const validationErrors = [];
+    if (req.body.termsAndCondition != 'true') validationErrors.push({
+        msg: 'You must agree with the Terms and Condition.'
+    });
+    if (req.body.privacyPolicy != 'true') validationErrors.push({
+        msg: 'You must accept the Privacy Policy.'
+    });
+    if (req.body.soa != 'true') validationErrors.push({
+        msg: 'You must agree that in case you do not have email address, you allow us to send your SOA in your office.'
+    });
+    if (req.body.letterOfAuthorization != 'true') validationErrors.push({
+        msg: 'You must sign a Letter of Authorization.'
+    });
+    if (validator.isEmpty(req.body.signatureDataURL)) validationErrors.push({
+        msg: 'Signature cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/declaration');
+    }
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            signature: req.body.signatureDataURL
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your KYC declaration.  Please try again later.'
+                });
+                return res.redirect('/declaration');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'KYC declaration has been updated.'
+                });
+                return res.redirect('/declaration');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/declaration');
+            }
+        }
+    );
 };
 
 const getVerificationsForm = (req, res) => {
@@ -597,11 +984,18 @@ module.exports = {
     postSecurity,
     postSecurityQuestions,
     getVerifications,
+    getVerificationsCancel,
+    getVerificationsSubmit,
     getVerificationsPersonal,
+    postVerificationsPersonal,
     getVerificationsAddress,
+    postVerificationsAddress,
     getVerificationsFinancial,
+    postVerificationsFinancial,
     getVerificationsDocuments,
+    postVerificationsDocuments,
     getVerificationsDeclaration,
+    postVerificationsDeclaration,
     getVerificationsForm,
     getLoans
 };

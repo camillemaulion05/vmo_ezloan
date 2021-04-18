@@ -43,6 +43,7 @@ const borrowerSchema = mongoose.Schema({
         placeOfBirth: String,
         nationality: String,
         address: {
+            sameAddress: Boolean,
             present: {
                 unitNo: String,
                 houseNo: String,
@@ -151,21 +152,27 @@ const borrowerSchema = mongoose.Schema({
     account: {
         name: String,
         branch: String,
-        typeOfAccount: {
+        type: {
             type: String,
             enum: ["Savings", "Checking/Current", "G-Cash"]
         },
         number: String
     },
-    signature: {
-        type: String,
-        default: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCADIAZADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//Z"
+    signature: String,
+    documents: {
+        primaryIdFront: String,
+        primaryIdBack: String,
+        companyIdFront: String,
+        companyIdBack: String,
+        coe: String,
+        payslip1: String,
+        payslip2: String,
+        bir: String,
+        tinProof: String,
+        selfiewithId: String
     },
-    documents: [{
-        type: {
-            type: String,
-            enum: ["Identification Card", "Company Id", "Certificate of Employment", "Payslip", "BIR 2316", "TIN Proof", "Selfie with ID", "Others"]
-        },
+    additionalDocuments: [{
+        name: String,
         filename: String
     }],
     beneficiaries: [{

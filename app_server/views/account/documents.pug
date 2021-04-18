@@ -2,184 +2,163 @@ extends ../layout2
 
 block content
   #content-wrapper.d-flex.flex-column
-      #content.landing
-        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
-          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
-            i.fa.fa-bars
-          ul.navbar-nav.ml-auto
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='/profile')
-                span.mr-2.small camille0510
-                img.img-profile.rounded-circle(src='img/profile-1.png')
-            .topbar-divider.d-none.d-sm-block
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
-                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
-                | Logout
-        main
-          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
-            .container-fluid
-              .page-header-content
-                .row.align-items-center.justify-content-between.pt-3
-                  .col-auto.mb-3
-                    h1.page-header-title
-                      .page-header-icon
-                        i.fas.fa-check-circle
-                      | Account Settings - Verifications - Identity Documentation
-          .container-fluid
-            .card.mb-4
-              .card-body
-                #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
-                  .row.justify-content-center
-                    .col-xxl-6.col-xl-8
-                      form
-                        fieldset
-                          legend.text-primary Identity Card
-                          p
-                            | Choose from: TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance.
-                            br
-                            | Example:
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.mb-4
+            .card-body
+              #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                .row.justify-content-center
+                  .col-xxl-6.col-xl-8
+                    form(method='POST' enctype='multipart/form-data' action='/upload/documents')
+                      input(type='hidden', name='_csrf', value=_csrf)
+                      fieldset
+                        legend.text-primary Identity Card
+                        p
+                          | Choose from: TIN, SSS, GSIS, UMID, Passport, Driver's License, Postal ID, Voter's ID, PRC, NBI Clearance.
+                          br
+                          | Example:
+                        .form-row
+                          .form-group.col-md-6.mb-md-0
+                            .card
+                              img.card-img(src=(user.documents && user.documents.primaryIdFront) ? 'uploads/' + user.documents.primaryIdFront : 'img/group_a_front.jpg' alt='...')
+                          .form-group.col-md-6.mb-md-0
+                            .card
+                              img.card-img(src=(user.documents && user.documents.primaryIdBack) ? 'uploads/' + user.documents.primaryIdBack : 'img/group_a_back.jpg' alt='...')
+                        .form-row
+                          .form-group.col-md-6.mb-md-0
+                            label.small.mb-1(for='') Front
+                            .custom-file
+                              input#primaryIdFront.custom-file-input(type='file' name='primaryIdFront')
+                              label.custom-file-label(for='primaryIdFront') Choose file
+                          .form-group.col-md-6.mb-md-0
+                            label.small.mb-1(for='') Back
+                            .custom-file
+                              input#primaryIdBack.custom-file-input(type='file' name='primaryIdBack')
+                              label.custom-file-label(for='primaryIdBack') Choose file
+                      hr.my-4
+                      fieldset
+                        legend.text-primary Company ID or COE
+                        .form-group.md-4
+                          .form-check.form-check-inline
+                            input#companyIdOption.form-check-input(type='radio' name='identity2Options' value='Company' checked='')
+                            label.form-check-label(for='companyIdOption') Company ID
+                          .form-check.form-check-inline
+                            input#coeOption.form-check-input(type='radio' name='identity2Options' value='COE')
+                            label.form-check-label(for='coeOption') COE
+                        p
+                          | For Company ID, please upload FRONT and BACK side. If working under agency, provide Employee ID Issued by the Agency. For COE, issue date should be within 2 months. You may uokoad more than 1 file.
+                          br
+                          | Example:
+                        .company-id
                           .form-row
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src='img/group_a_front.jpg' alt='...')
+                                img.card-img(src=(user.documents && user.documents.companyIdFront) ? 'uploads/' + user.documents.companyIdFront : 'img/company_front.jpg' alt='...')
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src='img/group_a_back.jpg' alt='...')
+                                img.card-img(src=(user.documents && user.documents.companyIdBack) ? 'uploads/' + user.documents.companyIdBack : 'img/company_back.jpg' alt='...')
                           .form-row
                             .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='') Front
+                              label.small.mb-1(for='') Company ID - Front
                               .custom-file
-                                input.custom-file-input(type='file' id='')
-                                label.custom-file-label(for='customFile') Choose file
+                                input#companyIdFront.custom-file-input(type='file' name='companyIdFront')
+                                label.custom-file-label(for='companyIdFront') Choose file
                             .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='') Back
+                              label.small.mb-1(for='') Company ID - Back
                               .custom-file
-                                input.custom-file-input(type='file' id='')
-                                label.custom-file-label(for='customFile') Choose file
-                        hr.my-4
-                        fieldset
-                          legend.text-primary Company ID or COE
-                          .form-group.md-4
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='identity2Options' id='' value='Company' checked='')
-                              label.form-check-label(for='') Company ID
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='identity2Options' id='' value='COE')
-                              label.form-check-label(for='') COE
-                          p
-                            | For Company ID, please upload FRONT and BACK side. If working under agency, provide Employee ID Issued by the Agency. For COE, issue date should be within 2 months. You may uokoad more than 1 file.
-                            br
-                            | Example:
-                          .company-id
-                            .form-row
-                              .form-group.col-md-6.mb-md-0
-                                .card
-                                  img.card-img(src='img/company_front.jpg' alt='...')
-                              .form-group.col-md-6.mb-md-0
-                                .card
-                                  img.card-img(src='img/company_back.jpg' alt='...')
-                            .form-row
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Company ID - Front
-                                .custom-file
-                                  input.custom-file-input(type='file' id='')
-                                  label.custom-file-label(for='customFile') Choose file
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Company ID - Back
-                                .custom-file
-                                  input.custom-file-input(type='file' id='')
-                                  label.custom-file-label(for='customFile') Choose file
-                          .coe
-                            .form-group.mb-md-0
-                              .card
-                                .text-center
-                                  img.card-img(style='width: 25rem;' src='img/coe.jpg' alt='')
-                            .form-group.mb-md-0
-                              label.small.mb-1(for='') Certificate of Employment
-                              .custom-file
-                                input.custom-file-input(type='file' id='')
-                                label.custom-file-label(for='customFile') Choose file
-                        hr.my-4
-                        fieldset
-                          legend.text-primary Payslip or BIR 2316
-                          .form-group.md-4
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='identity3Options' id='' value='Payslip' checked='')
-                              label.form-check-label(for='') Payslip
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='identity3Options' id='' value='BIR')
-                              label.form-check-label(for='') BIR 2316
-                          p
-                            | For Payslips, please upload latest income proof, reflecting consecutive pay periods that will make up 1 month worth of pay. You may upload more than 1 file.
-                            br
-                            | Example:
-                          .payslip
-                            .form-group.mb-md-0
-                              .card
-                                .text-center
-                                  img.card-img(style='width: 25rem;' src='img/payslip.png' alt='')
-                            .form-row
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Payslip File 1
-                                .custom-file
-                                  input.custom-file-input(type='file' id='')
-                                  label.custom-file-label(for='customFile') Choose file
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Payslip File 2
-                                .custom-file
-                                  input.custom-file-input(type='file' id='')
-                                  label.custom-file-label(for='customFile') Choose file
-                          .bir
-                            .form-group.mb-md-0
-                              .card
-                                .text-center
-                                  img.card-img(style='width: 25rem;' src='img/bir_2316.png' alt='')
-                            .form-group.mb-md-0
-                              label.small.mb-1(for='') BIR 2316
-                              .custom-file
-                                input.custom-file-input(type='file' id='')
-                                label.custom-file-label(for='customFile') Choose file
-                        hr.my-4
-                        fieldset
-                          legend.text-primary TIN proof
-                          p
-                            | If TIN is not indicated in any of the documents previously uploaded, please provide any of the following: TIN Card, BIR2316, BIR 1905, BIR1902 (Stamped) or other document with TIN number.
-                            br
-                            | Example:
+                                input#companyIdBack.custom-file-input(type='file' name='companyIdBack')
+                                label.custom-file-label(for='companyIdBack') Choose file
+                        .coe
                           .form-group.mb-md-0
                             .card
                               .text-center
-                                img.card-img(style='width: 25rem;' src='img/TIN.png' alt='')
+                                img.card-img(style='width: 25rem;' src=(user.documents && user.documents.coe) ? 'uploads/' + user.documents.coe : 'img/coe.jpg' alt='...')
                           .form-group.mb-md-0
-                            label.small.mb-1(for='') TIN proof
+                            label.small.mb-1(for='') Certificate of Employment
                             .custom-file
-                              input.custom-file-input(type='file' id='')
-                              label.custom-file-label(for='customFile') Choose file
-                        hr.my-4
-                        fieldset
-                          legend.text-primary Selfie with ID
-                          p
-                            | Please provide a photo of you holding your identification card.
-                            br
-                            | Example:
+                              input#coe.custom-file-input(type='file' name='coe')
+                              label.custom-file-label(for='coe') Choose file
+                      hr.my-4
+                      fieldset
+                        legend.text-primary Payslip or BIR 2316
+                        .form-group.md-4
+                          .form-check.form-check-inline
+                            input#payslipOption.form-check-input(type='radio' name='identity3Options' value='Payslip' checked='')
+                            label.form-check-label(for='payslipOption') Payslip
+                          .form-check.form-check-inline
+                            input#birOption.form-check-input(type='radio' name='identity3Options' value='BIR')
+                            label.form-check-label(for='birOption') BIR 2316
+                        p
+                          | For Payslips, please upload latest income proof, reflecting consecutive pay periods that will make up 1 month worth of pay. You may upload more than 1 file.
+                          br
+                          | Example:
+                        .payslip
+                          .form-row
+                            .form-group.col-md-6.mb-md-0
+                              .card
+                                img.card-img(src=(user.documents && user.documents.payslip1) ? 'uploads/' + user.documents.payslip1 : 'img/payslip.png' alt='...')
+                            .form-group.col-md-6.mb-md-0
+                              .card
+                                img.card-img(src=(user.documents && user.documents.payslip2) ? 'uploads/' + user.documents.payslip2 : 'img/payslip.png' alt='...')
+                          .form-row
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Payslip File 1
+                              .custom-file
+                                input#payslip1.custom-file-input(type='file' name='payslip1')
+                                label.custom-file-label(for='payslip1') Choose file
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='') Payslip File 2
+                              .custom-file
+                                input#payslip2.custom-file-input(type='file' name='payslip2')
+                                label.custom-file-label(for='payslip2') Choose file
+                        .bir
                           .form-group.mb-md-0
                             .card
                               .text-center
-                                img.card-img(style='width: 25rem;' src='img/selfieId.png' alt='')
+                                img.card-img(style='width: 25rem;' src=(user.documents && user.documents.bir) ? 'uploads/' + user.documents.bir : 'img/bir_2316.png' alt='...')
                           .form-group.mb-md-0
-                            label.small.mb-1(for='') Selfie with ID
+                            label.small.mb-1(for='') BIR 2316
                             .custom-file
-                              input.custom-file-input(type='file' id='')
-                              label.custom-file-label(for='customFile') Choose file
-                        hr.my-4
-                        .d-flex.justify-content-between
-                          a.btn.btn-light(type='button' href='/verifications') Back
-                          button.btn.btn-primary(type='submit') Submit
-      footer.sticky-footer.bg-white
-        .container.my-auto
-          .copyright.text-center.my-auto
-            - let now = new Date
-            - let theYear=now.getYear()
-            - if (theYear < 1900) theYear=theYear+1900
-            span Copyright &copy; VMO EZ Loan #{theYear}
+                              input#bir.custom-file-input(type='file' name='bir')
+                              label.custom-file-label(for='bir') Choose file
+                      hr.my-4
+                      fieldset
+                        legend.text-primary TIN proof
+                        p
+                          | If TIN is not indicated in any of the documents previously uploaded, please provide any of the following: TIN Card, BIR2316, BIR 1905, BIR1902 (Stamped) or other document with TIN number.
+                          br
+                          | Example:
+                        .form-group.mb-md-0
+                          .card
+                            .text-center
+                              img.card-img(style='width: 25rem;' src=(user.documents && user.documents.tinProof) ? 'uploads/' + user.documents.tinProof : 'img/TIN.png' alt='...')
+                        .form-group.mb-md-0
+                          label.small.mb-1(for='') TIN proof
+                          .custom-file
+                            input#tinProof.custom-file-input(type='file' name='tinProof')
+                            label.custom-file-label(for='tinProof') Choose file
+                      hr.my-4
+                      fieldset
+                        legend.text-primary Selfie with ID
+                        p
+                          | Please provide a photo of you holding your identification card.
+                          br
+                          | Example:
+                        .form-group.mb-md-0
+                          .card
+                            .text-center
+                              img.card-img(style='width: 25rem;' src=(user.documents && user.documents.selfiewithId) ? 'uploads/' + user.documents.selfiewithId : 'img/selfiewithId.png' alt='...')
+                        .form-group.mb-md-0
+                          label.small.mb-1(for='') Selfie with ID
+                          .custom-file
+                            input#selfiewithId.custom-file-input(type='file' name='selfiewithId')
+                            label.custom-file-label(for='selfiewithId') Choose file
+                      hr.my-4
+                      .d-flex.justify-content-between
+                        a.btn.btn-light(type='button' href='/verifications') Back
+                        button.btn.btn-primary(type='submit') Submit
+    include ../partials/page-footer

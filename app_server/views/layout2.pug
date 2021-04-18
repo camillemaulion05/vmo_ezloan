@@ -97,23 +97,64 @@ html
               });
           });
 
-    if title.indexOf("Verifications") != -1
+    if title == "Account Management - Verifications"
       script(src='/js/chart-pie.js')
+
+    if title.indexOf("Address") != -1
+      script.
+        $(function () {
+          let boxChecked = function () {
+            if ($("input[name=sameAddress]:checked").length == 1){
+                $("input[name=sameAddress]").val("true");
+                $("input[name=unitNo2]").val( $("input[name=unitNo]").val());
+                $("input[name=unitNo2]").prop('disabled', true);
+                $("input[name=houseNo2]").val( $("input[name=houseNo]").val());
+                $("input[name=houseNo2]").prop('disabled', true);
+                $("input[name=street2]").val( $("input[name=street]").val());
+                $("input[name=street2]").prop('disabled', true);
+                $("input[name=subdivision2]").val( $("input[name=subdivision]").val());
+                $("input[name=subdivision2]").prop('disabled', true);
+                $("input[name=barangay2]").val( $("input[name=barangay]").val());
+                $("input[name=barangay2]").prop('disabled', true);
+                $("input[name=city2]").val( $("input[name=city]").val());
+                $("input[name=city2]").prop('disabled', true);
+                $("input[name=province2]").val( $("input[name=province]").val());
+                $("input[name=province2]").prop('disabled', true);
+                $("input[name=zipCode2]").val( $("input[name=zipCode]").val());
+                $("input[name=zipCode2]").prop('disabled', true);
+            } else{
+                $("input[name=sameAddress]").val("false");
+                $("input[name=unitNo2]").prop('disabled', false);
+                $("input[name=houseNo2]").prop('disabled', false);
+                $("input[name=street2]").prop('disabled', false);
+                $("input[name=subdivision2]").prop('disabled', false);
+                $("input[name=barangay2]").prop('disabled', false);
+                $("input[name=city2]").prop('disabled', false);
+                $("input[name=province2]").prop('disabled', false);
+                $("input[name=zipCode2]").prop('disabled', false);
+            }
+          };
+          boxChecked();
+          $("input[name=sameAddress]").on("click", boxChecked);
+        });
 
     if title.indexOf("Financial Questionnaire") != -1
       script.
         $(function () {
           let radioChecked = function () {
-            if ($('input[name="financialOptions"]:checked')[0].value == "Bank Transfer") {
+            if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "Bank Transfer") {
               $('.bank').show();
               $('.gcash').hide();
-            } else if ($('input[name="financialOptions"]:checked')[0].value == "G-Cash") {
+            } else if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "G-Cash") {
               $('.gcash').show();
+              $('.bank').hide();
+            } else{
+              $('.gcash').hide();
               $('.bank').hide();
             }
           };
           radioChecked();
-          $("input[type=radio]").on("click", radioChecked);
+          $('input[name="mop"]').on("click", radioChecked);
         });
 
     if title.indexOf("Identity Documentation") != -1
@@ -142,26 +183,45 @@ html
     if title.indexOf("KYC Declaration") != -1
       script.
         $(function () {
+          let boxChecked = function () {
+            if ($('input[name="termsAndCondition"]:checked').length == 1) {
+              $('input[name="termsAndCondition"]').val("true");
+            } else {
+              $('input[name="termsAndCondition"]').val("false");
+            }
+            if ($('input[name="privacyPolicy"]:checked').length == 1) {
+              $('input[name="privacyPolicy"]').val("true");
+            } else {
+              $('input[name="privacyPolicy"]').val("false");
+            }
+            if ($('input[name="soa"]:checked').length == 1) {
+              $('input[name="soa"]').val("true");
+            } else {
+              $('input[name="soa"]').val("false");
+            }
+             if ($('input[name="letterOfAuthorization"]:checked').length == 1) {
+              $('input[name="letterOfAuthorization"]').val("true");
+            } else {
+              $('input[name="letterOfAuthorization"]').val("false");
+            }
+          };
+          boxChecked();
+          $('input[type="checkbox"]').on("click", boxChecked);
           var sig = $('#sig').signature();
           $('#clear').click(function () {
             sig.signature('clear');
           });
           $('#redrawButton').click(function () {
-            $('#signatureJSON').val(sig.signature('toJSON'));
-            var signature = JSON.parse($('#signatureJSON').val());
-              if (signature.lines.length > 0) {
-                $('#redrawSignature').removeClass('d-none');
-                $('#redrawSignature').signature('enable').
-                signature('draw', $('#signatureJSON').val()).
-                signature('disable');
-                $('#defaultSignature').addClass('d-none');
-                $('#redrawSignature :first-child').attr("data-toggle", "modal");
-                $('#redrawSignature :first-child').attr("data-target", "#signatureModal");
-              }
-              else {
-                $('#defaultSignature').removeClass('d-none');
-                $('#redrawSignature').addClass('d-none');
-              }
+            $('#signatureDataURL').val(sig.signature('toJSON'));
+            var signature = JSON.parse($('#signatureDataURL').val());
+            if (signature.lines.length > 0) {
+              $('#defaultSignature').attr("src", sig.signature('toDataURL', 'image/jpeg'));
+              $('#signatureDataURL').val(sig.signature('toDataURL', 'image/jpeg'));
+            }
+            else {
+              $('#defaultSignature').attr("src", "img/icon_signature.png");
+              $('#signatureDataURL').val("");
+            }
           });
           $('#redrawSignature').signature({ disabled: true });
         });

@@ -191,7 +191,18 @@ const borrowersUpdateOne = (req, res) => {
 
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
                     borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
-                    borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
+
+                    borrower.documents.primaryIdFront = (req.body.documents && req.body.documents.primaryIdFront) ? req.body.documents.primaryIdFront : borrower.documents.primaryIdFront;
+                    borrower.documents.primaryIdBack = (req.body.documents && req.body.documents.primaryIdBack) ? req.body.documents.primaryIdBack : borrower.documents.primaryIdBack;
+                    borrower.documents.companyIdFront = (req.body.documents && req.body.documents.companyIdFront) ? req.body.documents.companyIdFront : borrower.documents.companyIdFront;
+                    borrower.documents.companyIdBack = (req.body.documents && req.body.documents.companyIdBack) ? req.body.documents.companyIdBack : borrower.documents.companyIdBack;
+                    borrower.documents.coe = (req.body.documents && req.body.documents.coe) ? req.body.documents.coe : borrower.documents.coe;
+                    borrower.documents.payslip1 = (req.body.documents && req.body.documents.payslip1) ? req.body.documents.payslip1 : borrower.documents.payslip1;
+                    borrower.documents.payslip2 = (req.body.documents && req.body.documents.payslip2) ? req.body.documents.payslip2 : borrower.documents.payslip2;
+                    borrower.documents.bir = (req.body.documents && req.body.documents.bir) ? req.body.documents.bir : borrower.documents.bir;
+                    borrower.documents.tinProof = (req.body.documents && req.body.documents.tinProof) ? req.body.documents.tinProof : borrower.documents.tinProof;
+                    borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
+
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
                     if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
@@ -524,7 +535,18 @@ const borrowersUpdateOneByUser = (req, res) => {
 
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
                     borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
-                    borrower.documents = (req.body.documents) ? req.body.documents : borrower.documents;
+
+                    borrower.documents.primaryIdFront = (req.body.documents && req.body.documents.primaryIdFront) ? req.body.documents.primaryIdFront : borrower.documents.primaryIdFront;
+                    borrower.documents.primaryIdBack = (req.body.documents && req.body.documents.primaryIdBack) ? req.body.documents.primaryIdBack : borrower.documents.primaryIdBack;
+                    borrower.documents.companyIdFront = (req.body.documents && req.body.documents.companyIdFront) ? req.body.documents.companyIdFront : borrower.documents.companyIdFront;
+                    borrower.documents.companyIdBack = (req.body.documents && req.body.documents.companyIdBack) ? req.body.documents.companyIdBack : borrower.documents.companyIdBack;
+                    borrower.documents.coe = (req.body.documents && req.body.documents.coe) ? req.body.documents.coe : borrower.documents.coe;
+                    borrower.documents.payslip1 = (req.body.documents && req.body.documents.payslip1) ? req.body.documents.payslip1 : borrower.documents.payslip1;
+                    borrower.documents.payslip2 = (req.body.documents && req.body.documents.payslip2) ? req.body.documents.payslip2 : borrower.documents.payslip2;
+                    borrower.documents.bir = (req.body.documents && req.body.documents.bir) ? req.body.documents.bir : borrower.documents.bir;
+                    borrower.documents.tinProof = (req.body.documents && req.body.documents.tinProof) ? req.body.documents.tinProof : borrower.documents.tinProof;
+                    borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
+
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
                     if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;

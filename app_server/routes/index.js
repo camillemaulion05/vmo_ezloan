@@ -57,14 +57,67 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getSecurity)
     .post(passportConfig.isAuthenticated, ctrlAccount.postSecurity);
 
-router.post('/security/questions', ctrlAccount.postSecurityQuestions);
+router.post('/security/questions', passportConfig.isAuthenticated, ctrlAccount.postSecurityQuestions);
 
-router.get('/verifications', ctrlAccount.getVerifications);
-router.get('/personal', ctrlAccount.getVerificationsPersonal);
-router.get('/address', ctrlAccount.getVerificationsAddress);
-router.get('/financial', ctrlAccount.getVerificationsFinancial);
-router.get('/documents', ctrlAccount.getVerificationsDocuments);
-router.get('/declaration', ctrlAccount.getVerificationsDeclaration);
+router.get('/verifications', passportConfig.isAuthenticated, ctrlAccount.getVerifications);
+router.get('/verifications/submit', passportConfig.isAuthenticated, ctrlAccount.getVerificationsSubmit);
+router.get('/verifications/cancel', passportConfig.isAuthenticated, ctrlAccount.getVerificationsCancel);
+
+router
+    .route('/personal')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsPersonal)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsPersonal);
+
+router
+    .route('/address')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsAddress)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsAddress);
+
+router
+    .route('/financial')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsFinancial)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsFinancial);
+
+router.get('/documents', passportConfig.isAuthenticated, ctrlAccount.getVerificationsDocuments);
+router.post('/upload/documents', passportConfig.isAuthenticated, multerConfig.upload.fields([{
+    name: 'primaryIdFront',
+    maxCount: 1
+}, {
+    name: 'primaryIdBack',
+    maxCount: 1
+}, {
+    name: 'companyIdFront',
+    maxCount: 1
+}, {
+    name: 'companyIdBack',
+    maxCount: 1
+}, {
+    name: 'coe',
+    maxCount: 1
+}, {
+    name: 'payslip1',
+    maxCount: 1
+}, {
+    name: 'payslip2',
+    maxCount: 1
+}, {
+    name: 'bir',
+    maxCount: 1
+}, {
+    name: 'tinProof',
+    maxCount: 1
+}, {
+    name: 'selfiewithId',
+    maxCount: 1
+}]), lusca({
+    csrf: true
+}), ctrlAccount.postVerificationsDocuments);
+
+router
+    .route('/declaration')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsDeclaration)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsDeclaration);
+
 router.get('/form', ctrlAccount.getVerificationsForm);
 router.get('/loans', ctrlAccount.getLoans);
 

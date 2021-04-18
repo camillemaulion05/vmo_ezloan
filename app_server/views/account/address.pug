@@ -2,124 +2,101 @@ extends ../layout2
 
 block content
   #content-wrapper.d-flex.flex-column
-      #content.landing
-        nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
-          button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
-            i.fa.fa-bars
-          ul.navbar-nav.ml-auto
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='/profile')
-                span.mr-2.small camille0510
-                img.img-profile.rounded-circle(src='img/profile-1.png')
-            .topbar-divider.d-none.d-sm-block
-            li.nav-item.dropdown.no-arrow
-              a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
-                i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
-                | Logout
-        main
-          header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
-            .container-fluid
-              .page-header-content
-                .row.align-items-center.justify-content-between.pt-3
-                  .col-auto.mb-3
-                    h1.page-header-title
-                      .page-header-icon
-                        i.fas.fa-check-circle
-                      | Account Settings - Verifications - Address
-          .container-fluid
-            .card.mb-4
-              .card-body
-                #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
-                  .row.justify-content-center
-                    .col-xxl-6.col-xl-8
-                      form
-                        fieldset
-                          legend.text-primary Present Address
-                          label.small.mb-1(for='homeOwnership') Home Ownership
-                          .form-group.md-4
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Owned')
-                              label.form-check-label(for='') Owned
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Rented/Boarder')
-                              label.form-check-label(for='') Rented/Boarder
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Living with Parents/Relatives')
-                              label.form-check-label(for='') Living with Parents/Relatives
-                            .form-check.form-check-inline
-                              input.form-check-input(type='radio' name='homeOwnership' id='' value='Others')
-                              label.form-check-label(for='') Others
-                          .form-row
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') Unit/Room No./Floor Building Name
-                                input.form-control(id='' type='text' placeholder='' value='')
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') Lot/Block/House No.
-                                input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') Street
-                                input.form-control(id='' type='text' placeholder='' value='')
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') Subdivision Village
-                                input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') Barangay Clearance/Utility Bill
-                                input.form-control(id='' type='text' placeholder='' value='')
-                              .form-group.col-md-6
-                                label.small.mb-1(for='') City/Municipality
-                                input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Province
-                                input.form-control(id='' type='text' placeholder='' value='')
-                              .form-group.col-md-6.mb-md-0
-                                label.small.mb-1(for='') Zip Code
-                                input.form-control(id='' type='text' placeholder='' value='')
-                          hr.my-4
-                        fieldset
-                          legend.text-primary Permanent Address
-                          .custom-control.custom-checkbox
-                            input#checkProductUpdates.custom-control-input(type='checkbox' checked='')
-                            label.custom-control-label(for='checkProductUpdates')
-                              | Check if same with present address
-                          .form-row
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.mb-4
+            .card-body
+              #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                .row.justify-content-center
+                  .col-xxl-6.col-xl-8
+                    form(method='POST')
+                      input(type='hidden', name='_csrf', value=_csrf)
+                      fieldset
+                        legend.text-primary Present Address
+                        label.small.mb-1(for='homeOwnership') Home Ownership
+                        .form-group.md-4
+                          - let homeOwnership = ["Owned", "Rented/Boarder", "Living with Parents/Relatives", "Others"]
+                          for x in homeOwnership
+                            if (x == user.profile.homeOwnership) 
+                              .form-check.form-check-inline
+                                input#homeOwnership.form-check-input(type='radio' name='homeOwnership' value=x checked)
+                                label.form-check-label #{x}
+                            else
+                              .form-check.form-check-inline
+                                input#homeOwnership.form-check-input(type='radio' name='homeOwnership' value=x)
+                                label.form-check-label #{x}
+                        .form-row
                             .form-group.col-md-6
-                              label.small.mb-1(for='') Unit/Room No./Floor Building Name
-                              input.form-control(id='' type='text' placeholder='' value='')
+                              label.small.mb-1(for='unitNo') Unit/Room No./Floor Building Name
+                              input#unitNo.form-control(type='text' placeholder='Enter your Unit/Room No./Floor Building Name' name='unitNo' value=(user.profile.address) ? user.profile.address.present.unitNo : "")
                             .form-group.col-md-6
-                              label.small.mb-1(for='') Lot/Block/House No.
-                              input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
+                              label.small.mb-1(for='houseNo') Lot/Block/House No.
+                              input#houseNo.form-control(type='text' placeholder='Enter your Lot/Block/House No.' name='houseNo' value=(user.profile.address) ? user.profile.address.present.houseNo : "")
+                        .form-row
                             .form-group.col-md-6
-                              label.small.mb-1(for='') Street
-                              input.form-control(id='' type='text' placeholder='' value='')
+                              label.small.mb-1(for='street') Street
+                              input#street.form-control(type='text' placeholder='Enter your Street' name='street' value=(user.profile.address) ? user.profile.address.present.street : "")
                             .form-group.col-md-6
-                              label.small.mb-1(for='') Subdivision Village
-                              input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
+                              label.small.mb-1(for='subdivision') Subdivision Village
+                              input#subdivision.form-control(type='text' placeholder='Enter your Subdivision Village' name='subdivision' value=(user.profile.address) ? user.profile.address.present.subdivision : "")
+                        .form-row
                             .form-group.col-md-6
-                              label.small.mb-1(for='') Barangay Clearance/Utility Bill
-                              input.form-control(id='' type='text' placeholder='' value='')
+                              label.small.mb-1(for='barangay') Barangay Clearance/Utility Bill
+                              input#barangay.form-control(type='text' placeholder='Enter your Barangay Clearance/Utility Bill' name='barangay' value=(user.profile.address) ? user.profile.address.present.barangay : "")
                             .form-group.col-md-6
-                              label.small.mb-1(for='') City/Municipality
-                              input.form-control(id='' type='text' placeholder='' value='')
-                          .form-row
+                              label.small.mb-1(for='city') City/Municipality
+                              input#city.form-control(type='text' placeholder='Enter your City/Municipality' name='city' value=(user.profile.address) ? user.profile.address.present.city : "")
+                        .form-row
                             .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='') Province
-                              input.form-control(id='' type='text' placeholder='' value='')
+                              label.small.mb-1(for='province') Province
+                              input#province.form-control(type='text' placeholder='Enter your Province' name='province' value=(user.profile.address) ? user.profile.address.present.province : "")
                             .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='') Zip Code
-                              input.form-control(id='' type='text' placeholder='' value='')
-                          hr.my-4
-                          .d-flex.justify-content-between
-                            a.btn.btn-light(type='button' href='/verifications') Back
-                            button.btn.btn-primary(type='submit') Submit
-      footer.sticky-footer.bg-white
-        .container.my-auto
-          .copyright.text-center.my-auto
-            - let now = new Date
-            - let theYear=now.getYear()
-            - if (theYear < 1900) theYear=theYear+1900
-            span Copyright &copy; VMO EZ Loan #{theYear}
+                              label.small.mb-1(for='zipCode') Zip Code
+                              input#zipCode.form-control(type='text' placeholder='Enter your Zip Code' name='zipCode' value=(user.profile.address) ? user.profile.address.present.zipCode : "")
+                        hr.my-4
+                      fieldset
+                        legend.text-primary Permanent Address
+                        .custom-control.custom-checkbox
+                          if (user.profile.address && user.profile.address.sameAddress)
+                            input#sameAddress.custom-control-input(type='checkbox' name='sameAddress' value='true' checked='')
+                          else
+                            input#sameAddress.custom-control-input(type='checkbox' name='sameAddress' value='false')
+                          label.custom-control-label(for='sameAddress')
+                            | Check if same with present address
+                        .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='unitNo2') Unit/Room No./Floor Building Name
+                              input#unitNo2.form-control(type='text' placeholder='Enter your Unit/Room No./Floor Building Name' name='unitNo2' value=(user.profile.address) ? user.profile.address.permanent.unitNo : "")
+                            .form-group.col-md-6
+                              label.small.mb-1(for='houseNo2') Lot/Block/House No.
+                              input#houseNo2.form-control(type='text' placeholder='Enter your Lot/Block/House No.' name='houseNo2' value=(user.profile.address) ? user.profile.address.permanent.houseNo : "")
+                        .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='street2') Street
+                              input#street2.form-control(type='text' placeholder='Enter your Street' name='street2' value=(user.profile.address) ? user.profile.address.permanent.street : "")
+                            .form-group.col-md-6
+                              label.small.mb-1(for='subdivision2') Subdivision Village
+                              input#subdivision2.form-control(type='text' placeholder='Enter your Subdivision Village' name='subdivision2' value=(user.profile.address) ? user.profile.address.permanent.subdivision : "")
+                        .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='barangay2') Barangay Clearance/Utility Bill
+                              input#barangay2.form-control(type='text' placeholder='Enter your Barangay Clearance/Utility Bill' name='barangay2' value=(user.profile.address) ? user.profile.address.permanent.barangay : "")
+                            .form-group.col-md-6
+                              label.small.mb-1(for='city2') City/Municipality
+                              input#city2.form-control(type='text' placeholder='Enter your City/Municipality' name='city2' value=(user.profile.address) ? user.profile.address.permanent.city : "")
+                        .form-row
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='province2') Province
+                              input#province2.form-control(type='text' placeholder='Enter your Province' name='province2' value=(user.profile.address) ? user.profile.address.permanent.province : "")
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='zipCode2') Zip Code
+                              input#zipCode2.form-control(type='text' placeholder='Enter your Zip Code' name='zipCode2' value=(user.profile.address) ? user.profile.address.permanent.zipCode : "")
+                        hr.my-4
+                        .d-flex.justify-content-between
+                          a.btn.btn-light(type='button' href='/verifications') Back
+                          button.btn.btn-primary(type='submit') Submit
+    include ../partials/page-footer

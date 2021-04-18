@@ -2,76 +2,76 @@ extends ../layout2
 
 block content
   #content-wrapper.d-flex.flex-column
-      #content.landing
-        include ../partials/page-topbar
-        main
-          include ../partials/page-header
-          include ../partials/page-flash
-          .container-fluid
-            .row
-              .col-lg-4
-                .card.mb-4
-                  .card-header Change Password
-                  .card-body
-                    form(method='POST')
-                      input(type='hidden', name='_csrf', value=_csrf)
-                      .form-group
-                        label.small.mb-1(for='currentPassword') Current Password
-                        input#currentPassword.form-control(type='password' placeholder='Enter current password' name='currentPassword')
-                      .form-group
-                        label.small.mb-1(for='newPassword') New Password
-                        input#newPassword.form-control(type='password' placeholder='Enter new password' name='newPassword')
-                      .form-group
-                        label.small.mb-1(for='confirmPassword') Confirm Password
-                        input#confirmPassword.form-control(type='password' placeholder='Confirm new password' name='confirmPassword')
-                      button.btn.btn-primary(type='submit') Save
-              .col-lg-8
-                .card.mb-4
-                  .card-header Password Recovery Questions
-                  .card-body
-                    p
-                      | If you ever forget your password, these questions will be used to verify your identity so that you can reset you password.
-                    form(method='POST' action='/security/questions')
-                      input(type='hidden', name='_csrf', value=_csrf)
-                      .form-row
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputQuestion1') Question 1
-                          select#inputQuestion1.form-control.selectpicker(type='text' name='question1')
-                            option(value='' selected='' disabled='') Security Question
-                            - let questions = ["What is your close friend's name?","What is your Driving License Number?","What is your favorite color?","What is your favorite pet`s name?","What is your favorite sports team?", "What is your mother's maiden name?","What is your Passport No.?","What is your SSS No.?","What was your first car?","Where did you first meet your spouse?","Who was your childhood hero?"];
-                            for x in questions
-                              if (user.userId.security[0] && x == user.userId.security[0].question) 
-                                option(value=x selected) #{x}
-                              else
-                                option(value=x) #{x}
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputAnswer1') Answer 1
-                          input#inputAnswer1.form-control(type='text' name='answer1' placeholder='Enter your answer' value=(user.userId.security[0]) ? user.userId.security[0].answer : "")
-                      .form-row
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputQuestion2') Question 2
-                          select#inputQuestion2.form-control.selectpicker(type='text' name='question2')
-                            option(value='' selected='' disabled='') Security Question
-                            for x in questions
-                              if (user.userId.security[1] && x == user.userId.security[1].question) 
-                                option(value=x selected) #{x}
-                              else
-                                option(value=x) #{x}
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputAnswer2') Answer 2
-                          input#inputAnswer2.form-control(type='text' name='answer2' placeholder='Enter your answer' value=(user.userId.security[1]) ? user.userId.security[1].answer : "")
-                      .form-row
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputQuestion3') Question 3
-                          select#inputQuestion3.form-control.selectpicker(type='text' name='question3')
-                            option(value='' selected='' disabled='') Security Question
-                            for x in questions
-                              if (user.userId.security[2] && x == user.userId.security[2].question) 
-                                option(value=x selected) #{x}
-                              else
-                                option(value=x) #{x}
-                        .form-group.col-md-6
-                          label.small.mb-1(for='inputAnswer3') Answer 3
-                          input#inputAnswer3.form-control(type='text' name='answer3' placeholder='Enter your answer' value=(user.userId.security[2]) ? user.userId.security[2].answer : "")
-                      button.btn.btn-primary(type='submit') Save
-      include ../partials/page-footer
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            .col-lg-4
+              .card.mb-4
+                .card-header Change Password
+                .card-body
+                  form(method='POST')
+                    input(type='hidden', name='_csrf', value=_csrf)
+                    .form-group
+                      label.small.mb-1(for='currentPassword') Current Password
+                      input#currentPassword.form-control(type='password' placeholder='Enter current password' name='currentPassword')
+                    .form-group
+                      label.small.mb-1(for='newPassword') New Password
+                      input#newPassword.form-control(type='password' placeholder='Enter new password' name='newPassword')
+                    .form-group
+                      label.small.mb-1(for='confirmPassword') Confirm Password
+                      input#confirmPassword.form-control(type='password' placeholder='Confirm new password' name='confirmPassword')
+                    button.btn.btn-primary(type='submit') Save
+            .col-lg-8
+              .card.mb-4
+                .card-header Password Recovery Questions
+                .card-body
+                  p
+                    | If you ever forget your password, these questions will be used to verify your identity so that you can reset you password.
+                  form(method='POST' action='/security/questions')
+                    input(type='hidden', name='_csrf', value=_csrf)
+                    .form-row
+                      .form-group.col-md-6
+                        label.small.mb-1(for='question1') Question 1
+                        select#question1.form-control.selectpicker(type='text' name='question1')
+                          option(value='' selected='' disabled='') Security Question
+                          - let questions = ["What is your close friend's name?","What is your Driving License Number?","What is your favorite color?","What is your favorite pet`s name?","What is your favorite sports team?", "What is your mother's maiden name?","What is your Passport No.?","What is your SSS No.?","What was your first car?","Where did you first meet your spouse?","Who was your childhood hero?"];
+                          for x in questions
+                            if (user.userId.security[0] && x == user.userId.security[0].question) 
+                              option(value=x selected) #{x}
+                            else
+                              option(value=x) #{x}
+                      .form-group.col-md-6
+                        label.small.mb-1(for='answer1') Answer 1
+                        input#answer1.form-control(type='text' name='answer1' placeholder='Enter your answer' value=(user.userId.security[0]) ? user.userId.security[0].answer : "")
+                    .form-row
+                      .form-group.col-md-6
+                        label.small.mb-1(for='question2') Question 2
+                        select#question2.form-control.selectpicker(type='text' name='question2')
+                          option(value='' selected='' disabled='') Security Question
+                          for x in questions
+                            if (user.userId.security[1] && x == user.userId.security[1].question) 
+                              option(value=x selected) #{x}
+                            else
+                              option(value=x) #{x}
+                      .form-group.col-md-6
+                        label.small.mb-1(for='answer2') Answer 2
+                        input#answer2.form-control(type='text' name='answer2' placeholder='Enter your answer' value=(user.userId.security[1]) ? user.userId.security[1].answer : "")
+                    .form-row
+                      .form-group.col-md-6
+                        label.small.mb-1(for='question3') Question 3
+                        select#question3.form-control.selectpicker(type='text' name='question3')
+                          option(value='' selected='' disabled='') Security Question
+                          for x in questions
+                            if (user.userId.security[2] && x == user.userId.security[2].question) 
+                              option(value=x selected) #{x}
+                            else
+                              option(value=x) #{x}
+                      .form-group.col-md-6
+                        label.small.mb-1(for='answer3') Answer 3
+                        input#answer3.form-control(type='text' name='answer3' placeholder='Enter your answer' value=(user.userId.security[2]) ? user.userId.security[2].answer : "")
+                    button.btn.btn-primary(type='submit') Save
+    include ../partials/page-footer
