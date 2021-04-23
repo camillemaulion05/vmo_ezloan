@@ -19,6 +19,14 @@ const transactionSchema = mongoose.Schema({
         ]
     },
     message: String,
+    method: {
+        type: String,
+        required: true,
+        enum: [
+            "Bank Transfer",
+            "G-Cash"
+        ]
+    },
     senderNum: String,
     receiverNum: String,
     referenceNo: {
@@ -34,7 +42,7 @@ const transactionSchema = mongoose.Schema({
     status: {
         type: String,
         default: "Processing",
-        enum: ["Processing, Posted"]
+        enum: ["Processing", "Posted"]
     },
     borrowerId: {
         type: mongoose.Schema.Types.ObjectId,

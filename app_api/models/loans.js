@@ -93,6 +93,7 @@ const loanSchema = mongoose.Schema({
     status: {
         type: String,
         default: "Processing",
+        // primary, success, danger, info, info, light, warning
         enum: ["Processing", "Approved", "Declined", "Loan Release", "Open", "Fully Paid", "Loan Debt"]
     },
     reviewedBy: {
@@ -176,6 +177,7 @@ loanSchema.methods.addRepayment = function (date, amount) {
         const repaymentSchedule = schedules[0];
         const scheduleNum = repaymentSchedule.scheduleNum;
 
+        this.status = "Open";
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount = ROUND(parseFloat(this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount) + amount);
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentDate = paymentDate;
 
@@ -217,7 +219,7 @@ loanSchema.methods.addRepayment = function (date, amount) {
         this.principalRemaining = ROUND(parseFloat(this.loanAmount) - parseFloat(this.totalPrincipalPaid));
 
         //update status
-        if (this.totalPayments == this.totalAmortization || parseFloat(this.principalRemaining) == 0.00) {
+        if (this.totalPayments == this.totalAmortization || parseFloat(this.principalRemaining) <= 0.00) {
             this.status = "Fully Paid";
         }
     }

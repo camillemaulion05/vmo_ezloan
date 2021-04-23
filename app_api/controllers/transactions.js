@@ -26,6 +26,7 @@ const transactionsCreate = (req, res) => {
         amount,
         type,
         message,
+        method,
         senderNum,
         receiverNum,
         referenceNo,
@@ -131,6 +132,7 @@ const transactionsUpdateOne = (req, res) => {
                     transaction.amount = (req.body.amount) ? req.body.amount : transaction.amount;
                     transaction.type = (req.body.type) ? req.body.type : transaction.type;
                     transaction.message = (req.body.message) ? req.body.message : transaction.message;
+                    transaction.method = (req.body.method) ? req.body.method : transaction.method;
                     transaction.senderNum = (req.body.senderNum) ? req.body.senderNum : transaction.senderNum;
                     transaction.receiverNum = (req.body.receiverNum) ? req.body.receiverNum : transaction.receiverNum;
                     transaction.referenceNo = (req.body.referenceNo) ? req.body.referenceNo : transaction.referenceNo;
@@ -273,6 +275,40 @@ const transactionsListByUser = (req, res) => {
     }
 };
 
+const transactionsListByLoans = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    } else {
+        Transaction
+            .aggregate([{
+                $match: {
+                    'loanId': mongoose.Types.ObjectId(loanid)
+                }
+            }])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
 const transactionsSummary = (req, res) => {
     const {
         year
@@ -393,6 +429,7 @@ module.exports = {
     transactionsDeleteOne,
     transactionsListByType,
     transactionsListByUser,
+    transactionsListByLoans,
     transactionsSummary,
     contributionsListByMember
 };

@@ -68,7 +68,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account.number')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -366,6 +366,53 @@ const loansDueListByLoan = (req, res) => {
     }
 };
 
+const loansPastDueListByLoan = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    if (!loanid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, loanid is required"
+            });
+    } else {
+        const dateToday = new Date();
+        const dateLastMonth = new Date(dateToday);
+        dateLastMonth.setMonth(dateLastMonth.getMonth() - 1);
+        Loan.find({
+                _id: mongoose.Types.dObjectId(loanid),
+                "loanPaymentSchedule.dueDate": {
+                    $gte: dateLastMonth
+                }
+            }, {
+                "loanPaymentSchedule.$": 1,
+                "_id": 0
+            })
+            .populate('requestedBy', 'profile.firstName profile.lastName type')
+            .exec((err, loanPaymentSchedule) => {
+                if (!loanPaymentSchedule) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(loanPaymentSchedule);
+                }
+            });
+    }
+};
+
 const loansDueRepaymentsList = (req, res) => {
     const dateToday = new Date();
     Loan.find({
@@ -615,6 +662,7 @@ module.exports = {
     loansSchedulesUpdate,
     loansSchedulesReadOne,
     loansDueListByLoan,
+    loansPastDueListByLoan,
     loansDueRepaymentsList,
     loansSummary,
     loansInterestReport,

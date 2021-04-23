@@ -16,7 +16,7 @@ block content
                     form(method='POST')
                       input(type='hidden', name='_csrf', value=_csrf)
                       fieldset
-                        legend.text-primary Bank or G-Cash Information
+                        legend.text-primary Bank or G-Cash Enrollment
                         .form-group.md-4
                           if (user.account && user.account.type == "G-Cash") 
                             .form-check.form-check-inline
@@ -85,7 +85,10 @@ block content
                             input#department.form-control(type='text' placeholder='Enter your department' name='department' value=(user.workBusinessInfo) ? user.workBusinessInfo.department : '')
                           .form-group.col-md-6
                             label.small.mb-1(for='officePhone') Office Phone No.
-                            input#officePhone.form-control(type='text' placeholder='Enter your office phone no.' name='officePhone' value=(user.workBusinessInfo) ? user.workBusinessInfo.officePhone : '')
+                            .input-group
+                              .input-group-prepend
+                                span.input-group-text +63
+                              input#officePhone.form-control(type='text' placeholder='Enter your office phone no.' name='officePhone' value=(user.workBusinessInfo) ? user.workBusinessInfo.officePhone : '')
                         .form-row
                           .form-group.col-md-6
                             label.small.mb-1(for='employmentType') Employment Status

@@ -1,0 +1,276 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-primary.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
+                        | Loan No.
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{loan.loanNum}
+            if loan.status == "Loan Release" || loan.status == "Open" || loan.status == "Loan Debt"
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-info.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                          | Total Amount Due
+                        -let amountDue = (schedule.amountDue) ? (schedule.paymentAmount) ? (parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) < 0.00) ? '0.00' : parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) : (parseFloat(schedule.amountDue)).toFixed(2) : '0.00'
+                        .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{amountDue}
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-success.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                          | Payment Due Date
+                        - let date = (new Date(schedule.dueDate)).toString().split(' ');
+                        - let paymentDueDate =  (schedule.dueDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                        .h5.mb-0.font-weight-bold.text-gray-800 #{paymentDueDate}
+            else if loan.status == "Fully Paid" 
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-info.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                          | Last Payment
+                        - let lastPayment = (repayments.length >= 1 && ((repayments[repayments.length-1]).status == "Posted")) ? (repayments[repayments.length-1]).amount : '0.00'
+                        .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{lastPayment}
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-success.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                          | Last Payment Date
+                        - let date2 = (repayments.length >= 1 && (repayments[repayments.length-1]).createdAt  && ((repayments[repayments.length-1]).status == "Posted")) ? (new Date((repayments[repayments.length-1]).createdAt)).toString().split(' ') : "";
+                        - let createdAt =  (repayments.length >= 1 && (repayments[repayments.length-1]).createdAt && ((repayments[repayments.length-1]).status == "Posted")) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                        .h5.mb-0.font-weight-bold.text-gray-800 #{createdAt}
+            else
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-info.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                          | Loan Amount
+                        .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(parseFloat(loan.loanAmount)).toFixed(2)}
+              .col-xl-3.col-md-6.mb-4
+                .card.border-left-success.shadow.h-100.py-2
+                  .card-body
+                    .row.no-gutters.align-items-center
+                      .col.mr-2
+                        .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                          | Monthly AMortization
+                        .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(parseFloat(loan.monthlyAmortization)).toFixed(2)}
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-warning.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
+                        | Loan Status
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{loan.status}
+          .card.shadow.mb-4
+            .card-header.border-bottom
+              ul#dashboardNav.nav.nav-tabs.card-header-tabs(role='tablist')
+                li.nav-item.mr-1
+                  a#repayments-pill.nav-link.active(href='#repayments' data-toggle='tab' role='tab' aria-controls='repayments' aria-selected='true') Repayments
+                li.nav-item.mr-1
+                  a#loan-details-pill.nav-link(href='#loan-details' data-toggle='tab' role='tab' aria-controls='loan-details' aria-selected='false') Loan Details
+                li.nav-item
+                  a#loan-schedule-pill.nav-link(href='#loan-schedule' data-toggle='tab' role='tab' aria-controls='loan-schedule' aria-selected='false') Loan Schedule
+            .card-body
+              #dashboardNavContent.tab-content
+                #repayments.tab-pane.fade.active.show(role='tabpanel' aria-labelledby='repayments-pill')
+                  if loan.status == "Loan Release" || loan.status == "Open" || loan.status == "Loan Debt"
+                    button.btn.btn-sm.btn-primary.mr-2.mb-4(type='button' href='#' data-toggle='modal' data-target='#repaymentModal') Add Repayment
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      thead
+                        tr
+                          th Transaction No.
+                          th Payment Date
+                          th Payment Amount
+                          th Method
+                          th Reference Code
+                          th Sender Number
+                          th Receiver Number 
+                          th Posted Date
+                      tfoot
+                        tr
+                          th Transaction No.
+                          th Payment Date
+                          th Payment Amount
+                          th Method
+                          th Reference Code
+                          th Sender Number
+                          th Receiver Number 
+                          th Posted Date
+                      tbody
+                        for x in repayments
+                          if (x.type == "Repayments")
+                            tr
+                              td #{x.transactionNum}
+                              - let date4 = (new Date(x.createdAt)).toString().split(' ');
+                              - let createdAt =  (x.createdAt) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
+                              td #{createdAt}
+                              td #{(parseFloat(x.amount)).toFixed(2)}
+                              td #{x.method} 
+                              td #{x.referenceNo}
+                              td #{x.senderNum}
+                              td #{x.receiverNum}
+                              - let date5 = (new Date(x.postedDate)).toString().split(' ');
+                              - let postedDate =  (x.postedDate) ? date5[1] + ' ' + date5[2] + ', ' + date5[3] : "";
+                              td #{postedDate}
+                #loan-details.tab-pane.fade(role='tabpanel' aria-labelledby='loan-details-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/soa") Print Statement
+                  .row
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Loan Purpose
+                              td 
+                              td.text-right #{loan.purposeOfLoan}
+                            tr
+                              th Loan Amount
+                              td Php
+                              td.text-right #{(parseFloat(loan.loanAmount)).toFixed(2)}
+                            tr
+                              th Service Fee
+                              td Php
+                              td.text-right #{(parseFloat(loan.serviceFee)).toFixed(2)}
+                            tr
+                              th New Proceeds of Loan
+                              td Php
+                              td.text-right #{(parseFloat(loan.newProceedsAmount)).toFixed(2)}
+                            tr
+                              th Monthly Amortization
+                              td Php
+                              td.text-right #{(parseFloat(loan.monthlyAmortization)).toFixed(2)}
+                            tr
+                              th #{user.account.type} Account Number
+                              td 
+                              td.text-right #{user.account.number}
+                            tr
+                              th Total Payments
+                              td Php
+                              td.text-right #{(parseFloat(loan.totalPayments)).toFixed(2)}
+                            tr
+                              th Total Principal Paid
+                              td Php
+                              td.text-right #{(parseFloat(loan.totalPrincipalPaid)).toFixed(2)}
+                            tr
+                              th Prinicipal Remaining
+                              td Php
+                              td.text-right #{(parseFloat(loan.principalRemaining)).toFixed(2)}
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Loan Term 
+                              td 
+                              td.text-right #{loan.loanTerm} months
+                            tr
+                              th Application Date
+                              td 
+                              - let date = (new Date(loan.createdAt)).toString().split(' ');
+                              - let createdAt =  (loan.createdAt) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                              td.text-right #{createdAt}
+                            tr
+                              th Loan Start Date
+                              td 
+                              - let date1 = (new Date(loan.paymentStartDate)).toString().split(' ');
+                              - let paymentStartDate =  (loan.paymentStartDate) ? date1[1] + ' ' + date1[2] + ', ' + date1[3] : "";
+                              td.text-right #{paymentStartDate}
+                            tr
+                              th Loan End Date
+                              td 
+                              - let date2 = (new Date(loan.paymentEndDate)).toString().split(' ');
+                              - let paymentEndDate =  (loan.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                              td.text-right #{paymentEndDate}
+                            tr
+                              th Rate (per month)
+                              td 
+                              td.text-right #{(parseFloat(loan.monthlyInterestRate)).toFixed(2)} %
+                            tr
+                              - let loanReleaseRefNum = (repayments.length >= 1) ? ((repayments[0]).type == "Release" && (repayments[0]).status == "Posted") ? (repayments[0]).referenceNo : "" : ''
+                              th Reference No.
+                              td 
+                              td.text-right #{loanReleaseRefNum}
+                            tr
+                              th Total Interest Accrued
+                              td Php
+                              td.text-right #{(parseFloat(loan.totalInterestAccrued)).toFixed(2)}
+                            tr
+                              th Total Interest Paid
+                              td Php
+                              td.text-right #{(parseFloat(loan.totalInterestPaid)).toFixed(2)}
+                            tr
+                              th Unpaid Interest
+                              td Php
+                              td.text-right #{(parseFloat(loan.unpaidInterest)).toFixed(2)}
+                #loan-schedule.tab-pane.fade(role='tabpanel' aria-labelledby='loan-schedule-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/schedule") Print Schedule
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      thead
+                        tr
+                          th No.
+                          th Due Date
+                          th Amount Due
+                          th Payment Date
+                          th Payment Amount
+                          th Interest
+                          th Interest Paid
+                          th Interest Balance
+                          th Principal
+                          th Principal Paid
+                          th Principal Balance
+                      tfoot
+                        tr
+                          th No.
+                          th Due Date
+                          th Amount Due
+                          th Payment Date
+                          th Payment Amount
+                          th Interest
+                          th Interest Paid
+                          th Interest Balance
+                          th Principal
+                          th Principal Paid
+                          th Principal Balance
+                      tbody
+                        for x in loan.loanPaymentSchedule
+                          - let bal = (parseFloat(x.paymentAmount) != 0.00) ? true : false
+                          tr(style=(bal && x.paymentDate) ? "background-color: wheat;" : "")
+                            td #{x.scheduleNum}
+                            - let date3 = (new Date(x.dueDate)).toString().split(' ');
+                            - let dueDate =  (x.dueDate) ? date3[1] + ' ' + date3[2] + ', ' + date3[3] : "";
+                            td #{dueDate}
+                            td #{(parseFloat(x.amountDue)).toFixed(2)}
+                            - let date4 = (new Date(x.paymentDate)).toString().split(' ');
+                            - let paymentDate =  (x.paymentDate) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
+                            td #{paymentDate}
+                            td #{(parseFloat(x.paymentAmount)).toFixed(2)}
+                            td #{(parseFloat(x.interest)).toFixed(2)}
+                            td #{(parseFloat(x.interestPaid)).toFixed(2)}
+                            td #{(parseFloat(x.interestBalance)).toFixed(2)}
+                            td #{(parseFloat(x.principal)).toFixed(2)}
+                            td #{(parseFloat(x.principalPaid)).toFixed(2)}
+                            td #{(parseFloat(x.principalBalance)).toFixed(2)}        
+    include ../partials/page-footer

@@ -47,7 +47,7 @@ const borrowersCreate = (req, res) => {
         signature,
         documents,
         beneficiaries,
-        maxLoanAmount,
+        totalCreditLimit,
         reviewedBy,
         hrCertifiedBy,
         userId,
@@ -169,10 +169,10 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : borrower.profile.address;
                     borrower.profile.homeOwnership = (req.body.profile && req.body.profile.homeOwnership) ? req.body.profile.homeOwnership : borrower.profile.homeOwnership;
                     borrower.profile.homePhoneNum = (req.body.profile && req.body.profile.homePhoneNum) ? req.body.profile.homePhoneNum : borrower.profile.homePhoneNum;
-                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (borrower.profile.mobileNumVerified && req.body.profile.mobileNum && borrower.profile.mobileNum == req.body.profile.mobileNum) ? true : false;
+                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (borrower.profile.mobileNumVerified && borrower.profile.mobileNum == req.body.profile.mobileNum) ? borrower.profile.mobileNumVerified : false : borrower.profile.mobileNumVerified;
                     borrower.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : borrower.profile.mobileNum;
                     borrower.profile.tin = (req.body.profile && req.body.profile.tin) ? req.body.profile.tin : borrower.profile.tin;
-                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (borrower.profile.emailVerified && req.body.profile.email && borrower.profile.email == req.body.profile.email) ? true : false;
+                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (borrower.profile.emailVerified && borrower.profile.email == req.body.profile.email) ? borrower.profile.emailVerified : false : borrower.profile.emailVerified;
                     borrower.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : borrower.profile.email;
                     borrower.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : borrower.profile.emailVerificationToken;
                     borrower.profile.nameOfSpouse = (req.body.profile && req.body.profile.nameOfSpouse) ? req.body.profile.nameOfSpouse : borrower.profile.nameOfSpouse;
@@ -204,11 +204,11 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
 
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
-                    if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
+                    if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
-                    borrower.reviewedDate = (!req.body.reviewedBy && borrower.reviewedDate) ? borrower.reviewedDate : Date.now();
+                    borrower.reviewedDate = (req.body.reviewedBy) ? Date.now() : borrower.reviewedDate;
                     borrower.hrCertifiedBy = (req.body.hrCertifiedBy) ? req.body.hrCertifiedBy : borrower.hrCertifiedBy;
-                    borrower.hrCertifiedDate = (!req.body.hrCertifiedBy && borrower.hrCertifiedDate) ? borrower.hrCertifiedDate : Date.now();
+                    borrower.hrCertifiedDate = (req.body.hrCertifiedBy) ? Date.now() : borrower.hrCertifiedDate;
                     borrower.userId = (req.body.userId) ? req.body.userId : borrower.userId;
                     borrower.sharesPerPayDay = (req.body.sharesPerPayDay) ? req.body.sharesPerPayDay : borrower.sharesPerPayDay;
                     borrower.save((err) => {
@@ -422,11 +422,6 @@ const borrowersReadOneByUser = (req, res) => {
         Borrower
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
-            }, {
-                "createdAt:": 0,
-                "reviewedDate": 0,
-                "updatedAt": 0,
-                "__v": 0
             })
             .populate('userId reviewedBy', 'username lastLogin lastFailedLogin status security picture profile.firstName profile.lastName signature')
             .exec((err, borrower) => {
@@ -513,10 +508,10 @@ const borrowersUpdateOneByUser = (req, res) => {
                     borrower.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : borrower.profile.address;
                     borrower.profile.homeOwnership = (req.body.profile && req.body.profile.homeOwnership) ? req.body.profile.homeOwnership : borrower.profile.homeOwnership;
                     borrower.profile.homePhoneNum = (req.body.profile && req.body.profile.homePhoneNum) ? req.body.profile.homePhoneNum : borrower.profile.homePhoneNum;
-                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (borrower.profile.mobileNumVerified && req.body.profile.mobileNum && borrower.profile.mobileNum == req.body.profile.mobileNum) ? true : false;
+                    borrower.profile.mobileNumVerified = (req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (borrower.profile.mobileNumVerified && borrower.profile.mobileNum == req.body.profile.mobileNum) ? borrower.profile.mobileNumVerified : false : borrower.profile.mobileNumVerified;
                     borrower.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : borrower.profile.mobileNum;
                     borrower.profile.tin = (req.body.profile && req.body.profile.tin) ? req.body.profile.tin : borrower.profile.tin;
-                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (borrower.profile.emailVerified && req.body.profile.email && borrower.profile.email == req.body.profile.email) ? true : false;
+                    borrower.profile.emailVerified = (req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (borrower.profile.emailVerified && borrower.profile.email == req.body.profile.email) ? borrower.profile.emailVerified : false : borrower.profile.emailVerified;
                     borrower.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : borrower.profile.email;
                     borrower.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : borrower.profile.emailVerificationToken;
                     borrower.profile.nameOfSpouse = (req.body.profile && req.body.profile.nameOfSpouse) ? req.body.profile.nameOfSpouse : borrower.profile.nameOfSpouse;
@@ -548,11 +543,11 @@ const borrowersUpdateOneByUser = (req, res) => {
                     borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
 
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
-                    if ("Verified" == borrower.status) borrower.maxLoanAmount = (req.body.maxLoanAmount) ? req.body.maxLoanAmount : borrower.maxLoanAmount;
+                    if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
-                    borrower.reviewedDate = (!req.body.reviewedBy && borrower.reviewedDate) ? borrower.reviewedDate : Date.now();
+                    borrower.reviewedDate = (req.body.reviewedBy) ? Date.now() : borrower.reviewedDate;
                     borrower.hrCertifiedBy = (req.body.hrCertifiedBy) ? req.body.hrCertifiedBy : borrower.hrCertifiedBy;
-                    borrower.hrCertifiedDate = (!req.body.hrCertifiedBy && borrower.hrCertifiedDate) ? borrower.hrCertifiedDate : Date.now();
+                    borrower.hrCertifiedDate = (req.body.hrCertifiedBy) ? Date.now() : borrower.hrCertifiedDate;
                     borrower.userId = (req.body.userId) ? req.body.userId : borrower.userId;
                     borrower.sharesPerPayDay = (req.body.sharesPerPayDay) ? req.body.sharesPerPayDay : borrower.sharesPerPayDay;
                     borrower.save((err) => {

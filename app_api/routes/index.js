@@ -96,6 +96,10 @@ router
     .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByUser);
 
 router
+    .route('/transactions/loans/:loanid')
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByLoans);
+
+router
     .route('/transactions/summary/:year')
     .get(auth, middleware.isAdmin, ctrlTransactions.transactionsSummary);
 
@@ -169,6 +173,10 @@ router
 router
     .route('/loans/:loanid/due')
     .get(auth, middleware.isSafe, ctrlLoans.loansDueListByLoan);
+
+router
+    .route('/loans/:loanid/pastDue')
+    .get(auth, middleware.isSafe, ctrlLoans.loansPastDueListByLoan);
 
 router
     .route('/loans/due/repayments')

@@ -183,7 +183,7 @@ const borrowerSchema = mongoose.Schema({
         },
         birthday: Date
     }], //For Members Only
-    maxLoanAmount: {
+    totalCreditLimit: {
         type: String,
         default: "0.00"
     }, // Set by Loan Officer
@@ -201,10 +201,7 @@ const borrowerSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
     },
-    sharesPerPayDay: {
-        type: String,
-        default: "300.00"
-    }
+    sharesPerPayDay: String, // default: "300.00" for members
 }, {
     timestamps: true
 });

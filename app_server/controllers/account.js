@@ -11,11 +11,17 @@ const apiOptions = {
  * Profile page.
  */
 
-function parseDate(date) {
+function parseDate(date, format) {
     let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     let d = (new Date(date)).toString().split(' ');
-    return (date) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+    let dateFormat = month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3];
+    if (format) {
+        if (format == "short") {
+            dateFormat = d[1] + ' ' + d[2] + ', ' + d[3];
+        }
+    }
+    return dateFormat;
 }
 
 function getUserDetails(req, res, filename, title) {
@@ -634,7 +640,7 @@ const getVerificationsCancel = (req, res) => {
     );
 };
 
-const getVerificationsDownload = (req, res) => {
+const getDownloadBorrowerInfo = (req, res) => {
     path = '/api/borrowers/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -655,7 +661,7 @@ const getVerificationsDownload = (req, res) => {
                 });
                 return res.redirect('/verifications');
             } else if (statusCode === 200) {
-                var fonts = {
+                let fonts = {
                     Roboto: {
                         normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
                         bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
@@ -669,11 +675,7 @@ const getVerificationsDownload = (req, res) => {
                 let printer = new PdfPrinter(fonts);
                 let unchecked = '';
                 let checked = '';
-                let dateOfBirth = parseDate(user.profile.dateOfBirth);
-                let dateHired = parseDate(user.workBusinessInfo.dateHired);
-                let dateNow = parseDate(new Date);
-                let reviewedDate = parseDate(user.reviewedDate);
-                var docDefinition = {
+                let docDefinition = {
                     content: [{
                             text: 'VMO EZ LOAN',
                             style: 'header'
@@ -780,7 +782,7 @@ const getVerificationsDownload = (req, res) => {
                                             ]
                                         },
                                         {
-                                            text: dateOfBirth,
+                                            text: parseDate(user.profile.dateOfBirth),
                                             style: 'medium',
                                             border: [true, false, false, true]
                                         },
@@ -1580,7 +1582,7 @@ const getVerificationsDownload = (req, res) => {
                                             ]
                                         },
                                         {
-                                            text: dateHired,
+                                            text: parseDate(user.workBusinessInfo.dateHired),
                                             style: 'medium',
                                             border: [true, false, false, true]
                                         },
@@ -1628,16 +1630,22 @@ const getVerificationsDownload = (req, res) => {
                                     [{
                                         text: 'COMPANY ID / COE',
                                         style: 'small',
-                                        border: [true, false, true, false],
-                                        colSpan: 2
-                                    }, {}],
+                                        border: [true, false, false, false],
+                                        colSpan: (user.documents.coe) ? 1 : 2
+                                    }, {
+                                        text: '',
+                                        border: [false, false, true, false]
+                                    }],
                                     [{
-                                            image: __basedir + '/uploads/' + user.documents.companyIdFront,
+                                            image: (user.documents.coe) ? __basedir + '/uploads/' + user.documents.coe : __basedir + '/uploads/' + user.documents.companyIdFront,
                                             width: 240,
                                             border: [true, false, false, false],
                                             alignment: 'center'
                                         },
-                                        {
+                                        (user.documents.coe) ? {
+                                            text: '',
+                                            border: [false, false, true, false]
+                                        } : {
                                             image: __basedir + '/uploads/' + user.documents.companyIdBack,
                                             width: 240,
                                             border: [false, false, true, false],
@@ -1647,16 +1655,26 @@ const getVerificationsDownload = (req, res) => {
                                     [{
                                         text: 'PAYSLIP / BIR 2316',
                                         style: 'small',
-                                        border: [true, false, true, false],
-                                        colSpan: 2
-                                    }, {}],
+                                        border: [true, false, false, false],
+                                        colSpan: (user.documents.bir) ? 1 : 2
+                                    }, {
+                                        text: '',
+                                        border: [false, false, true, false]
+                                    }],
                                     [{
-                                        image: __basedir + '/uploads/' + user.documents.payslip1,
+                                        image: (user.documents.bir) ? __basedir + '/uploads/' + user.documents.bir : __basedir + '/uploads/' + user.documents.payslip1,
+                                        width: 250,
+                                        border: [true, false, false, false],
+                                        alignment: 'center'
+                                    }, (user.documents.bir) ? {
+                                        text: '',
+                                        border: [false, false, true, false]
+                                    } : {
+                                        image: __basedir + '/uploads/' + user.documents.payslip2,
                                         width: 250,
                                         border: [true, false, true, false],
-                                        alignment: 'center',
-                                        colSpan: 2
-                                    }, {}],
+                                        alignment: 'center'
+                                    }],
                                     [{
                                         text: 'TIN PROOF',
                                         style: 'small',
@@ -1886,7 +1904,7 @@ const getVerificationsDownload = (req, res) => {
 
                                         }, {}, {},
                                         {
-                                            text: dateNow,
+                                            text: parseDate(new Date),
                                             alignment: 'center',
                                             border: [false, false, false, false]
                                         },
@@ -1970,13 +1988,13 @@ const getVerificationsDownload = (req, res) => {
                                             border: [true, false, false, false]
                                         },
                                         {
-                                            text: (user.reviewedBy && user.reviewedBy.profile.firstName && user.reviewedBy.profile.lastName) ? user.reviewedBy.profile.firstName + ' ' + user.reviewedBy.profile.lastName : '',
+                                            text: (user.reviewedBy && user.reviewedBy.profile.firstName && user.reviewedBy.profile.lastName) ? (user.reviewedBy.profile.firstName).toUpperCase() + ' ' + (user.reviewedBy.profile.lastName).toUpperCase() : '',
                                             alignment: 'center',
                                             border: [false, false, false, false],
                                             colSpan: 3
                                         }, {}, {},
                                         {
-                                            text: reviewedDate,
+                                            text: parseDate(user.reviewedDate),
                                             alignment: 'center',
                                             border: [false, false, false, false]
                                         },
@@ -2062,7 +2080,7 @@ const getVerificationsDownload = (req, res) => {
                 res.set('Content-Description: File Transfer');
                 res.set('Cache-Control: no-cache');
                 // Create the PDF and pipe it to the response object.
-                var pdfDoc = printer.createPdfKitDocument(docDefinition);
+                let pdfDoc = printer.createPdfKitDocument(docDefinition);
                 pdfDoc.pipe(res);
                 pdfDoc.end();
             } else {
@@ -2351,7 +2369,6 @@ const getVerificationsDeclaration = (req, res) => {
 };
 
 const postVerificationsDeclaration = (req, res) => {
-    console.log(req.body);
     const validationErrors = [];
     if (req.body.termsAndCondition != 'true') validationErrors.push({
         msg: 'You must agree with the Terms and Condition.'
@@ -2408,18 +2425,1534 @@ const postVerificationsDeclaration = (req, res) => {
     );
 };
 
-const getVerificationsForm = (req, res) => {
-    res.render('account/form', {
-        title: 'Account Management - Verifications - Application Form'
-    });
-};
-
 const getLoans = (req, res) => {
-    res.render('account/loans', {
-        title: 'Account Management - Loans'
-    });
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans/users/' + (req.user.id).toString();
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loans) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading your loan list'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            res.render('account/loans', {
+                                title: 'Account Management - Loans',
+                                user: user,
+                                loans: loans
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
 };
 
+const postLoans = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.loanAmount)) validationErrors.push({
+        msg: 'Loan amount cannot be blank.'
+    });
+    if (req.body.loanAmount == 0) validationErrors.push({
+        msg: 'Loan amount cannot be zero.'
+    });
+    if (validator.isEmpty(req.body.purposeOfLoan)) validationErrors.push({
+        msg: 'Purpose of loan cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
+        msg: 'Loan term amount cannot be blank.'
+    });
+    if (req.body.termsAndCondition != 'true') validationErrors.push({
+        msg: 'You must agree with the Terms and Condition.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/loans');
+    }
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans/users/' + (req.user.id).toString();
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loans) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading your loan list'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            //validations
+                            let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
+                            let remainingCreditLimit = parseFloat(user.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
+                            if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
+                                path = '/api/loans'
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        purposeOfLoan: req.body.purposeOfLoan,
+                                        loanTerm: req.body.loanTerm,
+                                        loanAmount: req.body.loanAmount,
+                                        monthlyInterestRate: (user.type == "Member") ? 3 : 5,
+                                        requestedBy: user._id
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, loan) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when applying for new loan.  Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Your Personal Loan has been submitted successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: loan.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                req.flash('errors', {
+                                    msg: "Invalid loan amount."
+                                });
+                                return res.redirect('back');
+                            }
+                        } else {
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getLoanDetails = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans/' + (req.params.loanid).toString();
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loan) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading your loan details.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/loans/' + (req.params.loanid).toString() + '/due'
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, schedules) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading your loan schedules.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/transactions/loans/' + (req.params.loanid).toString()
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, repayments) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error in loading your repayments.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/loans-details', {
+                                                        title: 'Account Management - Loan Details',
+                                                        user: user,
+                                                        loan: loan,
+                                                        schedule: (schedules.length >= 1) ? schedules[0].loanPaymentSchedule[0] : schedules,
+                                                        repayments: repayments
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: repayments.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: schedules.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: loan.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDownloadLoanSOA = (req, res) => {
+    function download(data, req, res) {
+        let fonts = {
+            Roboto: {
+                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+            },
+            Fontello: {
+                normal: __basedir + '/public/fonts/fontello.ttf'
+            }
+        }
+        let printer = new PdfPrinter(fonts);
+        let docDefinition = {
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        'LOAN STATEMENT\n\n'
+                    ],
+                    style: 'subheader'
+                },
+                {
+                    table: {
+                        widths: ['*', '*', '*', '*'],
+                        body: [
+                            [{
+                                    text: 'Borrower Name :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.requestedBy.profile.firstName + ' ' + data.loan.requestedBy.profile.lastName,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }, {
+                                    text: 'Borrower No: ',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.requestedBy.borrowerNum,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+
+                            ],
+                            [{
+                                    text: 'Loan No :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.loanNum,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan Status :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.status,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Loan Purpose :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.purposeOfLoan,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan Term :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.loanTerm + ' months',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Loan Amount :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.loanAmount)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Application Date :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: parseDate(data.loan.createdAt, 'short'),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Service Fee :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.serviceFee)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan Start Date :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.loan.paymentStartDate) ? parseDate(data.loan.paymentStartDate, 'short') : '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'New Proceeds of Loan :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.newProceedsAmount)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan End Date :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.loan.paymentEndDate) ? parseDate(data.loan.paymentEndDate, 'short') : '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Monthly Amortization :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.monthlyAmortization)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Rate (per month) :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (parseFloat(data.loan.monthlyInterestRate)).toFixed(2) + ' %',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Account Number :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.loan.requestedBy.account) ? data.loan.requestedBy.account.number : '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Reference No. :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.repayments.length >= 1) ? ((data.repayments[0]).type == "Release" && (data.repayments[0]).status == "Posted") ? (data.repayments[0]).referenceNo : "" : '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Total Payments :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalPayments)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Total Interest Accrued :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalInterestAccrued)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Total Principal Paid :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalPrincipalPaid)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Total Interest Paid :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalInterestPaid)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Prinicipal Remaining :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.principalRemaining)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Unpaid Interest :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.unpaidInterest)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                        ]
+                    }
+                },
+                {
+                    table: {
+                        widths: ['*'],
+                        body: [
+                            [{
+                                text: '\n',
+                                border: [false, true, false, false]
+                            }],
+
+                        ]
+                    }
+                },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', '*', '*'],
+                        body: [
+                            [{
+                                text: 'STATEMENT OF ACCOUNT AS OF ' + (parseDate(new Date, 'short')).toUpperCase(),
+                                style: 'tableHeader',
+                                alignment: 'center',
+                                fillColor: 'black',
+                                colSpan: 4,
+                            }, {}, {}, {}],
+                            [{
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'PAST DUE',
+                                    style: 'medium',
+                                    bold: true,
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'Principal : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.pastDue) ? (parseFloat(data.pastDue.principal)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'Interest : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.pastDue) ? (parseFloat(data.pastDue.interest)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'CURRENT DUE',
+                                    style: 'medium',
+                                    bold: true,
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'Principal : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.principal)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: 'Interest : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.interest)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: 'Total Amount Due : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, true, false, true]
+                                },
+                                {
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.amountDue)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [true, true, true, true]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: 'Amount Not Yet Due : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [false, true, false, true]
+                                },
+                                {
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: '',
+                                    border: [true, true, true, true]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, true, false, true]
+                                },
+                                {
+                                    text: 'Prinicipal : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.principalBalance)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [true, true, true, true]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: '',
+                                    border: [false, true, false, true]
+                                },
+                                {
+                                    text: 'Interest : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.principalBalance) * (data.loan.monthlyInterestRate / 100)).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [true, true, true, true]
+                                }
+                            ],
+                            [{
+                                    text: 'Total Amount of Obligation : ',
+                                    style: 'item',
+                                    alignment: 'right',
+                                    border: [true, true, false, true],
+                                    colSpan: 2
+                                }, {},
+                                {
+                                    text: '',
+                                    border: [true, true, false, true]
+                                },
+                                {
+                                    text: (data.currentDue) ? (parseFloat(data.currentDue.amountDue) + parseFloat(data.currentDue.principalBalance) + (parseFloat(data.currentDue.principalBalance) * (data.loan.monthlyInterestRate / 100))).toFixed(2) : '0.00',
+                                    style: 'medium',
+                                    alignment: 'right',
+                                    border: [true, true, true, true]
+                                }
+                            ],
+                        ]
+                    }
+                },
+                {
+                    text: '\n\n'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+        let repaymentsTable = {
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'REPAYMENTS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 6,
+                    }, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Method',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Reference Code',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        data.repayments.forEach(d => {
+            if (d.type == "Repayments") {
+                let repaymentRow = [{
+                        text: d.transactionNum,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: parseDate(d.createdAt, 'short'),
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (parseFloat(d.amount)).toFixed(2),
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.method,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.referenceNo,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: parseDate(d.postedDate, 'short'),
+                        style: 'item',
+                        border: [true, true, true, true]
+                    }
+                ];
+                repaymentsTable.table.body.push(repaymentRow);
+            }
+        });
+        docDefinition.content.push(repaymentsTable);
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loan_soa.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+    path = '/api/loans/' + (req.params.loanid).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, loan) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your loan details.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/loans/' + (req.params.loanid).toString()
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, repayments) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading your repayments.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            if (loan.status == "Loan Release" || loan.status == "Open" || loan.status == "Loan Debt" && (parseFloat(loan.principalRemaining) <= 0.00) && (parseFloat(loan.unpaidInterest) <= 0.00)) {
+                                path = '/api/loans/' + (req.params.loanid).toString() + '/due'
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {}
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, currentDue) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error in loading your loan current due.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            let scheduleNum = (currentDue.length >= 1) ? currentDue[0].loanPaymentSchedule[0].scheduleNum : '';
+                                            if (scheduleNum && scheduleNum > 1) {
+                                                path = '/api/loans/' + (req.params.loanid).toString() + '/pastDue'
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'GET',
+                                                    headers: {
+                                                        Authorization: 'Bearer ' + req.user.token
+                                                    },
+                                                    json: {}
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, pastDue) => {
+                                                        if (err) {
+                                                            req.flash('errors', {
+                                                                msg: 'There was an error in loading your loan past due.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 200) {
+                                                            download({
+                                                                loan: loan,
+                                                                currentDue: (currentDue.length >= 1) ? currentDue[0].loanPaymentSchedule[0] : '',
+                                                                repayments: repayments,
+                                                                pastDue: pastDue[0].loanPaymentSchedule[0],
+                                                            }, req, res);
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: pastDue.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
+                                                    }
+                                                );
+                                            } else {
+                                                download({
+                                                    loan: loan,
+                                                    currentDue: (currentDue.length >= 1) ? currentDue[0].loanPaymentSchedule[0] : '',
+                                                    repayments: repayments,
+                                                    pastDue: ''
+                                                }, req, res);
+                                            }
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: currentDue.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                download({
+                                    loan: loan,
+                                    currentDue: '',
+                                    repayments: repayments,
+                                    pastDue: ''
+                                }, req, res);
+                            }
+                        } else {
+                            req.flash('errors', {
+                                msg: repayments.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: loan.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDownloadLoanSchedule = (req, res) => {
+    function download(data, req, res) {
+        let fonts = {
+            Roboto: {
+                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+            },
+            Fontello: {
+                normal: __basedir + '/public/fonts/fontello.ttf'
+            }
+        }
+        let printer = new PdfPrinter(fonts);
+        let docDefinition = {
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        'LOAN REPAYMENT SCHEDULE\n\n'
+                    ],
+                    style: 'subheader'
+                },
+                {
+                    table: {
+                        widths: ['*', '*', '*', '*'],
+                        body: [
+                            [{
+                                    text: 'Borrower Name :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.requestedBy.profile.firstName + ' ' + data.loan.requestedBy.profile.lastName,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }, {
+                                    text: 'Borrower No: ',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.requestedBy.borrowerNum,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+
+                            ],
+                            [{
+                                    text: 'Loan No :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.loanNum,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan Status :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.status,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Loan Purpose :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.purposeOfLoan,
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Loan Term :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: data.loan.loanTerm + ' months',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Loan Amount :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.loanAmount)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Application Date :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: parseDate(data.loan.createdAt, 'short'),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Service Fee :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.serviceFee)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Rate (per month) :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (parseFloat(data.loan.monthlyInterestRate)).toFixed(2) + ' %',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ],
+                            [{
+                                    text: 'New Proceeds of Loan :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.newProceedsAmount)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Monthly Amortization :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.monthlyAmortization)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    table: {
+                        widths: ['*'],
+                        body: [
+                            [{
+                                text: '\n',
+                                border: [false, true, false, false]
+                            }],
+
+                        ]
+                    }
+                },
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+        let scheduleTable = {
+            table: {
+                headerRows: 1,
+                widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                            text: (data.loan.status == "Loan Release" || data.loan.status == "Open" || data.loan.status == "Fully Paid" || data.loan.status == "Loan Debt") ? 'Due Date' : 'Month',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Amount Due',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Interest',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Interest Paid',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Interest Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal Paid',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        data.loan.loanPaymentSchedule.forEach(d => {
+            let scheduleRow = [{
+                    text: (d.dueDate) ? parseDate(d.dueDate, 'short') : d.scheduleNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amountDue)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.paymentDate) ? parseDate(d.paymentDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.paymentAmount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.interest)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.interestPaid)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.interestBalance)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.principal)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.principalPaid)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.principalBalance)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            scheduleTable.table.body.push(scheduleRow);
+        });
+        docDefinition.content.push(scheduleTable);
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loan_schedule.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+    path = '/api/loans/' + (req.params.loanid).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, loan) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your loan details.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                download({
+                    loan: loan
+                }, req, res);
+            } else {
+                req.flash('errors', {
+                    msg: loan.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postRepayment = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.amount)) validationErrors.push({
+        msg: 'Amount cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.senderNum)) validationErrors.push({
+        msg: 'Sender number cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.method)) validationErrors.push({
+        msg: 'MOP cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+        msg: 'Reference no. cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/transactions';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            amount: req.body.amount,
+            type: "Repayments",
+            message: req.body.message,
+            method: req.body.method,
+            senderNum: req.body.senderNum,
+            receiverNum: (req.body.method == "G-Cash") ? '9556993031' : '3729457999',
+            referenceNo: req.body.referenceNo,
+            loanId: req.params.loanid
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transaction) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when adding your repayment.  Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 201) {
+                req.flash('success', {
+                    msg: "Successfully added new repayment."
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: transaction.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
 
 module.exports = {
     getAccount,
@@ -2435,7 +3968,7 @@ module.exports = {
     getVerifications,
     getVerificationsCancel,
     getVerificationsSubmit,
-    getVerificationsDownload,
+    getDownloadBorrowerInfo,
     getVerificationsPersonal,
     postVerificationsPersonal,
     getVerificationsAddress,
@@ -2446,6 +3979,10 @@ module.exports = {
     postVerificationsDocuments,
     getVerificationsDeclaration,
     postVerificationsDeclaration,
-    getVerificationsForm,
-    getLoans
+    getLoans,
+    postLoans,
+    getLoanDetails,
+    postRepayment,
+    getDownloadLoanSOA,
+    getDownloadLoanSchedule
 };

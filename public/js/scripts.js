@@ -226,45 +226,8 @@
         $(this).next().text("");
     });
 
-    //form-validations
-    $('input[name="mobile"]').on("keyup change blur", function () {
-        var mobile = this.value;
-        if (mobile.charAt(0) != '9') {
-            this.value = '';
-        };
-        formatNumber(this.value);
-        $("#number").text(this.value);
-    });
-
-    $("#name, #firstName, #lastName").on("keyup change blur", function () {
-        $(this).val(formatName($(this).val()));
-    });
-
-    $('input[name="email"]').on("keyup change blur", function () {
-        $(this).val(formatEmail($(this).val()));
-    });
-
-    $('input[name="message"]').on("keyup change blur", function () {
-        $(this).val(formatMsgs($(this).val()));
-    });
-
-    $('input[name="username"]').on("keyup change blur", function () {
-        $(this).val(formatUsername($(this).val()));
-    });
-
-    $("#password, #confirmPassword").on("keyup change blur", function () {
-        $(this).val(formatPass($(this).val()));
-    });
-
-    $('input[name="code"]').on("keyup change blur", function () {
-        $(this).val(formatNumber($(this).val()));
-    });
-
-    $('input[name="dateOfBirth"]').attr("min", formatDate(dateNowMinusYrs(65)));
-    $('input[name="dateOfBirth"]').attr("max", formatDate(dateNowMinusYrs(21)));
-
     /*When clicking on Full hide fail/success boxes */
-    $('form#contactForm input[name="name"]').focus(function () {
+    $('form#contactForm input[name="firstName"]').focus(function () {
         $('form#contactForm div#success').html('');
     });
 })(jQuery); // End of use strict

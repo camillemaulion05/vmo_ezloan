@@ -43,12 +43,20 @@ block content
                       fieldset
                         legend.text-primary Company ID or COE
                         .form-group.md-4
-                          .form-check.form-check-inline
-                            input#companyIdOption.form-check-input(type='radio' name='identity2Options' value='Company' checked='')
-                            label.form-check-label(for='companyIdOption') Company ID
-                          .form-check.form-check-inline
-                            input#coeOption.form-check-input(type='radio' name='identity2Options' value='COE')
-                            label.form-check-label(for='coeOption') COE
+                          if (user.documents && user.documents.coe)
+                            .form-check.form-check-inline
+                              input#companyIdOption.form-check-input(type='radio' name='identity2Options' value='Company')
+                              label.form-check-label(for='companyIdOption') Company ID
+                            .form-check.form-check-inline
+                              input#coeOption.form-check-input(type='radio' name='identity2Options' value='COE' checked='')
+                              label.form-check-label(for='coeOption') COE
+                          else
+                            .form-check.form-check-inline
+                              input#companyIdOption.form-check-input(type='radio' name='identity2Options' value='Company' checked='')
+                              label.form-check-label(for='companyIdOption') Company ID
+                            .form-check.form-check-inline
+                              input#coeOption.form-check-input(type='radio' name='identity2Options' value='COE')
+                              label.form-check-label(for='coeOption') COE
                         p
                           | For Company ID, please upload FRONT and BACK side. If working under agency, provide Employee ID Issued by the Agency. For COE, issue date should be within 2 months. You may uokoad more than 1 file.
                           br
@@ -86,12 +94,20 @@ block content
                       fieldset
                         legend.text-primary Payslip or BIR 2316
                         .form-group.md-4
-                          .form-check.form-check-inline
-                            input#payslipOption.form-check-input(type='radio' name='identity3Options' value='Payslip' checked='')
-                            label.form-check-label(for='payslipOption') Payslip
-                          .form-check.form-check-inline
-                            input#birOption.form-check-input(type='radio' name='identity3Options' value='BIR')
-                            label.form-check-label(for='birOption') BIR 2316
+                          if (user.documents && user.documents.bir)
+                            .form-check.form-check-inline
+                              input#payslipOption.form-check-input(type='radio' name='identity3Options' value='Payslip')
+                              label.form-check-label(for='payslipOption') Payslip
+                            .form-check.form-check-inline
+                              input#birOption.form-check-input(type='radio' name='identity3Options' value='BIR' checked='')
+                              label.form-check-label(for='birOption') BIR 2316
+                          else 
+                            .form-check.form-check-inline
+                              input#payslipOption.form-check-input(type='radio' name='identity3Options' value='Payslip' checked='')
+                              label.form-check-label(for='payslipOption') Payslip
+                            .form-check.form-check-inline
+                              input#birOption.form-check-input(type='radio' name='identity3Options' value='BIR')
+                              label.form-check-label(for='birOption') BIR 2316
                         p
                           | For Payslips, please upload latest income proof, reflecting consecutive pay periods that will make up 1 month worth of pay. You may upload more than 1 file.
                           br

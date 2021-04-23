@@ -3,29 +3,10 @@ extends ../layout2
 block content
   #content-wrapper.d-flex.flex-column
     #content.landing
-      nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shadow
-        button#sidebarToggleTop.btn.btn-link.d-md-none.rounded-circle.mr-3
-          i.fa.fa-bars
-        ul.navbar-nav.ml-auto
-          li.nav-item.dropdown.no-arrow
-            a.nav-link.dropdown-toggle(href='/profile')
-              span.mr-2.small camille0510
-              img.img-profile.rounded-circle(src='img/profile-1.png')
-          .topbar-divider.d-none.d-sm-block
-          li.nav-item.dropdown.no-arrow
-            a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
-              i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
-              | Logout
+      include ../partials/page-topbar
       main
-        header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.mb-4
-          .container-fluid
-            .page-header-content
-              .row.align-items-center.justify-content-between.pt-3
-                .col-auto.mb-3
-                  h1.page-header-title
-                    .page-header-icon
-                      i.fas.fa-balance-scale
-                    | Account Settings - Loans
+        include ../partials/page-header
+        include ../partials/page-flash
         .container-fluid
           .row
             .col-xl-3.col-md-6.mb-4
@@ -35,47 +16,53 @@ block content
                     .col.mr-2
                       .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
                         | Borrower No.
-                      .h5.mb-0.font-weight-bold.text-gray-800 1578097288950
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{user.borrowerNum}
                     .col-auto
                       i.fas.fa-address-card.fa-2x.text-gray-300
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-success.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
-                        | Loanable Amount
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱10,000
-                    .col-auto
-                      i.fas.fa-money-bill.fa-2x.text-gray-300
             .col-xl-3.col-md-6.mb-4
               .card.border-left-info.shadow.h-100.py-2
                 .card-body
                   .row.no-gutters.align-items-center
                     .col.mr-2
                       .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
-                        | Next payment due
-                      .h5.mb-0.font-weight-bold.text-gray-800 April 1, 2021
+                        | Total Used Credit Limit
+                      - let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{totalUsedCreditLimit.toFixed(2)}
                     .col-auto
-                      i.fas.fa-calendar-day.fa-2x.text-gray-300
+                      i.fas.fa-receipt.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-success.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                        | Remaining Credit Limit
+                      - let remainingCreditLimit = parseFloat(user.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(remainingCreditLimit).toFixed(2)}
+                    .col-auto
+                      i.fas.fa-wallet.fa-2x.text-gray-300
             .col-xl-3.col-md-6.mb-4
               .card.border-left-warning.shadow.h-100.py-2
                 .card-body
                   .row.no-gutters.align-items-center
                     .col.mr-2
                       .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
-                        | Amount Due
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱2,128.25
+                        | Interest Rate
+                      if user.type == 'Non-Member'
+                        .h5.mb-0.font-weight-bold.text-gray-800 5.00
+                      else
+                        .h5.mb-0.font-weight-bold.text-gray-800 3.00
                     .col-auto
-                      i.fas.fa-bell.fa-2x.text-gray-300
+                      i.fas.fa-percent.fa-2x.text-gray-300
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary Loan Applications
               .dropdown.no-arrow
-                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#loanModal') Apply Loan
+                if parseFloat(remainingCreditLimit) > 0.00
+                  button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#loanModal') Apply Loan
             .card-body
               .table-responsive
-                table#dataTable.table.table-bordered(width='100%' cellspacing='0')
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
                   thead
                     tr
                       th Loan No
@@ -97,32 +84,36 @@ block content
                       th Balance
                       th Status
                   tbody
-                    tr
-                      td
-                        a(href='#') 1588043784551
-                      td April 25, 2021
-                      td October 25, 2021
-                      td ₱ 6,000
-                      td ₱ 639.31
-                      td ₱ 2,000
-                      td ₱ 1056.31
-                      td
-                        .badge.badge-primary.badge-pill Open
-                    tr
-                      td
-                        a(href='#') 1588043784552
-                      td May 25, 2021
-                      td November 25, 2021
-                      td ₱ 6,000
-                      td ₱ 639.31
-                      td ₱ 2,000
-                      td ₱ 1056.31
-                      td
-                        .badge.badge-primary.badge-pill Open
-    footer.sticky-footer.bg-white
-      .container.my-auto
-        .copyright.text-center.my-auto
-          - let now = new Date
-          - let theYear=now.getYear()
-          - if (theYear < 1900) theYear=theYear+1900
-          span Copyright &copy; VMO EZ Loan #{theYear}
+                    for x in loans
+                      - let date = (new Date(x.paymentStartDate)).toString().split(' ');
+                      - let paymentStartDate =  (x.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                      - let date2 = (new Date(x.paymentEndDate)).toString().split(' ');
+                      - let paymentEndDate =  (x.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                      tr
+                        td
+                          a(href='/loans/' + x._id) #{x.loanNum}
+                        td #{paymentStartDate}
+                        td #{paymentEndDate}
+                        td ₱ #{(parseFloat(x.loanAmount)).toFixed(2)}
+                        td ₱ #{(parseFloat(x.monthlyAmortization)).toFixed(2)}
+                        td ₱ #{(parseFloat(x.totalPrincipalPaid)).toFixed(2)}
+                        td ₱ #{(parseFloat(x.principalRemaining)).toFixed(2)}
+                        if x.status == "Processing"
+                          td
+                            .badge.badge-primary.badge-pill #{x.status}
+                        else if x.status == "Approved"
+                          td
+                            .badge.badge-success.badge-pill #{x.status}
+                        else if x.status == "Declined"
+                          td
+                            .badge.badge-danger.badge-pill #{x.status}
+                        else if x.status == "Loan Release" || x.status == "Open"
+                          td
+                            .badge.badge-info.badge-pill #{x.status}
+                        else if x.status == "Fully Paid"
+                          td
+                            .badge.badge-secondary.badge-pill #{x.status}
+                        else if x.status == "Loan Debt"
+                          td
+                            .badge.badge-warning.badge-pill #{x.status}
+    include ../partials/page-footer

@@ -62,7 +62,7 @@ router.post('/security/questions', passportConfig.isAuthenticated, ctrlAccount.p
 router.get('/verifications', passportConfig.isAuthenticated, ctrlAccount.getVerifications);
 router.get('/verifications/submit', passportConfig.isAuthenticated, ctrlAccount.getVerificationsSubmit);
 router.get('/verifications/cancel', passportConfig.isAuthenticated, ctrlAccount.getVerificationsCancel);
-router.get('/verifications/download', passportConfig.isAuthenticated, ctrlAccount.getVerificationsDownload);
+router.get('/download/borrower', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowerInfo);
 
 router
     .route('/personal')
@@ -119,7 +119,17 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsDeclaration)
     .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsDeclaration);
 
-router.get('/form', ctrlAccount.getVerificationsForm);
-router.get('/loans', ctrlAccount.getLoans);
+router
+    .route('/loans')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getLoans)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postLoans);
+
+router
+    .route('/loans/:loanid')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getLoanDetails)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postRepayment);
+
+router.get('/download/loan/:loanid/soa', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSOA);
+router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSchedule);
 
 module.exports = router;

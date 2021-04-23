@@ -33,6 +33,7 @@ html
     script(src='/js/jquery.easing.min.js')
     script(src='/js/methods.js')
     script(src='/js/sb-admin-2.js')
+    script(src='/js/validations.js')
     script(src='/js/chart.min.js')
     script(src='/js/jquery.dataTables.min.js')
     script(src='/js/dataTables.bootstrap4.min.js')
@@ -145,9 +146,21 @@ html
             if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "Bank Transfer") {
               $('.bank').show();
               $('.gcash').hide();
+              $("input[name=bankName2]").val( $("input[name=bankName2]").val());
+              $("input[name=bankName2]").prop('disabled', true);
+              $("input[name=accountNum2]").val( $("input[name=accountNum2]").val());
+              $("input[name=accountNum2]").prop('disabled', true);
             } else if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "G-Cash") {
               $('.gcash').show();
               $('.bank').hide();
+              $("input[name=bankName]").val( $("input[name=bankName]").val());
+              $("input[name=bankName]").prop('disabled', true);
+              $("input[name=branch]").val( $("input[name=branch]").val());
+              $("input[name=branch]").prop('disabled', true);
+              $("input[name=accountType]").val( $("input[name=accountType]").val());
+              $("input[name=accountType]").prop('disabled', true);
+              $("input[name=accountNum]").val( $("input[name=accountNum]").val());
+              $("input[name=accountNum]").prop('disabled', true);
             } else{
               $('.gcash').hide();
               $('.bank').hide();
@@ -178,6 +191,32 @@ html
           };
           radioChecked();
           $("input[type=radio]").on("click", radioChecked);
+        });
+
+    if title.indexOf("Loans") != -1
+      script.
+        $(function () {
+          let boxChecked = function () {
+            if ($('input[name="termsAndCondition"]:checked').length == 1) {
+              $('input[name="termsAndCondition"]').val("true");
+            } else {
+              $('input[name="termsAndCondition"]').val("false");
+            }
+          };
+          boxChecked();
+          $('input[type="checkbox"]').on("click", boxChecked);
+        });
+
+    if title.indexOf("Loan Details") != -1
+      script.
+        $(function () {
+          $('select[name="method"]').on("change",  function () {
+              if ($('select[name="method"]').val() == "G-Cash"){
+                $('input[name="receiverNum"]').val('9556993031');
+              }else{
+                $('input[name="receiverNum"]').val('3729457999')
+              }
+          });
         });
 
     if title.indexOf("KYC Declaration") != -1
