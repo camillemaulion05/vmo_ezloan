@@ -136,7 +136,7 @@ const loansUpdateOne = (req, res) => {
                     loan.compute(loan.loanAmount, loan.monthlyInterestRate, loan.loanTerm);
                     loan.status = (req.body.status) ? req.body.status : loan.status;
                     loan.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : loan.reviewedBy;
-                    loan.reviewedDate = (!req.body.reviewedBy || loan.reviewedDate) ? loan.reviewedDate : Date.now();
+                    loan.reviewedDate = (req.body.reviewedBy) ? Date.now() : loan.reviewedDate;
                     if ("Loan Release" == req.body.status) loan.updateDates();
                     loan.save((err) => {
                         if (err) {
@@ -149,7 +149,9 @@ const loansUpdateOne = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(loan);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }
@@ -234,7 +236,9 @@ const loansSchedulesUpdate = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(loan);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }
@@ -255,6 +259,7 @@ const loansSchedulesList = (req, res) => {
     } else {
         Loan
             .findById(loanid)
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account.number')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -270,6 +275,13 @@ const loansSchedulesList = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && loan.requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loan.loanPaymentSchedule);
@@ -298,6 +310,7 @@ const loansSchedulesReadOne = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -313,6 +326,13 @@ const loansSchedulesReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loanPaymentSchedule);
@@ -340,9 +360,10 @@ const loansDueListByLoan = (req, res) => {
                 }
             }, {
                 "loanPaymentSchedule.$": 1,
-                "_id": 0
+                "_id": 0,
+                "requestedBy": 1
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -358,6 +379,13 @@ const loansDueListByLoan = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loanPaymentSchedule);
@@ -389,7 +417,7 @@ const loansPastDueListByLoan = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -405,6 +433,13 @@ const loansPastDueListByLoan = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loanPaymentSchedule);
@@ -645,6 +680,13 @@ const loansListByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(loans);

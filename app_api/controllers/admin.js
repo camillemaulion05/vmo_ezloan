@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
-const Employee = mongoose.model('Employee');
+const Admin = mongoose.model('Admin');
 
-const employeesList = (req, res) => {
-    Employee
+const adminList = (req, res) => {
+    Admin
         .find({}, {
-            "employeeNum": 1,
+            "adminNum": 1,
             "type": 1,
             "profile.firstName": 1,
             "profile.lastName": 1,
-            "profile.gender": 1,
-            "profile.dateOfBirth": 1,
             "profile.mobileNum": 1,
-            "profile.email": 1
+            "profile.email": 1,
+            "profile.adminID": 1,
+            "userId": 1
         })
-        .exec((err, employees) => {
+        .exec((err, admin) => {
             if (err) {
                 console.log(err);
                 res
@@ -24,21 +24,21 @@ const employeesList = (req, res) => {
             } else {
                 res
                     .status(200)
-                    .json(employees);
+                    .json(admin);
             }
         });
 };
 
-const employeesCreate = (req, res) => {
-    const employee = new Employee({
+const adminCreate = (req, res) => {
+    const admin = new Admin({
         type,
         profile,
         userId,
         signature
     } = req.body);
-    employee.employeeNum = Date.now();
-    if ("Employee" == req.payload.type) employee.userId = req.payload._id;
-    employee.save((err) => {
+    admin.adminNum = Date.now();
+    if ("Admin" == req.payload.type) admin.userId = req.payload._id;
+    admin.save((err) => {
         if (err) {
             console.log(err);
             res
@@ -56,25 +56,25 @@ const employeesCreate = (req, res) => {
     });
 };
 
-const employeesReadOne = (req, res) => {
+const adminReadOne = (req, res) => {
     const {
-        employeeid
+        adminid
     } = req.params;
-    if (!employeeid) {
+    if (!adminid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, adminid is required"
             });
     } else {
-        Employee
-            .findById(employeeid)
-            .exec((err, employee) => {
-                if (!employee) {
+        Admin
+            .findById(adminid)
+            .exec((err, admin) => {
+                if (!admin) {
                     res
                         .status(404)
                         .json({
-                            "message": "Employee not found."
+                            "message": "Admin not found."
                         });
                 } else if (err) {
                     console.log(err);
@@ -86,31 +86,31 @@ const employeesReadOne = (req, res) => {
                 } else {
                     res
                         .status(200)
-                        .json(employee);
+                        .json(admin);
                 }
             });
     }
 };
 
-const employeesUpdateOne = (req, res) => {
+const adminUpdateOne = (req, res) => {
     const {
-        employeeid
+        adminid
     } = req.params;
-    if (!employeeid) {
+    if (!adminid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, adminid is required"
             });
     } else {
-        Employee
-            .findById(employeeid)
-            .exec((err, employee) => {
-                if (!employee) {
+        Admin
+            .findById(adminid)
+            .exec((err, admin) => {
+                if (!admin) {
                     res
                         .status(404)
                         .json({
-                            "message": "Employee not found."
+                            "message": "Admin not found."
                         });
                 } else if (err) {
                     console.log(err);
@@ -120,22 +120,22 @@ const employeesUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    employee.type = (req.body.type) ? req.body.type : employee.type;
-                    employee.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : employee.profile.firstName;
-                    employee.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : employee.profile.middleName;
-                    employee.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : employee.profile.lastName;
-                    employee.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : employee.profile.gender;
-                    employee.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : employee.profile.dateOfBirth;
-                    employee.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : employee.profile.address;
-                    employee.profile.mobileNumVerified = (req.body.profile && req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (employee.profile.mobileNumVerified && employee.profile.mobileNum == req.body.profile.mobileNum) ? employee.profile.mobileNumVerified : false : employee.profile.mobileNumVerified;
-                    employee.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : employee.profile.mobileNum;
-                    employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
-                    employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
-                    employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
-                    employee.profile.employeeID = (req.body.profile && req.body.profile.employeeID) ? req.body.profile.employeeID : employee.profile.employeeID;
-                    employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
-                    employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
-                    employee.save((err) => {
+                    admin.type = (req.body.type) ? req.body.type : admin.type;
+                    admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
+                    admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
+                    admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
+                    admin.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : admin.profile.gender;
+                    admin.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : admin.profile.dateOfBirth;
+                    admin.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : admin.profile.address;
+                    admin.profile.mobileNumVerified = (req.body.profile && req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (admin.profile.mobileNumVerified && admin.profile.mobileNum == req.body.profile.mobileNum) ? admin.profile.mobileNumVerified : false : admin.profile.mobileNumVerified;
+                    admin.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : admin.profile.mobileNum;
+                    admin.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (admin.profile.emailVerified && admin.profile.email == req.body.profile.email) ? admin.profile.emailVerified : false : admin.profile.emailVerified;
+                    admin.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : admin.profile.email;
+                    admin.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : admin.profile.emailVerificationToken;
+                    admin.profile.adminID = (req.body.profile && req.body.profile.adminID) ? req.body.profile.adminID : admin.profile.adminID;
+                    admin.userId = (req.body.userId) ? req.body.userId : admin.userId;
+                    admin.signature = (req.body.signature) ? req.body.signature : admin.signature;
+                    admin.save((err) => {
                         if (err) {
                             console.log(err);
                             res
@@ -156,25 +156,25 @@ const employeesUpdateOne = (req, res) => {
     }
 };
 
-const employeesDeleteOne = (req, res) => {
+const adminDeleteOne = (req, res) => {
     const {
-        employeeid
+        adminid
     } = req.params;
-    if (!employeeid) {
+    if (!adminid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, adminid is required"
             });
     } else {
-        Employee
-            .findByIdAndRemove(employeeid)
-            .exec((err, employee) => {
-                if (!employee) {
+        Admin
+            .findByIdAndRemove(adminid)
+            .exec((err, admin) => {
+                if (!admin) {
                     res
                         .status(404)
                         .json({
-                            "message": "Employee not found."
+                            "message": "Admin not found."
                         });
                 } else if (err) {
                     console.log(err);
@@ -192,13 +192,13 @@ const employeesDeleteOne = (req, res) => {
     }
 };
 
-const employeesGetEmailByUser = (req, res) => {
+const adminGetEmailByUser = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
-    Employee.findOne({
+    Admin.findOne({
             'userId': mongoose.Types.ObjectId(originalUserId),
         })
-        .exec((err, employee) => {
+        .exec((err, admin) => {
             if (err) {
                 console.log(err);
                 res
@@ -206,7 +206,7 @@ const employeesGetEmailByUser = (req, res) => {
                     .json({
                         "message": err._message
                     });
-            } else if (!employee) {
+            } else if (!admin) {
                 res
                     .status(404)
                     .json({
@@ -216,13 +216,13 @@ const employeesGetEmailByUser = (req, res) => {
                 res
                     .status(200)
                     .json({
-                        'email': employee.profile.email
+                        'email': admin.profile.email
                     });
             }
         });
 };
 
-const employeesSetEmailToken = (req, res) => {
+const adminSetEmailToken = (req, res) => {
     const {
         userid
     } = req.params;
@@ -233,11 +233,11 @@ const employeesSetEmailToken = (req, res) => {
                 "message": "Not found, userid is required"
             });
     } else {
-        Employee
+        Admin
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
-            .exec((err, employee) => {
+            .exec((err, admin) => {
                 if (err) {
                     console.log(err);
                     res
@@ -245,28 +245,21 @@ const employeesSetEmailToken = (req, res) => {
                         .json({
                             "message": err._message
                         });
-                } else if (!employee) {
+                } else if (!admin) {
                     res
                         .status(404)
                         .json({
                             "message": "Email not found."
                         });
                 } else {
-                    if ("Employee" == req.payload.type && userid != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     const createRandomToken = randomBytesAsync(16)
                         .then((buf) => buf.toString('hex'));
 
                     createRandomToken
                         .then((token) => {
-                            employee.profile.emailVerificationToken = token;
+                            admin.profile.emailVerificationToken = token;
                             let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
-                            employee.save((err) => {
+                            admin.save((err) => {
                                 if (err) {
                                     console.log(err);
                                     res
@@ -279,7 +272,7 @@ const employeesSetEmailToken = (req, res) => {
                                         .status(200)
                                         .json({
                                             'token': encryptToken,
-                                            'email': employee.profile.email
+                                            'email': admin.profile.email
                                         });
                                 }
                             });
@@ -290,11 +283,11 @@ const employeesSetEmailToken = (req, res) => {
     }
 };
 
-const employeesVerifyEmailToken = (req, res) => {
-    Employee.findOne({
+const adminVerifyEmailToken = (req, res) => {
+    Admin.findOne({
             "userId": mongoose.Types.ObjectId(req.body.userid)
         })
-        .exec((err, employee) => {
+        .exec((err, admin) => {
             if (err) {
                 console.log(err);
                 res
@@ -302,26 +295,19 @@ const employeesVerifyEmailToken = (req, res) => {
                     .json({
                         "message": err._message
                     });
-            } else if (!employee) {
+            } else if (!admin) {
                 res
                     .status(404)
                     .json({
                         "message": "Invalid token or expired token."
                     });
             } else {
-                if ("Employee" == req.payload.type && req.body.userid != req.payload._id) {
-                    return res
-                        .status(403)
-                        .json({
-                            "message": "You don\'t have permission to do that!"
-                        });
-                }
                 let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
                 let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-                if (employee.profile.emailVerificationToken == originalToken) {
-                    employee.profile.emailVerificationToken = '';
-                    employee.profile.emailVerified = true;
-                    employee.save((err) => {
+                if (admin.profile.emailVerificationToken == originalToken) {
+                    admin.profile.emailVerificationToken = '';
+                    admin.profile.emailVerified = true;
+                    admin.save((err) => {
                         if (err) {
                             console.log(err);
                             res
@@ -348,7 +334,7 @@ const employeesVerifyEmailToken = (req, res) => {
         });
 };
 
-const employeesReadOneByUser = (req, res) => {
+const adminReadOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -359,17 +345,17 @@ const employeesReadOneByUser = (req, res) => {
                 "message": "Not found, userid is required"
             });
     } else {
-        Employee
+        Admin
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
             .populate('userId', 'username lastLogin lastFailedLogin status security picture')
-            .exec((err, employee) => {
-                if (!employee) {
+            .exec((err, admin) => {
+                if (!admin) {
                     res
                         .status(404)
                         .json({
-                            "message": "Employee not found."
+                            "message": "Admin not found."
                         });
                 } else if (err) {
                     console.log(err);
@@ -379,7 +365,7 @@ const employeesReadOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Employee" == req.payload.type && userid != req.payload._id) {
+                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -388,14 +374,14 @@ const employeesReadOneByUser = (req, res) => {
                     }
                     res
                         .status(200)
-                        .json(employee);
+                        .json(admin);
                 }
             });
     }
 };
 
 
-const employeesUpdateOneByUser = (req, res) => {
+const adminUpdateOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -406,16 +392,16 @@ const employeesUpdateOneByUser = (req, res) => {
                 "message": "Not found, userid is required"
             });
     } else {
-        Employee
+        Admin
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
-            .exec((err, employee) => {
-                if (!employee) {
+            .exec((err, admin) => {
+                if (!admin) {
                     res
                         .status(404)
                         .json({
-                            "message": "Employee not found."
+                            "message": "Admin not found."
                         });
                 } else if (err) {
                     console.log(err);
@@ -425,29 +411,29 @@ const employeesUpdateOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Employee" == req.payload.type && userid != req.payload._id) {
+                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
                         return res
                             .status(403)
                             .json({
                                 "message": "You don\'t have permission to do that!"
                             });
                     }
-                    employee.type = (req.body.type) ? req.body.type : employee.type;
-                    employee.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : employee.profile.firstName;
-                    employee.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : employee.profile.middleName;
-                    employee.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : employee.profile.lastName;
-                    employee.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : employee.profile.gender;
-                    employee.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : employee.profile.dateOfBirth;
-                    employee.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : employee.profile.address;
-                    employee.profile.mobileNumVerified = (req.body.profile && req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (employee.profile.mobileNumVerified && employee.profile.mobileNum == req.body.profile.mobileNum) ? employee.profile.mobileNumVerified : false : employee.profile.mobileNumVerified;
-                    employee.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : employee.profile.mobileNum;
-                    employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
-                    employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
-                    employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
-                    employee.profile.employeeID = (req.body.profile && req.body.profile.employeeID) ? req.body.profile.employeeID : employee.profile.employeeID;
-                    employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
-                    employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
-                    employee.save((err) => {
+                    admin.type = (req.body.type) ? req.body.type : admin.type;
+                    admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
+                    admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
+                    admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
+                    admin.profile.gender = (req.body.profile && req.body.profile.gender) ? req.body.profile.gender : admin.profile.gender;
+                    admin.profile.dateOfBirth = (req.body.profile && req.body.profile.dateOfBirth) ? req.body.profile.dateOfBirth : admin.profile.dateOfBirth;
+                    admin.profile.address = (req.body.profile && req.body.profile.address) ? req.body.profile.address : admin.profile.address;
+                    admin.profile.mobileNumVerified = (req.body.profile && req.body.profile && req.body.profile.mobileNumVerified) ? req.body.profile.mobileNumVerified : (req.body.profile && req.body.profile.mobileNum) ? (admin.profile.mobileNumVerified && admin.profile.mobileNum == req.body.profile.mobileNum) ? admin.profile.mobileNumVerified : false : admin.profile.mobileNumVerified;
+                    admin.profile.mobileNum = (req.body.profile && req.body.profile.mobileNum) ? req.body.profile.mobileNum : admin.profile.mobileNum;
+                    admin.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (admin.profile.emailVerified && admin.profile.email == req.body.profile.email) ? admin.profile.emailVerified : false : admin.profile.emailVerified;
+                    admin.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : admin.profile.email;
+                    admin.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : admin.profile.emailVerificationToken;
+                    admin.profile.adminID = (req.body.profile && req.body.profile.adminID) ? req.body.profile.adminID : admin.profile.adminID;
+                    admin.userId = (req.body.userId) ? req.body.userId : admin.userId;
+                    admin.signature = (req.body.signature) ? req.body.signature : admin.signature;
+                    admin.save((err) => {
                         if (err) {
                             console.log(err);
                             res
@@ -469,14 +455,14 @@ const employeesUpdateOneByUser = (req, res) => {
 };
 
 module.exports = {
-    employeesList,
-    employeesCreate,
-    employeesReadOne,
-    employeesUpdateOne,
-    employeesDeleteOne,
-    employeesGetEmailByUser,
-    employeesSetEmailToken,
-    employeesVerifyEmailToken,
-    employeesReadOneByUser,
-    employeesUpdateOneByUser
+    adminList,
+    adminCreate,
+    adminReadOne,
+    adminUpdateOne,
+    adminDeleteOne,
+    adminGetEmailByUser,
+    adminSetEmailToken,
+    adminVerifyEmailToken,
+    adminReadOneByUser,
+    adminUpdateOneByUser
 };

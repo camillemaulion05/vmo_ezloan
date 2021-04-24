@@ -103,13 +103,6 @@ const borrowersReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(borrower);
@@ -146,13 +139,6 @@ const borrowersUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     borrower.type = (req.body.type) ? req.body.type : borrower.type;
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
 
@@ -222,7 +208,9 @@ const borrowersUpdateOne = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(borrower);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }
@@ -326,6 +314,13 @@ const borrowersSetEmailToken = (req, res) => {
                             "message": "Email not found."
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     const createRandomToken = randomBytesAsync(16)
                         .then((buf) => buf.toString('hex'));
 
@@ -376,6 +371,13 @@ const borrowersVerifyEmailToken = (req, res) => {
                         "message": "Invalid token or expired token."
                     });
             } else {
+                if ("Borrower" == req.payload.type && req.body.userid != req.payload._id) {
+                    return res
+                        .status(403)
+                        .json({
+                            "message": "You don\'t have permission to do that!"
+                        });
+                }
                 let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
                 let originalToken = bytes.toString(CryptoJS.enc.Utf8);
                 if (borrower.profile.emailVerificationToken == originalToken) {
@@ -439,7 +441,7 @@ const borrowersReadOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -485,7 +487,7 @@ const borrowersUpdateOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -561,7 +563,9 @@ const borrowersUpdateOneByUser = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(borrower);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }

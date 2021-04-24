@@ -4,7 +4,6 @@ const Transaction = mongoose.model('Transaction');
 const transactionsList = (req, res) => {
     Transaction
         .find()
-        .populate('borrowerId', 'profile.firstName profile.lastName type')
         .exec((err, transactions) => {
             if (err) {
                 console.log(err);
@@ -69,7 +68,6 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -85,13 +83,6 @@ const transactionsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && transaction.borrowerId.userId != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(transaction);
@@ -113,7 +104,6 @@ const transactionsUpdateOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -137,7 +127,7 @@ const transactionsUpdateOne = (req, res) => {
                     transaction.receiverNum = (req.body.receiverNum) ? req.body.receiverNum : transaction.receiverNum;
                     transaction.referenceNo = (req.body.referenceNo) ? req.body.referenceNo : transaction.referenceNo;
                     transaction.postedBy = (req.body.postedBy) ? req.body.postedBy : transaction.postedBy;
-                    transaction.postedDate = (!req.body.postedBy || transaction.postedDate) ? transaction.postedDate : Date.now();
+                    transaction.postedDate = (req.body.postedBy) ? Date.now() : transaction.postedDate;
                     transaction.status = (req.body.status) ? req.body.status : transaction.status;
                     transaction.borrowerId = (req.body.borrowerId) ? req.body.borrowerId : transaction.borrowerId;
                     transaction.loanId = (req.body.loanId) ? req.body.loanId : transaction.loanId;
@@ -153,7 +143,9 @@ const transactionsUpdateOne = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(transaction);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }
@@ -212,7 +204,6 @@ const transactionsListByType = (req, res) => {
             .find({
                 "type": type
             })
-            .populate('borrowerId', 'profile.firstName profile.lastName type')
             .exec((err, transactions) => {
                 if (err) {
                     console.log(err);
@@ -267,6 +258,13 @@ const transactionsListByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(transactions);

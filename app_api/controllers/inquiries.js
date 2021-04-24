@@ -118,7 +118,7 @@ const inquiriesUpdateOne = (req, res) => {
                     inquiry.message = (req.body.message) ? req.body.message : inquiry.message;
                     inquiry.response.message = (req.body.response && req.body.response.message) ? req.body.response.message : inquiry.response.message;
                     inquiry.response.repliedBy = (req.body.response && req.body.response.repliedBy) ? req.body.response.repliedBy : inquiry.response.repliedBy;
-                    inquiry.response.createdAt = (!req.body.response || inquiry.response.createdAt) ? inquiry.response.createdAt : Date.now();
+                    inquiry.response.createdAt = (req.body.response && req.body.response.repliedBy) ? Date.now() : inquiry.response.createdAt;
                     inquiry.save((err) => {
                         if (err) {
                             console.log(err);
@@ -130,7 +130,9 @@ const inquiriesUpdateOne = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(inquiry);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }

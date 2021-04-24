@@ -3365,7 +3365,7 @@ const getDownloadLoanSOA = (req, res) => {
                         border: [true, true, true, true]
                     },
                     {
-                        text: parseDate(d.postedDate, 'short'),
+                        text: (d.postedDate) ? parseDate(d.postedDate, 'short') : '',
                         style: 'item',
                         border: [true, true, true, true]
                     }

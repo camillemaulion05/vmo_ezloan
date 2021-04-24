@@ -98,7 +98,12 @@ const usersReadOne = (req, res) => {
             });
     } else {
         User
-            .findById(userid)
+            .findById(userid, {
+                "password": 0,
+                "passwordResetToken": 0,
+                "passwordResetExpires": 0,
+                "security": 0
+            })
             .exec((err, user) => {
                 if (!user) {
                     res
@@ -114,6 +119,13 @@ const usersReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if (("Borrower" == req.payload.type || "Employee" == req.payload.type) && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(user);
@@ -148,6 +160,13 @@ const usersUpdateOne = (req, res) => {
                         "message": err._message
                     });
             } else {
+                if (("Borrower" == req.payload.type || "Employee" == req.payload.type) && userid != req.payload._id) {
+                    return res
+                        .status(403)
+                        .json({
+                            "message": "You don\'t have permission to do that!"
+                        });
+                }
                 user.username = (req.body.username) ? req.body.username : user.username;
                 user.password = (req.body.password) ? req.body.password : user.password;
                 user.passwordResetToken = (req.body.passwordResetToken) ? req.body.passwordResetToken : user.passwordResetToken;
@@ -170,7 +189,9 @@ const usersUpdateOne = (req, res) => {
                     } else {
                         res
                             .status(200)
-                            .json(user);
+                            .json({
+                                "message": "Updated successfully."
+                            });
                     }
                 });
             }
@@ -473,6 +494,13 @@ const usersChangePassword = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if (("Borrower" == req.payload.type || "Employee" == req.payload.type) && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     user.comparePassword(req.body.currentPassword, (err, isMatch) => {
                         if (err) {
                             console.log(err);

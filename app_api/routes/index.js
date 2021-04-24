@@ -17,6 +17,7 @@ const ctrlTransactions = require('../controllers/transactions');
 const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
+const ctrlAdmin = require('../controllers/admin');
 const middleware = require('../middlewares/authorization');
 
 router.get('/', ctrlHome.index);
@@ -70,10 +71,14 @@ router
     .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
 
+router.post('/employees/email', ctrlEmployees.employeesGetEmailByUser);
+router.get('/employees/setEmailToken/:userid', auth, middleware.isSafe, ctrlEmployees.employeesSetEmailToken);
+router.post('/employees/validateEmailToken', auth, middleware.isSafe, ctrlEmployees.employeesVerifyEmailToken);
+
 router
     .route('/employees/users/:userid')
-    .get(auth, middleware.isModerator, ctrlEmployees.employeesReadOneByUser)
-    .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOneByUser);
+    .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOneByUser)
+    .put(auth, middleware.isSafe, ctrlEmployees.employeesUpdateOneByUser);
 
 // transactions
 router
@@ -131,8 +136,8 @@ router
 
 router
     .route('/borrowers/:borrowerid')
-    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOne)
-    .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
+    .get(auth, middleware.isModerator, ctrlBorrowers.borrowersReadOne)
+    .put(auth, middleware.isModerator, ctrlBorrowers.borrowersUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
 
 router.post('/borrowers/email', ctrlBorrowers.borrowersGetEmailByUser);
@@ -143,7 +148,6 @@ router
     .route('/borrowers/users/:userid')
     .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOneByUser)
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOneByUser);
-
 
 // loans
 router
@@ -189,5 +193,26 @@ router
 router
     .route('/loans/report/:year')
     .get(auth, middleware.isAdmin, ctrlLoans.loansInterestReport);
+
+// admin
+router
+    .route('/admin')
+    .get(auth, middleware.isAdmin, ctrlAdmin.adminList)
+    .post(auth, middleware.isAdmin, ctrlAdmin.adminCreate);
+
+router
+    .route('/admin/:adminid')
+    .get(auth, middleware.isModerator, ctrlAdmin.adminReadOne)
+    .put(auth, middleware.isModerator, ctrlAdmin.adminUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlAdmin.adminDeleteOne);
+
+router.post('/admin/email', ctrlAdmin.adminGetEmailByUser);
+router.get('/admin/setEmailToken/:userid', auth, middleware.isSafe, ctrlAdmin.adminSetEmailToken);
+router.post('/admin/validateEmailToken', auth, middleware.isSafe, ctrlAdmin.adminVerifyEmailToken);
+
+router
+    .route('/admin/users/:userid')
+    .get(auth, middleware.isSafe, ctrlAdmin.adminReadOneByUser)
+    .put(auth, middleware.isSafe, ctrlAdmin.adminUpdateOneByUser);
 
 module.exports = router;

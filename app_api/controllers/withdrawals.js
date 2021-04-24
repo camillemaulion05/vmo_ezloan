@@ -65,7 +65,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName')
+            .populate('requestedBy', 'profile.firstName profile.lastName userId')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -130,7 +130,7 @@ const withdrawalsUpdateOne = (req, res) => {
                     withdrawal.requestBy = (req.body.requestBy) ? req.body.requestBy : withdrawal.requestBy;
                     withdrawal.status = (req.body.status) ? req.body.status : withdrawal.status;
                     withdrawal.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : withdrawal.reviewedBy;
-                    withdrawal.reviewedDate = (!req.body.reviewedBy || withdrawal.reviewedDate) ? withdrawal.reviewedDate : Date.now();
+                    withdrawal.reviewedDate = (req.body.reviewedBy) ? Date.now() : withdrawal.reviewedDate;
                     withdrawal.save((err) => {
                         if (err) {
                             console.log(err);
@@ -142,7 +142,9 @@ const withdrawalsUpdateOne = (req, res) => {
                         } else {
                             res
                                 .status(200)
-                                .json(withdrawal);
+                                .json({
+                                    "message": "Updated successfully."
+                                });
                         }
                     });
                 }
@@ -223,6 +225,13 @@ const withdrawalsListByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(withdrawals);
