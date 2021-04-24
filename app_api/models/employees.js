@@ -64,9 +64,9 @@ const employeeSchema = mongoose.Schema({
         emailVerified: {
             type: Boolean,
             default: false
-        },
-        employeeID: String
+        }
     },
+    employeeID: String,
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"

@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 
 const adminSchema = mongoose.Schema({
     adminNum: String, // Date.now();
-    type: {
-        type: String,
-        required: true,
-        enum: ["Loan Officer", "Loan Processor", "HRD Authorized Officer"]
-    },
     profile: {
         firstName: {
             type: String,
@@ -64,14 +59,13 @@ const adminSchema = mongoose.Schema({
         emailVerified: {
             type: Boolean,
             default: false
-        },
-        adminID: String
+        }
     },
+    employeeID: String,
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    },
-    signature: String
+    }
 }, {
     timestamps: true
 });

@@ -6,6 +6,12 @@ const apiOptions = {
     server: process.env.BASE_URL
 };
 
+function capitalizeFirstLetter(str) {
+    // converting first letter to uppercase
+    let capitalized = str.charAt(0).toUpperCase() + str.slice(1);
+    return capitalized;
+}
+
 /**
  * GET /login
  * Login page.
@@ -82,24 +88,93 @@ const getLogout = (req, res) => {
 };
 
 /**
- * GET /signup
+ * GET /signup/:type
  * Signup page.
  */
-const getSignup = (req, res) => {
+const getSignupByType = (req, res) => {
     if (req.user) {
         return res.redirect('/account');
     }
     res.render('user/signup', {
-        title: 'Signup'
+        title: 'Signup',
+        type: (req.params.type == 'admin' || req.params.type == 'employee' || req.params.type == 'member' || req.params.type == 'borrower') ? req.params.type : 'borrower'
     });
 };
 
 /**
- * POST /signup
+ * POST /signup/:type
  * Create a new local account.
  */
-const postSignup = (req, res, next) => {
+const postSignupByType = (req, res, next) => {
     const validationErrors = [];
+    let userType = req.params.type;
+    let type = '',
+        employeeID = '',
+        sharesPerPayDay = '';
+    if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
+        if (userType == 'employee' || userType == 'member' || userType == 'admin') {
+            if (validator.isEmpty(req.body.userCode)) validationErrors.push({
+                msg: 'User code cannot be blank.'
+            });
+            if (req.body.userCode) {
+                if (userType == 'admin') {
+                    let bytes = CryptoJS.AES.decrypt(process.env.ADMIN_CODE, process.env.CRYPTOJS_SERVER_SECRET);
+                    let originalAdminCode = bytes.toString(CryptoJS.enc.Utf8);
+                    if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+                        msg: 'Employee ID cannot be blank.'
+                    });
+                    if (req.body.employeeID) {
+                        if (req.body.userCode != originalAdminCode) {
+                            userType = 'borrower'
+                            type = 'Non-Member';
+                        }
+                    }
+                }
+                if (userType == 'employee') {
+                    let bytes = CryptoJS.AES.decrypt(process.env.EMPLOYEE_CODE, process.env.CRYPTOJS_SERVER_SECRET);
+                    let originalEmployeeCode = bytes.toString(CryptoJS.enc.Utf8);
+                    if (validator.isEmpty(req.body.employeeType)) validationErrors.push({
+                        msg: 'Employee type cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+                        msg: 'Employee ID cannot be blank.'
+                    });
+                    if (req.body.employeeID && req.body.employeeType) {
+                        if (req.body.userCode != originalEmployeeCode) {
+                            userType = 'borrower';
+                            type = 'Non-Member';
+                        } else {
+                            type = req.body.employeeType;
+                            employeeID = req.body.employeeID;
+                        }
+                    }
+                }
+                if (userType == 'member') {
+                    let bytes = CryptoJS.AES.decrypt(process.env.MEMBER_CODE, process.env.CRYPTOJS_SERVER_SECRET);
+                    let originalMemberCode = bytes.toString(CryptoJS.enc.Utf8);
+                    if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+                        msg: 'Employee ID cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+                        msg: 'Shares per payday cannot be blank.'
+                    });
+                    if (req.body.employeeID && req.body.sharesPerPayDay) {
+                        if (req.body.userCode == originalMemberCode) {
+                            userType = 'borrower';
+                            type = 'Member';
+                            employeeID = req.body.employeeID;
+                            sharesPerPayDay = req.body.sharesPerPayDay;
+                        }
+                    }
+                }
+            }
+        } else {
+            type = 'Non-Member';
+        }
+    } else {
+        userType = 'borrower'
+        type = 'Non-Member';
+    }
     if (validator.isEmpty(req.body.username)) validationErrors.push({
         msg: 'Username cannot be blank.'
     });
@@ -148,7 +223,7 @@ const postSignup = (req, res, next) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/signup');
+        return res.redirect('back');
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
@@ -172,7 +247,7 @@ const postSignup = (req, res, next) => {
                 req.flash('errors', {
                     msg: 'The verification code you entered is not correct. Please try again.'
                 });
-                return res.redirect('/signup');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 path = '/api/users';
                 requestOptions = {
@@ -180,7 +255,8 @@ const postSignup = (req, res, next) => {
                     method: 'POST',
                     json: {
                         username: req.body.username,
-                        password: CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+                        password: CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTOJS_CLIENT_SECRET).toString(),
+                        type: capitalizeFirstLetter(userType)
                     }
                 };
                 request(
@@ -192,9 +268,11 @@ const postSignup = (req, res, next) => {
                             req.flash('errors', {
                                 msg: 'There was an error in creating your account.'
                             });
-                            return res.redirect('/signup');
+                            return res.redirect('back');
                         } else if (statusCode === 201) {
                             path = '/api/borrowers';
+                            if (userType == 'admin') path = '/api/admins';
+                            if (userType == 'employee') path = '/api/employees';
                             requestOptions = {
                                 url: `${apiOptions.server}${path}`,
                                 method: 'POST',
@@ -202,6 +280,7 @@ const postSignup = (req, res, next) => {
                                     Authorization: 'Bearer ' + user.token
                                 },
                                 json: {
+                                    type: type,
                                     profile: {
                                         firstName: req.body.firstName,
                                         lastName: req.body.lastName,
@@ -210,7 +289,9 @@ const postSignup = (req, res, next) => {
                                         email: req.body.email,
                                         mobileNum: req.body.mobileNum,
                                         mobileNumVerified: true
-                                    }
+                                    },
+                                    employeeID: employeeID,
+                                    sharesPerPayDay: sharesPerPayDay
                                 }
                             };
                             request(
@@ -222,7 +303,7 @@ const postSignup = (req, res, next) => {
                                         req.flash('errors', {
                                             msg: 'There was an error in creating your account profile.'
                                         });
-                                        return res.redirect('/signup');
+                                        return res.redirect('back');
                                     } else if (statusCode === 201) {
                                         req.flash("success", {
                                             msg: "Successfully Signed Up! Please login your credentials. "
@@ -232,7 +313,7 @@ const postSignup = (req, res, next) => {
                                         req.flash('errors', {
                                             msg: borrower.message
                                         });
-                                        return res.redirect('/signup');
+                                        return res.redirect('back');
                                     }
                                 }
                             );
@@ -240,7 +321,7 @@ const postSignup = (req, res, next) => {
                             req.flash('errors', {
                                 msg: user.message
                             });
-                            return res.redirect('/signup');
+                            return res.redirect('back');
                         }
                     }
                 );
@@ -248,7 +329,7 @@ const postSignup = (req, res, next) => {
                 req.flash('errors', {
                     msg: body.message
                 });
-                return res.redirect('/signup');
+                return res.redirect('back');
             }
         }
     );
@@ -560,8 +641,8 @@ const postReset = (req, res, next) => {
 module.exports = {
     getLogin,
     postLogin,
-    getSignup,
-    postSignup,
+    getSignupByType,
+    postSignupByType,
     getLogout,
     getForgot,
     postForgot,

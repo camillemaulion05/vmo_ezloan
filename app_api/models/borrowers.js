@@ -147,8 +147,8 @@ const borrowerSchema = mongoose.Schema({
             enum: ["Director/Executive", "Supervisor", "Officer", "Staff", "None"]
         },
         monthlyIncome: String,
-        employeeID: String, //For Members Only
     },
+    employeeID: String, //For Members Only
     account: {
         name: String,
         branch: String,

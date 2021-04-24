@@ -28,9 +28,9 @@ router
     .post(ctrlUsers.postReset);
 
 router
-    .route('/signup')
-    .get(ctrlUsers.getSignup)
-    .post(ctrlUsers.postSignup);
+    .route('/signup/:type')
+    .get(ctrlUsers.getSignupByType)
+    .post(ctrlUsers.postSignupByType);
 
 router.get('/logout', ctrlUsers.getLogout);
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Admin = mongoose.model('Admin');
 
-const adminList = (req, res) => {
+const adminsList = (req, res) => {
     Admin
         .find({}, {
             "adminNum": 1,
@@ -29,7 +29,7 @@ const adminList = (req, res) => {
         });
 };
 
-const adminCreate = (req, res) => {
+const adminsCreate = (req, res) => {
     const admin = new Admin({
         type,
         profile,
@@ -56,7 +56,7 @@ const adminCreate = (req, res) => {
     });
 };
 
-const adminReadOne = (req, res) => {
+const adminsReadOne = (req, res) => {
     const {
         adminid
     } = req.params;
@@ -92,7 +92,7 @@ const adminReadOne = (req, res) => {
     }
 };
 
-const adminUpdateOne = (req, res) => {
+const adminsUpdateOne = (req, res) => {
     const {
         adminid
     } = req.params;
@@ -156,7 +156,7 @@ const adminUpdateOne = (req, res) => {
     }
 };
 
-const adminDeleteOne = (req, res) => {
+const adminsDeleteOne = (req, res) => {
     const {
         adminid
     } = req.params;
@@ -192,7 +192,7 @@ const adminDeleteOne = (req, res) => {
     }
 };
 
-const adminGetEmailByUser = (req, res) => {
+const adminsGetEmailByUser = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
     Admin.findOne({
@@ -222,7 +222,7 @@ const adminGetEmailByUser = (req, res) => {
         });
 };
 
-const adminSetEmailToken = (req, res) => {
+const adminsSetEmailToken = (req, res) => {
     const {
         userid
     } = req.params;
@@ -283,7 +283,7 @@ const adminSetEmailToken = (req, res) => {
     }
 };
 
-const adminVerifyEmailToken = (req, res) => {
+const adminsVerifyEmailToken = (req, res) => {
     Admin.findOne({
             "userId": mongoose.Types.ObjectId(req.body.userid)
         })
@@ -334,7 +334,7 @@ const adminVerifyEmailToken = (req, res) => {
         });
 };
 
-const adminReadOneByUser = (req, res) => {
+const adminsReadOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -381,7 +381,7 @@ const adminReadOneByUser = (req, res) => {
 };
 
 
-const adminUpdateOneByUser = (req, res) => {
+const adminsUpdateOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
@@ -455,14 +455,14 @@ const adminUpdateOneByUser = (req, res) => {
 };
 
 module.exports = {
-    adminList,
-    adminCreate,
-    adminReadOne,
-    adminUpdateOne,
-    adminDeleteOne,
-    adminGetEmailByUser,
-    adminSetEmailToken,
-    adminVerifyEmailToken,
-    adminReadOneByUser,
-    adminUpdateOneByUser
+    adminsList,
+    adminsCreate,
+    adminsReadOne,
+    adminsUpdateOne,
+    adminsDeleteOne,
+    adminsGetEmailByUser,
+    adminsSetEmailToken,
+    adminsVerifyEmailToken,
+    adminsReadOneByUser,
+    adminsUpdateOneByUser
 };

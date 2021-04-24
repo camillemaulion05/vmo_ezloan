@@ -17,7 +17,7 @@ const ctrlTransactions = require('../controllers/transactions');
 const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
-const ctrlAdmin = require('../controllers/admin');
+const ctrlAdmin = require('../controllers/admins');
 const middleware = require('../middlewares/authorization');
 
 router.get('/', ctrlHome.index);
@@ -63,7 +63,7 @@ router
 router
     .route('/employees')
     .get(auth, middleware.isAdmin, ctrlEmployees.employeesList)
-    .post(auth, middleware.isAdmin, ctrlEmployees.employeesCreate);
+    .post(auth, middleware.isModerator, ctrlEmployees.employeesCreate);
 
 router
     .route('/employees/:employeeid')
@@ -196,23 +196,23 @@ router
 
 // admin
 router
-    .route('/admin')
-    .get(auth, middleware.isAdmin, ctrlAdmin.adminList)
-    .post(auth, middleware.isAdmin, ctrlAdmin.adminCreate);
+    .route('/admins')
+    .get(auth, middleware.isAdmin, ctrlAdmin.adminsList)
+    .post(auth, middleware.isAdmin, ctrlAdmin.adminsCreate);
 
 router
-    .route('/admin/:adminid')
-    .get(auth, middleware.isModerator, ctrlAdmin.adminReadOne)
-    .put(auth, middleware.isModerator, ctrlAdmin.adminUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlAdmin.adminDeleteOne);
+    .route('/admins/:adminid')
+    .get(auth, middleware.isModerator, ctrlAdmin.adminsReadOne)
+    .put(auth, middleware.isModerator, ctrlAdmin.adminsUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlAdmin.adminsDeleteOne);
 
-router.post('/admin/email', ctrlAdmin.adminGetEmailByUser);
-router.get('/admin/setEmailToken/:userid', auth, middleware.isSafe, ctrlAdmin.adminSetEmailToken);
-router.post('/admin/validateEmailToken', auth, middleware.isSafe, ctrlAdmin.adminVerifyEmailToken);
+router.post('/admins/email', ctrlAdmin.adminsGetEmailByUser);
+router.get('/admins/setEmailToken/:userid', auth, middleware.isSafe, ctrlAdmin.adminsSetEmailToken);
+router.post('/admins/validateEmailToken', auth, middleware.isSafe, ctrlAdmin.adminsVerifyEmailToken);
 
 router
-    .route('/admin/users/:userid')
-    .get(auth, middleware.isSafe, ctrlAdmin.adminReadOneByUser)
-    .put(auth, middleware.isSafe, ctrlAdmin.adminUpdateOneByUser);
+    .route('/admins/users/:userid')
+    .get(auth, middleware.isSafe, ctrlAdmin.adminsReadOneByUser)
+    .put(auth, middleware.isSafe, ctrlAdmin.adminsUpdateOneByUser);
 
 module.exports = router;

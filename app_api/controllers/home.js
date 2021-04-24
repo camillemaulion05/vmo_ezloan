@@ -95,29 +95,38 @@ const createService = function () {
 
 const sendOTP = function (req, res) {
     if (req.body.mobileNum) {
-        client.verify.services(process.env.TWILIO_SERVICESID)
-            .verifications
-            .create({
-                to: '+63' + req.body.mobileNum,
-                channel: 'sms'
-            })
-            .then(verification => {
-                return res
-                    .status(200)
-                    .json({
-                        "status": verification.status,
-                        "message": (verification.status == "pending") ? "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.mobileNum).substring(6, 10) + ", please check." : "Sorry " + req.body.name + ", it seems that my sms server is not responding. Please try again later!"
-                    });
-            })
-            .catch(err => {
-                console.log('ERROR: Could not send OTP code.\n', err.message)
-                return res
-                    .status(404)
-                    .json({
-                        "status": "error",
-                        "message": "Error sending the code. Please try again shortly."
-                    });
-            });
+        if (process.env.NODE_ENV == "development") {
+            return res
+                .status(200)
+                .json({
+                    "status": "pending",
+                    "message": "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.mobileNum).substring(6, 10) + ", please check."
+                });
+        } else {
+            client.verify.services(process.env.TWILIO_SERVICESID)
+                .verifications
+                .create({
+                    to: '+63' + req.body.mobileNum,
+                    channel: 'sms'
+                })
+                .then(verification => {
+                    return res
+                        .status(200)
+                        .json({
+                            "status": verification.status,
+                            "message": (verification.status == "pending") ? "We sent a 6-digit verification code to your registered mobile number +639XXXXX" + (req.body.mobileNum).substring(6, 10) + ", please check." : "Sorry " + req.body.name + ", it seems that my sms server is not responding. Please try again later!"
+                        });
+                })
+                .catch(err => {
+                    console.log('ERROR: Could not send OTP code.\n', err.message)
+                    return res
+                        .status(404)
+                        .json({
+                            "status": "error",
+                            "message": "Error sending the code. Please try again shortly."
+                        });
+                });
+        }
     } else {
         return res
             .status(400)
@@ -130,37 +139,46 @@ const sendOTP = function (req, res) {
 
 const validateOTP = function (req, res) {
     if (req.body.mobileNum && req.body.code) {
-        client.verify.services(process.env.TWILIO_SERVICESID)
-            .verificationChecks
-            .create({
-                to: "+63" + req.body.mobileNum,
-                code: req.body.code
-            })
-            .then(verification_check => {
-                if (verification_check.status != "approved" && !verification_check.valid) {
+        if (process.env.NODE_ENV == "development") {
+            return res
+                .status(200)
+                .json({
+                    "status": "approved",
+                    "message": "Your mobile number is verified."
+                });
+        } else {
+            client.verify.services(process.env.TWILIO_SERVICESID)
+                .verificationChecks
+                .create({
+                    to: "+63" + req.body.mobileNum,
+                    code: req.body.code
+                })
+                .then(verification_check => {
+                    if (verification_check.status != "approved" && !verification_check.valid) {
+                        return res
+                            .status(400)
+                            .json({
+                                "status": verification_check.status,
+                                "message": 'The verification code you entered is not correct. Please try again.'
+                            });
+                    }
                     return res
-                        .status(400)
+                        .status(200)
                         .json({
                             "status": verification_check.status,
-                            "message": 'The verification code you entered is not correct. Please try again.'
+                            "message": "Your mobile number is verified."
                         });
-                }
-                return res
-                    .status(200)
-                    .json({
-                        "status": verification_check.status,
-                        "message": "Your mobile number is verified."
-                    });
-            })
-            .catch(err => {
-                console.log('ERROR: Could not validateOTP code.\n', err.message)
-                return res
-                    .status(404)
-                    .json({
-                        "status": "error",
-                        "message": "The requested resource was not found."
-                    });
-            });
+                })
+                .catch(err => {
+                    console.log('ERROR: Could not validateOTP code.\n', err.message)
+                    return res
+                        .status(404)
+                        .json({
+                            "status": "error",
+                            "message": "The requested resource was not found."
+                        });
+                });
+        }
     } else {
         return res
             .status(400)

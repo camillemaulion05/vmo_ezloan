@@ -77,7 +77,34 @@ block content
                   option(value='' selected='' disabled='') Gender
                   option(value='Female') Female
                   option(value='Male') Male
-                em.invalid-feedback 
+                em.invalid-feedback
+          if type == "admin" || type == "employee" || type == "member"
+            .row
+              .col-sm-6
+                .form-group
+                  input#userCode.form-control(type='text' name='userCode' placeholder='User Code')
+                  em.invalid-feedback
+              .col-sm-6
+                .form-group
+                  input#employeeID.form-control(type='text' name='employeeID' placeholder='Employee ID')
+                  em.invalid-feedback 
+          if type == "employee"
+            .row
+              .col-sm-12
+                .form-group
+                  select#employeeType.form-control.selectpicker(type='text' name='employeeType')
+                    option(value='' selected='' disabled='') Employee Type
+                    option(value='Loan Officer') Loan Officer
+                    option(value='Loan Processor') Loan Processor
+                    option(value='HRD Authorized Officer') HRD Authorized Officer
+                  em.invalid-feedback
+          if type == "member"
+            .row
+              .col-sm-12
+                .form-group
+                  input#sharesPerPayDay.form-control(type="number" step="300" min="300" name='sharesPerPayDay')
+                  em.invalid-feedback 
+                  p.label-text Shares/Payday (Php)
         div(style='overflow:auto;')
           div(style='float:right;')
             button#prevBtn.btn.btn-danger.d-none(type='button') Previous

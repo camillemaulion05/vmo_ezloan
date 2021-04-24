@@ -25,7 +25,9 @@ function parseDate(date, format) {
 }
 
 function getUserDetails(req, res, filename, title) {
-    path = ((req.user.type == "Borrower") ? '/api/borrowers/users/' : '/api/employees/users/') + (req.user.id).toString();
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
