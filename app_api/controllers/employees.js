@@ -12,6 +12,7 @@ const employeesList = (req, res) => {
             "profile.dateOfBirth": 1,
             "profile.mobileNum": 1,
             "profile.email": 1,
+            "employeeID": 1,
             "userId": 1
         })
         .exec((err, employees) => {
@@ -34,6 +35,7 @@ const employeesCreate = (req, res) => {
     const employee = new Employee({
         type,
         profile,
+        employeeID,
         userId,
         signature
     } = req.body);
@@ -133,7 +135,7 @@ const employeesUpdateOne = (req, res) => {
                     employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
                     employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
                     employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
-                    employee.profile.employeeID = (req.body.profile && req.body.profile.employeeID) ? req.body.profile.employeeID : employee.profile.employeeID;
+                    employee.employeeID = (req.body.employeeID) ? req.body.employeeID : employee.employeeID;
                     employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
                     employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
                     employee.save((err) => {
@@ -364,7 +366,7 @@ const employeesReadOneByUser = (req, res) => {
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
-            .populate('userId', 'username lastLogin lastFailedLogin status security picture')
+            .populate('userId', 'username type lastLogin lastFailedLogin status security picture')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -445,7 +447,7 @@ const employeesUpdateOneByUser = (req, res) => {
                     employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
                     employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
                     employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
-                    employee.profile.employeeID = (req.body.profile && req.body.profile.employeeID) ? req.body.profile.employeeID : employee.profile.employeeID;
+                    employee.employeeID = (req.body.employeeID) ? req.body.employeeID : employee.employeeID;
                     employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
                     employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
                     employee.save((err) => {

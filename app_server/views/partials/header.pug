@@ -43,14 +43,28 @@ else
       a.nav-link(href='/security')
         i.fas.fa-cogs
         span Security
-    li.nav-item(class=(title.indexOf("Verifications") != -1) ? 'active' : undefined)
-      a.nav-link(href='/verifications')
-        i.fas.fa-check-circle
-        span Verifications
-    li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
-      a.nav-link(href='/loans')
-        i.fas.fa-balance-scale
-        span Loans
+    if user.userId.type == "Borrower"
+      li.nav-item(class=(title.indexOf("Verifications") != -1) ? 'active' : undefined)
+        a.nav-link(href='/verifications')
+          i.fas.fa-check-circle
+          span Verifications
+      li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
+        a.nav-link(href='/loans')
+          i.fas.fa-balance-scale
+          span Loans
+    if user.userId.type == "Admin"
+      li.nav-item(class=(title.indexOf("List of Borrowers") != -1) ? 'active' : undefined)
+        a.nav-link(href='/borrowers')
+          i.fas.fa-user-friends
+          span Borrowers
+      li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
+        a.nav-link(href='/loans')
+          i.fas.fa-balance-scale
+          span Loans
+      li.nav-item(class=(title.indexOf("Repayments") != -1) ? 'active' : undefined)
+        a.nav-link(href='/repayments')
+          i.fas.fa-balance-scale
+          span Repayments
     hr.sidebar-divider.d-none.d-md-block
     .text-center.d-none.d-md-inline
       button#sidebarToggle.rounded-circle.border-0

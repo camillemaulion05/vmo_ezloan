@@ -181,7 +181,7 @@ const borrowerSchema = mongoose.Schema({
             type: String,
             enum: ["Parent", "Sibling", "Spouse", "Child"]
         },
-        birthday: Date
+        dateOfBirth: Date
     }], //For Members Only
     totalCreditLimit: {
         type: String,

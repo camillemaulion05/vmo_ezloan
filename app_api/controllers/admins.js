@@ -5,12 +5,13 @@ const adminsList = (req, res) => {
     Admin
         .find({}, {
             "adminNum": 1,
-            "type": 1,
             "profile.firstName": 1,
             "profile.lastName": 1,
+            "profile.gender": 1,
+            "profile.dateOfBirth": 1,
             "profile.mobileNum": 1,
             "profile.email": 1,
-            "profile.adminID": 1,
+            "employeeID": 1,
             "userId": 1
         })
         .exec((err, admin) => {
@@ -31,10 +32,9 @@ const adminsList = (req, res) => {
 
 const adminsCreate = (req, res) => {
     const admin = new Admin({
-        type,
         profile,
-        userId,
-        signature
+        employeeID,
+        userId
     } = req.body);
     admin.adminNum = Date.now();
     if ("Admin" == req.payload.type) admin.userId = req.payload._id;
@@ -120,7 +120,6 @@ const adminsUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    admin.type = (req.body.type) ? req.body.type : admin.type;
                     admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
                     admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
                     admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
@@ -132,9 +131,8 @@ const adminsUpdateOne = (req, res) => {
                     admin.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (admin.profile.emailVerified && admin.profile.email == req.body.profile.email) ? admin.profile.emailVerified : false : admin.profile.emailVerified;
                     admin.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : admin.profile.email;
                     admin.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : admin.profile.emailVerificationToken;
-                    admin.profile.adminID = (req.body.profile && req.body.profile.adminID) ? req.body.profile.adminID : admin.profile.adminID;
+                    admin.employeeID = (req.body.employeeID) ? req.body.employeeID : admin.employeeID;
                     admin.userId = (req.body.userId) ? req.body.userId : admin.userId;
-                    admin.signature = (req.body.signature) ? req.body.signature : admin.signature;
                     admin.save((err) => {
                         if (err) {
                             console.log(err);
@@ -349,7 +347,7 @@ const adminsReadOneByUser = (req, res) => {
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
-            .populate('userId', 'username lastLogin lastFailedLogin status security picture')
+            .populate('userId', 'username type lastLogin lastFailedLogin status security picture')
             .exec((err, admin) => {
                 if (!admin) {
                     res
@@ -418,7 +416,6 @@ const adminsUpdateOneByUser = (req, res) => {
                                 "message": "You don\'t have permission to do that!"
                             });
                     }
-                    admin.type = (req.body.type) ? req.body.type : admin.type;
                     admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
                     admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
                     admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
@@ -430,9 +427,8 @@ const adminsUpdateOneByUser = (req, res) => {
                     admin.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (admin.profile.emailVerified && admin.profile.email == req.body.profile.email) ? admin.profile.emailVerified : false : admin.profile.emailVerified;
                     admin.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : admin.profile.email;
                     admin.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : admin.profile.emailVerificationToken;
-                    admin.profile.adminID = (req.body.profile && req.body.profile.adminID) ? req.body.profile.adminID : admin.profile.adminID;
+                    admin.employeeID = (req.body.employeeID) ? req.body.employeeID : admin.employeeID;
                     admin.userId = (req.body.userId) ? req.body.userId : admin.userId;
-                    admin.signature = (req.body.signature) ? req.body.signature : admin.signature;
                     admin.save((err) => {
                         if (err) {
                             console.log(err);

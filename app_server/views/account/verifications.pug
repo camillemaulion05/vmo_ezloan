@@ -40,7 +40,7 @@ block content
                           a.btn.btn-primary.p-2.mr-2(href='/verifications/submit')
                             | Submit Verification Request
                         if profileStat == 'Completed' && addressStat == 'Completed' && workAndAccountStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
-                          a.btn.btn-success.p-2.mr-2(href='/download/borrower')
+                          a.btn.btn-success.p-2.mr-2(href='/download/borrower/'+user._id)
                             | Download Application Form
               .col-xl-4
                 .card.mb-4

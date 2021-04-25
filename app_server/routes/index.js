@@ -62,7 +62,7 @@ router.post('/security/questions', passportConfig.isAuthenticated, ctrlAccount.p
 router.get('/verifications', passportConfig.isAuthenticated, ctrlAccount.getVerifications);
 router.get('/verifications/submit', passportConfig.isAuthenticated, ctrlAccount.getVerificationsSubmit);
 router.get('/verifications/cancel', passportConfig.isAuthenticated, ctrlAccount.getVerificationsCancel);
-router.get('/download/borrower', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowerInfo);
+router.get('/download/borrower/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowerInfo);
 
 router
     .route('/personal')
@@ -131,5 +131,10 @@ router
 
 router.get('/download/loan/:loanid/soa', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSOA);
 router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSchedule);
+
+router
+    .route('/borrowers')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postBorrowers);
 
 module.exports = router;

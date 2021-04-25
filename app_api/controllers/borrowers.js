@@ -44,9 +44,11 @@ const borrowersCreate = (req, res) => {
         status,
         profile,
         workBusinessInfo,
+        employeeID,
         account,
         signature,
         documents,
+        additionalDocuments,
         beneficiaries,
         totalCreditLimit,
         reviewedBy,
@@ -89,6 +91,7 @@ const borrowersReadOne = (req, res) => {
     } else {
         Borrower
             .findById(borrowerid)
+            .populate('reviewedBy', 'profile.firstName profile.lastName signature')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -104,6 +107,13 @@ const borrowersReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && borrower.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(borrower);
@@ -140,6 +150,13 @@ const borrowersUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && borrower.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     borrower.type = (req.body.type) ? req.body.type : borrower.type;
                     borrower.status = (req.body.status) ? req.body.status : borrower.status;
 
@@ -174,8 +191,8 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.workBusinessInfo.businessType = (req.body.workBusinessInfo && req.body.workBusinessInfo.businessType) ? req.body.workBusinessInfo.businessType : borrower.workBusinessInfo.businessType;
                     borrower.workBusinessInfo.position = (req.body.workBusinessInfo && req.body.workBusinessInfo.position) ? req.body.workBusinessInfo.position : borrower.workBusinessInfo.position;
                     borrower.workBusinessInfo.monthlyIncome = (req.body.workBusinessInfo && req.body.workBusinessInfo.monthlyIncome) ? req.body.workBusinessInfo.monthlyIncome : borrower.workBusinessInfo.monthlyIncome;
-                    borrower.workBusinessInfo.employeeID = (req.body.workBusinessInfo && req.body.workBusinessInfo.employeeID) ? req.body.workBusinessInfo.employeeID : borrower.workBusinessInfo.employeeID;
 
+                    borrower.employeeID = (req.body.employeeID) ? req.body.employeeID : borrower.employeeID;
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
                     borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
 
@@ -189,6 +206,8 @@ const borrowersUpdateOne = (req, res) => {
                     borrower.documents.bir = (req.body.documents && req.body.documents.bir) ? req.body.documents.bir : borrower.documents.bir;
                     borrower.documents.tinProof = (req.body.documents && req.body.documents.tinProof) ? req.body.documents.tinProof : borrower.documents.tinProof;
                     borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
+
+                    borrower.additionalDocuments = (req.body.additionalDocuments) ? req.body.additionalDocuments : borrower.additionalDocuments;
 
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
                     if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;
@@ -426,7 +445,7 @@ const borrowersReadOneByUser = (req, res) => {
             .findOne({
                 'userId': mongoose.Types.ObjectId(userid),
             })
-            .populate('userId reviewedBy', 'username lastLogin lastFailedLogin status security picture profile.firstName profile.lastName signature')
+            .populate('userId reviewedBy', 'username type lastLogin lastFailedLogin status security picture profile.firstName profile.lastName signature')
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -529,8 +548,8 @@ const borrowersUpdateOneByUser = (req, res) => {
                     borrower.workBusinessInfo.businessType = (req.body.workBusinessInfo && req.body.workBusinessInfo.businessType) ? req.body.workBusinessInfo.businessType : borrower.workBusinessInfo.businessType;
                     borrower.workBusinessInfo.position = (req.body.workBusinessInfo && req.body.workBusinessInfo.position) ? req.body.workBusinessInfo.position : borrower.workBusinessInfo.position;
                     borrower.workBusinessInfo.monthlyIncome = (req.body.workBusinessInfo && req.body.workBusinessInfo.monthlyIncome) ? req.body.workBusinessInfo.monthlyIncome : borrower.workBusinessInfo.monthlyIncome;
-                    borrower.workBusinessInfo.employeeID = (req.body.workBusinessInfo && req.body.workBusinessInfo.employeeID) ? req.body.workBusinessInfo.employeeID : borrower.workBusinessInfo.employeeID;
 
+                    borrower.employeeID = (req.body.employeeID) ? req.body.employeeID : borrower.employeeID;
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
                     borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
 
@@ -544,6 +563,8 @@ const borrowersUpdateOneByUser = (req, res) => {
                     borrower.documents.bir = (req.body.documents && req.body.documents.bir) ? req.body.documents.bir : borrower.documents.bir;
                     borrower.documents.tinProof = (req.body.documents && req.body.documents.tinProof) ? req.body.documents.tinProof : borrower.documents.tinProof;
                     borrower.documents.selfiewithId = (req.body.documents && req.body.documents.selfiewithId) ? req.body.documents.selfiewithId : borrower.documents.selfiewithId;
+
+                    borrower.additionalDocuments = (req.body.additionalDocuments) ? req.body.additionalDocuments : borrower.additionalDocuments;
 
                     borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
                     if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;

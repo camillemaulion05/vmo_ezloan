@@ -1,0 +1,104 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-primary.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
+                        | Registered Members
+                      - let members = borrowers.filter(d => d.type == "Member").length;
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{members}
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-info.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                        | Registered Non-Members
+                      - let nonMembers = borrowers.filter(d => d.type == "Non-Member").length;
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{nonMembers}
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-success.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                        | Pending for Review
+                      - let forReviews = borrowers.filter(d => d.status == "Pending for Review").length;
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{forReviews}
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-warning.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
+                        | Verified
+                      - let verified = borrowers.filter(d => d.status == "Verified").length;
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{verified}
+          .card.shadow.mb-4
+            .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
+              h6.m-0.font-weight-bold.text-primary List of Borrowers
+              .dropdown.no-arrow
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#borrowerModal') Add New Borrower
+            .card-body
+              .table-responsive
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th Borrower No.
+                      th Name
+                      th Age
+                      th Borrower Type
+                      th Mobile Number
+                      th Email Address
+                      th Status
+                      th Action
+                  tfoot
+                    tr
+                      th Borrower No.
+                      th Name
+                      th Age
+                      th Borrower Type
+                      th Mobile Number
+                      th Email Address
+                      th Status
+                      th Action
+                  tbody
+                    for x in borrowers
+                      - let dob = new Date(x.profile.dateOfBirth)
+                      - let diff_ms = Date.now() - dob.getTime();
+                      - let age_dt = new Date(diff_ms); 
+                      - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+                      tr
+                        td #{x.borrowerNum}
+                        td #{x.profile.firstName} #{x.profile.lastName}
+                        td #{age}          
+                        td #{x.type}          
+                        td #{x.profile.mobileNum}          
+                        td #{x.profile.email}
+                        if x.status == "Basic"
+                          td
+                            .badge.badge-primary.badge-pill #{x.status}
+                        else if x.status == "Verified"
+                          td
+                            .badge.badge-success.badge-pill #{x.status}
+                        else if x.status == "Declined"
+                          td
+                            .badge.badge-danger.badge-pill #{x.status} 
+                        else if x.status == "Pending for Review"
+                          td
+                            button.badge.badge-warning.badge-pill(type='button' href=x._id data-toggle='modal' data-target='#reviewBorrowerModal') #{x.status} 
+                        td 
+                          a.btn.btn-sm.btn-primary.mr-2(href='/download/borrower/'+x._id) View
+                          button.btn.btn-sm.btn-danger.mr-2(type='button' href=(x._id+'&'+x.profile.firstName+'&'+x.profile.lastName) data-toggle='modal' data-target='#deleteBorrowerModal') Delete
+    include ../partials/page-footer

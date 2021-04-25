@@ -136,8 +136,8 @@ router
 
 router
     .route('/borrowers/:borrowerid')
-    .get(auth, middleware.isModerator, ctrlBorrowers.borrowersReadOne)
-    .put(auth, middleware.isModerator, ctrlBorrowers.borrowersUpdateOne)
+    .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOne)
+    .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
 
 router.post('/borrowers/email', ctrlBorrowers.borrowersGetEmailByUser);
