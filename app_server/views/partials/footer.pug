@@ -31,6 +31,87 @@ else
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
+  if title.indexOf("Borrowers") != -1
+    #deleteBorrowerModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteBorrowerModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteBorrowerModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete borrower 
+              span#deleteBorrowerName
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteBorrower.btn.btn-primary(href='') Yes, delete it
+    #updateBorrowerModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateBorrowerModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#updateBorrowerModalLabel.modal-title 
+              | Update 
+              span#updateBorrowerName
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#updateBorrower(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='type') Borrower Type
+                  select#type.form-control.selectpicker(type='text' name='type')
+                    option(value='' selected='' disabled='') Borrower Type
+                    - let type = ["Non-Member", "Member"]
+                    for x in type
+                      option(value=x) #{x}
+                .col-md-6 
+                  label.small.mb-1(for='status') Status
+                  select#status.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='' disabled='') Status
+                    - let status = ["Basic", "Pending for Review", "Verified", "Declined"]
+                    for x in status
+                      if (x == 'Pending for Review' || x == 'Basic')
+                        option(value=x disabled='') #{x}
+                      else
+                        option(value=x) #{x}
+              .form-row.mb-2.membersOnly
+                .col-md-6
+                  label.small.mb-1(for='employeeID') Employee ID
+                  input#employeeID.form-control(type='text' name='employeeID')
+                .col-md-6
+                  label.small.mb-1(for='sharesPerPayDay') Shares/Payday (Php)
+                  input#sharesPerPayDay.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
+              .form-row.mb-2.verifiedOnly
+                .col-md-6
+                  label.small.mb-1(for='totalCreditLimit') Total Credit Limit
+                  input#totalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
+                .col-md-6
+                  label.small.mb-1(for='reviewedBy') Assigned Reviewer
+                  select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
+                    option(value='' selected='') Assigned Reviewer
+                    for x in employees
+                      if (x.type != 'HRD Authorized Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+              .form-row.mb-2.verifiedMemberOnly
+                .col-md-6
+                  label.small.mb-1(for='hrCertifiedBy') HRD Authorized Officer
+                  select#hrCertifiedBy.form-control.selectpicker(type='text' name='hrCertifiedBy')
+                    option(value='' selected='') HRD Authorized Officer
+                    for x in employees
+                      if (x.type == 'HRD Authorized Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='employmentType') Employment Status
+                  select#employmentType.form-control.selectpicker(type='text' name='employmentType')
+                    option(value='' selected='') Employment Status
+                    - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+                    for x in employmentType
+                      option(value=x) #{x}
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
   if title.indexOf("Profile") != -1
     #codeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='codeModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
@@ -40,12 +121,12 @@ else
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
           form(method='POST' action='/verifyMobileNum')
+            input(type='hidden', name='_csrf', value=_csrf)
+            input(type='hidden', name='mobileNum', value=user.profile.mobileNum)
             .modal-body
               p VMO EZ Loan will send a text message with a 6-digit verification code.
               .form-row
                 .form-group
-                  input(type='hidden', name='_csrf', value=_csrf)
-                  input(type='hidden', name='mobileNum', value=user.profile.mobileNum)
                   input#code.form-control(type='text' placeholder='Enter code' name='code')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
@@ -59,6 +140,7 @@ else
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
           form(method='POST' action='/loans')
+            input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               - let interestRate = (user.type == "Member") ? 3: 5;
               - let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
@@ -68,7 +150,6 @@ else
                 br
                 | Continuing Interest of #{interestRate}% per month against Outstanding Balance after the loan terms.
               .form-row.mb-2
-                input(type='hidden', name='_csrf', value=_csrf)
                 input#loanAmount.form-control(type="number" step="500" min="0" max=remainingCreditLimit name='loanAmount' value=remainingCreditLimit)
               .form-row.mb-2
                 select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')
@@ -101,13 +182,13 @@ else
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
           form(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               p 
                 | You can pay your repayment thru Bank Transfer or G-Cash. Check account numbers below.
                 br
                 | Please note your confirmation/reference number.
               .form-row.mb-2
-                input(type='hidden', name='_csrf', value=_csrf)
                 -let amountDue = (schedule.amountDue) ? (schedule.paymentAmount) ? (parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) < 0.00) ? '0.00' : parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) : (parseFloat(schedule.amountDue)).toFixed(2) : '0.00'
                 input#amount.form-control(type="text" name='amount' value=amountDue)
               .form-row.mb-2

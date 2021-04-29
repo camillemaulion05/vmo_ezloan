@@ -20,7 +20,13 @@ const borrowersList = (req, res) => {
             "profile.dateOfBirth": 1,
             "profile.mobileNum": 1,
             "profile.email": 1,
-            "userId": 1
+            "userId": 1,
+            "totalCreditLimit": 1,
+            "reviewedBy": 1,
+            "employeeID": 1,
+            "sharesPerPayDay": 1,
+            "hrCertifiedBy": 1,
+            "workBusinessInfo.employmentType": 1,
         })
         .exec((err, borrowers) => {
             if (err) {

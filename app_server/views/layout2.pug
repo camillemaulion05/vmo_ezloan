@@ -74,7 +74,81 @@ html
                 });
               });
           });
-
+    if title.indexOf("Borrowers") != -1
+      script.
+          $(function () {
+              $('a.deleteBorrower').click(function () {
+                let path = ($(this).prop('href')).split('/');
+                let lastName = (path[path.length-1]).replace(/%20/g," ");
+                let firstName = (path[path.length-2]).replace(/%20/g," ");
+                let borrowerid = path[path.length-3];
+                let userid = path[path.length-4];
+                $('a#deleteBorrower').attr('href', '/delete' + '/borrower/' + borrowerid + '/' + userid); 
+                $('span#deleteBorrowerName').text(firstName + ' ' + lastName);
+                $('#deleteBorrowerModal').modal('show'); 
+              });
+              $('a.updateBorrower').click(function () {
+                let path = ($(this).prop('href')).split('/');
+                let employmentType = (path[path.length-1] != 'undefined') ? (path[path.length-1]).replace(/%20/g," ") : '';
+                let hrCertifiedBy = (path[path.length-2] != 'undefined') ? path[path.length-2] : '';
+                let sharesPerPayDay = (path[path.length-3] != 'undefined') ? parseFloat(path[path.length-3]) : '';
+                let employeeID = (path[path.length-4] != 'undefined') ? path[path.length-4] : '';
+                let reviewedBy = (path[path.length-5] != 'undefined') ? path[path.length-5] : '';
+                let totalCreditLimit = parseFloat(path[path.length-6]);
+                let status = (path[path.length-7]).replace(/%20/g," ");
+                let type = (path[path.length-8]).replace(/%20/g," ");
+                let lastName = (path[path.length-9]).replace(/%20/g," ");
+                let firstName = (path[path.length-10]).replace(/%20/g," ");
+                let borrowerid = path[path.length-11];
+                $('select[name=type').val(type);
+                $('select[name=status').val(status);
+                $('input[name=totalCreditLimit').val(totalCreditLimit);
+                $('select[name=reviewedBy').val(reviewedBy);
+                $('input[name=employeeID').val(employeeID);
+                $('input[name=sharesPerPayDay').val(sharesPerPayDay);
+                $('select[name=hrCertifiedBy').val(hrCertifiedBy);
+                $('select[name=employmentType').val(employmentType);
+                if (type == 'Member') {
+                  $('.membersOnly').removeClass('d-none');
+                } else{
+                  $('.membersOnly').addClass('d-none');
+                }
+                if (status == 'Pending for Review' || status == 'Basic'  || status == 'Declined') {
+                  $('.verifiedOnly').addClass('d-none');
+                  $('.verifiedMemberOnly').addClass('d-none');
+                } else{
+                   $('.verifiedOnly').removeClass('d-none');
+                  if (type == 'Member') {
+                    $('.verifiedMemberOnly').removeClass('d-none');
+                  } else{
+                    $('.verifiedMemberOnly').addClass('d-none');
+                  }
+                }
+                $("#updateBorrower").attr("action", "/update/borrower/" + borrowerid);
+                $('span#updateBorrowerName').text(firstName + ' ' + lastName);
+                $('#updateBorrowerModal').modal('show');
+              });
+              $('select[name=type]').change(function () {
+                if ($('select[name=type').val() == 'Member') {
+                  $('.membersOnly').removeClass('d-none');
+                } else{
+                  $('.membersOnly').addClass('d-none');
+                }
+              });
+              $('select[name=status]').change(function () {
+                if ($('select[name=status').val() == 'Pending for Review' || $('select[name=status').val() == 'Basic' || $('select[name=status').val() == 'Declined') {
+                  $('.verifiedOnly').addClass('d-none');
+                  $('.verifiedMemberOnly').addClass('d-none');
+                } else{
+                   $('.verifiedOnly').removeClass('d-none');
+                  if ($('select[name=type').val() == 'Member') {
+                     $('.verifiedMemberOnly').removeClass('d-none');
+                   } else{
+                     $('.verifiedMemberOnly').addClass('d-none');
+                   }
+                }
+              });
+          });
     if title.indexOf("Security") != -1
       script.
           $(function () {

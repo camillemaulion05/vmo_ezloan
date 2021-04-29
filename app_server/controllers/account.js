@@ -5135,11 +5135,40 @@ const getBorrowers = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            res.render('account/borrowers', {
-                                title: 'Account Management - Borrowers',
-                                user: user,
-                                borrowers: borrowers
-                            });
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading list of employees.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        res.render('account/borrowers', {
+                                            title: 'Account Management - Borrowers',
+                                            user: user,
+                                            borrowers: borrowers,
+                                            employees: employees
+                                        });
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: borrowers.message
@@ -5158,8 +5187,152 @@ const getBorrowers = (req, res) => {
     );
 };
 
-const postBorrowers = (req, res) => {
+const postBorrower = (req, res) => {
     return res.redirect('back');
+};
+
+const getDeleteBorrower = (req, res) => {
+    path = '/api/borrowers/' + req.params.borrowerid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in deleting borrower account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                path = '/api/users/' + req.params.userid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, user) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in deleting user account.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting user account."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: user.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postUpdateBorrower = (req, res) => {
+    const validationErrors = [];
+    if (req.body.type == 'Member') {
+        if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+            msg: 'Employee ID cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+            msg: 'Shares/Payday cannot be blank.'
+        });
+        if (validator.equals(req.body.sharesPerPayDay, '0')) validationErrors.push({
+            msg: 'Shares/Payday cannot be zero.'
+        });
+    }
+    if (req.body.status == 'Verified') {
+        if (validator.isEmpty(req.body.totalCreditLimit)) validationErrors.push({
+            msg: 'Total Credit Limit cannot be blank.'
+        });
+        if (validator.equals(req.body.totalCreditLimit, '0')) validationErrors.push({
+            msg: 'Total Credit Limit cannot be zero.'
+        });
+        if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
+            msg: 'Assigned Reviewer cannot be blank.'
+        });
+    }
+    if (req.body.type == 'Member' && req.body.status == 'Verified') {
+        if (validator.isEmpty(req.body.hrCertifiedBy)) validationErrors.push({
+            msg: 'HRD Authorized Officer cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.employmentType)) validationErrors.push({
+            msg: 'Employment Status cannot be blank.'
+        });
+    }
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('/borrowers');
+    }
+    path = '/api/borrowers/' + req.params.borrowerid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            type: req.body.type,
+            status: req.body.status,
+            totalCreditLimit: (req.body.status == 'Verified') ? req.body.totalCreditLimit : '',
+            reviewedBy: (req.body.status == 'Verified') ? req.body.reviewedBy : '',
+            employeeID: (req.body.type == 'Member') ? req.body.employeeID : '',
+            sharesPerPayDay: (req.body.type == 'Member') ? req.body.sharesPerPayDay : '',
+            hrCertifiedBy: (req.body.type == 'Member' && req.body.status == 'Verified') ? req.body.hrCertifiedBy : '',
+            workBusinessInfo: {
+                employmentType: (req.body.type == 'Member' && req.body.status == 'Verified') ? req.body.employmentType : ''
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating borrower information.  Please try again later.'
+                });
+                return res.redirect('/borrowers');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Borrower information has been updated.'
+                });
+                return res.redirect('/borrowers');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('/borrowers');
+            }
+        }
+    );
 };
 
 module.exports = {
@@ -5194,5 +5367,7 @@ module.exports = {
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
     getBorrowers,
-    postBorrowers
+    postBorrower,
+    getDeleteBorrower,
+    postUpdateBorrower,
 };

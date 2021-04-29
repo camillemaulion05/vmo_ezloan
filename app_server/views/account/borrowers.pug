@@ -62,7 +62,7 @@ block content
                       th Mobile Number
                       th Email Address
                       th Status
-                      th Action
+                      th Actions
                   tfoot
                     tr
                       th Borrower No.
@@ -72,7 +72,7 @@ block content
                       th Mobile Number
                       th Email Address
                       th Status
-                      th Action
+                      th Actions
                   tbody
                     for x in borrowers
                       - let dob = new Date(x.profile.dateOfBirth)
@@ -80,7 +80,8 @@ block content
                       - let age_dt = new Date(diff_ms); 
                       - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
                       tr
-                        td #{x.borrowerNum}
+                        td 
+                          a(href='/download/borrower/'+x._id) #{x.borrowerNum}
                         td #{x.profile.firstName} #{x.profile.lastName}
                         td #{age}          
                         td #{x.type}          
@@ -97,8 +98,11 @@ block content
                             .badge.badge-danger.badge-pill #{x.status} 
                         else if x.status == "Pending for Review"
                           td
-                            button.badge.badge-warning.badge-pill(type='button' href=x._id data-toggle='modal' data-target='#reviewBorrowerModal') #{x.status} 
+                            .badge.badge-warning.badge-pill #{x.status} 
                         td 
-                          a.btn.btn-sm.btn-primary.mr-2(href='/download/borrower/'+x._id) View
-                          button.btn.btn-sm.btn-danger.mr-2(type='button' href=(x._id+'&'+x.profile.firstName+'&'+x.profile.lastName) data-toggle='modal' data-target='#deleteBorrowerModal') Delete
+                          - let employmentType = (x.workBusinessInfo && x.workBusinessInfo.employmentType) ? x.workBusinessInfo.employmentType : undefined;
+                          a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/'+x.type+'/'+x.status+'/'+x.totalCreditLimit+'/'+x.reviewedBy+'/'+x.employeeID+'/'+x.sharesPerPayDay+'/'+x.hrCertifiedBy+'/'+ employmentType) data-toggle='modal' data-target='#')
+                            i.fas.fa-edit
+                          a.deleteBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
+                            i.fas.fa-trash
     include ../partials/page-footer

@@ -195,13 +195,16 @@ const borrowerSchema = mongoose.Schema({
     hrCertifiedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee' // HRD Authorized Officer
-    },
-    hrCertifiedDate: Date,
+    }, //For Members Only
+    hrCertifiedDate: Date, //For Members Only
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User" // User account
     },
-    sharesPerPayDay: String, // default: "300.00" for members
+    sharesPerPayDay: {
+        type: String,
+        default: "0.00"
+    }, // default: "300.00" For Members Only
 }, {
     timestamps: true
 });
