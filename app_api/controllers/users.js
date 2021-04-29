@@ -73,13 +73,21 @@ const usersCreate = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    const token = user.generateJwt();
-                    res
-                        .status(201)
-                        .json({
-                            'username': user.username,
-                            'token': token
-                        });
+                    if (req.payload && "Admin" == req.payload.type) {
+                        res
+                            .status(201)
+                            .json({
+                                'id': user._id
+                            });
+                    } else {
+                        const token = user.generateJwt();
+                        res
+                            .status(201)
+                            .json({
+                                'username': user.username,
+                                'token': token
+                            });
+                    }
                 }
             });
         }

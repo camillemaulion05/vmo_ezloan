@@ -449,7 +449,7 @@ const postForgot = (req, res) => {
                                         return res.redirect('/forgot');
                                     } else {
                                         req.flash('errors', {
-                                            msg: borrower.message
+                                            msg: body.message
                                         });
                                         return res.redirect('/forgot');
                                     }
@@ -614,7 +614,7 @@ const postReset = (req, res, next) => {
                                         return res.redirect('/login');
                                     } else {
                                         req.flash('errors', {
-                                            msg: borrower.message
+                                            msg: body.message
                                         });
                                         return res.redirect('/login');
                                     }
@@ -630,7 +630,7 @@ const postReset = (req, res, next) => {
                 );
             } else {
                 req.flash('errors', {
-                    msg: borrower.message
+                    msg: user.message
                 });
                 return res.redirect('back');
             }

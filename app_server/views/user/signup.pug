@@ -75,8 +75,9 @@ block content
               .form-group
                 select#gender.form-control.selectpicker(type='text' name='gender')
                   option(value='' selected='' disabled='') Gender
-                  option(value='Female') Female
-                  option(value='Male') Male
+                  - let gender = ['Female', 'Male']
+                  for x in gender
+                    option(value=x) #{x}
                 em.invalid-feedback
           if type == "admin" || type == "employee" || type == "member"
             .row
@@ -94,9 +95,9 @@ block content
                 .form-group
                   select#employeeType.form-control.selectpicker(type='text' name='employeeType')
                     option(value='' selected='' disabled='') Employee Type
-                    option(value='Loan Officer') Loan Officer
-                    option(value='Loan Processor') Loan Processor
-                    option(value='HRD Authorized Officer') HRD Authorized Officer
+                    - let employeeType = ["Loan Officer", "Loan Processor", "HRD Authorized Officer"]
+                    for x in employeeType
+                      option(value=x) #{x}
                   em.invalid-feedback
           if type == "member"
             .row

@@ -135,9 +135,9 @@ router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ct
 router
     .route('/borrowers')
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
-    .post(passportConfig.isAuthenticated, ctrlAccount.postBorrower);
+    .post(passportConfig.isAuthenticated, ctrlAccount.postBorrowers);
 
-router.get('/delete/borrower/:borrowerid/:userid', passportConfig.isAuthenticated, ctrlAccount.getDeleteBorrower);
-router.post('/update/borrower/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.postUpdateBorrower);
+router.get('/borrowers/:borrowerid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteBorrowers);
+router.post('/borrowers/:borrowerid/update', passportConfig.isAuthenticated, ctrlAccount.postUpdateBorrowers);
 
 module.exports = router;

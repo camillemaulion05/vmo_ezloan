@@ -6,10 +6,20 @@ const apiOptions = {
     server: process.env.BASE_URL
 };
 
-/**
- * GET /account
- * Profile page.
- */
+function passwordGen() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 8; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
+function usernameGen(firstName, lastName, dob) {
+    firstName.trim()
+    lastName.trim()
+    dob.trim()
+    return (firstName.substr(0, 1)).toUpperCase() + (lastName).toUpperCase() + (dob).replace(/\-/g, '');
+}
 
 function parseDate(date, format) {
     let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -67,7 +77,10 @@ function getUserDetails(req, res, filename, title) {
     );
 }
 
-
+/**
+ * GET /account
+ * Accoun page.
+ */
 const getAccount = (req, res) => {
     getUserDetails(req, res, 'account/index', 'Account Management');
 };
@@ -5187,11 +5200,225 @@ const getBorrowers = (req, res) => {
     );
 };
 
-const postBorrower = (req, res) => {
-    return res.redirect('back');
+const postBorrowers = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.type)) validationErrors.push({
+        msg: 'Borrower type cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.status)) validationErrors.push({
+        msg: 'Borrower status cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.firstName)) validationErrors.push({
+        msg: 'First Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.lastName)) validationErrors.push({
+        msg: 'Last Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Birthday cannot be blank.'
+    });
+    if (!validator.isDate(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Enter a valid date.'
+    });
+    if (validator.isEmpty(req.body.gender)) validationErrors.push({
+        msg: 'Gender cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.mobileNum)) validationErrors.push({
+        msg: 'Mobile number cannot be blank.'
+    });
+    if (!validator.isEmail(req.body.email)) validationErrors.push({
+        msg: 'Please enter a valid email address.'
+    });
+    if (req.body.type == 'Member') {
+        if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+            msg: 'Employee ID cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+            msg: 'Shares/Payday cannot be blank.'
+        });
+        if (validator.equals(req.body.sharesPerPayDay, '0')) validationErrors.push({
+            msg: 'Shares/Payday cannot be zero.'
+        });
+    }
+    if (req.body.status == 'Verified') {
+        if (validator.isEmpty(req.body.totalCreditLimit)) validationErrors.push({
+            msg: 'Total Credit Limit cannot be blank.'
+        });
+        if (validator.equals(req.body.totalCreditLimit, '0')) validationErrors.push({
+            msg: 'Total Credit Limit cannot be zero.'
+        });
+        if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
+            msg: 'Assigned Reviewer cannot be blank.'
+        });
+    }
+    if (req.body.type == 'Member' && req.body.status == 'Verified') {
+        if (validator.isEmpty(req.body.hrCertifiedBy)) validationErrors.push({
+            msg: 'HRD Authorized Officer cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.employmentType)) validationErrors.push({
+            msg: 'Employment Status cannot be blank.'
+        });
+    }
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    req.body.email = validator.normalizeEmail(req.body.email, {
+        gmail_remove_dots: false
+    });
+    let username = usernameGen(req.body.firstName, req.body.lastName, req.body.dateOfBirth);
+    let password = passwordGen();
+    path = '/api/users';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            username: username,
+            password: CryptoJS.AES.encrypt(password, process.env.CRYPTOJS_CLIENT_SECRET).toString()
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in creating user account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 201) {
+                let data;
+                if (req.body.status == 'Verified') {
+                    if (req.body.type == 'Member') {
+                        data = {
+                            type: req.body.type,
+                            status: req.body.status,
+                            profile: {
+                                firstName: req.body.firstName,
+                                lastName: req.body.lastName,
+                                dateOfBirth: req.body.dateOfBirth,
+                                gender: req.body.gender,
+                                email: req.body.email,
+                                mobileNum: req.body.mobileNum
+                            },
+                            totalCreditLimit: req.body.totalCreditLimit,
+                            reviewedBy: req.body.reviewedBy,
+                            employeeID: req.body.employeeID,
+                            sharesPerPayDay: req.body.sharesPerPayDay,
+                            hrCertifiedBy: req.body.hrCertifiedBy,
+                            workBusinessInfo: {
+                                employmentType: req.body.employmentType
+                            },
+                            userId: user.id
+                        };
+                    } else {
+                        data = {
+                            type: req.body.type,
+                            status: req.body.status,
+                            profile: {
+                                firstName: req.body.firstName,
+                                lastName: req.body.lastName,
+                                dateOfBirth: req.body.dateOfBirth,
+                                gender: req.body.gender,
+                                email: req.body.email,
+                                mobileNum: req.body.mobileNum
+                            },
+                            totalCreditLimit: req.body.totalCreditLimit,
+                            reviewedBy: req.body.reviewedBy,
+                            userId: user.id
+                        };
+                    }
+                } else {
+                    data = {
+                        type: req.body.type,
+                        status: req.body.status,
+                        profile: {
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            dateOfBirth: req.body.dateOfBirth,
+                            gender: req.body.gender,
+                            email: req.body.email,
+                            mobileNum: req.body.mobileNum
+                        },
+                        userId: user.id
+                    };
+                }
+                path = '/api/borrowers';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + user.token
+                    },
+                    json: data
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, borrower) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in creating borrower account.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            path = '/api/sendMail';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                json: {
+                                    receiver: req.body.email,
+                                    subject: 'VMO EZ Loan Account',
+                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your birthdate in YYYYMMDD.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, body) => {
+                                    if (err) {
+                                        req.flash('warning', {
+                                            msg: 'We were unable to send the password to respective email.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        req.flash('success', {
+                                            msg: 'Success! New Borrower has been created and password has been sent to respective email.'
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: body.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: borrower.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
 };
 
-const getDeleteBorrower = (req, res) => {
+const getDeleteBorrowers = (req, res) => {
     path = '/api/borrowers/' + req.params.borrowerid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -5254,8 +5481,14 @@ const getDeleteBorrower = (req, res) => {
     );
 };
 
-const postUpdateBorrower = (req, res) => {
+const postUpdateBorrowers = (req, res) => {
     const validationErrors = [];
+    if (validator.isEmpty(req.body.type)) validationErrors.push({
+        msg: 'Borrower type cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.status)) validationErrors.push({
+        msg: 'Borrower status cannot be blank.'
+    });
     if (req.body.type == 'Member') {
         if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
             msg: 'Employee ID cannot be blank.'
@@ -5288,7 +5521,7 @@ const postUpdateBorrower = (req, res) => {
     }
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/borrowers');
+        return res.redirect('back');
     }
     path = '/api/borrowers/' + req.params.borrowerid;
     requestOptions = {
@@ -5319,17 +5552,17 @@ const postUpdateBorrower = (req, res) => {
                 req.flash('errors', {
                     msg: 'There was an error when updating borrower information.  Please try again later.'
                 });
-                return res.redirect('/borrowers');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Borrower information has been updated.'
                 });
-                return res.redirect('/borrowers');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/borrowers');
+                return res.redirect('back');
             }
         }
     );
@@ -5367,7 +5600,7 @@ module.exports = {
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
     getBorrowers,
-    postBorrower,
-    getDeleteBorrower,
-    postUpdateBorrower,
+    postBorrowers,
+    getDeleteBorrowers,
+    postUpdateBorrowers,
 };

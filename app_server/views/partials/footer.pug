@@ -32,6 +32,95 @@ else
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
   if title.indexOf("Borrowers") != -1
+    - let type = ["Non-Member", "Member"]
+    - let status = ["Basic", "Pending for Review", "Verified", "Declined"]
+    - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+    #addBorrowerModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addBorrowerModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addBorrowerModalLabel.modal-title Add New Borrower
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addBorrower(method='POST' action='/borrowers')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerType') Borrower Type
+                  select#borrowerType.form-control.selectpicker(type='text' name='type')
+                    option(value='' selected='') Borrower Type
+                    for x in type
+                      option(value=x) #{x}
+                .col-md-6 
+                  label.small.mb-1(for='borrowerStatus') Status
+                  select#borrowerStatus.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='') Status
+                    for x in status
+                      option(value=x) #{x}
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerFirstName') First name
+                  input#borrowerFirstName.form-control(type='text' name='firstName')
+                .col-md-6
+                  label.small.mb-1(for='borrowerLastName') Last name
+                  input#borrowerLastName.form-control(type='text' name='lastName')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerGender') Gender
+                  select#borrowerGender.form-control.selectpicker(type='text' name='gender')
+                    option(value='' selected='') Gender
+                    - let gender = ['Female', 'Male']
+                    for x in gender
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='borrowerDateOfBirth') Birthdate
+                  input#borrowerDateOfBirth.form-control(type='date' name='dateOfBirth')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerEmail') Email address
+                  input#borrowerEmail.form-control(type='email' name='email')
+                .col-md-6
+                  label.small.mb-1(for='borrowerMobileNum') Mobile Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#borrowerMobileNum.form-control(type='text' name='mobileNum')
+              .form-row.mb-2.membersOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='borrowerEmployeeID') Employee ID
+                  input#borrowerEmployeeID.form-control(type='text' name='employeeID')
+                .col-md-6
+                  label.small.mb-1(for='borrowerShares') Shares/Payday (Php)
+                  input#borrowerShares.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
+              .form-row.mb-2.verifiedOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='borrowerTotalCreditLimit') Total Credit Limit
+                  input#borrowerTotalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
+                .col-md-6
+                  label.small.mb-1(for='borrowerReviewedBy') Assigned Reviewer
+                  select#borrowerReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
+                    option(value='' selected='') Assigned Reviewer
+                    for x in employees
+                      if (x.type != 'HRD Authorized Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+              .form-row.mb-2.verifiedMemberOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='borrowerHrCertifiedBy') HRD Authorized Officer
+                  select#borrowerHrCertifiedBy.form-control.selectpicker(type='text' name='hrCertifiedBy')
+                    option(value='' selected='') HRD Authorized Officer
+                    for x in employees
+                      if (x.type == 'HRD Authorized Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='borrowerEmploymentType') Employment Status
+                  select#borrowerEmploymentType.form-control.selectpicker(type='text' name='employmentType')
+                    option(value='' selected='') Employment Status
+                    for x in employmentType
+                      option(value=x) #{x}
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
     #deleteBorrowerModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteBorrowerModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
@@ -63,14 +152,12 @@ else
                   label.small.mb-1(for='type') Borrower Type
                   select#type.form-control.selectpicker(type='text' name='type')
                     option(value='' selected='' disabled='') Borrower Type
-                    - let type = ["Non-Member", "Member"]
                     for x in type
                       option(value=x) #{x}
                 .col-md-6 
                   label.small.mb-1(for='status') Status
                   select#status.form-control.selectpicker(type='text' name='status')
                     option(value='' selected='' disabled='') Status
-                    - let status = ["Basic", "Pending for Review", "Verified", "Declined"]
                     for x in status
                       if (x == 'Pending for Review' || x == 'Basic')
                         option(value=x disabled='') #{x}
@@ -106,7 +193,6 @@ else
                   label.small.mb-1(for='employmentType') Employment Status
                   select#employmentType.form-control.selectpicker(type='text' name='employmentType')
                     option(value='' selected='') Employment Status
-                    - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
                     for x in employmentType
                       option(value=x) #{x}
             .modal-footer
