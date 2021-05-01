@@ -124,10 +124,7 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getCredits)
     .post(passportConfig.isAuthenticated, ctrlAccount.postCredits);
 
-router
-    .route('/credits/:loanid')
-    .get(passportConfig.isAuthenticated, ctrlAccount.getCreditDetails)
-    .post(passportConfig.isAuthenticated, ctrlAccount.postRepayment);
+router.post('/repayments/:loanid', passportConfig.isAuthenticated, ctrlAccount.postRepayment);
 
 router.get('/download/loan/:loanid/soa', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSOA);
 router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSchedule);
@@ -146,7 +143,11 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postLoans);
 
 router.get('/delete/:dataid/:table', passportConfig.isAuthenticated, ctrlAccount.getDeleteData);
-router.post('/loans/:loanid', passportConfig.isAuthenticated, ctrlAccount.postUpdateLoans);
+
+router
+    .route('/loans/:loanid')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getLoanDetails)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateLoans);
 
 router.get('/loans/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerCredits);
 

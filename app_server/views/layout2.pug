@@ -451,6 +451,12 @@ html
                 $('input[name="receiverNum"]').val('3729457999')
               }
           });
+          $('a#addRepayment').click(function () {
+            let path = ($(this).prop('href')).split('/');
+            let loanid = path[path.length-1];
+            $("#repayment").attr("action", "/repayments/" + loanid);
+            $('#repaymentModal').modal('show'); 
+          });
         });
 
     if title.indexOf("KYC Declaration") != -1

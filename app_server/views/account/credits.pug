@@ -91,7 +91,7 @@ block content
                       - let paymentEndDate =  (x.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
                       tr
                         td
-                          a(href='/credits/' + x._id) #{x.loanNum}
+                          a(href='/loans/' + x._id) #{x.loanNum}
                         td #{paymentStartDate}
                         td #{paymentEndDate}
                         td #{(parseFloat(x.loanAmount)).toFixed(2)}

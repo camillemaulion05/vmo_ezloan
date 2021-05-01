@@ -403,7 +403,7 @@ else
             h5#repaymentModalLabel.modal-title Add Repayment
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form(method='POST')
+          form#repayment(method='POST')
             input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               p 

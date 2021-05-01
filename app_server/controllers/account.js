@@ -3779,128 +3779,6 @@ const postCredits = (req, res) => {
     );
 };
 
-const getCreditDetails = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, user) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 200) {
-                path = '/api/loans/' + (req.params.loanid).toString();
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'GET',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {}
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, loan) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error in loading your loan details.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 200) {
-                            path = '/api/loans/' + (req.params.loanid).toString() + '/due'
-                            requestOptions = {
-                                url: `${apiOptions.server}${path}`,
-                                method: 'GET',
-                                headers: {
-                                    Authorization: 'Bearer ' + req.user.token
-                                },
-                                json: {}
-                            };
-                            request(
-                                requestOptions,
-                                (err, {
-                                    statusCode
-                                }, schedules) => {
-                                    if (err) {
-                                        req.flash('errors', {
-                                            msg: 'There was an error in loading your loan schedules.'
-                                        });
-                                        return res.redirect('back');
-                                    } else if (statusCode === 200) {
-                                        path = '/api/transactions/loans/' + (req.params.loanid).toString()
-                                        requestOptions = {
-                                            url: `${apiOptions.server}${path}`,
-                                            method: 'GET',
-                                            headers: {
-                                                Authorization: 'Bearer ' + req.user.token
-                                            },
-                                            json: {}
-                                        };
-                                        request(
-                                            requestOptions,
-                                            (err, {
-                                                statusCode
-                                            }, repayments) => {
-                                                if (err) {
-                                                    req.flash('errors', {
-                                                        msg: 'There was an error in loading your repayments.'
-                                                    });
-                                                    return res.redirect('back');
-                                                } else if (statusCode === 200) {
-                                                    res.render('account/credits-details', {
-                                                        title: 'Account Management - Loan Details',
-                                                        user: user,
-                                                        loan: loan,
-                                                        schedule: (schedules.length >= 1) ? schedules[0].loanPaymentSchedule[0] : schedules,
-                                                        repayments: repayments
-                                                    });
-                                                } else {
-                                                    req.flash('errors', {
-                                                        msg: repayments.message
-                                                    });
-                                                    return res.redirect('back');
-                                                }
-                                            }
-                                        );
-                                    } else {
-                                        req.flash('errors', {
-                                            msg: schedules.message
-                                        });
-                                        return res.redirect('back');
-                                    }
-                                }
-                            );
-                        } else {
-                            req.flash('errors', {
-                                msg: loan.message
-                            });
-                            return res.redirect('back');
-                        }
-                    }
-                );
-            } else {
-                req.flash('errors', {
-                    msg: user.message
-                });
-                return res.redirect('back');
-            }
-        }
-    );
-};
-
 const getDownloadLoanSOA = (req, res) => {
     function download(data, req, res) {
         let fonts = {
@@ -6056,6 +5934,130 @@ const postUpdateLoans = (req, res) => {
     );
 };
 
+const getLoanDetails = (req, res) => {
+    path = '/api/borrowers/users/' + (req.user.id).toString();
+    if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans/' + (req.params.loanid).toString();
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loan) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading your loan details.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/loans/' + (req.params.loanid).toString() + '/due'
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, schedules) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading your loan schedules.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/transactions/loans/' + (req.params.loanid).toString()
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, repayments) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error in loading your repayments.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/loans-details', {
+                                                        title: 'Account Management - Loan Details',
+                                                        user: user,
+                                                        loan: loan,
+                                                        schedule: (schedules.length >= 1) ? schedules[0].loanPaymentSchedule[0] : schedules,
+                                                        repayments: repayments
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: repayments.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: schedules.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: loan.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -6083,7 +6085,6 @@ module.exports = {
     postVerificationsDeclaration,
     getCredits,
     postCredits,
-    getCreditDetails,
     postRepayment,
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
@@ -6095,5 +6096,6 @@ module.exports = {
     postLoans,
     getBorrowerCredits,
     getDeleteData,
-    postUpdateLoans
+    postUpdateLoans,
+    getLoanDetails
 };

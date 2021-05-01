@@ -95,7 +95,7 @@ block content
               #dashboardNavContent.tab-content
                 #repayments.tab-pane.fade.active.show(role='tabpanel' aria-labelledby='repayments-pill')
                   if loan.status == "Loan Release" || loan.status == "Open" || loan.status == "Loan Debt"
-                    button.btn.btn-sm.btn-primary.mr-2.mb-4(type='button' href='#' data-toggle='modal' data-target='#repaymentModal') Add Repayment
+                    a#addRepayment.btn.btn-sm.btn-primary.mr-2.mb-4(href=('/'+loan._id) data-toggle='modal' data-target='#') Add Repayment
                   .table-responsive
                     table.table.table-hover.mb-0
                       thead
@@ -142,6 +142,10 @@ block content
                         table.table.mb-0
                           tbody
                             tr
+                              th Borrower Name
+                              td 
+                              td.text-right #{loan.requestedBy.profile.firstName} #{loan.requestedBy.profile.lastName}
+                            tr
                               th Loan Purpose
                               td 
                               td.text-right #{loan.purposeOfLoan}
@@ -162,9 +166,9 @@ block content
                               td Php
                               td.text-right #{(parseFloat(loan.monthlyAmortization)).toFixed(2)}
                             tr
-                              th #{user.account.type} Account Number
+                              th #{loan.requestedBy.account.type} Account Number
                               td 
-                              td.text-right #{user.account.number}
+                              td.text-right #{loan.requestedBy.account.number}
                             tr
                               th Total Payments
                               td Php
@@ -184,6 +188,10 @@ block content
                       .table-responsive.table-hover
                         table.table.mb-0
                           tbody
+                            tr
+                              th Borrower No.
+                              td 
+                              td.text-right #{loan.requestedBy.borrowerNum}
                             tr
                               th Loan Term 
                               td 
