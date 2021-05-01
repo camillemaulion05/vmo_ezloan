@@ -131,9 +131,8 @@ const loansUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    loan.requestedBy = (req.body.requestedBy) ? req.body.requestedBy : loan.requestedBy;
-                    loan.status = (req.body.status) ? req.body.status : loan.status;
                     if (req.body.loanAmount && req.body.monthlyInterestRate && req.body.loanTerm && loan.status == 'Processing') {
+                        loan.purposeOfLoan = (req.body.purposeOfLoan) ? req.body.purposeOfLoan : loan.purposeOfLoan;
                         if (req.body.loanAmount != loan.loanAmount || req.body.loanTerm != loan.loanTerm || req.body.monthlyInterestRate != loan.monthlyInterestRate) {
                             loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
                             loan.loanAmount = (req.body.loanAmount) ? req.body.loanAmount : loan.loanAmount;
@@ -141,9 +140,10 @@ const loansUpdateOne = (req, res) => {
                             loan.compute(loan.loanAmount, loan.monthlyInterestRate, loan.loanTerm);
                         }
                     }
+                    if (req.body.status && req.body.status != loan.status && "Loan Release" == req.body.status) loan.updateDates();
+                    loan.status = (req.body.status) ? req.body.status : loan.status;
                     loan.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : loan.reviewedBy;
                     loan.reviewedDate = (req.body.reviewedBy) ? Date.now() : loan.reviewedDate;
-                    if ("Loan Release" == req.body.status) loan.updateDates();
                     loan.save((err) => {
                         if (err) {
                             console.log(err);

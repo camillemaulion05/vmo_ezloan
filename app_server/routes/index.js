@@ -145,6 +145,9 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getLoans)
     .post(passportConfig.isAuthenticated, ctrlAccount.postLoans);
 
+router.get('/delete/:dataid/:table', passportConfig.isAuthenticated, ctrlAccount.getDeleteData);
+router.post('/loans/:loanid', passportConfig.isAuthenticated, ctrlAccount.postUpdateLoans);
+
 router.get('/loans/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerCredits);
 
 module.exports = router;

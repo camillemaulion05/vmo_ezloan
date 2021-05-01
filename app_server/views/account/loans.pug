@@ -81,8 +81,8 @@ block content
                           td
                             .badge.badge-warning.badge-pill #{x.status}
                         td 
-                          a.updateLoan.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.loanNum+'/'+borrowerName+'/'+x.requestedBy.type+'/'+x.purposeOfLoan+'/'+x.loanAmount+'/'+x.loanTerm+'/'+x.status+'/'+x.reviewedBy) data-toggle='modal' data-target='#')
+                          a.updateLoan.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.loanNum+'/'+x.requestedBy._id+'/'+x.requestedBy.type+'/'+x.purposeOfLoan+'/'+x.loanAmount+'/'+x.loanTerm+'/'+x.status+'/'+x.reviewedBy) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
-                          a.deleteLoan.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.loanNum) data-toggle='modal' data-target='#')
+                          a.deleteLoan.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.loanNum+'/'+borrowerName) data-toggle='modal' data-target='#')
                             i.fas.fa-trash
     include ../partials/page-footer

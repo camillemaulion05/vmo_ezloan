@@ -211,14 +211,14 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='name') Borrower Name
-                  select#name.form-control.selectpicker(type='text' name='name')
+                  select#name.form-control.selectpicker(type='text' name='borrowerID')
                     option(value='' selected='') Borrower Name
                     for x in borrowers
                       if (x.status == 'Verified')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='type') Borrower Type
-                  input#type.form-control(type='text' name='type')
+                  input#type.form-control(type='text' name='borrowerType')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='loanPurpose') Purpose of Loan
@@ -266,7 +266,9 @@ else
               span(aria-hidden='true') ×
           .modal-body
             p Are you sure you want to delete loan no.  
-              span#deleteLoanNum
+              span#deleteLoanNum 
+              |  of 
+              span#deleteBorrowerName
               | ? This action cannot be undone.
           .modal-footer
             button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
@@ -286,7 +288,11 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='borrowerName') Borrower Name
-                  input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
+                  select#borrowerName.form-control.selectpicker(type='text' name='borrowerID' disabled='')
+                    option(value='' selected='') Borrower Name
+                    for x in borrowers
+                      if (x.status == 'Verified')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='borrowerType') Borrower Type
                   input#borrowerType.form-control(type='text' name='borrowerType' disabled='')
