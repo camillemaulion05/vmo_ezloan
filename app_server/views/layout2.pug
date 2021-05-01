@@ -74,6 +74,7 @@ html
                 });
               });
           });
+
     if title.indexOf("Borrowers") != -1
       script.
           $(function () {
@@ -182,28 +183,166 @@ html
                 }
               });
           });
-    if title.indexOf("Security") != -1
+
+    if title.indexOf("Manage Loans") != -1
       script.
           $(function () {
-              $('select#inputQuestion2 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
-              $('select#inputQuestion3 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
-              $('select#inputQuestion1 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
-              $('select#inputQuestion3 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
-              $('select#inputQuestion1 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
-              $('select#inputQuestion2 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
-              $('select#inputQuestion1').change(function () {
-                  $('select#inputQuestion2 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
-                  $('select#inputQuestion3 option[value="' + $('select#inputQuestion1').val() + '"]').hide();
-              });
-              $('select#inputQuestion2').change(function () {
-                  $('select#inputQuestion1 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
-                  $('select#inputQuestion3 option[value="' + $('select#inputQuestion2').val() + '"]').hide();
-              });
-              $('select#inputQuestion3').change(function () {
-                  $('select#inputQuestion1 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
-                  $('select#inputQuestion2 option[value="' + $('select#inputQuestion3').val() + '"]').hide();
-              });
+            $('a.deleteLoan').click(function () {
+                let path = ($(this).prop('href')).split('/');
+                let loanNum = path[path.length-1];
+                let loanid = path[path.length-2];
+                $('a#deleteLoan').attr('href', '/loans/' + loanid + '/delete'); 
+                $('span#deleteLoanNum').text(loanNum);
+                $('#deleteLoanModal').modal('show'); 
+            });
+            $('a.updateLoan').click(function () {
+                let path = ($(this).prop('href')).split('/');
+                let reviewedBy = path[path.length-1];
+                let status = (path[path.length-2]).replace(/%20/g," ");
+                let loanTerm = path[path.length-3];
+                let loanAmount = parseFloat(path[path.length-4]);
+                let purposeOfLoan = (path[path.length-5]).replace(/%20/g," ");
+                let borrowerType = (path[path.length-6]).replace(/%20/g," ");
+                let borrowerName = (path[path.length-7]).replace(/%20/g," ");
+                let loanNum = path[path.length-8];
+                let loanid = path[path.length-9];
+                let monthlyInterestRate = (borrowerType == 'Member') ? 3 : 5;
+                $('input#borrowerName').val(borrowerName);
+                $('input#borrowerType').val(borrowerType);
+                $('select#purposeOfLoan').val(purposeOfLoan);
+                $('input#loanAmount').val(loanAmount);
+                $('input#monthlyInterestRate').val(monthlyInterestRate);
+                $('select#loanTerm').val(loanTerm);
+                $('select#status').val(status);
+                $('select#reviewedBy').val(reviewedBy);
+                if (status == 'Processing') {
+                  $('select#purposeOfLoan').prop('disabled', false);
+                  $('input#loanAmount').prop('disabled', false);
+                  $('.processingOnly').removeClass('d-none');
+                  $('select#status option[value="Processing"]').show();
+                  $('select#status option[value="Approved"]').show();
+                  $('select#status option[value="Declined"]').show();
+                  $('select#status option[value="Loan Release"]').show();
+                  $('select#status option[value="Open"]').show();
+                  $('select#status option[value="Fully Paid"]').hide();
+                  $('select#status option[value="Loan Debt"]').show();
+                  $('select#status').prop('disabled', false);
+                } else{
+                  $('select#purposeOfLoan').prop('disabled', true);
+                  $('input#loanAmount').prop('disabled', true);
+                  $('.processingOnly').addClass('d-none');
+                  $('select#status').prop('disabled', false);
+                  $('select#status option[value="Processing"]').hide();
+                  $('select#status option[value="Approved"]').show();
+                  $('select#status option[value="Declined"]').show();
+                  $('select#status option[value="Loan Release"]').show();
+                  $('select#status option[value="Open"]').show();
+                  $('select#status option[value="Fully Paid"]').hide();
+                  $('select#status option[value="Loan Debt"]').show();
+                  if (status == 'Loan Release' || status == 'Open' || status == 'Loan Debt' || status == 'Fully Paid') {
+                    $('select#status option[value="Approved"]').hide();
+                    $('select#status option[value="Declined"]').hide();
+                  }
+                  if (status == 'Open' || status == 'Loan Debt') {
+                    $('select#status option[value="Loan Release"]').hide();
+                  }
+                  if (status == 'Fully Paid') {
+                    $('select#status option[value="Open"]').hide();
+                    $('select#status option[value="Fully Paid"]').show();
+                    $('select#status').prop('disabled', true);
+                  }
+                }
+                $("#updateLoan").attr("action", "/loans/" + loanid + '/update');
+                $('span#updateLoanNum').text(loanNum);
+                $('#updateLoanModal').modal('show');
+            });
+            $('select#status').change(function () {
+                if ($('select#status').val() == '' || $('select#status').val() == 'Processing') {
+                  $('select#purposeOfLoan').prop('disabled', false);
+                  $('input#loanAmount').prop('disabled', false);
+                  $('.processingOnly').removeClass('d-none');
+                  $('select#status option[value="Processing"]').show();
+                  $('select#status option[value="Approved"]').show();
+                  $('select#status option[value="Declined"]').show();
+                  $('select#status option[value="Loan Release"]').show();
+                  $('select#status option[value="Open"]').show();
+                  $('select#status option[value="Fully Paid"]').hide();
+                  $('select#status option[value="Loan Debt"]').show();
+                  $('select#status').prop('disabled', false);
+                } else{
+                  $('select#purposeOfLoan').prop('disabled', true);
+                  $('input#loanAmount').prop('disabled', true);
+                  $('.processingOnly').addClass('d-none');
+                  $('select#status').prop('disabled', false);
+                  $('select#status option[value="Processing"]').hide();
+                  $('select#status option[value="Approved"]').show();
+                  $('select#status option[value="Declined"]').show();
+                  $('select#status option[value="Loan Release"]').show();
+                  $('select#status option[value="Open"]').show();
+                  $('select#status option[value="Fully Paid"]').hide();
+                  $('select#status option[value="Loan Debt"]').show();
+                  if ($('select#status').val() == 'Loan Release' || $('select#status').val() == 'Open' || $('select#status').val() == 'Loan Debt' || $('select#status').val() == 'Fully Paid') {
+                    $('select#status option[value="Approved"]').hide();
+                    $('select#status option[value="Declined"]').hide();
+                  }
+                  if ($('select#status').val() == 'Open' || $('select#status').val() == 'Loan Debt') {
+                    $('select#status option[value="Loan Release"]').hide();
+                  }
+                  if ($('select#status').val() == 'Fully Paid') {
+                    $('select#status option[value="Open"]').hide();
+                    $('select#status option[value="Fully Paid"]').show();
+                    $('select#status').prop('disabled', true);
+                  }
+                }
+            });
+            $('select#name').change(function () {
+              let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/loans/borrowers/" + $('select#name').val(),
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                      console.log(data);
+                        $('input#type').val(data.borrowerType);
+                        $('input#interest').val((data.borrowerType == "Member") ? 3 : 5);
+                        $('input#amount').prop('max', data.remainingCreditLimit);
+                        $('input#amount').val(data.remainingCreditLimit);
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
+            });
           });
+
+    if title.indexOf("Security") != -1
+      script.
+        $(function () {
+            $('select#question2 option[value="' + $('select#question1').val() + '"]').hide();
+            $('select#question3 option[value="' + $('select#question1').val() + '"]').hide();
+            $('select#question1 option[value="' + $('select#question2').val() + '"]').hide();
+            $('select#question3 option[value="' + $('select#question2').val() + '"]').hide();
+            $('select#question1 option[value="' + $('select#question3').val() + '"]').hide();
+            $('select#question2 option[value="' + $('select#question3').val() + '"]').hide();
+            $('select#question1').change(function () {
+                $('select#question2 option[value="' + $('select#question1').val() + '"]').hide();
+                $('select#question3 option[value="' + $('select#question1').val() + '"]').hide();
+            });
+            $('select#question2').change(function () {
+                $('select#question1 option[value="' + $('select#question2').val() + '"]').hide();
+                $('select#question3 option[value="' + $('select#question2').val() + '"]').hide();
+            });
+            $('select#question3').change(function () {
+                $('select#question1 option[value="' + $('select#question3').val() + '"]').hide();
+                $('select#question2 option[value="' + $('select#question3').val() + '"]').hide();
+            });
+        });
 
     if title.indexOf("Account Management - Verifications") != -1
       script(src='/js/chart-pie.js')
@@ -300,7 +439,7 @@ html
           $("input[type=radio]").on("click", radioChecked);
         });
 
-    if title.indexOf("Loans") != -1
+    if title.indexOf("Account Management - Loans") != -1
       script.
         $(function () {
           let boxChecked = function () {

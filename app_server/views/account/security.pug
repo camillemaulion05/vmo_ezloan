@@ -37,7 +37,7 @@ block content
                       .form-group.col-md-6
                         label.small.mb-1(for='question1') Question 1
                         select#question1.form-control.selectpicker(type='text' name='question1')
-                          option(value='' selected='' disabled='') Security Question
+                          option(value='' selected='') Security Question
                           - let questions = ["What is your close friend's name?","What is your Driving License Number?","What is your favorite color?","What is your favorite pet`s name?","What is your favorite sports team?", "What is your mother's maiden name?","What is your Passport No.?","What is your SSS No.?","What was your first car?","Where did you first meet your spouse?","Who was your childhood hero?"];
                           for x in questions
                             if (user.userId.security[0] && x == user.userId.security[0].question) 
@@ -51,7 +51,7 @@ block content
                       .form-group.col-md-6
                         label.small.mb-1(for='question2') Question 2
                         select#question2.form-control.selectpicker(type='text' name='question2')
-                          option(value='' selected='' disabled='') Security Question
+                          option(value='' selected='') Security Question
                           for x in questions
                             if (user.userId.security[1] && x == user.userId.security[1].question) 
                               option(value=x selected) #{x}
@@ -64,7 +64,7 @@ block content
                       .form-group.col-md-6
                         label.small.mb-1(for='question3') Question 3
                         select#question3.form-control.selectpicker(type='text' name='question3')
-                          option(value='' selected='' disabled='') Security Question
+                          option(value='' selected='') Security Question
                           for x in questions
                             if (user.userId.security[2] && x == user.userId.security[2].question) 
                               option(value=x selected) #{x}

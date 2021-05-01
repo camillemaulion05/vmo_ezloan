@@ -51,7 +51,7 @@ block content
                             .form-group.col-md-6.mb-md-0
                               label.small.mb-1(for='accountType') Type of Account
                               select#accountType.form-control.selectpicker(type='text' name='accountType')
-                                option(value='' selected='' disabled='') Type of Account
+                                option(value='' selected='') Type of Account
                                 - let accountType = ['Savings', 'Checking/Current']
                                 for x in accountType
                                   if (user.account && x == user.account.type) 
@@ -93,7 +93,7 @@ block content
                           .form-group.col-md-6
                             label.small.mb-1(for='employmentType') Employment Status
                             select#employmentType.form-control.selectpicker(type='text' name='employmentType')
-                              option(value='' selected='' disabled='') Employment Status
+                              option(value='' selected='') Employment Status
                               - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
                               for x in employmentType
                                 if (user.workBusinessInfo && x == user.workBusinessInfo.employmentType) 
@@ -103,7 +103,7 @@ block content
                           .form-group.col-md-6
                             label.small.mb-1(for='occupationType') Occupation Type
                             select#occupationType.form-control.selectpicker(type='text' name='occupationType')
-                              option(value='' selected='' disabled='') Occupation Type
+                              option(value='' selected='') Occupation Type
                               - let occupationType = ["Management","Marketing","Sales","Office Worker","Professional/Technical","Service/Reception","Production Worker/Labor","Security/Guard/Maid","Driver","Self Employee/Freelance","Others"]
                               for x in occupationType
                                 if (user.workBusinessInfo && x == user.workBusinessInfo.occupationType) 
@@ -114,7 +114,7 @@ block content
                           .form-group.col-md-6
                             label.small.mb-1(for='businessType') Business Type
                             select#businessType.form-control.selectpicker(type='text' name='businessType')
-                              option(value='' selected='' disabled='') Business Type
+                              option(value='' selected='') Business Type
                               - let businessType = ["BPO/Communications/IT/Mass Media","Retail Sale/Restaurant/Hotel/Tourism/Other Service","Transportation/Shipping/Real Estate","Bank/Insurance/Finance","Government","Construction/Marker/Manufacturing","Trading/Export/Import/Wholesale","Electric/Gas/Waterworks","Medical/Education/School","Security","Agriculture/Forestry/Fisheries/Mining","Others"]
                               for x in businessType
                                 if (user.workBusinessInfo && x == user.workBusinessInfo.businessType) 
@@ -124,7 +124,7 @@ block content
                           .form-group.col-md-6.mb-md-0
                             label.small.mb-1(for='position') Position
                             select#position.form-control.selectpicker(type='text' name='position')
-                              option(value='' selected='' disabled='') Position 
+                              option(value='' selected='') Position 
                               - let position =  ["Director/Executive", "Supervisor", "Officer", "Staff", "None"]
                               for x in position
                                 if (user.workBusinessInfo && x == user.workBusinessInfo.position) 

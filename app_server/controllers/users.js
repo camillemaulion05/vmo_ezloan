@@ -398,7 +398,9 @@ const postForgot = (req, res) => {
                 });
                 return res.redirect('/forgot');
             } else if (statusCode === 200) {
-                path = ((user.type == "Borrower") ? '/api/borrowers/email' : '/api/employees/email');
+                path = '/api/borrowers/email';
+                if (user.type == "Admin") path = '/api/admins/email';
+                if (user.type == "Employee") path = '/api/employees/email';
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'POST',
@@ -568,7 +570,9 @@ const postReset = (req, res, next) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = ((user.type == "Borrower") ? '/api/borrowers/email' : '/api/employees/email');
+                path = '/api/borrowers/email';
+                if (user.type == "Admin") path = '/api/admins/email';
+                if (user.type == "Employee") path = '/api/employees/email';
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'POST',

@@ -166,6 +166,10 @@ router
     .get(auth, middleware.isSafe, ctrlLoans.loansListByUser);
 
 router
+    .route('/loans/borrowers/:borrowerid')
+    .get(auth, middleware.isAdmin, ctrlLoans.loansListByBorrower);
+
+router
     .route('/loans/:loanid/schedules')
     .get(auth, middleware.isSafe, ctrlLoans.loansSchedulesList)
     .put(auth, middleware.isModerator, ctrlLoans.loansSchedulesUpdate);

@@ -7,9 +7,9 @@ const loanSchema = mongoose.Schema({
         enum: [
             "Living Cost",
             "Educational",
-            "Medical/Hospitalization",
+            "Medical or Hospitalization",
             "Purchasing Appliance",
-            "Travel/Vacation",
+            "Travel or Vacation",
             "Entertainment",
             "Own Business",
             "Wedding",

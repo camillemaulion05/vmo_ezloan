@@ -5,12 +5,11 @@ const loansList = (req, res) => {
     Loan
         .find({}, {
             "loanPaymentSchedule": 0,
-            "reviewedBy": 0,
             "reviewedDate": 0,
             "updatedAt": 0,
             "__v": 0
         })
-        .populate('requestedBy', 'profile.firstName profile.lastName type')
+        .populate('requestedBy', 'profile.firstName profile.lastName type totalCreditLimit')
         .exec((err, loans) => {
             if (err) {
                 console.log(err);
@@ -33,10 +32,14 @@ const loansCreate = (req, res) => {
         loanTerm,
         loanAmount,
         monthlyInterestRate,
-        requestedBy
+        requestedBy,
+        status,
+        reviewedBy
     } = req.body);
     loan.loanNum = Date.now();
     loan.compute(req.body.loanAmount, req.body.monthlyInterestRate, req.body.loanTerm);
+    if ("Loan Release" == req.body.status) loan.updateDates();
+    if (req.body.reviewedBy) loan.reviewedDate = Date.now();
     loan.save((err) => {
         if (err) {
             console.log(err);
@@ -128,13 +131,16 @@ const loansUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    loan.purposeOfLoan = (req.body.purposeOfLoan) ? req.body.purposeOfLoan : loan.purposeOfLoan;
-                    loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
-                    loan.loanAmount = (req.body.loanAmount) ? req.body.loanAmount : loan.loanAmount;
-                    loan.monthlyInterestRate = (req.body.monthlyInterestRate) ? req.body.monthlyInterestRate : loan.monthlyInterestRate;
                     loan.requestedBy = (req.body.requestedBy) ? req.body.requestedBy : loan.requestedBy;
-                    loan.compute(loan.loanAmount, loan.monthlyInterestRate, loan.loanTerm);
                     loan.status = (req.body.status) ? req.body.status : loan.status;
+                    if (req.body.loanAmount && req.body.monthlyInterestRate && req.body.loanTerm && loan.status == 'Processing') {
+                        if (req.body.loanAmount != loan.loanAmount || req.body.loanTerm != loan.loanTerm || req.body.monthlyInterestRate != loan.monthlyInterestRate) {
+                            loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
+                            loan.loanAmount = (req.body.loanAmount) ? req.body.loanAmount : loan.loanAmount;
+                            loan.monthlyInterestRate = (req.body.monthlyInterestRate) ? req.body.monthlyInterestRate : loan.monthlyInterestRate;
+                            loan.compute(loan.loanAmount, loan.monthlyInterestRate, loan.loanTerm);
+                        }
+                    }
                     loan.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : loan.reviewedBy;
                     loan.reviewedDate = (req.body.reviewedBy) ? Date.now() : loan.reviewedDate;
                     if ("Loan Release" == req.body.status) loan.updateDates();
@@ -326,7 +332,7 @@ const loansSchedulesReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                    if (loanPaymentSchedule.length > 0 && "Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -379,7 +385,7 @@ const loansDueListByLoan = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                    if (loanPaymentSchedule.length > 0 && "Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -433,7 +439,7 @@ const loansPastDueListByLoan = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                    if (loanPaymentSchedule.length > 0 && "Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
                         return res
                             .status(403)
                             .json({
@@ -694,6 +700,50 @@ const loansListByUser = (req, res) => {
             });
     }
 };
+
+const loansListByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    if (!borrowerid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, borrowerid is required"
+            });
+    } else {
+        Loan
+            .find({
+                "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            }, {
+                "loanPaymentSchedule": 0,
+                "reviewedDate": 0,
+                "updatedAt": 0,
+                "__v": 0
+            })
+            .exec((err, loans) => {
+                if (!loans) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Borrower not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(loans);
+                }
+            });
+    }
+};
+
 module.exports = {
     loansList,
     loansCreate,
@@ -708,5 +758,6 @@ module.exports = {
     loansDueRepaymentsList,
     loansSummary,
     loansInterestReport,
-    loansListByUser
+    loansListByUser,
+    loansListByBorrower
 };

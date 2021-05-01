@@ -153,6 +153,8 @@ const postProfile = (req, res) => {
                 return res.redirect('/profile');
             } else if (statusCode === 200) {
                 path = '/api/borrowers/users/' + (req.user.id).toString();
+                if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
+                if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'PUT',
@@ -278,6 +280,8 @@ const postVerifyMobileNum = (req, res) => {
                 return res.redirect('/profile');
             } else if (statusCode === 200) {
                 path = '/api/borrowers/users/' + (req.user.id).toString();
+                if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
+                if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'PUT',
@@ -325,6 +329,8 @@ const postVerifyMobileNum = (req, res) => {
 
 const getVerifyEmail = (req, res) => {
     path = '/api/borrowers/setEmailToken/' + (req.user.id).toString();
+    if (req.user.type == "Admin") path = '/api/admins/setEmailToken/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/setEmailToken/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -403,6 +409,8 @@ const getVerifyEmailToken = (req, res) => {
         return res.redirect('/profile');
     }
     path = '/api/borrowers/validateEmailToken';
+    if (req.user.type == "Admin") path = '/api/admins/validateEmailToken';
+    if (req.user.type == "Employee") path = '/api/employees/validateEmailToken';
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'POST',
@@ -3578,7 +3586,7 @@ const postVerificationsDeclaration = (req, res) => {
     );
 };
 
-const getLoans = (req, res) => {
+const getCredits = (req, res) => {
     path = '/api/borrowers/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -3619,7 +3627,7 @@ const getLoans = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            res.render('account/loans', {
+                            res.render('account/credits', {
                                 title: 'Account Management - Loans',
                                 user: user,
                                 loans: loans
@@ -3642,7 +3650,7 @@ const getLoans = (req, res) => {
     );
 };
 
-const postLoans = (req, res) => {
+const postCredits = (req, res) => {
     const validationErrors = [];
     if (validator.isEmpty(req.body.loanAmount)) validationErrors.push({
         msg: 'Loan amount cannot be blank.'
@@ -3704,7 +3712,9 @@ const postLoans = (req, res) => {
                             return res.redirect('back');
                         } else if (statusCode === 200) {
                             //validations
-                            let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
+                            let totalUsedCreditLimit = (loans) ? loans.filter(({
+                                status
+                            }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
                             let remainingCreditLimit = parseFloat(user.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
                             if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
                                 path = '/api/loans'
@@ -3769,7 +3779,7 @@ const postLoans = (req, res) => {
     );
 };
 
-const getLoanDetails = (req, res) => {
+const getCreditDetails = (req, res) => {
     path = '/api/borrowers/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -3850,7 +3860,7 @@ const getLoanDetails = (req, res) => {
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
-                                                    res.render('account/loans-details', {
+                                                    res.render('account/credits-details', {
                                                         title: 'Account Management - Loan Details',
                                                         user: user,
                                                         loan: loan,
@@ -4528,7 +4538,7 @@ const getDownloadLoanSOA = (req, res) => {
         });
         docDefinition.content.push(repaymentsTable);
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=loan-soa-` + data.loanNum + `.pdf`);
+        res.set('Content-Disposition', `attachment; filename=loan-soa-` + data.loan.loanNum + `.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
@@ -5005,7 +5015,7 @@ const getDownloadLoanSchedule = (req, res) => {
         });
         docDefinition.content.push(scheduleTable);
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=loan-schedule-` + data.loanNum + `.pdf`);
+        res.set('Content-Disposition', `attachment; filename=loan-schedule-` + data.loan.loanNum + `.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
@@ -5169,7 +5179,7 @@ const getBorrowers = (req, res) => {
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
                                         res.render('account/borrowers', {
-                                            title: 'Account Management - Borrowers',
+                                            title: 'Manage Borrowers',
                                             user: user,
                                             borrowers: borrowers,
                                             employees: employees
@@ -5568,6 +5578,197 @@ const postUpdateBorrowers = (req, res) => {
     );
 };
 
+const getLoans = (req, res) => {
+    path = '/api/admins/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loans) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading list of loans.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading list of employees.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error in loading list of employees.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/loans', {
+                                                        title: 'Manage Loans',
+                                                        user: user,
+                                                        loans: loans,
+                                                        employees: employees,
+                                                        borrowers: borrowers
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getBorrowerCredits = (req, res) => {
+    path = '/api/borrowers/' + req.params.borrowerid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json('There was an error when loading borrower information. Please try again later.');
+            } else if (statusCode === 200) {
+                path = '/api/loans/borrowers/' + req.params.borrowerid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loans) => {
+                        if (err) {
+                            return res
+                                .status(404)
+                                .json('There was an error when loading loans by borrower information.  Please try again later.');
+                        } else if (statusCode === 200) {
+                            let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
+                                status
+                            }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
+                            let remainingCreditLimit = parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
+                            return res
+                                .status(200)
+                                .json({
+                                    borrowerType: borrower.type,
+                                    remainingCreditLimit: remainingCreditLimit
+                                });
+                        } else {
+                            return res
+                                .status(404)
+                                .json(loans.message);
+                        }
+                    }
+                );
+            } else {
+                return res
+                    .status(404)
+                    .json(borrower.message);
+            }
+        }
+    );
+};
+
+const postLoans = (req, res) => {
+    getUserDetails(req, res, 'account/security', 'Account Management - Security');
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -5593,9 +5794,9 @@ module.exports = {
     postVerificationsDocuments,
     getVerificationsDeclaration,
     postVerificationsDeclaration,
-    getLoans,
-    postLoans,
-    getLoanDetails,
+    getCredits,
+    postCredits,
+    getCreditDetails,
     postRepayment,
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
@@ -5603,4 +5804,7 @@ module.exports = {
     postBorrowers,
     getDeleteBorrowers,
     postUpdateBorrowers,
+    getLoans,
+    postLoans,
+    getBorrowerCredits
 };

@@ -1,5 +1,5 @@
 // Footer
-if title.indexOf("Account Management") === -1
+if title.indexOf("Manage") === -1
   footer.footer
     .container
       .row.align-items-center
@@ -159,10 +159,7 @@ else
                   select#status.form-control.selectpicker(type='text' name='status')
                     option(value='' selected='' disabled='') Status
                     for x in status
-                      if (x == 'Pending for Review' || x == 'Basic')
-                        option(value=x disabled='') #{x}
-                      else
-                        option(value=x) #{x}
+                      option(value=x) #{x}
               .form-row.mb-2.membersOnly
                 .col-md-6
                   label.small.mb-1(for='employeeID') Employee ID
@@ -179,7 +176,7 @@ else
                   select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
                     option(value='' selected='') Assigned Reviewer
                     for x in employees
-                      if (x.type != 'HRD Authorized Officer')
+                      if (x.type == 'Loan Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
               .form-row.mb-2.verifiedMemberOnly
                 .col-md-6
@@ -195,6 +192,139 @@ else
                     option(value='' selected='') Employment Status
                     for x in employmentType
                       option(value=x) #{x}
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+  if title.indexOf("Manage Loans") != -1
+    - let loanTerm = ["6", "12", "18", "24", "30", "36", "42", "48", "54", "60"]
+    - let purposeOfLoan = ["Living Cost","Educational","Medical or Hospitalization","Purchasing Appliance","Travel or Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
+    #addLoanModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addLoanModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addLoanModalLabel.modal-title Add New Loan
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addLoan(method='POST' action='/loans')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='name') Borrower Name
+                  select#name.form-control.selectpicker(type='text' name='name')
+                    option(value='' selected='') Borrower Name
+                    for x in borrowers
+                      if (x.status == 'Verified')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='type') Borrower Type
+                  input#type.form-control(type='text' name='type')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='loanPurpose') Purpose of Loan
+                  select#loanPurpose.form-control.selectpicker(type='text' name='purposeOfLoan')
+                    option(value='' selected='') Purpose of Loan
+                    for x in purposeOfLoan
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='amount') Loan Amount
+                  input#amount.form-control(type="number" step="500" min="0" name='loanAmount')
+              .form-row.mb-2.processingOnly
+                .col-md-6
+                  label.small.mb-1(for='interest') Monthly Interest Rate
+                  input#interest.form-control(type="number" step="1" min="3" name='monthlyInterestRate' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='term') Loan Term
+                  select#term.form-control.selectpicker(type='text' name='loanTerm')
+                    option(value='' selected='') Loan Term
+                    for x in loanTerm
+                      option(value=x) #{x} months
+              .form-row.mb-2
+                .col-md-6 
+                  label.small.mb-1(for='loanStatus') Status
+                  select#loanStatus.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='') Status
+                    - let loanStat = ["Processing", "Approved", "Declined", "Loan Release"]
+                    for x in loanStat
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='loanReviewedBy') Assigned Reviewer
+                  select#loanReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
+                    option(value='' selected='') Assigned Reviewer
+                    for x in employees
+                      if (x.type == 'Loan Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+    #deleteLoanModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteLoanModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteLoanModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete loan no.  
+              span#deleteLoanNum
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteLoan.btn.btn-primary(href='') Yes, delete it
+    #updateLoanModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateLoanModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#updateLoanModalLabel.modal-title 
+              | Update 
+              span#updateLoanNum
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#updateLoan(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerName') Borrower Name
+                  input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='borrowerType') Borrower Type
+                  input#borrowerType.form-control(type='text' name='borrowerType' disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='purposeOfLoan') Purpose of Loan
+                  select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')
+                    option(value='' selected='' disabled='') Purpose of Loan
+                    for x in purposeOfLoan
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='loanAmount') Loan Amount
+                  input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount')
+              .form-row.mb-2.processingOnly
+                .col-md-6
+                  label.small.mb-1(for='monthlyInterestRate') Monthly Interest Rate
+                  input#monthlyInterestRate.form-control(type="number" step="1" min="3" name='monthlyInterestRate' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='loanTerm') Loan Term
+                  select#loanTerm.form-control.selectpicker(type='text' name='loanTerm')
+                    option(value='' selected='' disabled='') Loan Term
+                    for x in loanTerm
+                      option(value=x) #{x} months
+              .form-row.mb-2
+                .col-md-6 
+                  label.small.mb-1(for='status') Status
+                  select#status.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='' disabled='') Status
+                     - let status = ["Processing", "Approved", "Declined", "Loan Release", "Open", "Fully Paid", "Loan Debt"]
+                    for x in status
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='reviewedBy') Assigned Reviewer
+                  select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
+                    option(value='' selected='') Assigned Reviewer
+                    for x in employees
+                      if (x.type == 'Loan Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -217,7 +347,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Verify
-  if title.indexOf("Loans") != -1
+  if title.indexOf("Account Management - Loans") != -1
     #loanModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='loanModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
@@ -225,11 +355,11 @@ else
             h5#loanModalLabel.modal-title Loan Application
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form(method='POST' action='/loans')
+          form(method='POST' action='/credits')
             input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               - let interestRate = (user.type == "Member") ? 3: 5;
-              - let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
+              - let totalUsedCreditLimit = (loans) ? loans.filter(({status}) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
               - let remainingCreditLimit = parseFloat(user.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
               p 
                 | The amount that you can borrow varies depending on your submitted documents and credit evaluation. 
@@ -240,7 +370,7 @@ else
               .form-row.mb-2
                 select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')
                   option(value='' selected='' disabled='') Purpose of Loan
-                  - let purposeOfLoan = ["Living Cost","Educational","Medical/Hospitalization","Purchasing Appliance","Travel/Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
+                  - let purposeOfLoan = ["Living Cost","Educational","Medical or Hospitalization","Purchasing Appliance","Travel or Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
                   for x in purposeOfLoan
                     option(value=x) #{x}
               .form-row.mb-2
@@ -259,7 +389,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
-  if title.indexOf("Loan Details") != -1
+  if title.indexOf("Account Management - Loan Details") != -1
     #repaymentModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='repaymentModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content

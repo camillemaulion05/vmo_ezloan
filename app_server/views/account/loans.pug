@@ -8,96 +8,60 @@ block content
         include ../partials/page-header
         include ../partials/page-flash
         .container-fluid
-          .row
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-primary.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
-                        | Borrower No.
-                      .h5.mb-0.font-weight-bold.text-gray-800 #{user.borrowerNum}
-                    .col-auto
-                      i.fas.fa-address-card.fa-2x.text-gray-300
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-info.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
-                        | Total Used Credit Limit
-                      - let totalUsedCreditLimit = (loans) ? loans.reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : '0.00';
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{totalUsedCreditLimit.toFixed(2)}
-                    .col-auto
-                      i.fas.fa-receipt.fa-2x.text-gray-300
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-success.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
-                        | Remaining Credit Limit
-                      - let remainingCreditLimit = parseFloat(user.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(remainingCreditLimit).toFixed(2)}
-                    .col-auto
-                      i.fas.fa-wallet.fa-2x.text-gray-300
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-warning.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
-                        | Interest Rate
-                      if user.type == 'Non-Member'
-                        .h5.mb-0.font-weight-bold.text-gray-800 5.00
-                      else
-                        .h5.mb-0.font-weight-bold.text-gray-800 3.00
-                    .col-auto
-                      i.fas.fa-percent.fa-2x.text-gray-300
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
-              h6.m-0.font-weight-bold.text-primary Loan Applications
+              h6.m-0.font-weight-bold.text-primary List of Loans
               .dropdown.no-arrow
-                if parseFloat(remainingCreditLimit) > 0.00
-                  button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#loanModal') Apply Loan
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addLoanModal') Add New Loan
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
                   thead
                     tr
-                      th Loan No
+                      th 
+                        | Borrower Name
+                        br
+                        | Loan No.
+                      th Borrower Type
                       th Release Date
                       th Maturity Date
                       th Principal
                       th Monthly Payment
-                      th Total Amount Paid
                       th Balance
                       th Status
+                      th Actions
                   tfoot
                     tr
-                      th Loan No
+                      th 
+                        | Borrower Name
+                        br
+                        | Loan No.
+                      th Borrower Type
                       th Release Date
                       th Maturity Date
                       th Principal
                       th Monthly Payment
-                      th Total Amount Paid
                       th Balance
                       th Status
+                      th Actions
                   tbody
                     for x in loans
+                      - let borrowerName = x.requestedBy.profile.firstName + ' ' + x.requestedBy.profile.lastName;
                       - let date = (new Date(x.paymentStartDate)).toString().split(' ');
                       - let paymentStartDate =  (x.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
                       - let date2 = (new Date(x.paymentEndDate)).toString().split(' ');
                       - let paymentEndDate =  (x.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
                       tr
                         td
-                          a(href='/loans/' + x._id) #{x.loanNum}
+                          | #{borrowerName}
+                          br
+                          a(href='/loans/' + x._id)  #{x.loanNum}
+                        td #{x.requestedBy.type}
                         td #{paymentStartDate}
                         td #{paymentEndDate}
-                        td ₱ #{(parseFloat(x.loanAmount)).toFixed(2)}
-                        td ₱ #{(parseFloat(x.monthlyAmortization)).toFixed(2)}
-                        td ₱ #{(parseFloat(x.totalPrincipalPaid)).toFixed(2)}
-                        td ₱ #{(parseFloat(x.principalRemaining)).toFixed(2)}
+                        td #{(parseFloat(x.loanAmount)).toFixed(2)}
+                        td #{(parseFloat(x.monthlyAmortization)).toFixed(2)}
+                        td #{(parseFloat(x.principalRemaining)).toFixed(2)}
                         if x.status == "Processing"
                           td
                             .badge.badge-primary.badge-pill #{x.status}
@@ -116,4 +80,9 @@ block content
                         else if x.status == "Loan Debt"
                           td
                             .badge.badge-warning.badge-pill #{x.status}
+                        td 
+                          a.updateLoan.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.loanNum+'/'+borrowerName+'/'+x.requestedBy.type+'/'+x.purposeOfLoan+'/'+x.loanAmount+'/'+x.loanTerm+'/'+x.status+'/'+x.reviewedBy) data-toggle='modal' data-target='#')
+                            i.fas.fa-edit
+                          a.deleteLoan.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.loanNum) data-toggle='modal' data-target='#')
+                            i.fas.fa-trash
     include ../partials/page-footer

@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 const Admin = mongoose.model('Admin');
+const {
+    promisify
+} = require('util');
+const crypto = require('crypto');
+const CryptoJS = require("crypto-js");
+
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 const adminsList = (req, res) => {
     Admin

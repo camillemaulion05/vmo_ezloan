@@ -74,7 +74,7 @@ block content
             .col-sm-12
               .form-group
                 select#gender.form-control.selectpicker(type='text' name='gender')
-                  option(value='' selected='' disabled='') Gender
+                  option(value='' selected='') Gender
                   - let gender = ['Female', 'Male']
                   for x in gender
                     option(value=x) #{x}

@@ -1,5 +1,5 @@
 // Navigation
-if title.indexOf("Account Management") == -1
+if title.indexOf("Manage") == -1
   nav.navbar.navbar-expand-lg(id=(title == 'Home') ? 'mainNav' : 'secondNav' class=(title == 'Home') ? 'navbar-dark fixed-top' : 'navbar-light navbar-shrink') 
     .container
       a.navbar-brand(href=(title == 'Home') ? '#page-top' : '/' class=(title == 'Home' ? 'js-scroll-trigger' : '') style='display: flex;align-items: center;')
@@ -49,11 +49,11 @@ else
           i.fas.fa-check-circle
           span Verifications
       li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
-        a.nav-link(href='/loans')
+        a.nav-link(href='/credits')
           i.fas.fa-balance-scale
           span Loans
     if user.userId.type == "Admin"
-      li.nav-item(class=(title.indexOf("List of Borrowers") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Borrowers") != -1) ? 'active' : undefined)
         a.nav-link(href='/borrowers')
           i.fas.fa-user-friends
           span Borrowers

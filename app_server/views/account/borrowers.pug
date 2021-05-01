@@ -8,43 +8,43 @@ block content
         include ../partials/page-header
         include ../partials/page-flash
         .container-fluid
-          .row
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-primary.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
-                        | Registered Members
-                      - let members = borrowers.filter(d => d.type == "Member").length;
-                      .h5.mb-0.font-weight-bold.text-gray-800 #{members}
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-info.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
-                        | Registered Non-Members
-                      - let nonMembers = borrowers.filter(d => d.type == "Non-Member").length;
-                      .h5.mb-0.font-weight-bold.text-gray-800 #{nonMembers}
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-success.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
-                        | Pending for Review
-                      - let forReviews = borrowers.filter(d => d.status == "Pending for Review").length;
-                      .h5.mb-0.font-weight-bold.text-gray-800 #{forReviews}
-            .col-xl-3.col-md-6.mb-4
-              .card.border-left-warning.shadow.h-100.py-2
-                .card-body
-                  .row.no-gutters.align-items-center
-                    .col.mr-2
-                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
-                        | Verified
-                      - let verified = borrowers.filter(d => d.status == "Verified").length;
-                      .h5.mb-0.font-weight-bold.text-gray-800 #{verified}
+          //- .row
+          //-   .col-xl-3.col-md-6.mb-4
+          //-     .card.border-left-primary.shadow.h-100.py-2
+          //-       .card-body
+          //-         .row.no-gutters.align-items-center
+          //-           .col.mr-2
+          //-             .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
+          //-               | Registered Members
+          //-             - let members = borrowers.filter(d => d.type == "Member").length;
+          //-             .h5.mb-0.font-weight-bold.text-gray-800 #{members}
+          //-   .col-xl-3.col-md-6.mb-4
+          //-     .card.border-left-info.shadow.h-100.py-2
+          //-       .card-body
+          //-         .row.no-gutters.align-items-center
+          //-           .col.mr-2
+          //-             .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+          //-               | Registered Non-Members
+          //-             - let nonMembers = borrowers.filter(d => d.type == "Non-Member").length;
+          //-             .h5.mb-0.font-weight-bold.text-gray-800 #{nonMembers}
+          //-   .col-xl-3.col-md-6.mb-4
+          //-     .card.border-left-success.shadow.h-100.py-2
+          //-       .card-body
+          //-         .row.no-gutters.align-items-center
+          //-           .col.mr-2
+          //-             .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+          //-               | Pending for Review
+          //-             - let forReviews = borrowers.filter(d => d.status == "Pending for Review").length;
+          //-             .h5.mb-0.font-weight-bold.text-gray-800 #{forReviews}
+          //-   .col-xl-3.col-md-6.mb-4
+          //-     .card.border-left-warning.shadow.h-100.py-2
+          //-       .card-body
+          //-         .row.no-gutters.align-items-center
+          //-           .col.mr-2
+          //-             .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
+          //-               | Verified
+          //-             - let verified = borrowers.filter(d => d.status == "Verified").length;
+          //-             .h5.mb-0.font-weight-bold.text-gray-800 #{verified}
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary List of Borrowers

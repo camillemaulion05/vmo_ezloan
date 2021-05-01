@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 const Employee = mongoose.model('Employee');
+const {
+    promisify
+} = require('util');
+const crypto = require('crypto');
+const CryptoJS = require("crypto-js");
+
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 const employeesList = (req, res) => {
     Employee

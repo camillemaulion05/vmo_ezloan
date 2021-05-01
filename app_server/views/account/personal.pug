@@ -48,7 +48,7 @@ block content
                         .form-group.col-md-4.mb-4
                           label.small.mb-1(for='maritalStat') Civil Status
                           select#maritalStat.form-control.selectpicker(type='text' name='maritalStat')
-                            option(value='' selected='' disabled='') Civil Status
+                            option(value='' selected='') Civil Status
                             - let maritalStat = ["Single", "Married", "Widow/er", "Legally Seperated", "Annuled"]
                             for x in maritalStat
                               if (x == user.profile.maritalStat) 
@@ -62,7 +62,7 @@ block content
                         .form-group.col-md-4.mb-4
                           label.small.mb-1(for='educAttainment') Educational Attainment
                           select#educAttainment.form-control.selectpicker(type='text' name='educAttainment')
-                            option(value='' selected='' disabled='') Educational Attainment
+                            option(value='' selected='') Educational Attainment
                             - let educAttainment = ["High School", "Vocational/Technical", "College", "Post Graduate", "Others"]
                             for x in educAttainment
                               if (x == user.profile.educAttainment) 

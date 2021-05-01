@@ -72,7 +72,7 @@ block content
                     .row.no-gutters.align-items-center
                       .col.mr-2
                         .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
-                          | Monthly AMortization
+                          | Monthly Amortization
                         .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(parseFloat(loan.monthlyAmortization)).toFixed(2)}
             .col-xl-3.col-md-6.mb-4
               .card.border-left-warning.shadow.h-100.py-2
@@ -176,7 +176,10 @@ block content
                             tr
                               th Prinicipal Remaining
                               td Php
-                              td.text-right #{(parseFloat(loan.principalRemaining)).toFixed(2)}
+                              if loan.status == "Declined"
+                                td.text-right 0.00
+                              else
+                                td.text-right #{(parseFloat(loan.principalRemaining)).toFixed(2)}
                     .col-lg-6
                       .table-responsive.table-hover
                         table.table.mb-0
