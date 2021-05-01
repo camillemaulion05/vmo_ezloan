@@ -3915,6 +3915,10 @@ const getDownloadLoanSOA = (req, res) => {
             }
         }
         let printer = new PdfPrinter(fonts);
+        let statementDate = (data.currentDue) ? new Date(data.currentDue.dueDate) : '';
+        if (statementDate) {
+            statementDate.setDate(statementDate.getDate() - 24);
+        }
         let docDefinition = {
             content: [{
                     text: 'VMO EZ LOAN',
@@ -3928,51 +3932,78 @@ const getDownloadLoanSOA = (req, res) => {
                 },
                 {
                     table: {
+                        widths: ['*', '*', '*', '*', '*'],
+                        body: [
+                            [{
+                                    text: [{
+                                            text: data.loan.requestedBy.profile.firstName + ' ' + data.loan.requestedBy.profile.lastName + '\n'
+                                        },
+                                        {
+                                            text: (data.loan.requestedBy.profile.address && data.loan.requestedBy.profile.address.present && data.loan.requestedBy.profile.address.present.unitNo && data.loan.requestedBy.profile.address.present.houseNo && data.loan.requestedBy.profile.address.present.street) ? data.loan.requestedBy.profile.address.present.unitNo + ' ' + data.loan.requestedBy.profile.address.present.houseNo + ' ' + data.loan.requestedBy.profile.address.present.street + ',\n' : ''
+                                        },
+                                        {
+                                            text: (data.loan.requestedBy.profile.address && data.loan.requestedBy.profile.address.present && data.loan.requestedBy.profile.address.present.subdivision && data.loan.requestedBy.profile.address.present.barangay) ? data.loan.requestedBy.profile.address.present.subdivision + ', ' + data.loan.requestedBy.profile.address.present.barangay + ',\n' : ''
+                                        },
+                                        {
+                                            text: (data.loan.requestedBy.profile.address && data.loan.requestedBy.profile.address.present && data.loan.requestedBy.profile.address.present.city && data.loan.requestedBy.profile.address.present.province && data.loan.requestedBy.profile.address.present.zipCode) ? data.loan.requestedBy.profile.address.present.city + ', ' + data.loan.requestedBy.profile.address.present.province + ' ' + data.loan.requestedBy.profile.address.present.zipCode + '\n' : ''
+                                        },
+                                        {
+                                            text: (data.loan.requestedBy.profile.mobileNum) ? '+63' + data.loan.requestedBy.profile.mobileNum + '\n' : ''
+                                        },
+                                    ],
+                                    style: 'medium',
+                                    border: [false, false, false, false],
+                                    colSpan: 3
+                                }, {}, {},
+                                {
+                                    text: [{
+                                            text: 'Personal Loan\n'
+                                        },
+                                        {
+                                            text: 'Loan No. ' + data.loan.loanNum + '\n'
+                                        },
+                                        {
+                                            text: (data.currentDue) ? 'Total amount due ' + parseDate(data.currentDue.dueDate, 'short') + '\n' : ''
+                                        },
+                                        {
+                                            text: (data.currentDue) ? '(₱) ' + (parseFloat(data.currentDue.amountDue)).toFixed(2) + '\n' : '(₱) 0.00\n',
+                                            fontSize: 17,
+                                            bold: true
+                                        },
+                                    ],
+                                    style: 'medium',
+                                    border: [false, false, false, false],
+                                    colSpan: 2
+                                }, {}
+                            ]
+                        ]
+                    }
+                },
+                {
+                    text: '\n'
+                },
+                {
+                    table: {
+                        headerRows: 1,
                         widths: ['*', '*', '*', '*'],
                         body: [
                             [{
-                                    text: 'Borrower Name :',
+                                text: 'LOAN INFORMATION',
+                                style: 'tableHeader',
+                                alignment: 'center',
+                                fillColor: 'black',
+                                colSpan: 4,
+                            }, {}, {}, {}],
+                            [{
+                                    text: 'Statement Date :',
                                     style: 'medium',
-                                    border: [false, false, false, false]
+                                    border: [true, false, false, false]
                                 },
                                 {
-                                    text: data.loan.requestedBy.profile.firstName + ' ' + data.loan.requestedBy.profile.lastName,
+                                    text: (statementDate) ? parseDate(statementDate, 'short') : '',
                                     style: 'medium',
                                     border: [false, false, false, false]
                                 }, {
-                                    text: 'Borrower No: ',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: data.loan.requestedBy.borrowerNum,
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-
-                            ],
-                            [{
-                                    text: 'Loan No :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: data.loan.loanNum,
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Loan Status :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: data.loan.status,
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
                                     text: 'Loan Purpose :',
                                     style: 'medium',
                                     border: [false, false, false, false]
@@ -3980,201 +4011,79 @@ const getDownloadLoanSOA = (req, res) => {
                                 {
                                     text: data.loan.purposeOfLoan,
                                     style: 'medium',
-                                    border: [false, false, false, false]
+                                    border: [false, false, true, false]
                                 },
-                                {
-                                    text: 'Loan Term :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: data.loan.loanTerm + ' months',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
+
                             ],
                             [{
-                                    text: 'Loan Amount :',
+                                    text: 'Loan Status:',
+                                    style: 'medium',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: data.loan.status,
                                     style: 'medium',
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ ' + (parseFloat(data.loan.loanAmount)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Application Date :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: parseDate(data.loan.createdAt, 'short'),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Service Fee :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.serviceFee)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Loan Start Date :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: (data.loan.paymentStartDate) ? parseDate(data.loan.paymentStartDate, 'short') : '',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'New Proceeds of Loan :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.newProceedsAmount)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Loan End Date :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: (data.loan.paymentEndDate) ? parseDate(data.loan.paymentEndDate, 'short') : '',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Monthly Amortization :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.monthlyAmortization)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Rate (per month) :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: (parseFloat(data.loan.monthlyInterestRate)).toFixed(2) + ' %',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Account Number :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: (data.loan.requestedBy.account) ? data.loan.requestedBy.account.number : '',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Reference No. :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: (data.repayments.length >= 1) ? ((data.repayments[0]).type == "Release" && (data.repayments[0]).status == "Posted") ? (data.repayments[0]).referenceNo : "" : '',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Total Payments :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.totalPayments)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Total Interest Accrued :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.totalInterestAccrued)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Total Principal Paid :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.totalPrincipalPaid)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Total Interest Paid :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.totalInterestPaid)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                }
-                            ],
-                            [{
-                                    text: 'Prinicipal Remaining :',
+                                    text: 'Remaining Principal :',
                                     style: 'medium',
                                     border: [false, false, false, false]
                                 },
                                 {
                                     text: '₱ ' + (parseFloat(data.loan.principalRemaining)).toFixed(2),
                                     style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: 'Unpaid Interest :',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + (parseFloat(data.loan.unpaidInterest)).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
+                                    border: [false, false, true, false]
                                 }
                             ],
+                            [{
+                                    text: 'Maturity Date:',
+                                    style: 'medium',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: (data.loan.paymentEndDate) ? parseDate(data.loan.paymentEndDate, 'short') : '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: 'Interest Rate :',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: (parseFloat(data.loan.monthlyInterestRate)).toFixed(2) + '%',
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'Principal Paid :',
+                                    style: 'medium',
+                                    border: [true, false, false, true]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalPrincipalPaid)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: 'Interest Paid :',
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '₱ ' + (parseFloat(data.loan.totalInterestPaid)).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, true, true]
+                                }
+                            ],
+
                         ]
                     }
                 },
                 {
-                    table: {
-                        widths: ['*'],
-                        body: [
-                            [{
-                                text: '\n',
-                                border: [false, true, false, false]
-                            }],
-
-                        ]
-                    }
+                    text: '\n\n'
                 },
                 {
                     table: {
@@ -4314,15 +4223,12 @@ const getDownloadLoanSOA = (req, res) => {
                                 }
                             ],
                             [{
-                                    text: '',
-                                    border: [true, true, false, true]
-                                },
-                                {
-                                    text: 'Total Amount Due : ',
+                                    text: (data.currentDue) ? 'Total Amount Due ' + parseDate(data.currentDue.dueDate, 'short') + ': ' : '',
                                     style: 'item',
                                     alignment: 'right',
-                                    border: [false, true, false, true]
-                                },
+                                    border: [true, true, false, true],
+                                    colSpan: 2
+                                }, {},
                                 {
                                     text: '',
                                     border: [true, true, false, true]

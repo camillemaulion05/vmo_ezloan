@@ -71,7 +71,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account.number')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account.number profile.address profile.mobileNum')
             .exec((err, loan) => {
                 if (!loan) {
                     res
