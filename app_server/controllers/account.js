@@ -4903,6 +4903,7 @@ const postRepayment = (req, res) => {
 
 const getBorrowers = (req, res) => {
     path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -5364,6 +5365,7 @@ const postUpdateBorrowers = (req, res) => {
 
 const getLoans = (req, res) => {
     path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6058,6 +6060,427 @@ const getLoanDetails = (req, res) => {
     );
 };
 
+const getTransactions = (req, res) => {
+    path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading list of transactions.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading list of employees.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error in loading list of borrowers.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/transactions', {
+                                                        title: 'Manage Transactions',
+                                                        user: user,
+                                                        borrowers: borrowers,
+                                                        employees: employees,
+                                                        transactions: transactions
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: transactions.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postTransactions = (req, res) => {
+    getUserDetails(req, res, 'account/index', 'Account Management');
+};
+
+const getWithdrawals = (req, res) => {
+    path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/withdrawals';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, withdrawals) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading list of withdrawals.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading list of employees.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error in loading list of borrowers.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/withdrawals', {
+                                                        title: 'Manage Withdrawals',
+                                                        user: user,
+                                                        borrowers: borrowers,
+                                                        employees: employees,
+                                                        withdrawals: withdrawals
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: withdrawals.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postWithdrawals = (req, res) => {
+    getUserDetails(req, res, 'account/index', 'Account Management');
+};
+
+const getEmployees = (req, res) => {
+    path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/employees';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, employees) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading list of employees.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/admins';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, admins) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error in loading list of admins.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        res.render('account/employees', {
+                                            title: 'Manage Employees',
+                                            user: user,
+                                            employees: employees,
+                                            admins: admins
+                                        });
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: admins.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: employees.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postEmployees = (req, res) => {
+    getUserDetails(req, res, 'account/index', 'Account Management');
+};
+
+const getInquiries = (req, res) => {
+    path = '/api/admins/users/' + (req.user.id).toString();
+    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error in loading your account.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/inquiries';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, inquiries) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error in loading list of inquiries.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            res.render('account/inquiries', {
+                                title: 'Manage Inquiries',
+                                user: user,
+                                inquiries: inquiries
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: inquiries.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const postInquiries = (req, res) => {
+    getUserDetails(req, res, 'account/index', 'Account Management');
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -6097,5 +6520,13 @@ module.exports = {
     getBorrowerCredits,
     getDeleteData,
     postUpdateLoans,
-    getLoanDetails
+    getLoanDetails,
+    getTransactions,
+    postTransactions,
+    getWithdrawals,
+    postWithdrawals,
+    getEmployees,
+    postEmployees,
+    getInquiries,
+    postInquiries
 };

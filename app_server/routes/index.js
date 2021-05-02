@@ -151,4 +151,24 @@ router
 
 router.get('/loans/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerCredits);
 
+router
+    .route('/transactions')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getTransactions)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postTransactions);
+
+router
+    .route('/withdrawals')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getWithdrawals)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postWithdrawals);
+
+router
+    .route('/employees')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getEmployees)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postEmployees);
+
+router
+    .route('/inquiries')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiries)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postInquiries);
+
 module.exports = router;

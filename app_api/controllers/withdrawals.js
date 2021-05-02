@@ -7,7 +7,7 @@ const withdrawalsList = (req, res) => {
             "reviewedBy": 0,
             "reviewedDate": 0
         })
-        .populate('requestedBy', 'profile.firstName profile.lastName')
+        .populate('requestedBy', 'profile.firstName profile.lastName account')
         .exec((err, withdrawals) => {
             if (err) {
                 console.log(err);

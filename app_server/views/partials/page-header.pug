@@ -13,6 +13,12 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
                 i.fas.fa-check-circle
               if title.indexOf("Loans") != -1
                 i.fas.fa-balance-scale
-              if title.indexOf("Borrowers") != -1
+              if title.indexOf("Borrowers") != -1 || title.indexOf("Employees") != -1
                 i.fas.fa-user-friends
+              if title.indexOf("Transactions") != -1
+                i.fas.fa-wallet
+              if title.indexOf("Withdrawals") != -1
+                i.fas.fa-cash-register
+              if title.indexOf("Inquiries") != -1
+                i.fas.fa-comments
             |  #{title}

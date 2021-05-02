@@ -1,0 +1,66 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.shadow.mb-4
+            .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
+              h6.m-0.font-weight-bold.text-primary List of Transactions
+              .dropdown.no-arrow
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addTransactionModal') Add New Transaction
+            .card-body
+              .table-responsive
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th Transaction No.
+                      th Payment Date
+                      th Payment Amount
+                      th Type
+                      th Sender Number
+                      th Receiver Number 
+                      th Posted Date
+                      th Status
+                      th Actions
+                  tfoot
+                    tr
+                      th Transaction No.
+                      th Payment Date
+                      th Payment Amount
+                      th Type
+                      th Sender Number
+                      th Receiver Number 
+                      th Posted Date
+                      th Status
+                      th Actions
+                  tbody
+                    for x in transactions
+                      tr
+                        td #{x.transactionNum}
+                        - let date = (new Date(x.createdAt)).toString().split(' ');
+                        - let createdAt =  (x.createdAt) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                        td #{createdAt}
+                        td #{(parseFloat(x.amount)).toFixed(2)}
+                        td #{x.type} 
+                        td #{x.senderNum}
+                        td #{x.receiverNum}
+                        - let date2 = (new Date(x.postedDate)).toString().split(' ');
+                        - let postedDate =  (x.postedDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                        td #{postedDate}
+                        if x.status == "Processing"
+                          td
+                            .badge.badge-primary.badge-pill #{x.status}
+                        else if x.status == "Posted"
+                          td
+                            .badge.badge-success.badge-pill #{x.status}
+                        td 
+                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.transactionNum) data-toggle='modal' data-target='#')
+                            i.fas.fa-edit
+                          a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.transactionNum) data-toggle='modal' data-target='#')
+                            i.fas.fa-trash
+    include ../partials/page-footer

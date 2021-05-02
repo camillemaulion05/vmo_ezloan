@@ -1,0 +1,65 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.shadow.mb-4
+            .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
+              h6.m-0.font-weight-bold.text-primary List of Withdrawal Request
+              .dropdown.no-arrow
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addRequestModal') Add New Request
+            .card-body
+              .table-responsive
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th Withdrawal No.
+                      th Member Name
+                      th Application Date
+                      th Amount
+                      th Reason
+                      th Status
+                      th Actions
+                  tfoot
+                    tr
+                      th Withdrawal No.
+                      th Member Name
+                      th Application Date
+                      th Amount
+                      th Reason
+                      th Status
+                      th Actions
+                  tbody
+                    for x in withdrawals
+                      - let borrowerName = x.requestedBy.profile.firstName + ' ' + x.requestedBy.profile.lastName;
+                      tr
+                        td #{x.withdrawalNum}
+                        td #{borrowerName}
+                        - let date = (new Date(x.createdAt)).toString().split(' ');
+                        - let createdAt =  (x.createdAt) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                        td #{createdAt}
+                        td #{(parseFloat(x.amount)).toFixed(2)}
+                        td #{x.reason} 
+                        if x.status == "Processing"
+                          td
+                            .badge.badge-primary.badge-pill #{x.status}
+                        else if x.status == "Approved"
+                          td
+                            .badge.badge-success.badge-pill #{x.status}
+                        else if x.status == "Declined"
+                          td
+                            .badge.badge-danger.badge-pill #{x.status}
+                        else if x.status == "Cash Release"
+                          td
+                            .badge.badge-info.badge-pill #{x.status}
+                        td 
+                          a.updateWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.withdrawalNum) data-toggle='modal' data-target='#')
+                            i.fas.fa-edit
+                          a.deleteWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.withdrawalNum) data-toggle='modal' data-target='#')
+                            i.fas.fa-trash
+    include ../partials/page-footer
