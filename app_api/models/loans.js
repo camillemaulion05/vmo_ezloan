@@ -150,6 +150,7 @@ loanSchema.methods.compute = function (balance, monthlyRate, terms) {
 };
 
 loanSchema.methods.updateDates = function () {
+    this.status = "Open";
     this.paymentStartDate = Date.now();
     const terms = this.loanPaymentSchedule.length;
     for (let i = 0; i < terms; i++) {
@@ -177,7 +178,6 @@ loanSchema.methods.addRepayment = function (date, amount) {
         const repaymentSchedule = schedules[0];
         const scheduleNum = repaymentSchedule.scheduleNum;
 
-        this.status = "Open";
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount = ROUND(parseFloat(this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount) + amount);
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentDate = paymentDate;
 

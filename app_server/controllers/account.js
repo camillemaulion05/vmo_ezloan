@@ -58,7 +58,7 @@ function getUserDetails(req, res, filename, title) {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('/login');
             } else if (statusCode === 200) {
@@ -130,7 +130,7 @@ const postProfile = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/profile');
+        return res.redirect('back');
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
@@ -153,9 +153,9 @@ const postProfile = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your username.  Please try again later.'
+                    msg: 'There was an error when updating your username. Please try again later.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 path = '/api/borrowers/users/' + (req.user.id).toString();
                 if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
@@ -184,19 +184,19 @@ const postProfile = (req, res) => {
                     }, borrower) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error when updating your profile.  Please try again later.'
+                                msg: 'There was an error when updating your profile. Please try again later.'
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else if (statusCode === 200) {
                             req.flash('success', {
                                 msg: 'Profile information has been updated.'
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else {
                             req.flash('errors', {
                                 msg: borrower.message
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         }
                     }
                 );
@@ -204,7 +204,7 @@ const postProfile = (req, res) => {
                 req.flash('errors', {
                     msg: user.message
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             }
         }
     );
@@ -217,7 +217,7 @@ const postProfilePic = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/profile');
+        return res.redirect('back');
     }
     path = '/api/users/' + (req.user.id).toString();
     requestOptions = {
@@ -237,19 +237,19 @@ const postProfilePic = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your profile picture.  Please try again later.'
+                    msg: 'There was an error when updating your profile picture. Please try again later.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Profile picture has been updated.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: user.message
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             }
         }
     );
@@ -262,7 +262,7 @@ const postVerifyMobileNum = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/profile');
+        return res.redirect('back');
     }
     let path = '/api/validateOTP';
     let requestOptions = {
@@ -280,9 +280,9 @@ const postVerifyMobileNum = (req, res) => {
         }, body) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'The verification code you entered is not correct. Please try again.'
+                    msg: 'The verification code you entered is not correct. Please try again later.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 path = '/api/borrowers/users/' + (req.user.id).toString();
                 if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
@@ -306,19 +306,19 @@ const postVerifyMobileNum = (req, res) => {
                     }, borrower) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error when updating your profile.  Please try again later.'
+                                msg: 'There was an error when updating your profile. Please try again later.'
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else if (statusCode === 200) {
                             req.flash('success', {
                                 msg: 'Thank you for verifying your mobile number.'
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else {
                             req.flash('errors', {
                                 msg: borrower.message
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         }
                     }
                 );
@@ -326,7 +326,7 @@ const postVerifyMobileNum = (req, res) => {
                 req.flash('errors', {
                     msg: body.message
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             }
         }
     );
@@ -351,9 +351,9 @@ const getVerifyEmail = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'Error sending the email verification message. Please try again shortly.'
+                    msg: 'There was an error when updating your profile. Please try again later.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 let bytes = CryptoJS.AES.decrypt(borrower.token, process.env.CRYPTOJS_SERVER_SECRET);
                 let originalToken = bytes.toString(CryptoJS.enc.Utf8);
@@ -378,19 +378,19 @@ const getVerifyEmail = (req, res) => {
                     }, body) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'Error sending the email verification message. Please try again shortly.'
+                                msg: 'There was an error when sending the email verification message. Please try again later.'
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else if (statusCode === 200) {
                             req.flash('success', {
                                 msg: `An e-mail has been sent to ${borrower.email} with further instructions.`
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         } else {
                             req.flash('errors', {
                                 msg: borrower.message
                             });
-                            return res.redirect('/profile');
+                            return res.redirect('back');
                         }
                     }
                 );
@@ -398,7 +398,7 @@ const getVerifyEmail = (req, res) => {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             }
         }
     );
@@ -411,7 +411,7 @@ const getVerifyEmailToken = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/profile');
+        return res.redirect('back');
     }
     path = '/api/borrowers/validateEmailToken';
     if (req.user.type == "Admin") path = '/api/admins/validateEmailToken';
@@ -434,19 +434,19 @@ const getVerifyEmailToken = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your profile.  Please try again later.'
+                    msg: 'There was an error when updating your profile. Please try again later.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('info', {
                     msg: 'Thank you for verifying your email address.'
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/profile');
+                return res.redirect('back');
             }
         }
     );
@@ -479,7 +479,7 @@ const postSecurity = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/security');
+        return res.redirect('back');
     }
     path = '/api/change/' + (req.user.id).toString();
     requestOptions = {
@@ -500,19 +500,19 @@ const postSecurity = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your password.  Please try again later.'
+                    msg: 'There was an error when updating your password. Please try again later.'
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Success! Your password has been changed.'
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             }
         }
     );
@@ -540,7 +540,7 @@ const postSecurityQuestions = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/security');
+        return res.redirect('back');
     }
     path = '/api/users/' + (req.user.id).toString();
     requestOptions = {
@@ -572,19 +572,19 @@ const postSecurityQuestions = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your security questions.  Please try again later.'
+                    msg: 'There was an error when updating your password recovery questions. Please try again later.'
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Password Recovery Questions has been updated.'
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: user.message
                 });
-                return res.redirect('/security');
+                return res.redirect('back');
             }
         }
     );
@@ -613,19 +613,19 @@ const getVerificationsSubmit = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your verification status.  Please try again later.'
+                    msg: 'There was an error when updating your verification status. Please try again later.'
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Verification status has been updated.'
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             }
         }
     );
@@ -650,19 +650,19 @@ const getVerificationsCancel = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your verification status.  Please try again later.'
+                    msg: 'There was an error when updating your verification status. Please try again later.'
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Verification status has been updated.'
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             }
         }
     );
@@ -3239,9 +3239,9 @@ const getDownloadBorrowerInfo = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 if (user.type == "Non-Member") {
                     downloadNonMember(user, req, res);
@@ -3253,7 +3253,7 @@ const getDownloadBorrowerInfo = (req, res) => {
                 req.flash('errors', {
                     msg: user.message
                 });
-                return res.redirect('/verifications');
+                return res.redirect('back');
             }
         }
     );
@@ -3288,7 +3288,7 @@ const postVerificationsPersonal = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/profile');
+        return res.redirect('back');
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
@@ -3326,19 +3326,19 @@ const postVerificationsPersonal = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your personal information.  Please try again later.'
+                    msg: 'There was an error when updating your personal information. Please try again later.'
                 });
-                return res.redirect('/personal');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Personal information has been updated.'
                 });
-                return res.redirect('/personal');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/personal');
+                return res.redirect('back');
             }
         }
     );
@@ -3392,19 +3392,19 @@ const postVerificationsAddress = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your address information.  Please try again later.'
+                    msg: 'There was an error when updating your address information. Please try again later.'
                 });
-                return res.redirect('/address');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Address information has been updated.'
                 });
-                return res.redirect('/address');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/address');
+                return res.redirect('back');
             }
         }
     );
@@ -3460,19 +3460,19 @@ const postVerificationsFinancial = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your work/business information.  Please try again later.'
+                    msg: 'There was an error when updating your work/business information. Please try again later.'
                 });
-                return res.redirect('/financial');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Work/Business information has been updated.'
                 });
-                return res.redirect('/financial');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/financial');
+                return res.redirect('back');
             }
         }
     );
@@ -3512,19 +3512,19 @@ const postVerificationsDocuments = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your documents.  Please try again later.'
+                    msg: 'There was an error when updating your documents. Please try again later.'
                 });
-                return res.redirect('/documents');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'Documents have been updated.'
                 });
-                return res.redirect('/documents');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: user.message
                 });
-                return res.redirect('/documents');
+                return res.redirect('back');
             }
         }
     );
@@ -3553,7 +3553,7 @@ const postVerificationsDeclaration = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/declaration');
+        return res.redirect('back');
     }
     path = '/api/borrowers/users/' + (req.user.id).toString();
     requestOptions = {
@@ -3573,19 +3573,19 @@ const postVerificationsDeclaration = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your KYC declaration.  Please try again later.'
+                    msg: 'There was an error when updating your KYC declaration. Please try again later.'
                 });
-                return res.redirect('/declaration');
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 req.flash('success', {
                     msg: 'KYC declaration has been updated.'
                 });
-                return res.redirect('/declaration');
+                return res.redirect('back');
             } else {
                 req.flash('errors', {
                     msg: borrower.message
                 });
-                return res.redirect('/declaration');
+                return res.redirect('back');
             }
         }
     );
@@ -3608,7 +3608,7 @@ const getCredits = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -3628,7 +3628,7 @@ const getCredits = (req, res) => {
                     }, loans) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading your loan list'
+                                msg: 'There was an error when loading your loan applications. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -3674,7 +3674,7 @@ const postCredits = (req, res) => {
     });
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/loans');
+        return res.redirect('back');
     }
     path = '/api/borrowers/users/' + (req.user.id).toString();
     requestOptions = {
@@ -3692,7 +3692,7 @@ const postCredits = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -3712,7 +3712,7 @@ const postCredits = (req, res) => {
                     }, loans) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading your loan list'
+                                msg: 'There was an error when loading your loan applications. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -3744,7 +3744,7 @@ const postCredits = (req, res) => {
                                     }, loan) => {
                                         if (err) {
                                             req.flash('errors', {
-                                                msg: 'There was an error when applying for new loan.  Please try again later.'
+                                                msg: 'There was an error when applying for new loan. Please try again later.'
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 201) {
@@ -4351,7 +4351,7 @@ const getDownloadLoanSOA = (req, res) => {
         }, loan) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your loan details.'
+                    msg: 'There was an error when loading your loan statement of account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -4371,7 +4371,7 @@ const getDownloadLoanSOA = (req, res) => {
                     }, repayments) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading your repayments.'
+                                msg: 'There was an error when loading your repayments. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -4392,7 +4392,7 @@ const getDownloadLoanSOA = (req, res) => {
                                     }, currentDue) => {
                                         if (err) {
                                             req.flash('errors', {
-                                                msg: 'There was an error in loading your loan current due.'
+                                                msg: 'There was an error when loading your loan current due. Please try again later.'
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 200) {
@@ -4414,7 +4414,7 @@ const getDownloadLoanSOA = (req, res) => {
                                                     }, pastDue) => {
                                                         if (err) {
                                                             req.flash('errors', {
-                                                                msg: 'There was an error in loading your loan past due.'
+                                                                msg: 'There was an error when loading your loan past due. Please try again later.'
                                                             });
                                                             return res.redirect('back');
                                                         } else if (statusCode === 200) {
@@ -4828,7 +4828,7 @@ const getDownloadLoanSchedule = (req, res) => {
         }, loan) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your loan details.'
+                    msg: 'There was an error when loading your loan schedule. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -4888,7 +4888,7 @@ const postRepayment = (req, res) => {
         }, transaction) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when adding your repayment.  Please try again later.'
+                    msg: 'There was an error when adding your repayment. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 201) {
@@ -4924,7 +4924,7 @@ const getBorrowers = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -4944,7 +4944,7 @@ const getBorrowers = (req, res) => {
                     }, borrowers) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of borrowers.'
+                                msg: 'There was an error when loading list of borrowers. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -4964,7 +4964,7 @@ const getBorrowers = (req, res) => {
                                 }, employees) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading list of employees.'
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -5087,7 +5087,7 @@ const postBorrowers = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in creating user account.'
+                    msg: 'There was an error when creating user account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 201) {
@@ -5163,7 +5163,7 @@ const postBorrowers = (req, res) => {
                     }, borrower) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in creating borrower account.'
+                                msg: 'There was an error when creating borrower account. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 201) {
@@ -5184,7 +5184,7 @@ const postBorrowers = (req, res) => {
                                 }, body) => {
                                     if (err) {
                                         req.flash('warning', {
-                                            msg: 'We were unable to send the password to respective email.'
+                                            msg: 'There was an error when sending the password to respective email. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -5235,7 +5235,7 @@ const getDeleteBorrowers = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in deleting borrower account.'
+                    msg: 'There was an error when deleting borrower account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
@@ -5255,7 +5255,7 @@ const getDeleteBorrowers = (req, res) => {
                     }, user) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in deleting user account.'
+                                msg: 'There was an error when deleting user account. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 204) {
@@ -5350,7 +5350,7 @@ const postUpdateBorrowers = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating borrower information.  Please try again later.'
+                    msg: 'There was an error when updating borrower information. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -5386,7 +5386,7 @@ const getLoans = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -5406,7 +5406,7 @@ const getLoans = (req, res) => {
                     }, loans) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of loans.'
+                                msg: 'There was an error when loading list of loans. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -5426,7 +5426,7 @@ const getLoans = (req, res) => {
                                 }, employees) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading list of employees.'
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -5446,7 +5446,7 @@ const getLoans = (req, res) => {
                                             }, borrowers) => {
                                                 if (err) {
                                                     req.flash('errors', {
-                                                        msg: 'There was an error in loading list of employees.'
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
@@ -5507,9 +5507,10 @@ const getBorrowerCredits = (req, res) => {
             statusCode
         }, borrower) => {
             if (err) {
-                return res
-                    .status(404)
-                    .json('There was an error when loading borrower information. Please try again later.');
+                req.flash('errors', {
+                    msg: 'There was an error when loading borrower information. Please try again later.'
+                });
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 path = '/api/loans/borrowers/' + req.params.borrowerid;
                 requestOptions = {
@@ -5526,9 +5527,10 @@ const getBorrowerCredits = (req, res) => {
                         statusCode
                     }, loans) => {
                         if (err) {
-                            return res
-                                .status(404)
-                                .json('There was an error when loading loans by borrower information.  Please try again later.');
+                            req.flash('errors', {
+                                msg: 'There was an error when loading loans by borrower information. Please try again later.'
+                            });
+                            return res.redirect('back');
                         } else if (statusCode === 200) {
                             let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
                                 status
@@ -5541,16 +5543,18 @@ const getBorrowerCredits = (req, res) => {
                                     remainingCreditLimit: remainingCreditLimit
                                 });
                         } else {
-                            return res
-                                .status(404)
-                                .json(loans.message);
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
                         }
                     }
                 );
             } else {
-                return res
-                    .status(404)
-                    .json(borrower.message);
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('back');
             }
         }
     );
@@ -5580,7 +5584,7 @@ const postLoans = (req, res) => {
     }
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/loans');
+        return res.redirect('back');
     }
     path = '/api/borrowers/' + req.body.borrowerID;
     requestOptions = {
@@ -5597,9 +5601,10 @@ const postLoans = (req, res) => {
             statusCode
         }, borrower) => {
             if (err) {
-                return res
-                    .status(404)
-                    .json('There was an error when loading borrower information. Please try again later.');
+                req.flash('errors', {
+                    msg: 'There was an error when loading borrower information. Please try again later.'
+                });
+                return res.redirect('back');
             } else if (statusCode === 200) {
                 path = '/api/loans/borrowers/' + req.body.borrowerID;
                 requestOptions = {
@@ -5616,9 +5621,10 @@ const postLoans = (req, res) => {
                         statusCode
                     }, loans) => {
                         if (err) {
-                            return res
-                                .status(404)
-                                .json('There was an error when loading loans by borrower information.  Please try again later.');
+                            req.flash('errors', {
+                                msg: 'There was an error when loading loans by borrower information. Please try again later.'
+                            });
+                            return res.redirect('back');
                         } else if (statusCode === 200) {
                             //validations
                             let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
@@ -5685,16 +5691,18 @@ const postLoans = (req, res) => {
                                 return res.redirect('back');
                             }
                         } else {
-                            return res
-                                .status(404)
-                                .json(loans.message);
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
                         }
                     }
                 );
             } else {
-                return res
-                    .status(404)
-                    .json(borrower.message);
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('back');
             }
         }
     );
@@ -5717,7 +5725,7 @@ const getDeleteData = (req, res) => {
         }, body) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in deleting ' + req.params.table + '.'
+                    msg: 'There was an error when deleting ' + req.params.table + '. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
@@ -5751,21 +5759,16 @@ const postUpdateLoans = (req, res) => {
             statusCode
         }, loan) => {
             if (err) {
-                return res
-                    .status(404)
-                    .json('There was an error when loading loan information. Please try again later.');
-            } else if (statusCode === 200) {
-                //validations
-                let data;
-                const validationErrors = [];
-                if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-                    msg: 'Assigned reviewer of loan cannot be blank.'
+                req.flash('errors', {
+                    msg: 'There was an error when loading loan information. Please try again later.'
                 });
-                if (loan.status == "Fully Paid") {
-                    data = {
-                        reviewedBy: req.body.reviewedBy
-                    }
-                } else {
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                if (loan.status != "Fully Paid") {
+                    const validationErrors = [];
+                    if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
+                        msg: 'Assigned reviewer of loan cannot be blank.'
+                    });
                     if (validator.isEmpty(req.body.status)) validationErrors.push({
                         msg: 'Loan status cannot be blank.'
                     });
@@ -5782,160 +5785,163 @@ const postUpdateLoans = (req, res) => {
                         if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
                             msg: 'Loan term amount cannot be blank.'
                         });
-                    } else {
-                        data = {
-                            status: req.body.status,
-                            reviewedBy: req.body.reviewedBy
-                        }
                     }
-                }
-                if (validationErrors.length) {
-                    req.flash('errors', validationErrors);
+                    if (validationErrors.length) {
+                        req.flash('errors', validationErrors);
+                        return res.redirect('back');
+                    }
+                    if (loan.status == "Processing" && req.body.status == "Loan Release") {
+                        path = '/api/borrowers/' + loan.requestedBy._id;
+                        requestOptions = {
+                            url: `${apiOptions.server}${path}`,
+                            method: 'GET',
+                            headers: {
+                                Authorization: 'Bearer ' + req.user.token
+                            },
+                            json: {}
+                        };
+                        request(
+                            requestOptions,
+                            (err, {
+                                statusCode
+                            }, borrower) => {
+                                if (err) {
+                                    return res
+                                        .status(404)
+                                        .json('There was an error when loading borrower information. Please try again later.');
+                                } else if (statusCode === 200) {
+                                    path = '/api/loans/borrowers/' + loan.requestedBy._id;
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'GET',
+                                        headers: {
+                                            Authorization: 'Bearer ' + req.user.token
+                                        },
+                                        json: {}
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, loans) => {
+                                            if (err) {
+                                                return res
+                                                    .status(404)
+                                                    .json('There was an error when loading loans by borrower information. Please try again later.');
+                                            } else if (statusCode === 200) {
+                                                //validations
+                                                let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
+                                                    status
+                                                }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
+                                                let remainingCreditLimit = (parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit)) + parseFloat(req.body.loanAmount);
+                                                if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
+                                                    path = '/api/loans/' + req.params.loanid;
+                                                    requestOptions = {
+                                                        url: `${apiOptions.server}${path}`,
+                                                        method: 'PUT',
+                                                        headers: {
+                                                            Authorization: 'Bearer ' + req.user.token
+                                                        },
+                                                        json: {
+                                                            purposeOfLoan: req.body.purposeOfLoan,
+                                                            loanTerm: req.body.loanTerm,
+                                                            loanAmount: req.body.loanAmount,
+                                                            monthlyInterestRate: (borrower.type == "Member") ? 3 : 5,
+                                                            status: req.body.status,
+                                                            reviewedBy: req.body.reviewedBy
+                                                        }
+                                                    };
+                                                    request(
+                                                        requestOptions,
+                                                        (err, {
+                                                            statusCode
+                                                        }, updatedLoan) => {
+                                                            if (err) {
+                                                                req.flash('errors', {
+                                                                    msg: 'There was an error when updating loan application. Please try again later.'
+                                                                });
+                                                                return res.redirect('back');
+                                                            } else if (statusCode === 200) {
+                                                                req.flash('success', {
+                                                                    msg: "Loan application has been updated successfully."
+                                                                });
+                                                                return res.redirect('back');
+                                                            } else {
+                                                                req.flash('errors', {
+                                                                    msg: updatedLoan.message
+                                                                });
+                                                                return res.redirect('back');
+                                                            }
+                                                        }
+                                                    );
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: "Invalid loan amount."
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            } else {
+                                                return res
+                                                    .status(404)
+                                                    .json(loans.message);
+                                            }
+                                        }
+                                    );
+                                } else {
+                                    return res
+                                        .status(404)
+                                        .json(borrower.message);
+                                }
+                            }
+                        );
+                    } else {
+                        path = '/api/loans/' + req.params.loanid;
+                        requestOptions = {
+                            url: `${apiOptions.server}${path}`,
+                            method: 'PUT',
+                            headers: {
+                                Authorization: 'Bearer ' + req.user.token
+                            },
+                            json: {
+                                status: req.body.status,
+                                reviewedBy: req.body.reviewedBy
+                            }
+                        };
+                        request(
+                            requestOptions,
+                            (err, {
+                                statusCode
+                            }, updatedLoan) => {
+                                if (err) {
+                                    req.flash('errors', {
+                                        msg: 'There was an error when updating loan application. Please try again later.'
+                                    });
+                                    return res.redirect('back');
+                                } else if (statusCode === 200) {
+                                    req.flash('success', {
+                                        msg: "Loan application has been updated successfully."
+                                    });
+                                    return res.redirect('back');
+                                } else {
+                                    req.flash('errors', {
+                                        msg: updatedLoan.message
+                                    });
+                                    return res.redirect('back');
+                                }
+                            }
+                        );
+                    }
+                } else {
+                    req.flash('errors', {
+                        msg: 'Cannot update loan application. Status was already fully paid.'
+                    });
                     return res.redirect('back');
                 }
-                // update
-                if (loan.status == "Processing" && req.body.status == "Loan Release") {
-                    path = '/api/borrowers/' + loan.requestedBy._id;
-                    requestOptions = {
-                        url: `${apiOptions.server}${path}`,
-                        method: 'GET',
-                        headers: {
-                            Authorization: 'Bearer ' + req.user.token
-                        },
-                        json: {}
-                    };
-                    request(
-                        requestOptions,
-                        (err, {
-                            statusCode
-                        }, borrower) => {
-                            if (err) {
-                                return res
-                                    .status(404)
-                                    .json('There was an error when loading borrower information. Please try again later.');
-                            } else if (statusCode === 200) {
-                                path = '/api/loans/borrowers/' + loan.requestedBy._id;
-                                requestOptions = {
-                                    url: `${apiOptions.server}${path}`,
-                                    method: 'GET',
-                                    headers: {
-                                        Authorization: 'Bearer ' + req.user.token
-                                    },
-                                    json: {}
-                                };
-                                request(
-                                    requestOptions,
-                                    (err, {
-                                        statusCode
-                                    }, loans) => {
-                                        if (err) {
-                                            return res
-                                                .status(404)
-                                                .json('There was an error when loading loans by borrower information.  Please try again later.');
-                                        } else if (statusCode === 200) {
-                                            //validations
-                                            let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
-                                                status
-                                            }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
-                                            let remainingCreditLimit = parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
-                                            if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
-                                                path = '/api/loans/' + req.params.loanid;
-                                                requestOptions = {
-                                                    url: `${apiOptions.server}${path}`,
-                                                    method: 'PUT',
-                                                    headers: {
-                                                        Authorization: 'Bearer ' + req.user.token
-                                                    },
-                                                    json: {
-                                                        purposeOfLoan: req.body.purposeOfLoan,
-                                                        loanTerm: req.body.loanTerm,
-                                                        loanAmount: req.body.loanAmount,
-                                                        monthlyInterestRate: (borrower.type == "Member") ? 3 : 5,
-                                                        status: req.body.status,
-                                                        reviewedBy: req.body.reviewedBy
-                                                    }
-                                                };
-                                                request(
-                                                    requestOptions,
-                                                    (err, {
-                                                        statusCode
-                                                    }, updatedLoan) => {
-                                                        if (err) {
-                                                            req.flash('errors', {
-                                                                msg: 'There was an error when updating loan application. Please try again later.'
-                                                            });
-                                                            return res.redirect('back');
-                                                        } else if (statusCode === 200) {
-                                                            req.flash('success', {
-                                                                msg: "Loan application has been updated successfully."
-                                                            });
-                                                            return res.redirect('back');
-                                                        } else {
-                                                            req.flash('errors', {
-                                                                msg: updatedLoan.message
-                                                            });
-                                                            return res.redirect('back');
-                                                        }
-                                                    }
-                                                );
-                                            } else {
-                                                req.flash('errors', {
-                                                    msg: "Invalid loan amount."
-                                                });
-                                                return res.redirect('back');
-                                            }
-                                        } else {
-                                            return res
-                                                .status(404)
-                                                .json(loans.message);
-                                        }
-                                    }
-                                );
-                            } else {
-                                return res
-                                    .status(404)
-                                    .json(borrower.message);
-                            }
-                        }
-                    );
-                } else {
-                    path = '/api/loans/' + req.params.loanid;
-                    requestOptions = {
-                        url: `${apiOptions.server}${path}`,
-                        method: 'PUT',
-                        headers: {
-                            Authorization: 'Bearer ' + req.user.token
-                        },
-                        json: data
-                    };
-                    request(
-                        requestOptions,
-                        (err, {
-                            statusCode
-                        }, updatedLoan) => {
-                            if (err) {
-                                req.flash('errors', {
-                                    msg: 'There was an error when updating loan application. Please try again later.'
-                                });
-                                return res.redirect('back');
-                            } else if (statusCode === 200) {
-                                req.flash('success', {
-                                    msg: "Loan application has been updated successfully."
-                                });
-                                return res.redirect('back');
-                            } else {
-                                req.flash('errors', {
-                                    msg: updatedLoan.message
-                                });
-                                return res.redirect('back');
-                            }
-                        }
-                    );
-                }
             } else {
-                return res
-                    .status(404)
-                    .json(loan.message);
+                req.flash('errors', {
+                    msg: loan.message
+                });
+                return res.redirect('back');
             }
         }
     );
@@ -5960,7 +5966,7 @@ const getLoanDetails = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -5980,7 +5986,7 @@ const getLoanDetails = (req, res) => {
                     }, loan) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading your loan details.'
+                                msg: 'There was an error when loading your loan details. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -6000,7 +6006,7 @@ const getLoanDetails = (req, res) => {
                                 }, schedules) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading your loan schedules.'
+                                            msg: 'There was an error when loading your loan schedules. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -6020,7 +6026,7 @@ const getLoanDetails = (req, res) => {
                                             }, repayments) => {
                                                 if (err) {
                                                     req.flash('errors', {
-                                                        msg: 'There was an error in loading your repayments.'
+                                                        msg: 'There was an error when loading your repayments. Please try again later.'
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
@@ -6083,7 +6089,7 @@ const getTransactions = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -6103,7 +6109,7 @@ const getTransactions = (req, res) => {
                     }, transactions) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of transactions.'
+                                msg: 'There was an error when loading list of transactions. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -6123,7 +6129,7 @@ const getTransactions = (req, res) => {
                                 }, employees) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading list of employees.'
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -6143,7 +6149,7 @@ const getTransactions = (req, res) => {
                                             }, borrowers) => {
                                                 if (err) {
                                                     req.flash('errors', {
-                                                        msg: 'There was an error in loading list of borrowers.'
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
@@ -6210,7 +6216,7 @@ const getWithdrawals = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -6230,7 +6236,7 @@ const getWithdrawals = (req, res) => {
                     }, withdrawals) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of withdrawals.'
+                                msg: 'There was an error when loading list of withdrawals. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -6250,7 +6256,7 @@ const getWithdrawals = (req, res) => {
                                 }, employees) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading list of employees.'
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -6270,7 +6276,7 @@ const getWithdrawals = (req, res) => {
                                             }, borrowers) => {
                                                 if (err) {
                                                     req.flash('errors', {
-                                                        msg: 'There was an error in loading list of borrowers.'
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
@@ -6337,7 +6343,7 @@ const getEmployees = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -6357,7 +6363,7 @@ const getEmployees = (req, res) => {
                     }, employees) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of employees.'
+                                msg: 'There was an error when loading list of employees. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
@@ -6377,7 +6383,7 @@ const getEmployees = (req, res) => {
                                 }, admins) => {
                                     if (err) {
                                         req.flash('errors', {
-                                            msg: 'There was an error in loading list of admins.'
+                                            msg: 'There was an error when loading list of admins. Please try again later.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
@@ -6435,7 +6441,7 @@ const getInquiries = (req, res) => {
         }, user) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error in loading your account.'
+                    msg: 'There was an error when loading your account. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
@@ -6455,7 +6461,7 @@ const getInquiries = (req, res) => {
                     }, inquiries) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error in loading list of inquiries.'
+                                msg: 'There was an error when loading list of inquiries.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {

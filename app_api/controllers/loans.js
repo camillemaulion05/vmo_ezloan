@@ -140,8 +140,8 @@ const loansUpdateOne = (req, res) => {
                             loan.compute(loan.loanAmount, loan.monthlyInterestRate, loan.loanTerm);
                         }
                     }
-                    if (req.body.status && req.body.status != loan.status && "Loan Release" == req.body.status) loan.updateDates();
                     loan.status = (req.body.status) ? req.body.status : loan.status;
+                    if (req.body.status && "Loan Release" == req.body.status) loan.updateDates();
                     loan.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : loan.reviewedBy;
                     loan.reviewedDate = (req.body.reviewedBy) ? Date.now() : loan.reviewedDate;
                     loan.save((err) => {
