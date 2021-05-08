@@ -2,23 +2,28 @@ const validator = require('validator');
 const CryptoJS = require("crypto-js");
 const request = require('request');
 const PdfPrinter = require('pdfmake');
+const generator = require('generate-password');
 const apiOptions = {
     server: process.env.BASE_URL
 };
 
 function passwordGen() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 8; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
+    return generator.generate({
+        length: 8,
+        numbers: true,
+        symbols: true
+    });
 }
 
-function usernameGen(firstName, lastName, dob) {
+function usernameGen(firstName, lastName) {
     firstName.trim()
     lastName.trim()
-    dob.trim()
-    return (firstName.substr(0, 1)).toUpperCase() + (lastName).toUpperCase() + (dob).replace(/\-/g, '');
+    let random = generator.generate({
+        length: 6,
+        numbers: true,
+        symbols: false
+    });
+    return (firstName.substr(0, 1)).toUpperCase() + (lastName).toUpperCase() + random;
 }
 
 function parseDate(date, format) {
@@ -5061,7 +5066,7 @@ const postBorrowers = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    let username = usernameGen(req.body.firstName, req.body.lastName, req.body.dateOfBirth);
+    let username = usernameGen(req.body.firstName, req.body.lastName);
     let password = passwordGen();
     path = '/api/users';
     requestOptions = {
@@ -5169,7 +5174,7 @@ const postBorrowers = (req, res) => {
                                 json: {
                                     receiver: req.body.email,
                                     subject: 'VMO EZ Loan Account',
-                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your birthdate in YYYYMMDD.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
+                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your 6 random alphanumeric.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
                                 }
                             };
                             request(
@@ -5834,7 +5839,7 @@ const postUpdateLoans = (req, res) => {
                                             }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
                                             let remainingCreditLimit = parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit);
                                             if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
-                                                path = '/api/loans' + req.params.loanid;
+                                                path = '/api/loans/' + req.params.loanid;
                                                 requestOptions = {
                                                     url: `${apiOptions.server}${path}`,
                                                     method: 'PUT',

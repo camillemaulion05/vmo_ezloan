@@ -59,7 +59,8 @@ block content
                           td
                             .badge.badge-success.badge-pill #{x.status}
                         td 
-                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.transactionNum) data-toggle='modal' data-target='#')
+                          - let referenceId = (x.type == 'Contributions' || x.type == 'Fees') ? x.borrowerId : (x.type == 'Repayments' || x.type == 'Release') ? loanId : withdrawalId;
+                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.transactionNum+'/'+x.type+'/'+x.amount+'/'+referenceId+'/'+x.method+'/'+x.senderNum+'/'+x.receiverNum+'/'+x.referenceNo+'/'+x.status+'/'+x.postedBy) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
                           a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.transactionNum) data-toggle='modal' data-target='#')
                             i.fas.fa-trash

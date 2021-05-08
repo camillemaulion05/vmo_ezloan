@@ -47,7 +47,7 @@ html
               $('input[name="profilePic"]').change(function () {
                   $("form#profilePicForm").submit();
               });
-              $('a#verifyMobileNum').click(function () {
+              $('a#verifyMobileNum').on('click',function () {
                 let path = ($('a#verifyMobileNum').prop('href')).split('/');
                 let mobileNum = path[path.length-1];
                 let firstName = path[path.length-2];
@@ -78,7 +78,7 @@ html
     if title.indexOf("Borrowers") != -1
       script.
           $(function () {
-              $('a.deleteBorrower').click(function () {
+              $('#dataTable').on('click','.deleteBorrower',function () {
                 let path = ($(this).prop('href')).split('/');
                 let lastName = (path[path.length-1]).replace(/%20/g," ");
                 let firstName = (path[path.length-2]).replace(/%20/g," ");
@@ -88,7 +88,7 @@ html
                 $('span#deleteBorrowerName').text(firstName + ' ' + lastName);
                 $('#deleteBorrowerModal').modal('show'); 
               });
-              $('a.updateBorrower').click(function () {
+              $('#dataTable').on('click','.updateBorrower',function () {
                 let path = ($(this).prop('href')).split('/');
                 let employmentType = (path[path.length-1] != 'undefined') ? (path[path.length-1]).replace(/%20/g," ") : '';
                 let hrCertifiedBy = (path[path.length-2] != 'undefined') ? path[path.length-2] : '';
@@ -184,10 +184,23 @@ html
               });
           });
 
+    if title.indexOf("Manage Transactions") != -1
+      script.
+          $(function () {
+            $('#dataTable').on('click','.deleteTransaction',function () {
+                let path = ($(this).prop('href')).split('/');
+                let transactionNum = path[path.length-1];
+                let transactionid = path[path.length-2];
+                $('a#deleteTransaction').attr('href', '/delete/' + transactionid + '/transactions'); 
+                $('span#deleteTransactionNum').text(transactionNum);
+                $('#deleteTransactionModal').modal('show'); 
+            });
+          });
+
     if title.indexOf("Manage Loans") != -1
       script.
           $(function () {
-            $('a.deleteLoan').click(function () {
+            $('#dataTable').on('click','.deleteLoan',function () {
                 let path = ($(this).prop('href')).split('/');
                 let borrowerName = (path[path.length-1]).replace(/%20/g," ");
                 let loanNum = path[path.length-2];
@@ -197,7 +210,7 @@ html
                 $('span#deleteBorrowerName').text(borrowerName);
                 $('#deleteLoanModal').modal('show'); 
             });
-            $('a.updateLoan').click(function () {
+            $('#dataTable').on('click','.updateLoan',function () {
                 let path = ($(this).prop('href')).split('/');
                 let reviewedBy = (path[path.length-1] != 'undefined') ? path[path.length-1] : '';
                 let status = (path[path.length-2]).replace(/%20/g," ");
@@ -451,7 +464,7 @@ html
                 $('input[name="receiverNum"]').val('3729457999')
               }
           });
-          $('a#addRepayment').click(function () {
+          $('a#addRepayment').on('click',function () {
             let path = ($(this).prop('href')).split('/');
             let loanid = path[path.length-1];
             $("#repayment").attr("action", "/repayments/" + loanid);
@@ -487,10 +500,10 @@ html
           boxChecked();
           $('input[type="checkbox"]').on("click", boxChecked);
           var sig = $('#sig').signature();
-          $('#clear').click(function () {
+          $('#clear').on('click',function () {
             sig.signature('clear');
           });
-          $('#redrawButton').click(function () {
+          $('#redrawButton').on('click',function () {
             $('#signatureDataURL').val(sig.signature('toJSON'));
             var signature = JSON.parse($('#signatureDataURL').val());
             if (signature.lines.length > 0) {

@@ -195,6 +195,23 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
+
+  if title.indexOf("Manage Transactions") != -1
+    #deleteTransactionModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteTransactionModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteTransactionModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete transaction no.  
+              span#deleteTransactionNum 
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteTransaction.btn.btn-primary(href='') Yes, delete it
+
   if title.indexOf("Manage Loans") != -1
     - let loanTerm = ["6", "12", "18", "24", "30", "36", "42", "48", "54", "60"]
     - let purposeOfLoan = ["Living Cost","Educational","Medical or Hospitalization","Purchasing Appliance","Travel or Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
