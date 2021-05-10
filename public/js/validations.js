@@ -2,13 +2,13 @@
     "use strict"; // Start of use strict
 
     //form-validations
-    $('input[name="mobileNum"], input[name="accountNum2"]').on("keyup change blur", function () {
+    $('input[name="mobileNum"], input[name="accountNum"]').on("keyup change blur", function () {
         var mobile = this.value;
         if (mobile.charAt(0) != '9') {
             this.value = '';
         };
         formatNumber(this.value);
-        $('input[name="mobileNum"]').text(this.value);
+        $(this).text(this.value);
     });
 
     $('input[name="firstName"], input[name="lastName"], input[name="middleName"]').on("keyup change blur", function () {

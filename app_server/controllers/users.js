@@ -139,6 +139,12 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
                         msg: 'Employee ID cannot be blank.'
                     });
+                    if (validator.isEmpty(req.body.accountName)) validationErrors.push({
+                        msg: 'G-Cash Account Name cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
+                        msg: 'G-Cash Account No. cannot be blank.'
+                    });
                     if (req.body.employeeID && req.body.employeeType) {
                         if (req.body.userCode != originalEmployeeCode) {
                             userType = 'borrower';
@@ -291,7 +297,11 @@ const postSignupByType = (req, res, next) => {
                                         mobileNumVerified: true
                                     },
                                     employeeID: employeeID,
-                                    sharesPerPayDay: sharesPerPayDay
+                                    sharesPerPayDay: sharesPerPayDay,
+                                    account: {
+                                        name: (req.body.accountName) ? req.body.accountName : null,
+                                        number: (req.body.accountNum) ? req.body.accountNum : null
+                                    }
                                 }
                             };
                             request(

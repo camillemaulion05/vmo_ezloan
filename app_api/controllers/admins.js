@@ -10,17 +10,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
 
 const adminsList = (req, res) => {
     Admin
-        .find({}, {
-            "adminNum": 1,
-            "profile.firstName": 1,
-            "profile.lastName": 1,
-            "profile.gender": 1,
-            "profile.dateOfBirth": 1,
-            "profile.mobileNum": 1,
-            "profile.email": 1,
-            "employeeID": 1,
-            "userId": 1
-        })
+        .find()
         .exec((err, admin) => {
             if (err) {
                 console.log(err);
@@ -76,6 +66,7 @@ const adminsReadOne = (req, res) => {
     } else {
         Admin
             .findById(adminid)
+            .populate('userId', 'username type lastLogin lastFailedLogin status security picture')
             .exec((err, admin) => {
                 if (!admin) {
                     res

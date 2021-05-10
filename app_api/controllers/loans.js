@@ -3,13 +3,8 @@ const Loan = mongoose.model('Loan');
 
 const loansList = (req, res) => {
     Loan
-        .find({}, {
-            "loanPaymentSchedule": 0,
-            "reviewedDate": 0,
-            "updatedAt": 0,
-            "__v": 0
-        })
-        .populate('requestedBy', 'profile.firstName profile.lastName type totalCreditLimit')
+        .find()
+        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
         .exec((err, loans) => {
             if (err) {
                 console.log(err);
@@ -71,7 +66,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -115,7 +110,6 @@ const loansUpdateOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -214,7 +208,6 @@ const loansSchedulesUpdate = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -265,7 +258,7 @@ const loansSchedulesList = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account.number')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -316,7 +309,7 @@ const loansSchedulesReadOne = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -369,7 +362,7 @@ const loansDueListByLoan = (req, res) => {
                 "_id": 0,
                 "requestedBy": 1
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -423,7 +416,7 @@ const loansPastDueListByLoan = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -464,7 +457,7 @@ const loansDueRepaymentsList = (req, res) => {
             "loanPaymentSchedule.$": 1,
             "_id": 0
         })
-        .populate('requestedBy', 'profile.firstName profile.lastName type')
+        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
         .exec((err, loanPaymentSchedule) => {
             if (err) {
                 console.log(err);

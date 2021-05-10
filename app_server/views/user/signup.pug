@@ -99,6 +99,18 @@ block content
                     for x in employeeType
                       option(value=x) #{x}
                   em.invalid-feedback
+            .row.loanProcessorOnly.d-none
+              .col-sm-6
+                .form-group
+                  input#accountName.form-control(type='text' name='accountName' placeholder='G-Cash Account Name')
+                  em.invalid-feedback
+              .col-sm-6
+                .form-group.mb-md-0
+                  .input-group.mb-3
+                    .input-group-prepend
+                      span#basic-addon1.input-group-text +63
+                    input#accountNum.form-control(type='text' name='accountNum' placeholder='G-Cash Account No.' minlength='10' maxlength='10')
+                    em.invalid-feedback 
           if type == "member"
             .row
               .col-sm-12

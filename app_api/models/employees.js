@@ -66,6 +66,10 @@ const employeeSchema = mongoose.Schema({
             default: false
         }
     },
+    account: {
+        name: String,
+        number: String
+    },
     employeeID: String,
     userId: {
         type: mongoose.Schema.Types.ObjectId,

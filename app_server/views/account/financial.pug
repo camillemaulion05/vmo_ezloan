@@ -16,62 +16,17 @@ block content
                     form(method='POST')
                       input(type='hidden', name='_csrf', value=_csrf)
                       fieldset
-                        legend.text-primary Bank or G-Cash Enrollment
-                        .form-group.md-4
-                          if (user.account && user.account.type == "G-Cash") 
-                            .form-check.form-check-inline
-                              input#gcash.form-check-input(type='radio' name='mop' value='G-Cash' checked)
-                              label.form-check-label(for='gcash') G-Cash
-                            .form-check.form-check-inline
-                              input#bankTransfer.form-check-input(type='radio' name='mop' value='Bank Transfer')
-                              label.form-check-label(for='bankTransfer') Bank Transfer
-                          else if (user.account && user.account.type)
-                            .form-check.form-check-inline
-                              input#gcash.form-check-input(type='radio' name='mop' value='G-Cash')
-                              label.form-check-label(for='gcash') G-Cash
-                            .form-check.form-check-inline
-                              input#bankTransfer.form-check-input(type='radio' name='mop' value='Bank Transfer' checked)
-                              label.form-check-label(for='bankTransfer') Bank Transfer
-                          else
-                            .form-check.form-check-inline
-                              input#gcash.form-check-input(type='radio' name='mop' value='G-Cash')
-                              label.form-check-label(for='gcash') G-Cash
-                            .form-check.form-check-inline
-                              input#bankTransfer.form-check-input(type='radio' name='mop' value='Bank Transfer')
-                              label.form-check-label(for='bankTransfer') Bank Transfer
-                        .bank
-                          .form-row
-                            .form-group.col-md-6
-                              label.small.mb-1(for='bankName') Name of Bank
-                              input#bankName.form-control(type='text' placeholder='Enter name of bank' name='bankName' value=(user.account) ? user.account.name : '')
-                            .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='branch') Branch
-                              input#branch.form-control(type='text' placeholder='Enter branch' name='branch' value=(user.account) ? user.account.branch : '')
-                          .form-row
-                            .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='accountType') Type of Account
-                              select#accountType.form-control.selectpicker(type='text' name='accountType')
-                                option(value='' selected='') Type of Account
-                                - let accountType = ['Savings', 'Checking/Current']
-                                for x in accountType
-                                  if (user.account && x == user.account.type) 
-                                    option(value=x selected) #{x}
-                                  else
-                                    option(value=x) #{x}
-                            .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='accountNum') Account No.
+                        legend.text-primary G-Cash Enrollment
+                        .form-row
+                          .form-group.col-md-6.mb-md-0
+                            label.small.mb-1(for='accountName') Account name of G-Cash
+                            input#accountName.form-control(type='text' placeholder='Enter your gcash name' name='accountName' value=(user.account) ? user.account.name : '')
+                          .form-group.col-md-6.mb-md-0
+                            label.small.mb-1(for='accountNum') Account No.
+                            .input-group
+                              .input-group-prepend
+                                span.input-group-text +63
                               input#accountNum.form-control(type='text' placeholder='Enter your account no.' name='accountNum' value=(user.account) ? user.account.number : '')
-                        .gcash
-                          .form-row
-                            .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='bankName2') Account name of G-Cash
-                              input#bankName2.form-control(type='text' placeholder='Enter your gcash name' name='bankName2' value=(user.account) ? user.account.name : '')
-                            .form-group.col-md-6.mb-md-0
-                              label.small.mb-1(for='accountNum2') Account No.
-                              .input-group
-                                .input-group-prepend
-                                  span.input-group-text +63
-                                input#accountNum2.form-control(type='text' placeholder='Enter your account no.' name='accountNum2' value=(user.account) ? user.account.number : '')
                       hr.my-4
                       fieldset
                         legend.text-primary Work / Business Information

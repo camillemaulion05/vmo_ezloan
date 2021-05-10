@@ -149,7 +149,9 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getLoanDetails)
     .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateLoans);
 
-router.get('/loans/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerCredits);
+router.get('/borrowers/loans/:loanid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerLoans);
+router.get('/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerDetails);
+router.get('/employees/:employeeid', passportConfig.isAuthenticated, ctrlAccount.getEmployeeDetails);
 
 router
     .route('/transactions')

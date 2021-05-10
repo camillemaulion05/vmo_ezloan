@@ -100,8 +100,7 @@ block content
                           td
                             .badge.badge-warning.badge-pill #{x.status} 
                         td 
-                          - let employmentType = (x.workBusinessInfo && x.workBusinessInfo.employmentType) ? x.workBusinessInfo.employmentType : undefined;
-                          a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/'+x.type+'/'+x.status+'/'+x.totalCreditLimit+'/'+x.reviewedBy+'/'+x.employeeID+'/'+x.sharesPerPayDay+'/'+x.hrCertifiedBy+'/'+ employmentType) data-toggle='modal' data-target='#')
+                          a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
                           a.deleteBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
                             i.fas.fa-trash

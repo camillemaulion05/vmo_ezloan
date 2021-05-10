@@ -32,3 +32,15 @@ html
     script(src='/js/methods.js')
     script(src='/js/scripts.js')
     script(src='/js/validations.js')
+
+    if title.indexOf("Signup") != -1
+      script.
+          $(function () {
+              $('select#employeeType').change(function () {
+                if ($('select#employeeType').val() == 'Loan Processor') {
+                  $('.loanProcessorOnly').removeClass('d-none');
+                } else{
+                  $('.loanProcessorOnly').addClass('d-none');
+                }
+              });
+          });

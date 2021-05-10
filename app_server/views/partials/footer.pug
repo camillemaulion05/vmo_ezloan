@@ -169,6 +169,13 @@ else
                   input#sharesPerPayDay.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
               .form-row.mb-2.verifiedOnly
                 .col-md-6
+                  label.small.mb-1(for='totalUsedCreditLimit') Total Used Credit Limit
+                  input#totalUsedCreditLimit.form-control(type="number" step="500" min="0" name='totalUsedCreditLimit' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='remainingCreditLimit') Remaining Credit Limit
+                  input#remainingCreditLimit.form-control(type="number" step="500" min="0" name='remainingCreditLimit' disabled='')
+              .form-row.mb-2.verifiedOnly
+                .col-md-6
                   label.small.mb-1(for='totalCreditLimit') Total Credit Limit
                   input#totalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
                 .col-md-6
@@ -235,7 +242,7 @@ else
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='type') Borrower Type
-                  input#type.form-control(type='text' name='borrowerType')
+                  input#type.form-control(type='text' name='borrowerType' disabled='')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='loanPurpose') Purpose of Loan
@@ -246,7 +253,7 @@ else
                 .col-md-6
                   label.small.mb-1(for='amount') Loan Amount
                   input#amount.form-control(type="number" step="500" min="0" name='loanAmount')
-              .form-row.mb-2.processingOnly
+              .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='interest') Monthly Interest Rate
                   input#interest.form-control(type="number" step="1" min="3" name='monthlyInterestRate' disabled='')
@@ -261,13 +268,13 @@ else
                   label.small.mb-1(for='loanStatus') Status
                   select#loanStatus.form-control.selectpicker(type='text' name='status')
                     option(value='' selected='') Status
-                    - let loanStat = ["Processing", "Approved", "Declined", "Loan Release"]
+                    - let loanStat = ["Processing", "Approved", "Declined"]
                     for x in loanStat
                       option(value=x) #{x}
                 .col-md-6
-                  label.small.mb-1(for='loanReviewedBy') Assigned Reviewer
+                  label.small.mb-1(for='loanReviewedBy') Assigned Loan Officer
                   select#loanReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Reviewer
+                    option(value='' selected='') Assigned Loan Officer
                     for x in employees
                       if (x.type == 'Loan Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
@@ -295,7 +302,7 @@ else
         .modal-content
           .modal-header
             h5#updateLoanModalLabel.modal-title 
-              | Update 
+              span#updateTitle Update 
               span#updateLoanNum
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
@@ -323,7 +330,7 @@ else
                 .col-md-6
                   label.small.mb-1(for='loanAmount') Loan Amount
                   input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount')
-              .form-row.mb-2.processingOnly
+              .form-row.mb-2.processingOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='monthlyInterestRate') Monthly Interest Rate
                   input#monthlyInterestRate.form-control(type="number" step="1" min="3" name='monthlyInterestRate' disabled='')
@@ -342,12 +349,49 @@ else
                     for x in status
                       option(value=x) #{x}
                 .col-md-6
-                  label.small.mb-1(for='reviewedBy') Assigned Reviewer
+                  label.small.mb-1(for='reviewedBy') Assigned Loan Officer
                   select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Reviewer
+                    option(value='' selected='') Assigned Loan Officer
                     for x in employees
                       if (x.type == 'Loan Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+              .form-row.mb-2
+                .col-md-6.loanReleaseOnly.d-none
+                  label.small.mb-1(for='newProceedsAmount') New Proceeds of Loan
+                  input#newProceedsAmount.form-control(type='text' name='newProceedsAmount' disabled='')
+                .col-md-6.fullyPaidOnly.d-none
+                  label.small.mb-1(for='balance') Remaining Balance
+                  input#balance.form-control(type='text' name='balance' disabled='')
+                .col-md-6.addTransactionOnly.d-none
+                  label.small.mb-1(for='borrowerAcctNo') Borrower G-Cash No.
+                  .input-group.mb-1
+                    .input-group-prepend
+                      span#basic-addon1.input-group-text +63
+                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' disabled='')
+              .form-row.mb-2.addTransactionOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='postedBy') Assigned Loan Processor
+                  select#postedBy.form-control.selectpicker(type='text' name='postedBy')
+                    option(value='' selected='') Assigned Loan Processor
+                    for x in employees
+                      if (x.type == 'Loan Processor')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='processorAcctNo') Loan Processor G-Cash No.
+                  .input-group.mb-1
+                    .input-group-prepend
+                      span#basic-addon1.input-group-text +63
+                    input#processorAcctNo.form-control(type='text' name='processorAcctNo' disabled='')
+              .form-row.mb-2.addTransactionOnly.d-none
+                .col-md-6 
+                  label.small.mb-1(for='txnStat') Transaction Status
+                  select#txnStat.form-control.selectpicker(type='text' name='txnStatus')
+                    option(value='' selected='' disabled='') Transaction Status
+                    option(value='Processing') Processing
+                    option(value='Posted') Posted
+                .col-md-6
+                  label.small.mb-1(for='referenceNo') Reference No.
+                  input#referenceNo.form-control(type='text' name='referenceNo')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit

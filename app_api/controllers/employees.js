@@ -10,18 +10,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
 
 const employeesList = (req, res) => {
     Employee
-        .find({}, {
-            "employeeNum": 1,
-            "type": 1,
-            "profile.firstName": 1,
-            "profile.lastName": 1,
-            "profile.gender": 1,
-            "profile.dateOfBirth": 1,
-            "profile.mobileNum": 1,
-            "profile.email": 1,
-            "employeeID": 1,
-            "userId": 1
-        })
+        .find()
         .exec((err, employees) => {
             if (err) {
                 console.log(err);
@@ -42,6 +31,7 @@ const employeesCreate = (req, res) => {
     const employee = new Employee({
         type,
         profile,
+        account,
         employeeID,
         userId,
         signature
@@ -79,6 +69,7 @@ const employeesReadOne = (req, res) => {
     } else {
         Employee
             .findById(employeeid)
+            .populate('userId', 'username type lastLogin lastFailedLogin status security picture')
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -142,6 +133,7 @@ const employeesUpdateOne = (req, res) => {
                     employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
                     employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
                     employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
+                    employee.account = (req.body.account) ? req.body.account : employee.account;
                     employee.employeeID = (req.body.employeeID) ? req.body.employeeID : employee.employeeID;
                     employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
                     employee.signature = (req.body.signature) ? req.body.signature : employee.signature;
@@ -454,6 +446,7 @@ const employeesUpdateOneByUser = (req, res) => {
                     employee.profile.emailVerified = (req.body.profile && req.body.profile && req.body.profile.emailVerified) ? req.body.profile.emailVerified : (req.body.profile && req.body.profile.email) ? (employee.profile.emailVerified && employee.profile.email == req.body.profile.email) ? employee.profile.emailVerified : false : employee.profile.emailVerified;
                     employee.profile.email = (req.body.profile && req.body.profile.email) ? req.body.profile.email : employee.profile.email;
                     employee.profile.emailVerificationToken = (req.body.profile && req.body.profile.emailVerificationToken) ? req.body.profile.emailVerificationToken : employee.profile.emailVerificationToken;
+                    employee.account = (req.body.account) ? req.body.account : employee.account;
                     employee.employeeID = (req.body.employeeID) ? req.body.employeeID : employee.employeeID;
                     employee.userId = (req.body.userId) ? req.body.userId : employee.userId;
                     employee.signature = (req.body.signature) ? req.body.signature : employee.signature;

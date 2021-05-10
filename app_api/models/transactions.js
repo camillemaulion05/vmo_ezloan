@@ -19,14 +19,6 @@ const transactionSchema = mongoose.Schema({
         ]
     },
     message: String,
-    method: {
-        type: String,
-        required: true,
-        enum: [
-            "Bank Transfer",
-            "G-Cash"
-        ]
-    },
     senderNum: String,
     receiverNum: String,
     referenceNo: {

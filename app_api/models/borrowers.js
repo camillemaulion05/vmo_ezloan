@@ -151,11 +151,6 @@ const borrowerSchema = mongoose.Schema({
     employeeID: String, //For Members Only
     account: {
         name: String,
-        branch: String,
-        type: {
-            type: String,
-            enum: ["Savings", "Checking/Current", "G-Cash"]
-        },
         number: String
     },
     signature: String,

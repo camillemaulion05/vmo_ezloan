@@ -90,44 +90,56 @@ html
               });
               $('#dataTable').on('click','.updateBorrower',function () {
                 let path = ($(this).prop('href')).split('/');
-                let employmentType = (path[path.length-1] != 'undefined') ? (path[path.length-1]).replace(/%20/g," ") : '';
-                let hrCertifiedBy = (path[path.length-2] != 'undefined') ? path[path.length-2] : '';
-                let sharesPerPayDay = (path[path.length-3] != 'undefined') ? parseFloat(path[path.length-3]) : '';
-                let employeeID = (path[path.length-4] != 'undefined') ? path[path.length-4] : '';
-                let reviewedBy = (path[path.length-5] != 'undefined') ? path[path.length-5] : '';
-                let totalCreditLimit = parseFloat(path[path.length-6]);
-                let status = (path[path.length-7]).replace(/%20/g," ");
-                let type = (path[path.length-8]).replace(/%20/g," ");
-                let lastName = (path[path.length-9]).replace(/%20/g," ");
-                let firstName = (path[path.length-10]).replace(/%20/g," ");
-                let borrowerid = path[path.length-11];
-                $('select#type').val(type);
-                $('select#status').val(status);
-                $('input#totalCreditLimit').val(totalCreditLimit);
-                $('select#reviewedBy').val(reviewedBy);
-                $('input#employeeID').val(employeeID);
-                $('input#sharesPerPayDay').val(sharesPerPayDay);
-                $('select#hrCertifiedBy').val(hrCertifiedBy);
-                $('select#employmentType').val(employmentType);
-                if (type == 'Member') {
-                  $('.membersOnly').removeClass('d-none');
-                } else{
-                  $('.membersOnly').addClass('d-none');
-                }
-                if (status == 'Verified') {
-                  $('.verifiedOnly').removeClass('d-none');
-                  if (type == 'Member') {
-                    $('.verifiedMemberOnly').removeClass('d-none');
-                  } else{
-                    $('.verifiedMemberOnly').addClass('d-none');
-                  }
-                } else {
-                  $('.verifiedOnly').addClass('d-none');
-                  $('.verifiedMemberOnly').addClass('d-none');
-                }
-                $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
-                $('span#updateBorrowerName').text(firstName + ' ' + lastName);
-                $('#updateBorrowerModal').modal('show');
+                let borrowerid = path[path.length-1];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/borrowers/" + borrowerid,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        let employmentType = (data.borrower.workBusinessInfo && data.borrower.workBusinessInfo.employmentType) ? data.borrower.workBusinessInfo.employmentType : '';
+                        let reviewedBy = (data.borrower.reviewedBy && data.borrower.reviewedBy._id) ? data.borrower.reviewedBy._id : '';
+                        let hrCertifiedBy = (data.borrower.hrCertifiedBy && data.borrower.hrCertifiedBy._id) ? data.borrower.hrCertifiedBy._id : '';
+                        $('select#type').val(data.borrower.type);
+                        $('select#status').val(data.borrower.status);
+                        $('input#totalUsedCreditLimit').val(parseFloat(data.totalUsedCreditLimit));
+                        $('input#remainingCreditLimit').val(parseFloat(data.remainingCreditLimit));
+                        $('input#totalCreditLimit').val(parseFloat(data.borrower.totalCreditLimit));
+                        $('select#reviewedBy').val(reviewedBy);
+                        $('input#employeeID').val(data.borrower.employeeID);
+                        $('input#sharesPerPayDay').val(data.borrower.sharesPerPayDay);
+                        $('select#hrCertifiedBy').val(hrCertifiedBy);
+                        $('select#employmentType').val(employmentType);
+                        if (data.borrower.type == 'Member') {
+                          $('.membersOnly').removeClass('d-none');
+                        } else{
+                          $('.membersOnly').addClass('d-none');
+                        }
+                        if (data.borrower.status == 'Verified') {
+                          $('.verifiedOnly').removeClass('d-none');
+                          if (data.borrower.type == 'Member') {
+                            $('.verifiedMemberOnly').removeClass('d-none');
+                          } else{
+                            $('.verifiedMemberOnly').addClass('d-none');
+                          }
+                        } else {
+                          $('.verifiedOnly').addClass('d-none');
+                          $('.verifiedMemberOnly').addClass('d-none');
+                        }
+                        $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
+                        $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
+                        $('#updateBorrowerModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
               });
               $('select#borrowerType').change(function () {
                 if ($('select#borrowerType').val() == 'Member') {
@@ -212,90 +224,117 @@ html
             });
             $('#dataTable').on('click','.updateLoan',function () {
                 let path = ($(this).prop('href')).split('/');
-                let reviewedBy = (path[path.length-1] != 'undefined') ? path[path.length-1] : '';
-                let status = (path[path.length-2]).replace(/%20/g," ");
-                let loanTerm = path[path.length-3];
-                let loanAmount = parseFloat(path[path.length-4]);
-                let purposeOfLoan = (path[path.length-5]).replace(/%20/g," ");
-                let borrowerType = (path[path.length-6]).replace(/%20/g," ");
-                let borrowerID = (path[path.length-7]).replace(/%20/g," ");
-                let loanNum = path[path.length-8];
-                let loanid = path[path.length-9];
-                let monthlyInterestRate = (borrowerType == 'Member') ? 3 : 5;
-                $('select#borrowerName').val(borrowerID);
-                $('input#borrowerType').val(borrowerType);
-                $('select#purposeOfLoan').val(purposeOfLoan);
-                $('input#loanAmount').val(loanAmount);
-                $('input#monthlyInterestRate').val(monthlyInterestRate);
-                $('select#loanTerm').val(loanTerm);
-                $('select#status').val(status);
-                $('select#reviewedBy').val(reviewedBy);
-                if (status == 'Processing') {
-                  $('select#purposeOfLoan').prop('disabled', false);
-                  $('input#loanAmount').prop('disabled', false);
-                  $('.processingOnly').removeClass('d-none');
-                  $('select#status option[value="Processing"]').show();
-                  $('select#status option[value="Approved"]').show();
-                  $('select#status option[value="Declined"]').show();
-                  $('select#status option[value="Loan Release"]').show();
-                  $('select#status option[value="Open"]').hide();
-                  $('select#status option[value="Fully Paid"]').hide();
-                  $('select#status option[value="Loan Debt"]').hide();
-                  $('select#status').prop('disabled', false);
-                  //check remainingCreditLimit
-                  let token = $('input[name="_csrf"]').attr('value');
-                  $.ajaxSetup({
-                      beforeSend: function (xhr) {
-                          xhr.setRequestHeader('X-CSRF-Token', token);
+                let loanid = path[path.length-1];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/borrowers/loans/" + loanid,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                      let amount = parseFloat(data.loan.loanAmount) + parseFloat(data.remainingCreditLimit);
+                      let monthlyInterestRate = (data.loan.requestedBy.type == 'Member') ? 3 : 5;
+                      let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : '';
+                      let balance = round(parseFloat(data.loan.principalRemaining) + (parseFloat(data.loan.principalRemaining) * (monthlyInterestRate / 100)));
+                      $('select#borrowerName').val(data.loan.requestedBy._id);
+                      $('input#borrowerType').val(data.loan.requestedBy.type);
+                      $('select#purposeOfLoan').val(data.loan.purposeOfLoan);
+                      $('input#loanAmount').val(parseFloat(data.loan.loanAmount));
+                      $('input#loanAmount').prop('max', amount);
+                      $('input#monthlyInterestRate').val(monthlyInterestRate);
+                      $('select#loanTerm').val(data.loan.loanTerm);
+                      $('select#status').val(data.loan.status);
+                      $('select#reviewedBy').val(data.loan.reviewedBy);
+                      $('input#borrowerAcctNo').val(accountNum);
+                      $('input#newProceedsAmount').val(parseFloat(data.loan.newProceedsAmount));
+                      $('input#balance').val(balance);
+                      $("#updateLoan .btn.btn-primary").show();
+                      $("#updateLoan").attr("action", "/loans/" + loanid);
+                      $('#updateTitle').text("Update ");
+                      $('#updateLoanNum').text(data.loan.loanNum);
+                      $('.addTransactionOnly').addClass('d-none');
+                      $('.loanReleaseOnly').addClass('d-none');
+                      $('.fullyPaidOnly').addClass('d-none');
+                      if (data.loan.status == 'Processing') {
+                        $('select#purposeOfLoan').prop('disabled', false);
+                        $('input#loanAmount').prop('disabled', false);
+                        $('.processingOnly').removeClass('d-none');
+                        $('select#status option[value="Processing"]').show();
+                        $('select#status option[value="Approved"]').show();
+                        $('select#status option[value="Declined"]').show();
+                        $('select#status option[value="Loan Release"]').show();
+                        $('select#status option[value="Open"]').hide();
+                        $('select#status option[value="Fully Paid"]').hide();
+                        $('select#status option[value="Loan Debt"]').hide();
+                        $('select#status').prop('disabled', false);
+                      } else{
+                        $('select#purposeOfLoan').prop('disabled', true);
+                        $('input#loanAmount').prop('disabled', true);
+                        $('.processingOnly').addClass('d-none');
+                        $('select#status').prop('disabled', false);
+                        $('select#status option[value="Processing"]').hide();
+                        $('select#status option[value="Approved"]').show();
+                        $('select#status option[value="Declined"]').show();
+                        $('select#status option[value="Loan Release"]').show();
+                        $('select#status option[value="Open"]').hide();
+                        $('select#status option[value="Fully Paid"]').hide();
+                        $('select#status option[value="Loan Debt"]').hide();
+                        if (data.loan.status == 'Open' || data.loan.status == 'Loan Debt') {
+                          $('select#status option[value="Approved"]').hide();
+                          $('select#status option[value="Declined"]').hide();
+                          $('select#status option[value="Loan Release"]').hide();
+                          $('select#status option[value="Open"]').show();
+                          $('select#status option[value="Loan Debt"]').show();
+                          $('select#status option[value="Fully Paid"]').show();
+                        }
+                        if (data.loan.status == 'Loan Debt') {
+                          $('select#status option[value="Approved"]').hide();
+                          $('select#status option[value="Declined"]').hide();
+                          $('select#status option[value="Loan Release"]').hide();
+                          $('select#status option[value="Open"]').hide();
+                          $('select#status option[value="Loan Debt"]').show();
+                          $('select#status option[value="Fully Paid"]').show();
+                        }
+                        if (data.loan.status == 'Fully Paid') {
+                          $('#updateTitle').text("Loan No. ");
+                          $("#updateLoan .btn.btn-primary").hide();
+                          $('select#status option[value="Approved"]').hide();
+                          $('select#status option[value="Declined"]').hide();
+                          $('select#status option[value="Loan Release"]').hide();
+                          $('select#status option[value="Open"]').hide();
+                          $('select#status option[value="Loan Debt"]').hide();
+                          $('select#status option[value="Fully Paid"]').show();
+                          $('select#status').prop('disabled', true);
+                          $('select#reviewedBy').prop('disabled', true);
+                        }
                       }
-                  });
-                  $.ajax({
-                      url: "/loans/borrowers/" + borrowerID,
-                      type: "GET",
-                      data: {},
-                      cache: false,
-                      success: function (data) {
-                        let amount = parseFloat(loanAmount) + parseFloat(data.remainingCreditLimit)
-                          $('input#loanAmount').prop('max', amount);
-                      },
-                      error: function (xhr, status, error) {
-                        console.log(xhr.responseJSON.message);
-                      }
-                  });
-                } else{
-                  $('select#purposeOfLoan').prop('disabled', true);
-                  $('input#loanAmount').prop('disabled', true);
-                  $('.processingOnly').addClass('d-none');
-                  $('select#status').prop('disabled', false);
-                  $('select#status option[value="Processing"]').hide();
-                  $('select#status option[value="Approved"]').show();
-                  $('select#status option[value="Declined"]').show();
-                  $('select#status option[value="Loan Release"]').show();
-                  $('select#status option[value="Open"]').hide();
-                  $('select#status option[value="Fully Paid"]').hide();
-                  $('select#status option[value="Loan Debt"]').hide();
-                  if (status == 'Loan Release' || status == 'Open' || status == 'Loan Debt' || status == 'Fully Paid') {
-                    $('select#status option[value="Approved"]').hide();
-                    $('select#status option[value="Declined"]').hide();
-                  }
-                  if (status == 'Loan Release') {
-                    $('select#status option[value="Open"]').show();
-                    $('select#status option[value="Loan Debt"]').show();
-                  }
-                  if (status == 'Open' || status == 'Loan Debt') {
-                    $('select#status option[value="Open"]').show();
-                    $('select#status option[value="Loan Debt"]').show();
-                    $('select#status option[value="Loan Release"]').hide();
-                  }
-                  if (status == 'Fully Paid') {
-                    $('select#status option[value="Open"]').hide();
-                    $('select#status option[value="Fully Paid"]').show();
-                    $('select#status').prop('disabled', true);
-                  }
-                }
-                $("#updateLoan").attr("action", "/loans/" + loanid);
-                $('span#updateLoanNum').text(loanNum);
-                $('#updateLoanModal').modal('show');
+                      $('#updateLoanModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                      console.log(xhr.responseJSON.message);
+                    }
+                });
+            });
+            $('select#status').change(function () {
+              $('.loanReleaseOnly').addClass('d-none');
+              $('.fullyPaidOnly').addClass('d-none');
+              $('.addTransactionOnly').addClass('d-none');
+              if($('select#status').val() == "Loan Release" || $('select#status').val() == "Fully Paid") {
+                $('.addTransactionOnly').removeClass('d-none');
+                $('.loanReleaseOnly').addClass('d-none');
+                $('.fullyPaidOnly').addClass('d-none');
+                if($('select#status').val() == "Loan Release") {
+                  $('.loanReleaseOnly').removeClass('d-none');
+                } 
+                if($('select#status').val() == "Fully Paid") {
+                  $('.fullyPaidOnly').removeClass('d-none');
+                } 
+              } 
             });
             $('select#name').change(function () {
                 let token = $('input[name="_csrf"]').attr('value');
@@ -305,15 +344,35 @@ html
                     }
                 });
                 $.ajax({
-                    url: "/loans/borrowers/" + $('select#name').val(),
+                    url: "/borrowers/" + $('select#name').val(),
                     type: "GET",
                     data: {},
                     cache: false,
                     success: function (data) {
-                        $('input#type').val(data.borrowerType);
-                        $('input#interest').val((data.borrowerType == "Member") ? 3 : 5);
+                        $('input#type').val(data.borrower.type);
+                        $('input#interest').val((data.borrower.type == "Member") ? 3 : 5);
                         $('input#amount').prop('max', data.remainingCreditLimit);
                         $('input#amount').val(data.remainingCreditLimit);
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
+            });
+            $('select#postedBy').change(function () {
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/employees/" + $('select#postedBy').val(),
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        $('input#processorAcctNo').val(data.account.number);
                     },
                     error: function (xhr, status, error) {
                        console.log(xhr.responseJSON.message);
@@ -384,37 +443,6 @@ html
           };
           boxChecked();
           $("input[name=sameAddress]").on("click", boxChecked);
-        });
-
-    if title.indexOf("Financial Questionnaire") != -1
-      script.
-        $(function () {
-          let radioChecked = function () {
-            if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "Bank Transfer") {
-              $('.bank').show();
-              $('.gcash').hide();
-              $("input[name=bankName2]").val( $("input[name=bankName2]").val());
-              $("input[name=bankName2]").prop('disabled', true);
-              $("input[name=accountNum2]").val( $("input[name=accountNum2]").val());
-              $("input[name=accountNum2]").prop('disabled', true);
-            } else if ($('input[name="mop"]:checked').length == 1 && $('input[name="mop"]:checked')[0].value == "G-Cash") {
-              $('.gcash').show();
-              $('.bank').hide();
-              $("input[name=bankName]").val( $("input[name=bankName]").val());
-              $("input[name=bankName]").prop('disabled', true);
-              $("input[name=branch]").val( $("input[name=branch]").val());
-              $("input[name=branch]").prop('disabled', true);
-              $("input[name=accountType]").val( $("input[name=accountType]").val());
-              $("input[name=accountType]").prop('disabled', true);
-              $("input[name=accountNum]").val( $("input[name=accountNum]").val());
-              $("input[name=accountNum]").prop('disabled', true);
-            } else{
-              $('.gcash').hide();
-              $('.bank').hide();
-            }
-          };
-          radioChecked();
-          $('input[name="mop"]').on("click", radioChecked);
         });
 
     if title.indexOf("Identity Documentation") != -1
