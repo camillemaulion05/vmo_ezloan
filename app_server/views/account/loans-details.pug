@@ -171,7 +171,7 @@ block content
                               td Php
                               td.text-right #{(parseFloat(loan.monthlyAmortization)).toFixed(2)}
                             tr
-                              th #{loan.requestedBy.account.type} Account Number
+                              th G-Cash Account Number
                               td 
                               td.text-right #{loan.requestedBy.account.number}
                             tr
@@ -225,7 +225,7 @@ block content
                               td.text-right #{(parseFloat(loan.monthlyInterestRate)).toFixed(2)} %
                             tr
                               - let loanReleaseRefNum = (repayments.length >= 1) ? ((repayments[0]).type == "Release" && (repayments[0]).status == "Posted") ? (repayments[0]).referenceNo : "" : ''
-                              th Reference No.
+                              th Loan Release Reference No.
                               td 
                               td.text-right #{loanReleaseRefNum}
                             tr
@@ -252,6 +252,7 @@ block content
                           th Payment Date
                           th Payment Amount
                           th Interest
+                          th Interest Accrued
                           th Interest Paid
                           th Interest Balance
                           th Principal
@@ -265,6 +266,7 @@ block content
                           th Payment Date
                           th Payment Amount
                           th Interest
+                          th Interest Accrued
                           th Interest Paid
                           th Interest Balance
                           th Principal
@@ -280,10 +282,11 @@ block content
                             td #{dueDate}
                             td #{(parseFloat(x.amountDue)).toFixed(2)}
                             - let date4 = (new Date(x.paymentDate)).toString().split(' ');
-                            - let paymentDate =  (x.paymentDate) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
+                            - let paymentDate = (bal && x.paymentDate) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
                             td #{paymentDate}
                             td #{(parseFloat(x.paymentAmount)).toFixed(2)}
                             td #{(parseFloat(x.interest)).toFixed(2)}
+                            td #{(parseFloat(x.interestAccrued)).toFixed(2)}
                             td #{(parseFloat(x.interestPaid)).toFixed(2)}
                             td #{(parseFloat(x.interestBalance)).toFixed(2)}
                             td #{(parseFloat(x.principal)).toFixed(2)}

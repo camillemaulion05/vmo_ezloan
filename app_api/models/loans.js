@@ -72,6 +72,10 @@ const loanSchema = mongoose.Schema({
         }, //input
         amountDue: String, //auto
         interest: String, //auto
+        interestAccrued: {
+            type: String,
+            default: "0.00"
+        }, //recompute
         interestPaid: {
             type: String,
             default: "0.00"
@@ -168,10 +172,11 @@ loanSchema.methods.addRepayment = function (date, amount) {
     }
     amount = parseFloat(amount);
     const paymentDate = new Date(date);
-    const add1Month = new Date(date);
-    add1Month.setFullYear(add1Month.getFullYear(), add1Month.getMonth() + 1, add1Month.getDate());
+    paymentDate.setHours(0);
+    paymentDate.setMinutes(0);
+    paymentDate.setSeconds(0);
     const schedules = this.loanPaymentSchedule.filter(function (schedule) {
-        return paymentDate <= new Date(schedule.dueDate) && add1Month > new Date(schedule.dueDate);
+        return paymentDate <= new Date(schedule.dueDate);
     });
     if (schedules.length >= 1) {
         const monthlyRate = parseFloat(this.monthlyInterestRate / 100);
@@ -180,39 +185,36 @@ loanSchema.methods.addRepayment = function (date, amount) {
 
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount = ROUND(parseFloat(this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentAmount) + amount);
         this.loanPaymentSchedule[parseInt(scheduleNum) - 1].paymentDate = paymentDate;
+        this.loanPaymentSchedule[parseInt(scheduleNum) - 1].interestAccrued = this.loanPaymentSchedule[parseInt(scheduleNum) - 1].interest;
 
         for (let i = (parseInt(scheduleNum) - 1); i < this.loanTerm; i++) {
             if (this.loanPaymentSchedule[i].scheduleNum == '1') {
                 this.loanPaymentSchedule[i].amountDue = (this.loanPaymentSchedule[i].scheduleNum == this.loanTerm || this.monthlyAmortization > ROUND((1 + monthlyRate) * parseFloat(this.loanAmount))) ? ROUND((1 + monthlyRate) * parseFloat(this.loanAmount)) : this.monthlyAmortization;
                 this.loanPaymentSchedule[i].interest = ROUND(parseFloat(this.loanAmount) * monthlyRate);
                 this.loanPaymentSchedule[i].interestPaid = Math.min(this.loanPaymentSchedule[i].interest, this.loanPaymentSchedule[i].paymentAmount);
-                if (this.loanPaymentSchedule[i].paymentAmount > 0) this.loanPaymentSchedule[i].interestBalance = ROUND(this.loanPaymentSchedule[i].interest - this.loanPaymentSchedule[i].interestPaid);
+                if (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) this.loanPaymentSchedule[i].interestBalance = ROUND(this.loanPaymentSchedule[i].interest - this.loanPaymentSchedule[i].interestPaid);
                 this.loanPaymentSchedule[i].principalPaid = ROUND(this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid);
                 this.loanPaymentSchedule[i].principal = ROUND(this.loanPaymentSchedule[i].amountDue - this.loanPaymentSchedule[i].interest);
-                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].paymentAmount > 0) ? ROUND(this.loanAmount - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanAmount - this.loanPaymentSchedule[i].principal);
-
+                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) ? ROUND(this.loanAmount - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanAmount - this.loanPaymentSchedule[i].principal);
             } else {
                 this.loanPaymentSchedule[i].amountDue = (this.loanPaymentSchedule[i].scheduleNum == this.loanTerm || this.monthlyAmortization > ROUND((1 + monthlyRate) * parseFloat(this.loanPaymentSchedule[i - 1].principalBalance))) ? ROUND((1 + monthlyRate) * parseFloat(this.loanPaymentSchedule[i - 1].principalBalance)) : this.monthlyAmortization;
                 this.loanPaymentSchedule[i].interest = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].principalBalance) * monthlyRate);
                 this.loanPaymentSchedule[i].interestPaid = Math.min(ROUND(parseFloat(this.loanPaymentSchedule[i].interest) + parseFloat(this.loanPaymentSchedule[i - 1].interestBalance)), this.loanPaymentSchedule[i].paymentAmount);
-                if (this.loanPaymentSchedule[i].paymentAmount > 0) this.loanPaymentSchedule[i].interestBalance = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].interestBalance) + parseFloat(this.loanPaymentSchedule[i].interest) - parseFloat(this.loanPaymentSchedule[i].interestPaid));
+                if (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) this.loanPaymentSchedule[i].interestBalance = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].interestBalance) + parseFloat(this.loanPaymentSchedule[i].interest) - parseFloat(this.loanPaymentSchedule[i].interestPaid));
                 this.loanPaymentSchedule[i].principalPaid = ROUND(this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid);
                 this.loanPaymentSchedule[i].principal = ROUND(this.loanPaymentSchedule[i].amountDue - this.loanPaymentSchedule[i].interest);
-                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].paymentAmount > 0) ? ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principal);
+                this.loanPaymentSchedule[i].principalBalance = ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid);
+                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) ? ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principal);
             }
         }
 
         var sum = function (items, prop) {
             return items.reduce(function (a, b) {
-                if (b['paymentAmount'] > 0) {
-                    return ROUND(parseFloat(a) + parseFloat(b[prop]))
-                } else {
-                    return ROUND(parseFloat(a));
-                }
+                return ROUND(parseFloat(a) + parseFloat(b[prop]))
             }, 0);
         };
         this.totalPayments = sum(this.loanPaymentSchedule, 'paymentAmount');
-        this.totalInterestAccrued = sum(this.loanPaymentSchedule, 'interest');
+        this.totalInterestAccrued = sum(this.loanPaymentSchedule, 'interestAccrued');
         this.totalInterestPaid = sum(this.loanPaymentSchedule, 'interestPaid');
         this.unpaidInterest = ROUND(this.totalInterestAccrued - this.totalInterestPaid);
         this.totalPrincipalPaid = sum(this.loanPaymentSchedule, 'principalPaid');
@@ -221,6 +223,24 @@ loanSchema.methods.addRepayment = function (date, amount) {
         //update status
         if (this.totalPayments == this.totalAmortization || parseFloat(this.principalRemaining) <= 0.00) {
             this.status = "Fully Paid";
+        }
+    }
+};
+
+loanSchema.methods.validateRepayments = function () {
+    const dateNow = new Date();
+    dateNow.setHours(0);
+    dateNow.setMinutes(0);
+    dateNow.setSeconds(0);
+    const schedules = this.loanPaymentSchedule.filter(function (schedule) {
+        return dateNow <= new Date(schedule.dueDate);
+    });
+    if (schedules.length >= 1) {
+        const repaymentSchedule = schedules[0];
+        for (let i = 0; i < parseInt(repaymentSchedule.scheduleNum); i++) {
+            if (parseFloat(this.loanPaymentSchedule[i].paymentAmount) <= 0.00) {
+                this.addRepayment(this.loanPaymentSchedule[i].dueDate, this.loanPaymentSchedule[i].paymentAmount);
+            }
         }
     }
 };

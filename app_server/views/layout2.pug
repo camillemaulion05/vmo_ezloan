@@ -240,7 +240,7 @@ html
                       let amount = parseFloat(data.loan.loanAmount) + parseFloat(data.remainingCreditLimit);
                       let monthlyInterestRate = (data.loan.requestedBy.type == 'Member') ? 3 : 5;
                       let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : '';
-                      let balance = round(parseFloat(data.loan.principalRemaining) + (parseFloat(data.loan.principalRemaining) * (monthlyInterestRate / 100)));
+                      let balance = ROUND(parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance));
                       $('select#borrowerName').val(data.loan.requestedBy._id);
                       $('input#borrowerType').val(data.loan.requestedBy.type);
                       $('select#purposeOfLoan').val(data.loan.purposeOfLoan);

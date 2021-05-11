@@ -223,23 +223,33 @@ const loansSchedulesUpdate = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    loan.addRepayment(req.body.transactionDate, req.body.transactionAmount);
-                    loan.save((err) => {
-                        if (err) {
-                            console.log(err);
-                            res
-                                .status(404)
-                                .json({
-                                    "message": err._message
-                                });
-                        } else {
-                            res
-                                .status(200)
-                                .json({
-                                    "message": "Updated successfully."
-                                });
-                        }
-                    });
+                    if (loan.status == "Open" || loan.status == "Fully Paid" || loan.status == "Loan Debt") {
+                        loan.validateRepayments();
+                        loan.addRepayment(req.body.transactionDate, req.body.transactionAmount);
+                        loan.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        "message": "Updated successfully."
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Cannot add new repayment. Loan status must updated."
+                            });
+                    }
+
                 }
             });
     }
@@ -351,20 +361,11 @@ const loansDueListByLoan = (req, res) => {
                 "message": "Not found, loanid is required"
             });
     } else {
-        const dateToday = new Date();
-        Loan.find({
-                _id: mongoose.Types.ObjectId(loanid),
-                "loanPaymentSchedule.dueDate": {
-                    $gte: dateToday
-                }
-            }, {
-                "loanPaymentSchedule.$": 1,
-                "_id": 0,
-                "requestedBy": 1
-            })
+        Loan
+            .findById(loanid)
             .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
-            .exec((err, loanPaymentSchedule) => {
-                if (!loanPaymentSchedule) {
+            .exec((err, loan) => {
+                if (!loan) {
                     res
                         .status(404)
                         .json({
@@ -373,21 +374,56 @@ const loansDueListByLoan = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    if (loanPaymentSchedule.length > 0 && "Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                    if ("Borrower" == req.payload.type && loan.requestedBy.userId != req.payload._id) {
                         return res
                             .status(403)
                             .json({
                                 "message": "You don\'t have permission to do that!"
                             });
                     }
-                    res
-                        .status(200)
-                        .json(loanPaymentSchedule);
+                    if (loan.status == "Open" || loan.status == "Loan Debt") {
+                        loan.validateRepayments();
+                        loan.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                let dateNow = new Date();
+                                dateNow.setHours(0);
+                                dateNow.setMinutes(0);
+                                dateNow.setSeconds(0);
+                                let schedules = loan.loanPaymentSchedule.filter(function (schedule) {
+                                    return dateNow <= new Date(schedule.dueDate);
+                                });
+                                if (schedules.length >= 1) {
+                                    res
+                                        .status(200)
+                                        .json(schedules[0]);
+                                } else {
+                                    res
+                                        .status(200)
+                                        .json({
+                                            "message": "No current due"
+                                        });
+                                }
+                            }
+                        });
+                    } else {
+                        res
+                            .status(200)
+                            .json({
+                                "message": "No current due"
+                            });
+                    }
                 }
             });
     }
@@ -404,21 +440,11 @@ const loansPastDueListByLoan = (req, res) => {
                 "message": "Not found, loanid is required"
             });
     } else {
-        const dateToday = new Date();
-        const dateLastMonth = new Date(dateToday);
-        dateLastMonth.setMonth(dateLastMonth.getMonth() - 1);
-        Loan.find({
-                _id: mongoose.Types.dObjectId(loanid),
-                "loanPaymentSchedule.dueDate": {
-                    $gte: dateLastMonth
-                }
-            }, {
-                "loanPaymentSchedule.$": 1,
-                "_id": 0
-            })
+        Loan
+            .findById(loanid)
             .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
-            .exec((err, loanPaymentSchedule) => {
-                if (!loanPaymentSchedule) {
+            .exec((err, loan) => {
+                if (!loan) {
                     res
                         .status(404)
                         .json({
@@ -427,38 +453,68 @@ const loansPastDueListByLoan = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    if (loanPaymentSchedule.length > 0 && "Borrower" == req.payload.type && loanPaymentSchedule[0].requestedBy.userId != req.payload._id) {
+                    if ("Borrower" == req.payload.type && loan.requestedBy.userId != req.payload._id) {
                         return res
                             .status(403)
                             .json({
                                 "message": "You don\'t have permission to do that!"
                             });
                     }
-                    res
-                        .status(200)
-                        .json(loanPaymentSchedule);
+                    if (loan.status == "Open" || loan.status == "Fully Paid" || loan.status == "Loan Debt") {
+                        loan.validateRepayments();
+                        loan.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                let dateNow = new Date();
+                                dateNow.setHours(0);
+                                dateNow.setMinutes(0);
+                                dateNow.setSeconds(0);
+                                let dateLastMonth = new Date(dateNow);
+                                dateLastMonth.setMonth(dateNow.getMonth() - 1);
+                                let schedules = loan.loanPaymentSchedule.filter(function (schedule) {
+                                    return dateLastMonth < new Date(schedule.dueDate) && dateNow > new Date(schedule.dueDate);
+                                });
+                                if (schedules.length >= 1) {
+                                    res
+                                        .status(200)
+                                        .json(schedules[0]);
+                                } else {
+                                    res
+                                        .status(200)
+                                        .json({
+                                            "message": "No past due"
+                                        });
+                                }
+                            }
+                        });
+                    } else {
+                        res
+                            .status(200)
+                            .json({
+                                "message": "No past due"
+                            });
+                    }
                 }
             });
     }
 };
 
 const loansDueRepaymentsList = (req, res) => {
-    const dateToday = new Date();
-    Loan.find({
-            "loanPaymentSchedule.dueDate": {
-                $gte: dateToday
-            }
-        }, {
-            "loanPaymentSchedule.$": 1,
-            "_id": 0
-        })
+    Loan
+        .find()
         .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
-        .exec((err, loanPaymentSchedule) => {
+        .exec((err, loans) => {
             if (err) {
                 console.log(err);
                 res
@@ -467,9 +523,26 @@ const loansDueRepaymentsList = (req, res) => {
                         "message": err._message
                     });
             } else {
+                function filterDues(array) {
+                    let dateNow = new Date();
+                    dateNow.setHours(0);
+                    dateNow.setMinutes(0);
+                    dateNow.setSeconds(0);
+                    for (let i = 0; i < array.length; i++) {
+                        let loanPaymentSchedule = array[i].loanPaymentSchedule.filter(function (schedule) {
+                            return dateNow <= new Date(schedule.dueDate);
+                        });
+                        if (loanPaymentSchedule.length >= 1) {
+                            array[i].loanPaymentSchedule = loanPaymentSchedule[0];
+                        } else {
+                            array[i].loanPaymentSchedule = [];
+                        }
+                    }
+                    return array;
+                }
                 res
                     .status(200)
-                    .json(loanPaymentSchedule);
+                    .json(filterDues(loans));
             }
         });
 };

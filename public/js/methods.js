@@ -314,7 +314,7 @@ function formatNumberWithCommas(yourNumber) {
     }
 }
 
-function round(num) {
+function ROUND(num) {
     let newNum = +(Math.round(parseFloat(num) + "e+2") + "e-2");
     return (Number.isNaN(newNum)) ? (num.toFixed(2) == 0) ? 0.00 : num.toFixed(2) : newNum;
 }

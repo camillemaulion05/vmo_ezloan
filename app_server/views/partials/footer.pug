@@ -31,6 +31,7 @@ else
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
+  
   if title.indexOf("Borrowers") != -1
     - let type = ["Non-Member", "Member"]
     - let status = ["Basic", "Pending for Review", "Verified", "Declined"]
@@ -395,6 +396,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
+  
   if title.indexOf("Profile") != -1
     #codeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='codeModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
@@ -414,6 +416,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Verify
+  
   if title.indexOf("Account Management - Loans") != -1
     #loanModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='loanModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
@@ -456,6 +459,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
+  
   if title.indexOf("Account Management - Loan Details") != -1
     #repaymentModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='repaymentModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
@@ -490,6 +494,7 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
+  
   if title.indexOf("KYC Declaration") != -1
     #signatureModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='signatureModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
