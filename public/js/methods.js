@@ -332,7 +332,7 @@ function formatCurrency(num, withoutDecimals) {
     }
     num = convertCurrencyToNumber(num);
     if (withoutDecimals) {
-        num = round(num, 0);
+        num = ROUND(num, 0);
         sign = (num == (num = Math.abs(num)));
         num = Math.floor(num * 100 + 0.50000000001);
         cents = num % 100;

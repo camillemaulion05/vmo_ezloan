@@ -175,16 +175,16 @@
     });
 
 
-    $("a[data-toggle=\"tab\"]").click(function (e) {
+    $("a[data-toggle=\"tab\"]").on('click', function (e) {
         e.preventDefault();
         $(this).tab("show");
     });
 
-    $(".container-first button#minus").click(function (event) {
+    $(".container-first button#minus").on('click', function (event) {
         zoom("out");
     });
 
-    $(".container-first button#plus").click(function (event) {
+    $(".container-first button#plus").on('click', function (event) {
         zoom("in");
     });
 
@@ -196,7 +196,7 @@
         $(".container-second span#repayment").text(formatCurrency(getMonthlyPayment(amount, interest, loanTerm), true)).change();
     });
 
-    $(".container-first input#six").click(function (event) {
+    $(".container-first input#six").on('click', function (event) {
         $('.container-first input[name="loan-period"]').val(6).change();
         $(".container-first input#six").parent().addClass('radio-container-checked');
         $(".container-first input#twelve").parent().removeClass('radio-container-checked');
@@ -206,7 +206,7 @@
         $(".container-second span#repayment").text(formatCurrency(getMonthlyPayment(amount, interest, loanTerm), true)).change();
     });
 
-    $(".container-first input#twelve").click(function (event) {
+    $(".container-first input#twelve").on('click', function (event) {
         $('.container-first input[name="loan-period"]').val(12).change();
         $(".container-first input#twelve").parent().addClass('radio-container-checked');
         $(".container-first input#six").parent().removeClass('radio-container-checked');
