@@ -1757,7 +1757,7 @@ const getDownloadBorrowerInfo = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: 'BRANCH',
+                                    text: 'ACCOUNT NO.',
                                     style: 'small',
                                     border: [true, false, true, false]
                                 }
@@ -1768,68 +1768,10 @@ const getDownloadBorrowerInfo = (req, res) => {
                                     border: [true, false, false, true]
                                 },
                                 {
-                                    text: (user.account) ? user.account.branch : "",
+                                    text: (user.account) ? user.account.number : "",
                                     style: 'medium',
                                     border: [true, false, true, true]
                                 }
-                            ],
-                        ]
-                    }
-                },
-                {
-                    table: {
-                        headerRows: 0,
-                        widths: ['*', '*', '*', '*', '*'],
-                        body: [
-                            [{
-                                    text: 'TYPE OF ACCOUNT',
-                                    style: 'small',
-                                    border: [true, false, false, false],
-                                    colSpan: 3
-                                }, {}, {},
-                                {
-                                    text: 'ACCOUNT NO.',
-                                    style: 'small',
-                                    border: [true, false, true, false],
-                                    colSpan: 2
-                                }, {}
-                            ],
-                            [{
-                                    style: 'item',
-                                    border: [true, false, false, true],
-                                    text: [{
-                                        text: (user.account && user.account.type == "Savings") ? checked : unchecked,
-                                        style: 'icon'
-                                    }, {
-                                        text: '  Savings'
-                                    }, ]
-                                },
-                                {
-                                    style: 'item',
-                                    border: [false, false, false, true],
-                                    text: [{
-                                        text: (user.account && user.account.type == "Checking/Current") ? checked : unchecked,
-                                        style: 'icon'
-                                    }, {
-                                        text: '  Checking/Current'
-                                    }, ]
-                                },
-                                {
-                                    style: 'item',
-                                    border: [false, false, false, true],
-                                    text: [{
-                                        text: (user.account && user.account.type == "G-Cash") ? checked : unchecked,
-                                        style: 'icon'
-                                    }, {
-                                        text: '  G-Cash'
-                                    }, ]
-                                },
-                                {
-                                    text: (user.account) ? user.account.number : "",
-                                    style: 'medium',
-                                    border: [true, false, true, true],
-                                    colSpan: 2
-                                }, {}
                             ],
                         ]
                     }
