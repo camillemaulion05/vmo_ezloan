@@ -44,7 +44,7 @@ block content
               .form-group.mb-md-0
                 .input-group.mb-3
                   .input-group-prepend
-                    span#basic-addon1.input-group-text +63
+                    span.input-group-text +63
                   input#mobileNum.form-control(type='text' name='mobileNum' placeholder='Mobile Number' minlength='10' maxlength='10')
                   em.invalid-feedback 
                   em#errorSendOtp.error-text
@@ -108,16 +108,9 @@ block content
                 .form-group.mb-md-0
                   .input-group.mb-3
                     .input-group-prepend
-                      span#basic-addon1.input-group-text +63
+                      span.input-group-text +63
                     input#accountNum.form-control(type='text' name='accountNum' placeholder='G-Cash Account No.' minlength='10' maxlength='10')
                     em.invalid-feedback 
-          if type == "member"
-            .row
-              .col-sm-12
-                .form-group
-                  input#sharesPerPayDay.form-control(type="number" step="300" min="300" name='sharesPerPayDay')
-                  em.invalid-feedback 
-                  p.label-text Shares/Payday (Php)
         div(style='overflow:auto;')
           div(style='float:right;')
             button#prevBtn.btn.btn-danger.d-none(type='button') Previous
