@@ -69,31 +69,38 @@ function validateForm(currentTab) {
     z = $(".signup-form form .tab:eq(" + currentTab + ") select");
     // A loop that checks every input field in the current tab:
     for (i = 0; i < y.length; i++) {
-        // If a field is empty...
-        if (y[i].value == "") {
-            // add an "invalid" class to the field:
-            $(y[i]).addClass('is-invalid');
-            $(y[i]).next().text("This is required.");
-            // and set the current valid status to false
-            valid = false;
-        } else {
-            // remove an "invalid" class to the field:
+        // Skip accountName and accountNum in validations...
+        if (y[i].id == "accountName" || y[i].id == "accountNum") {
+            valid = true;
             $(y[i]).removeClass('is-invalid');
             $(y[i]).next().text("");
-
-            // and set the current valid status to false
-            if (y[i].id == "username" || y[i].id == "password" || y[i].id == "mobileNum" || y[i].id == "code") {
-                if (y[i].value.length < y[i].minLength) {
-                    valid = false;
-                    if (y[i].id == "mobileNum") $(".signup-form #errorSendOtp").hide();
-                    $(y[i]).addClass('is-invalid');
-                    $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + 'characters required.');
-                }
-            }
-            if (y[i].id == "confirmPassword" && y[i].value != $('#password').val()) {
-                valid = false;
+        } else {
+            // If a field is empty...
+            if (y[i].value == "") {
+                // add an "invalid" class to the field:
                 $(y[i]).addClass('is-invalid');
-                $(y[i]).next().text("Passwords Do Not Match!");
+                $(y[i]).next().text("This is required.");
+                // and set the current valid status to false
+                valid = false;
+            } else {
+                // remove an "invalid" class to the field:
+                $(y[i]).removeClass('is-invalid');
+                $(y[i]).next().text("");
+
+                // and set the current valid status to false
+                if (y[i].id == "username" || y[i].id == "password" || y[i].id == "mobileNum" || y[i].id == "code") {
+                    if (y[i].value.length < y[i].minLength) {
+                        valid = false;
+                        if (y[i].id == "mobileNum") $(".signup-form #errorSendOtp").hide();
+                        $(y[i]).addClass('is-invalid');
+                        $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + 'characters required.');
+                    }
+                }
+                if (y[i].id == "confirmPassword" && y[i].value != $('#password').val()) {
+                    valid = false;
+                    $(y[i]).addClass('is-invalid');
+                    $(y[i]).next().text("Passwords Do Not Match!");
+                }
             }
         }
     }

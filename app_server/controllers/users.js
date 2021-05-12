@@ -109,8 +109,7 @@ const postSignupByType = (req, res, next) => {
     const validationErrors = [];
     let userType = req.params.type;
     let type = '',
-        employeeID = '',
-        sharesPerPayDay = '';
+        employeeID = '';
     if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
         if (userType == 'employee' || userType == 'member' || userType == 'admin') {
             if (validator.isEmpty(req.body.userCode)) validationErrors.push({
@@ -139,12 +138,14 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
                         msg: 'Employee ID cannot be blank.'
                     });
-                    if (validator.isEmpty(req.body.accountName)) validationErrors.push({
-                        msg: 'G-Cash Account Name cannot be blank.'
-                    });
-                    if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
-                        msg: 'G-Cash Account No. cannot be blank.'
-                    });
+                    if (req.body.employeeType == "Loan Processor") {
+                        if (validator.isEmpty(req.body.accountName)) validationErrors.push({
+                            msg: 'G-Cash Account Name cannot be blank.'
+                        });
+                        if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
+                            msg: 'G-Cash Account No. cannot be blank.'
+                        });
+                    }
                     if (req.body.employeeID && req.body.employeeType) {
                         if (req.body.userCode != originalEmployeeCode) {
                             userType = 'borrower';
