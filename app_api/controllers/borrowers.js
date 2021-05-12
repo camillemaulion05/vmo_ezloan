@@ -96,7 +96,7 @@ const borrowersReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Borrower" == req.payload.type && borrower.userId != req.payload._id) {
+                    if ("Borrower" == req.payload.type && borrower.userId._id != req.payload._id) {
                         return res
                             .status(403)
                             .json({
