@@ -78,6 +78,14 @@ html
     if title.indexOf("Borrowers") != -1
       script.
           $(function () {
+              $('#addNewBorrower').on('click', function () {
+                $('select#borrowerType').val("");
+                $('select#borrowerStatus').val("");
+                $('.membersOnly').addClass('d-none');
+                $('.verifiedOnly').addClass('d-none');
+                $('.verifiedMemberOnly').addClass('d-none');
+                $('#addBorrowerModal').modal('show'); 
+              });
               $('#dataTable').on('click','.deleteBorrower',function () {
                 let path = ($(this).prop('href')).split('/');
                 let lastName = (path[path.length-1]).replace(/%20/g," ");
@@ -123,12 +131,18 @@ html
                         }
                         if (data.borrower.status == 'Verified') {
                           $('.verifiedOnly').removeClass('d-none');
+                          if (parseFloat(data.borrower.totalCreditLimit) > 0) {
+                            $('.withCreditLimitOnly').removeClass('d-none');
+                          } else {
+                            $('.withCreditLimitOnly').addClass('d-none');
+                          }
                           if (data.borrower.type == 'Member') {
                             $('.verifiedMemberOnly').removeClass('d-none');
                           } else{
                             $('.verifiedMemberOnly').addClass('d-none');
                           }
                         } else {
+                          $('.withCreditLimitOnly').addClass('d-none');
                           $('.verifiedOnly').addClass('d-none');
                           $('.verifiedMemberOnly').addClass('d-none');
                         }
@@ -183,6 +197,11 @@ html
               $('select#status').change(function () {
                 if ($('select#status').val() == 'Verified') {
                   $('.verifiedOnly').removeClass('d-none');
+                  if (parseFloat($('input#totalCreditLimit').val()) > 0) {
+                    $('.withCreditLimitOnly').removeClass('d-none');
+                  } else {
+                    $('.withCreditLimitOnly').addClass('d-none');
+                  }
                   if ($('select#type').val() == 'Member') {
                     $('.verifiedMemberOnly').removeClass('d-none');
                   } else{
@@ -190,6 +209,7 @@ html
                   }
                 }
                 else {
+                  $('.withCreditLimitOnly').addClass('d-none');
                   $('.verifiedOnly').addClass('d-none');
                   $('.verifiedMemberOnly').addClass('d-none');
                 }
@@ -264,19 +284,21 @@ html
                         $('select#purposeOfLoan').prop('disabled', false);
                         $('input#loanAmount').prop('disabled', false);
                         $('.processingOnly').removeClass('d-none');
+                        $('select#status').prop('disabled', false);
+                        $('select#reviewedBy').prop('disabled', false);
                         $('select#status option[value="Processing"]').show();
                         $('select#status option[value="Approved"]').show();
                         $('select#status option[value="Declined"]').show();
                         $('select#status option[value="Loan Release"]').show();
                         $('select#status option[value="Open"]').hide();
                         $('select#status option[value="Fully Paid"]').hide();
-                        $('select#status option[value="Loan Debt"]').hide();
-                        $('select#status').prop('disabled', false);
+                        $('select#status option[value="Loan Debt"]').hide(); 
                       } else{
                         $('select#purposeOfLoan').prop('disabled', true);
                         $('input#loanAmount').prop('disabled', true);
                         $('.processingOnly').addClass('d-none');
                         $('select#status').prop('disabled', false);
+                        $('select#reviewedBy').prop('disabled', true);
                         $('select#status option[value="Processing"]').hide();
                         $('select#status option[value="Approved"]').show();
                         $('select#status option[value="Declined"]').show();
@@ -310,7 +332,6 @@ html
                           $('select#status option[value="Loan Debt"]').hide();
                           $('select#status option[value="Fully Paid"]').show();
                           $('select#status').prop('disabled', true);
-                          $('select#reviewedBy').prop('disabled', true);
                         }
                       }
                       $('#updateLoanModal').modal('show');

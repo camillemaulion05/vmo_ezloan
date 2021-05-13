@@ -109,7 +109,8 @@ const postSignupByType = (req, res, next) => {
     const validationErrors = [];
     let userType = req.params.type;
     let type = '',
-        employeeID = '';
+        employeeID = '',
+        sharesPerPayDay = '';
     if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
         if (userType == 'employee' || userType == 'member' || userType == 'admin') {
             if (validator.isEmpty(req.body.userCode)) validationErrors.push({
@@ -162,11 +163,15 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
                         msg: 'Employee ID cannot be blank.'
                     });
-                    if (req.body.employeeID) {
+                    if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+                        msg: 'Shares per payday cannot be blank.'
+                    });
+                    if (req.body.employeeID && req.body.sharesPerPayDay) {
                         if (req.body.userCode == originalMemberCode) {
                             userType = 'borrower';
                             type = 'Member';
                             employeeID = req.body.employeeID;
+                            sharesPerPayDay = req.body.sharesPerPayDay;
                         }
                     }
                 }
@@ -294,6 +299,7 @@ const postSignupByType = (req, res, next) => {
                                         mobileNumVerified: true
                                     },
                                     employeeID: employeeID,
+                                    sharesPerPayDay: sharesPerPayDay,
                                     account: {
                                         name: (req.body.accountName) ? req.body.accountName : null,
                                         number: (req.body.accountNum) ? req.body.accountNum : null

@@ -4982,7 +4982,7 @@ const postBorrowers = (req, res) => {
             msg: 'Total Credit Limit cannot be zero.'
         });
         if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-            msg: 'Assigned Reviewer cannot be blank.'
+            msg: 'Assigned Loan Officer cannot be blank.'
         });
     }
     if (req.body.type == 'Member' && req.body.status == 'Verified') {
@@ -5242,7 +5242,7 @@ const postUpdateBorrowers = (req, res) => {
             msg: 'Total Credit Limit cannot be zero.'
         });
         if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-            msg: 'Assigned Reviewer cannot be blank.'
+            msg: 'Assigned Loan Officer cannot be blank.'
         });
     }
     if (req.body.type == 'Member' && req.body.status == 'Verified') {
@@ -5672,11 +5672,6 @@ const postLoans = (req, res) => {
     if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
         msg: 'Loan term amount cannot be blank.'
     });
-    if (req.body.status) {
-        if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-            msg: 'Assigned reviewer of loan cannot be blank.'
-        });
-    }
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
         return res.redirect('back');
@@ -5727,26 +5722,6 @@ const postLoans = (req, res) => {
                             }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
                             let remainingCreditLimit = ROUND(parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit));
                             if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
-                                let data;
-                                if (req.body.status && req.body.reviewedBy) {
-                                    data = {
-                                        purposeOfLoan: req.body.purposeOfLoan,
-                                        loanTerm: req.body.loanTerm,
-                                        loanAmount: req.body.loanAmount,
-                                        monthlyInterestRate: (borrower.type == "Member") ? 3 : 5,
-                                        requestedBy: req.body.borrowerID,
-                                        status: req.body.status,
-                                        reviewedBy: req.body.reviewedBy
-                                    };
-                                } else {
-                                    data = {
-                                        purposeOfLoan: req.body.purposeOfLoan,
-                                        loanTerm: req.body.loanTerm,
-                                        loanAmount: req.body.loanAmount,
-                                        monthlyInterestRate: (borrower.type == "Member") ? 3 : 5,
-                                        requestedBy: req.body.borrowerID
-                                    };
-                                }
                                 path = '/api/loans'
                                 requestOptions = {
                                     url: `${apiOptions.server}${path}`,
@@ -5754,7 +5729,13 @@ const postLoans = (req, res) => {
                                     headers: {
                                         Authorization: 'Bearer ' + req.user.token
                                     },
-                                    json: data
+                                    json: {
+                                        purposeOfLoan: req.body.purposeOfLoan,
+                                        loanTerm: req.body.loanTerm,
+                                        loanAmount: req.body.loanAmount,
+                                        monthlyInterestRate: (borrower.type == "Member") ? 3 : 5,
+                                        requestedBy: req.body.borrowerID
+                                    }
                                 };
                                 request(
                                     requestOptions,

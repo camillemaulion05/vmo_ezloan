@@ -71,9 +71,23 @@ function validateForm(currentTab) {
     for (i = 0; i < y.length; i++) {
         // Skip accountName and accountNum in validations...
         if (y[i].id == "accountName" || y[i].id == "accountNum") {
-            valid = true;
-            $(y[i]).removeClass('is-invalid');
-            $(y[i]).next().text("");
+            if ($('select[name="employeeType"]').val() != "Loan Processor") {
+                $(y[i]).removeClass('is-invalid');
+                $(y[i]).next().text("");
+            } else {
+                // If a field is empty...
+                if (y[i].value == "") {
+                    // add an "invalid" class to the field:
+                    $(y[i]).addClass('is-invalid');
+                    $(y[i]).next().text("This is required.");
+                    // and set the current valid status to false
+                    valid = false;
+                } else {
+                    // remove an "invalid" class to the field:
+                    $(y[i]).removeClass('is-invalid');
+                    $(y[i]).next().text("");
+                }
+            }
         } else {
             // If a field is empty...
             if (y[i].value == "") {
@@ -306,7 +320,7 @@ function formatDate(paramDate, format) {
 
 function dateNowMinusYrs(paramYrs) {
     let d = new Date();
-    d.setFullYear(d.getFullYear() - paramYrs, d.getMonth(), d.getDate());
+    d.setFullYear(d.getFullYear() - paramYrs, d.getMonth(), d.getDate() - 1);
     return d;
 }
 

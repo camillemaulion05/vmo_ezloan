@@ -57,7 +57,8 @@ else
                   label.small.mb-1(for='borrowerStatus') Status
                   select#borrowerStatus.form-control.selectpicker(type='text' name='status')
                     option(value='' selected='') Status
-                    for x in status
+                    - let borrowerStatus = ["Basic", "Verified"]
+                    for x in borrowerStatus
                       option(value=x) #{x}
               .form-row.mb-2
                 .col-md-6
@@ -99,11 +100,11 @@ else
                   label.small.mb-1(for='borrowerTotalCreditLimit') Total Credit Limit
                   input#borrowerTotalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
                 .col-md-6
-                  label.small.mb-1(for='borrowerReviewedBy') Assigned Reviewer
+                  label.small.mb-1(for='borrowerReviewedBy') Assigned Loan Officer
                   select#borrowerReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Reviewer
+                    option(value='' selected='') Assigned Loan Officer
                     for x in employees
-                      if (x.type != 'HRD Authorized Officer')
+                      if (x.type == 'Loan Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
               .form-row.mb-2.verifiedMemberOnly.d-none
                 .col-md-6
@@ -161,32 +162,32 @@ else
                     option(value='' selected='' disabled='') Status
                     for x in status
                       option(value=x) #{x}
-              .form-row.mb-2.membersOnly
+              .form-row.mb-2.membersOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='employeeID') Employee ID
                   input#employeeID.form-control(type='text' name='employeeID')
                 .col-md-6
                   label.small.mb-1(for='sharesPerPayDay') Shares/Payday (Php)
                   input#sharesPerPayDay.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
-              .form-row.mb-2.verifiedOnly
+              .form-row.mb-2.withCreditLimitOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='totalUsedCreditLimit') Total Used Credit Limit
                   input#totalUsedCreditLimit.form-control(type="number" step="500" min="0" name='totalUsedCreditLimit' disabled='')
                 .col-md-6
                   label.small.mb-1(for='remainingCreditLimit') Remaining Credit Limit
                   input#remainingCreditLimit.form-control(type="number" step="500" min="0" name='remainingCreditLimit' disabled='')
-              .form-row.mb-2.verifiedOnly
+              .form-row.mb-2.verifiedOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='totalCreditLimit') Total Credit Limit
                   input#totalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
                 .col-md-6
-                  label.small.mb-1(for='reviewedBy') Assigned Reviewer
+                  label.small.mb-1(for='reviewedBy') Assigned Loan Officer
                   select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Reviewer
+                    option(value='' selected='') Assigned Loan Officer
                     for x in employees
                       if (x.type == 'Loan Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
-              .form-row.mb-2.verifiedMemberOnly
+              .form-row.mb-2.verifiedMemberOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='hrCertifiedBy') HRD Authorized Officer
                   select#hrCertifiedBy.form-control.selectpicker(type='text' name='hrCertifiedBy')
@@ -264,21 +265,6 @@ else
                     option(value='' selected='') Loan Term
                     for x in loanTerm
                       option(value=x) #{x} months
-              .form-row.mb-2
-                .col-md-6 
-                  label.small.mb-1(for='loanStatus') Status
-                  select#loanStatus.form-control.selectpicker(type='text' name='status')
-                    option(value='' selected='') Status
-                    - let loanStat = ["Processing", "Approved", "Declined"]
-                    for x in loanStat
-                      option(value=x) #{x}
-                .col-md-6
-                  label.small.mb-1(for='loanReviewedBy') Assigned Loan Officer
-                  select#loanReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Loan Officer
-                    for x in employees
-                      if (x.type == 'Loan Officer')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit

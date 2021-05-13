@@ -36,6 +36,6 @@
     });
 
     $('input[name="dateOfBirth"]').attr("min", formatDate(dateNowMinusYrs(65)));
-    $('input[name="dateOfBirth"]').attr("max", formatDate(dateNowMinusYrs(22)));
+    $('input[name="dateOfBirth"]').attr("max", formatDate(dateNowMinusYrs(21)));
 
 })(jQuery); // End of use strict
