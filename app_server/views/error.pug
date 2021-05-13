@@ -1,6 +1,37 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  .container
+    //- h1= message
+    //- h2= error.status
+    //- pre #{error.stack}
+    .row.justify-content-center
+      .col-lg-6
+        .text-center.mt-4
+          if (error.status == "400")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/400-error-bad-request.svg' alt='')
+            p.lead Your client has issued a malformed or illegal request.
+          if (error.status == "401")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/401-error-unauthorized.svg' alt='')
+            p.lead Access to this resource is denied.
+          if (error.status == "403")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/403-error-forbidden.svg' alt='')
+            p.lead Your client does not have permission to get this page from the server.
+          if (error.status == "404")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/404-error.svg' alt='')
+            p.lead This requested URL was not found on this server.
+          if (error.status == "500")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/500-internal-server-error.svg' alt='')
+            p.lead The server encountered an internal error or misconfiguration and was unable to complete your request.
+          if (error.status == "503")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/503-error-service-unavailable.svg' alt='')
+            p.lead he server is temporarily unable to service your request due to maintenance downtime or capacity problems. Please try again later.
+          if (error.status == "504")
+            img.img-fluid.mx-auto.d-block(src='/img/errors/504-error-gateway-timeout.svg' alt='')
+            p.lead The server encountered a temporary error and could not complete your request.
+          a.text-arrow-icon(href='/')
+            svg.feather.feather-arrow-left.ml-0.mr-1(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+              line(x1='19' y1='12' x2='5' y2='12')
+              polyline(points='12 19 5 12 12 5')
+            |  Return to Home
+

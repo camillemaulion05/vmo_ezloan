@@ -60,11 +60,12 @@ const employeesReadOne = (req, res) => {
     const {
         employeeid
     } = req.params;
-    if (!employeeid) {
+    const isValid = mongoose.Types.ObjectId.isValid(employeeid);
+    if (!employeeid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, please enter a valid employeeid."
             });
     } else {
         Employee
@@ -85,6 +86,13 @@ const employeesReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Employee" == req.payload.type && employee.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(employee);
@@ -97,11 +105,12 @@ const employeesUpdateOne = (req, res) => {
     const {
         employeeid
     } = req.params;
-    if (!employeeid) {
+    const isValid = mongoose.Types.ObjectId.isValid(employeeid);
+    if (!employeeid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, please enter a valid employeeid."
             });
     } else {
         Employee
@@ -121,6 +130,13 @@ const employeesUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Employee" == req.payload.type && employee.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     employee.type = (req.body.type) ? req.body.type : employee.type;
                     employee.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : employee.profile.firstName;
                     employee.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : employee.profile.middleName;
@@ -162,11 +178,12 @@ const employeesDeleteOne = (req, res) => {
     const {
         employeeid
     } = req.params;
-    if (!employeeid) {
+    const isValid = mongoose.Types.ObjectId.isValid(employeeid);
+    if (!employeeid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, employeeid is required"
+                "message": "Not found, please enter a valid employeeid."
             });
     } else {
         Employee
@@ -197,42 +214,52 @@ const employeesDeleteOne = (req, res) => {
 const employeesGetEmailByUser = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
-    Employee.findOne({
-            'userId': mongoose.Types.ObjectId(originalUserId),
-        })
-        .exec((err, employee) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!employee) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "UserId not found."
-                    });
-            } else {
-                res
-                    .status(200)
-                    .json({
-                        'email': employee.profile.email
-                    });
-            }
-        });
+    const isValid = mongoose.Types.ObjectId.isValid(originalUserId);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid originalUserId."
+            });
+    } else {
+        Employee.findOne({
+                'userId': mongoose.Types.ObjectId(originalUserId),
+            })
+            .exec((err, employee) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!employee) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "UserId not found."
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json({
+                            'email': employee.profile.email
+                        });
+                }
+            });
+    }
 };
 
 const employeesSetEmailToken = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Employee
@@ -293,72 +320,82 @@ const employeesSetEmailToken = (req, res) => {
 };
 
 const employeesVerifyEmailToken = (req, res) => {
-    Employee.findOne({
-            "userId": mongoose.Types.ObjectId(req.body.userid)
-        })
-        .exec((err, employee) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!employee) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "Invalid token or expired token."
-                    });
-            } else {
-                if ("Employee" == req.payload.type && req.body.userid != req.payload._id) {
-                    return res
-                        .status(403)
+    const isValid = mongoose.Types.ObjectId.isValid(req.body.userid);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid userid."
+            });
+    } else {
+        Employee.findOne({
+                "userId": mongoose.Types.ObjectId(req.body.userid)
+            })
+            .exec((err, employee) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
                         .json({
-                            "message": "You don\'t have permission to do that!"
+                            "message": err._message
                         });
-                }
-                let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-                let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-                if (employee.profile.emailVerificationToken == originalToken) {
-                    employee.profile.emailVerificationToken = '';
-                    employee.profile.emailVerified = true;
-                    employee.save((err) => {
-                        if (err) {
-                            console.log(err);
-                            res
-                                .status(404)
-                                .json({
-                                    "message": err._message
-                                });
-                        } else {
-                            res
-                                .status(200)
-                                .json({
-                                    "message": "Thank you for verifying your email address."
-                                });
-                        }
-                    });
-                } else {
+                } else if (!employee) {
                     res
                         .status(404)
                         .json({
                             "message": "Invalid token or expired token."
                         });
+                } else {
+                    if ("Employee" == req.payload.type && req.body.userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+                    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                    if (employee.profile.emailVerificationToken == originalToken) {
+                        employee.profile.emailVerificationToken = '';
+                        employee.profile.emailVerified = true;
+                        employee.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        "message": "Thank you for verifying your email address."
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Invalid token or expired token."
+                            });
+                    }
                 }
-            }
-        });
+            });
+    }
 };
 
 const employeesReadOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Employee
@@ -401,11 +438,12 @@ const employeesUpdateOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Employee

@@ -8,6 +8,24 @@ const CryptoJS = require("crypto-js");
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
+function validUsername(username) {
+    const text = /^[A-z0-9]+$/;
+    if ((username != "") && (!text.test(username))) {
+        return false;
+    }
+    return true;
+}
+
+function validToken(token) {
+    const regexp = /^[0-9a-fA-F]+$/;
+
+    if (regexp.test(token)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 const usersList = (req, res) => {
     User
         .find({}, {
@@ -98,11 +116,12 @@ const usersReadOne = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         User
@@ -146,11 +165,12 @@ const usersUpdateOne = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         User.findById(userid, (err, user) => {
@@ -211,11 +231,12 @@ const usersDeleteOne = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         User
@@ -244,99 +265,33 @@ const usersDeleteOne = (req, res) => {
 };
 
 const usersAuthenticate = (req, res) => {
-    User.findOne({
-            username: req.body.username
-        })
-        .exec((err, user) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!user) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "Invalid username or password."
-                    });
-            } else {
-                user.comparePassword(req.body.password, (err, isMatch) => {
-                    if (err) {
-                        console.log(err);
-                        res
-                            .status(404)
-                            .json({
-                                "message": err._message
-                            });
-                    } else if (isMatch) {
-                        user.lastLogin = Date.now();
-                        user.save((err) => {
-                            if (err) {
-                                console.log(err);
-                                res
-                                    .status(404)
-                                    .json({
-                                        "message": err._message
-                                    });
-                            } else {
-                                const token = user.generateJwt();
-                                res
-                                    .status(200)
-                                    .json({
-                                        'id': user._id,
-                                        'type': user.type,
-                                        'token': token
-                                    });
-                            }
+    const isValid = validUsername(req.body.username);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid username."
+            });
+    } else {
+        User.findOne({
+                username: req.body.username
+            })
+            .exec((err, user) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
                         });
-
-                    } else {
-                        user.lastFailedLogin = Date.now();
-                        user.save((err) => {
-                            if (err) {
-                                console.log(err);
-                                res
-                                    .status(404)
-                                    .json({
-                                        "message": err._message
-                                    });
-                            } else {
-                                res
-                                    .status(404)
-                                    .json({
-                                        "message": "Invalid username or password."
-                                    });
-                            }
+                } else if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Invalid username or password."
                         });
-                    }
-                });
-            }
-        });
-};
-
-const usersSetPasswordToken = (req, res) => {
-    User.findOne({
-            username: req.body.username
-        })
-        .exec((err, user) => {
-            if (!user) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "User not found."
-                    });
-            } else if (err) {
-                console.log(err);
-                res
-                    .status(400)
-                    .json({
-                        "message": err._message
-                    });
-            } else {
-                if (user.security.length > 0) {
-                    user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
+                } else {
+                    user.comparePassword(req.body.password, (err, isMatch) => {
                         if (err) {
                             console.log(err);
                             res
@@ -345,144 +300,247 @@ const usersSetPasswordToken = (req, res) => {
                                     "message": err._message
                                 });
                         } else if (isMatch) {
-                            const createRandomToken = randomBytesAsync(16)
-                                .then((buf) => buf.toString('hex'));
-
-                            createRandomToken
-                                .then((token) => {
-                                    user.passwordResetToken = token;
-                                    user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-                                    let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
-                                    let encryptUserId = CryptoJS.AES.encrypt((user._id).toString(), process.env.CRYPTOJS_SERVER_SECRET).toString();
-                                    user.save((err) => {
-                                        if (err) {
-                                            console.log(err);
-                                            res
-                                                .status(404)
-                                                .json({
-                                                    "message": err._message
-                                                });
-                                        } else {
-                                            res
-                                                .status(200)
-                                                .json({
-                                                    'token': encryptToken,
-                                                    'userid': encryptUserId,
-                                                    'type': user.type
-                                                });
-                                        }
-                                    });
-                                })
-                                .catch(err);
+                            user.lastLogin = Date.now();
+                            user.save((err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res
+                                        .status(404)
+                                        .json({
+                                            "message": err._message
+                                        });
+                                } else {
+                                    const token = user.generateJwt();
+                                    res
+                                        .status(200)
+                                        .json({
+                                            'id': user._id,
+                                            'type': user.type,
+                                            'token': token
+                                        });
+                                }
+                            });
 
                         } else {
-                            res
-                                .status(404)
-                                .json({
-                                    "message": "Invalid username or security questions or answer."
-                                });
+                            user.lastFailedLogin = Date.now();
+                            user.save((err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res
+                                        .status(404)
+                                        .json({
+                                            "message": err._message
+                                        });
+                                } else {
+                                    res
+                                        .status(404)
+                                        .json({
+                                            "message": "Invalid username or password."
+                                        });
+                                }
+                            });
                         }
                     });
-                } else {
+                }
+            });
+    }
+};
+
+const usersSetPasswordToken = (req, res) => {
+    const isValid = validUsername(req.body.username);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid username."
+            });
+    } else {
+        User.findOne({
+                username: req.body.username
+            })
+            .exec((err, user) => {
+                if (!user) {
                     res
                         .status(404)
                         .json({
-                            "message": "Security questions are not yet setup."
+                            "message": "User not found."
                         });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    if (user.security.length > 0) {
+                        user.compareSecurityAnswer(req.body.security, (err, isMatch) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else if (isMatch) {
+                                const createRandomToken = randomBytesAsync(16)
+                                    .then((buf) => buf.toString('hex'));
+
+                                createRandomToken
+                                    .then((token) => {
+                                        user.passwordResetToken = token;
+                                        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+                                        let encryptToken = CryptoJS.AES.encrypt(token, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                                        let encryptUserId = CryptoJS.AES.encrypt((user._id).toString(), process.env.CRYPTOJS_SERVER_SECRET).toString();
+                                        user.save((err) => {
+                                            if (err) {
+                                                console.log(err);
+                                                res
+                                                    .status(404)
+                                                    .json({
+                                                        "message": err._message
+                                                    });
+                                            } else {
+                                                res
+                                                    .status(200)
+                                                    .json({
+                                                        'token': encryptToken,
+                                                        'userid': encryptUserId,
+                                                        'type': user.type
+                                                    });
+                                            }
+                                        });
+                                    })
+                                    .catch(err);
+
+                            } else {
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": "Invalid username or security questions or answer."
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Security questions are not yet setup."
+                            });
+                    }
                 }
-            }
-        });
+            });
+    }
 };
 
 const usersValidatePasswordToken = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
     let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-    User.findOne({
-            "passwordResetToken": originalToken
-        })
-        .where('passwordResetExpires').gt(Date.now())
-        .exec((err, user) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!user) {
-                res
-                    .status(404)
-                    .json({
-                        "message": 'Password reset token is invalid or has expired.'
-                    });
-            } else {
-                res
-                    .status(200)
-                    .json({
-                        'message': 'Valid Token! You can now change your password.'
-                    });
-            }
-        });
+    const isValid = validToken(originalToken);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid token."
+            });
+    } else {
+        User.findOne({
+                "passwordResetToken": originalToken
+            })
+            .where('passwordResetExpires').gt(Date.now())
+            .exec((err, user) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": 'Password reset token is invalid or has expired.'
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json({
+                            'message': 'Valid Token! You can now change your password.'
+                        });
+                }
+            });
+    }
 };
 
 const usersResetPassword = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
     let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-    User.findOne({
-            "passwordResetToken": originalToken
-        })
-        .where('passwordResetExpires').gt(Date.now())
-        .exec((err, user) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
+    const isValid = validToken(originalToken);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid token."
+            });
+    } else {
+        User.findOne({
+                "passwordResetToken": originalToken
+            })
+            .where('passwordResetExpires').gt(Date.now())
+            .exec((err, user) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!user) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": 'Password reset token is invalid or has expired.'
+                        });
+                } else {
+                    user.password = req.body.password;
+                    user.passwordResetToken = undefined;
+                    user.passwordResetExpires = undefined;
+                    let encryptUserId = CryptoJS.AES.encrypt((user._id).toString(), process.env.CRYPTOJS_SERVER_SECRET).toString();
+                    user.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(200)
+                                .json({
+                                    'message': 'Success! Your password has been changed.',
+                                    'userid': encryptUserId,
+                                    'username': user.username,
+                                    'type': user.type
+                                });
+                        }
                     });
-            } else if (!user) {
-                res
-                    .status(404)
-                    .json({
-                        "message": 'Password reset token is invalid or has expired.'
-                    });
-            } else {
-                user.password = req.body.password;
-                user.passwordResetToken = undefined;
-                user.passwordResetExpires = undefined;
-                let encryptUserId = CryptoJS.AES.encrypt((user._id).toString(), process.env.CRYPTOJS_SERVER_SECRET).toString();
-                user.save((err) => {
-                    if (err) {
-                        console.log(err);
-                        res
-                            .status(404)
-                            .json({
-                                "message": err._message
-                            });
-                    } else {
-                        res
-                            .status(200)
-                            .json({
-                                'message': 'Success! Your password has been changed.',
-                                'userid': encryptUserId,
-                                'username': user.username,
-                                'type': user.type
-                            });
-                    }
-                });
-            }
-        });
+                }
+            });
+    }
 };
 
 const usersChangePassword = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         User
@@ -502,7 +560,7 @@ const usersChangePassword = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if (("Borrower" == req.payload.type || "Employee" == req.payload.type) && userid != req.payload._id) {
+                    if (userid != req.payload._id) {
                         return res
                             .status(403)
                             .json({

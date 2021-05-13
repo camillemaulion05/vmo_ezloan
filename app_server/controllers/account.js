@@ -45,9 +45,9 @@ function ROUND(num) {
 }
 
 function getUserDetails(req, res, filename, title) {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
-    if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
+    if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -140,7 +140,7 @@ const postProfile = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    path = '/api/users/' + (req.user.id).toString();
+    path = '/api/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -162,9 +162,9 @@ const postProfile = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/borrowers/users/' + (req.user.id).toString();
-                if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
-                if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+                path = '/api/borrowers/users/' + req.user.id;
+                if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+                if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'PUT',
@@ -224,7 +224,7 @@ const postProfilePic = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/users/' + (req.user.id).toString();
+    path = '/api/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -289,9 +289,9 @@ const postVerifyMobileNum = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/borrowers/users/' + (req.user.id).toString();
-                if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
-                if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+                path = '/api/borrowers/users/' + req.user.id;
+                if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+                if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'PUT',
@@ -338,9 +338,9 @@ const postVerifyMobileNum = (req, res) => {
 };
 
 const getVerifyEmail = (req, res) => {
-    path = '/api/borrowers/setEmailToken/' + (req.user.id).toString();
-    if (req.user.type == "Admin") path = '/api/admins/setEmailToken/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/setEmailToken/' + (req.user.id).toString();
+    path = '/api/borrowers/setEmailToken/' + req.user.id;
+    if (req.user.type == "Admin") path = '/api/admins/setEmailToken/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/setEmailToken/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -486,7 +486,7 @@ const postSecurity = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/change/' + (req.user.id).toString();
+    path = '/api/change/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'POST',
@@ -547,7 +547,7 @@ const postSecurityQuestions = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/users/' + (req.user.id).toString();
+    path = '/api/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -600,7 +600,7 @@ const getVerifications = (req, res) => {
 };
 
 const getVerificationsSubmit = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -637,7 +637,7 @@ const getVerificationsSubmit = (req, res) => {
 };
 
 const getVerificationsCancel = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3182,7 +3182,7 @@ const postVerificationsPersonal = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3238,7 +3238,7 @@ const getVerificationsAddress = (req, res) => {
 };
 
 const postVerificationsAddress = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3304,7 +3304,7 @@ const getVerificationsFinancial = (req, res) => {
 };
 
 const postVerificationsFinancial = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3370,7 +3370,7 @@ const getVerificationsDocuments = (req, res) => {
 };
 
 const postVerificationsDocuments = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3442,7 +3442,7 @@ const postVerificationsDeclaration = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -3479,7 +3479,7 @@ const postVerificationsDeclaration = (req, res) => {
 };
 
 const getCredits = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -3499,7 +3499,7 @@ const getCredits = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/loans/users/' + (req.user.id).toString();
+                path = '/api/loans/users/' + req.user.id;
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'GET',
@@ -3563,7 +3563,7 @@ const postCredits = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/borrowers/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -3583,7 +3583,7 @@ const postCredits = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/loans/users/' + (req.user.id).toString();
+                path = '/api/loans/users/' + req.user.id;
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'GET',
@@ -4841,8 +4841,8 @@ const postRepayment = (req, res) => {
 };
 
 const getBorrowers = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -5117,7 +5117,7 @@ const postBorrowers = (req, res) => {
                                     statusCode
                                 }, body) => {
                                     if (err) {
-                                        req.flash('warning', {
+                                        req.flash('warnings', {
                                             msg: 'There was an error when sending the password to respective email. Please try again later.'
                                         });
                                         return res.redirect('back');
@@ -5303,8 +5303,8 @@ const postUpdateBorrowers = (req, res) => {
 };
 
 const getLoans = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6182,9 +6182,9 @@ const postUpdateLoans = (req, res) => {
 };
 
 const getLoanDetails = (req, res) => {
-    path = '/api/borrowers/users/' + (req.user.id).toString();
-    if (req.user.type == "Admin") path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/borrowers/users/' + req.user.id;
+    if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6306,8 +6306,8 @@ const getLoanDetails = (req, res) => {
 };
 
 const getTransactions = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6433,8 +6433,8 @@ const postTransactions = (req, res) => {
 };
 
 const getWithdrawals = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6560,8 +6560,8 @@ const postWithdrawals = (req, res) => {
 };
 
 const getEmployees = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -6658,8 +6658,8 @@ const postEmployees = (req, res) => {
 };
 
 const getInquiries = (req, res) => {
-    path = '/api/admins/users/' + (req.user.id).toString();
-    if (req.user.type == "Employee") path = '/api/employees/users/' + (req.user.id).toString();
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',

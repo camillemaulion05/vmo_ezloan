@@ -95,10 +95,18 @@ const getSignupByType = (req, res) => {
     if (req.user) {
         return res.redirect('/account');
     }
-    res.render('user/signup', {
-        title: 'Signup',
-        type: (req.params.type == 'admin' || req.params.type == 'employee' || req.params.type == 'member' || req.params.type == 'borrower') ? req.params.type : 'borrower'
-    });
+    let userType = req.params.type;
+    if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
+        res.render('user/signup', {
+            title: 'Signup',
+            type: (req.params.type == 'admin' || req.params.type == 'employee' || req.params.type == 'member' || req.params.type == 'borrower') ? req.params.type : 'borrower'
+        });
+    } else {
+        req.flash('errors', {
+            msg: 'Not existing user type. Please enter correct user type.'
+        });
+        return res.redirect('/signup/borrower');
+    }
 };
 
 /**
@@ -110,7 +118,9 @@ const postSignupByType = (req, res, next) => {
     let userType = req.params.type;
     let type = '',
         employeeID = '',
-        sharesPerPayDay = '';
+        sharesPerPayDay = '',
+        accountName = '',
+        accountNum = '';
     if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
         if (userType == 'employee' || userType == 'member' || userType == 'admin') {
             if (validator.isEmpty(req.body.userCode)) validationErrors.push({
@@ -123,12 +133,10 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
                         msg: 'Employee ID cannot be blank.'
                     });
-                    if (req.body.employeeID) {
-                        if (req.body.userCode != originalAdminCode) {
-                            userType = 'borrower'
-                            type = 'Non-Member';
-                        }
-                    }
+                    if (req.body.userCode != originalAdminCode) validationErrors.push({
+                        msg: 'User code is invalid.'
+                    });
+                    employeeID = req.body.employeeID;
                 }
                 if (userType == 'employee') {
                     let bytes = CryptoJS.AES.decrypt(process.env.EMPLOYEE_CODE, process.env.CRYPTOJS_SERVER_SECRET);
@@ -146,16 +154,14 @@ const postSignupByType = (req, res, next) => {
                         if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
                             msg: 'G-Cash Account No. cannot be blank.'
                         });
+                        accountName = req.body.accountName;
+                        accountNum = req.body.accountNum;
                     }
-                    if (req.body.employeeID && req.body.employeeType) {
-                        if (req.body.userCode != originalEmployeeCode) {
-                            userType = 'borrower';
-                            type = 'Non-Member';
-                        } else {
-                            type = req.body.employeeType;
-                            employeeID = req.body.employeeID;
-                        }
-                    }
+                    if (req.body.userCode != originalEmployeeCode) validationErrors.push({
+                        msg: 'User code is invalid.'
+                    });
+                    type = req.body.employeeType;
+                    employeeID = req.body.employeeID;
                 }
                 if (userType == 'member') {
                     let bytes = CryptoJS.AES.decrypt(process.env.MEMBER_CODE, process.env.CRYPTOJS_SERVER_SECRET);
@@ -166,14 +172,13 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
                         msg: 'Shares per payday cannot be blank.'
                     });
-                    if (req.body.employeeID && req.body.sharesPerPayDay) {
-                        if (req.body.userCode == originalMemberCode) {
-                            userType = 'borrower';
-                            type = 'Member';
-                            employeeID = req.body.employeeID;
-                            sharesPerPayDay = req.body.sharesPerPayDay;
-                        }
-                    }
+                    if (req.body.userCode != originalMemberCode) validationErrors.push({
+                        msg: 'User code is invalid.'
+                    });
+                    userType = 'borrower';
+                    type = 'Member';
+                    employeeID = req.body.employeeID;
+                    sharesPerPayDay = req.body.sharesPerPayDay;
                 }
             }
         } else {
@@ -301,8 +306,8 @@ const postSignupByType = (req, res, next) => {
                                     employeeID: employeeID,
                                     sharesPerPayDay: sharesPerPayDay,
                                     account: {
-                                        name: (req.body.accountName) ? req.body.accountName : null,
-                                        number: (req.body.accountNum) ? req.body.accountNum : null
+                                        name: accountName,
+                                        number: accountNum
                                     }
                                 }
                             };
@@ -352,8 +357,8 @@ const postSignupByType = (req, res, next) => {
  * Forgot Password page.
  */
 const getForgot = (req, res) => {
-    if (req.isAuthenticated()) {
-        return res.redirect('/account');
+    if (req.user) {
+        return res.redirect('/security');
     }
     res.render('user/forgot', {
         title: 'Forgot Pass'
@@ -493,8 +498,8 @@ const postForgot = (req, res) => {
  * Reset Password page.
  */
 const getReset = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        return res.redirect('/account');
+    if (req.user) {
+        return res.redirect('/security');
     }
     const validationErrors = [];
     if (!validator.isHexadecimal(req.params.token)) validationErrors.push({
@@ -598,7 +603,7 @@ const postReset = (req, res, next) => {
                         statusCode
                     }, borrower) => {
                         if (err) {
-                            req.flash('warning', {
+                            req.flash('warnings', {
                                 msg: 'Your password has been changed, however we were unable to send you a confirmation email. We will be looking into it shortly.'
                             });
                             return res.redirect('/login');
@@ -619,7 +624,7 @@ const postReset = (req, res, next) => {
                                     statusCode
                                 }, body) => {
                                     if (err) {
-                                        req.flash('warning', {
+                                        req.flash('warnings', {
                                             msg: 'Your password has been changed, however we were unable to send you a confirmation email. We will be looking into it shortly.'
                                         });
                                         return res.redirect('/login');

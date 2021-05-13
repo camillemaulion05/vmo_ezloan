@@ -107,7 +107,7 @@ function validateForm(currentTab) {
                         valid = false;
                         if (y[i].id == "mobileNum") $(".signup-form #errorSendOtp").hide();
                         $(y[i]).addClass('is-invalid');
-                        $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + 'characters required.');
+                        $(y[i]).next().text('Length is short, minimum ' + y[i].minLength + ' characters required.');
                     }
                 }
                 if (y[i].id == "confirmPassword" && y[i].value != $('#password').val()) {
@@ -231,6 +231,7 @@ function formatMsgs(f) {
 function formatUsername(f) {
     return f
         .replace(/[^A-z0-9]/ig, "")
+        .replace(/\_/g, "")
         .replace(/\^/g, "")
         .replace(/\[/g, "")
         .replace(/\`/g, "")

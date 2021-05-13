@@ -11,6 +11,12 @@
         i.fa.fa-times-circle
       for info in messages.info
         | #{info.msg}
+  if messages.warnings
+    .alert.alert-warning
+      button.close(type='button', data-dismiss='alert')
+        i.fa.fa-times-circle
+      for warning in messages.warnings
+        | #{warning.msg} 
   if messages.success
     .alert.alert-success
       button.close(type='button', data-dismiss='alert')

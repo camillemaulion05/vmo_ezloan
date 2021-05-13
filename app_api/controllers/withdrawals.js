@@ -53,16 +53,17 @@ const withdrawalsReadOne = (req, res) => {
     const {
         withdrawalid
     } = req.params;
-    if (!withdrawalid) {
+    const isValid = mongoose.Types.ObjectId.isValid(withdrawalid);
+    if (!withdrawalid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, withdrawalid is required"
+                "message": "Not found, please enter a valid withdrawalid."
             });
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName userId')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -97,16 +98,16 @@ const withdrawalsUpdateOne = (req, res) => {
     const {
         withdrawalid
     } = req.params;
-    if (!withdrawalid) {
+    const isValid = mongoose.Types.ObjectId.isValid(withdrawalid);
+    if (!withdrawalid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, withdrawalid is required"
+                "message": "Not found, please enter a valid withdrawalid."
             });
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -153,11 +154,12 @@ const withdrawalsDeleteOne = (req, res) => {
     const {
         withdrawalid
     } = req.params;
-    if (!withdrawalid) {
+    const isValid = mongoose.Types.ObjectId.isValid(withdrawalid);
+    if (!withdrawalid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, withdrawalid is required"
+                "message": "Not found, please enter a valid withdrawalid."
             });
     } else {
         Withdrawal
@@ -189,11 +191,12 @@ const withdrawalsListByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Withdrawal

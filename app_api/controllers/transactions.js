@@ -1,9 +1,37 @@
 const mongoose = require('mongoose');
 const Transaction = mongoose.model('Transaction');
 
+function validYear(year) {
+    const text = /^[0-9]+$/;
+    if (year != 0) {
+        if ((year != "") && (!text.test(year))) {
+            return false;
+        }
+        if (year.length != 4) {
+            return false;
+        }
+        var current_year = new Date().getFullYear();
+        if ((year < 1920) || (year > current_year)) {
+            return false;
+        }
+        return true;
+    }
+}
+
+function validTxnType(type) {
+    if (type == "Repayments") return true;
+    if (type == "Release") return true;
+    if (type == "Withdrawals") return true;
+    if (type == "Contributions") return true;
+    if (type == "Fees") return true;
+    if (type == "Expenses") return true;
+    return false;
+}
+
 const transactionsList = (req, res) => {
     Transaction
         .find()
+        .populate('borrowerId', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
         .exec((err, transactions) => {
             if (err) {
                 console.log(err);
@@ -58,15 +86,17 @@ const transactionsReadOne = (req, res) => {
     const {
         transactionid
     } = req.params;
-    if (!transactionid) {
+    const isValid = mongoose.Types.ObjectId.isValid(transactionid);
+    if (!transactionid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, transactionid is required"
+                "message": "Not found, please enter a valid transactionid."
             });
     } else {
         Transaction
             .findById(transactionid)
+            .populate('borrowerId', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -82,6 +112,13 @@ const transactionsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Borrower" == req.payload.type && transaction.borrowerId.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(transaction);
@@ -94,11 +131,12 @@ const transactionsUpdateOne = (req, res) => {
     const {
         transactionid
     } = req.params;
-    if (!transactionid) {
+    const isValid = mongoose.Types.ObjectId.isValid(transactionid);
+    if (!transactionid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, transactionid is required"
+                "message": "Not found, please enter a valid transactionid."
             });
     } else {
         Transaction
@@ -155,11 +193,12 @@ const transactionsDeleteOne = (req, res) => {
     const {
         transactionid
     } = req.params;
-    if (!transactionid) {
+    const isValid = mongoose.Types.ObjectId.isValid(transactionid);
+    if (!transactionid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, transactionid is required"
+                "message": "Not found, please enter a valid transactionid."
             });
     } else {
         Transaction
@@ -191,11 +230,12 @@ const transactionsListByType = (req, res) => {
     const {
         type
     } = req.params;
-    if (!type) {
+    const isValid = validTxnType(type);
+    if (!type || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, type is required"
+                "message": "Invalid transaction type."
             });
     } else {
         Transaction
@@ -223,11 +263,12 @@ const transactionsListByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Transaction
@@ -275,11 +316,12 @@ const transactionsListByLoans = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Transaction
@@ -309,11 +351,12 @@ const transactionsSummary = (req, res) => {
     const {
         year
     } = req.params;
-    if (!year) {
+    const isValid = validYear(year);
+    if (!year || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, year is required"
+                "message": "Invalid year."
             });
     } else {
         let date1 = new Date('2020-01-01');
@@ -364,11 +407,12 @@ const contributionsListByMember = (req, res) => {
     const {
         year
     } = req.params;
-    if (!year) {
+    const isValid = validYear(year);
+    if (!year || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, year is required"
+                "message": "Invalid year."
             });
     } else {
         let date1 = new Date('2020-01-01');

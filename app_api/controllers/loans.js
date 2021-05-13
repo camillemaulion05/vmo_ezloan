@@ -1,6 +1,23 @@
 const mongoose = require('mongoose');
 const Loan = mongoose.model('Loan');
 
+function validYear(year) {
+    const text = /^[0-9]+$/;
+    if (year != 0) {
+        if ((year != "") && (!text.test(year))) {
+            return false;
+        }
+        if (year.length != 4) {
+            return false;
+        }
+        var current_year = new Date().getFullYear();
+        if ((year < 1920) || (year > current_year)) {
+            return false;
+        }
+        return true;
+    }
+}
+
 const loansList = (req, res) => {
     Loan
         .find()
@@ -57,11 +74,12 @@ const loansReadOne = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -101,11 +119,12 @@ const loansUpdateOne = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -163,11 +182,12 @@ const loansDeleteOne = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -199,11 +219,12 @@ const loansSchedulesUpdate = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -259,11 +280,12 @@ const loansSchedulesList = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -304,11 +326,13 @@ const loansSchedulesReadOne = (req, res) => {
         loanid,
         scheduleid
     } = req.params;
-    if (!loanid && !scheduleid) {
+    const isValidloanid = mongoose.Types.ObjectId.isValid(loanid);
+    const isValidscheduleid = mongoose.Types.ObjectId.isValid(scheduleid);
+    if (!loanid && !scheduleid || !isValidloanid || !isValidscheduleid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid and scheduleid is required"
+                "message": "Not found, please enter a valid loanid or scheduleid."
             });
     } else {
         Loan
@@ -354,11 +378,12 @@ const loansDueListByLoan = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -433,11 +458,12 @@ const loansPastDueListByLoan = (req, res) => {
     const {
         loanid
     } = req.params;
-    if (!loanid) {
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, loanid is required"
+                "message": "Not found, please enter a valid loanid."
             });
     } else {
         Loan
@@ -551,11 +577,12 @@ const loansSummary = (req, res) => {
     const {
         year
     } = req.params;
-    if (!year) {
+    const isValid = validYear(year);
+    if (!year || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, year is required"
+                "message": "Invalid year."
             });
     } else {
         let date1 = new Date('2020-01-01');
@@ -658,11 +685,12 @@ const loansInterestReport = (req, res) => {
     const {
         year
     } = req.params;
-    if (!year) {
+    const isValid = validYear(year);
+    if (!year || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, year is required"
+                "message": "Invalid year."
             });
     } else {
         let date1 = new Date('2020-01-01');
@@ -718,11 +746,12 @@ const loansListByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Loan
@@ -771,11 +800,12 @@ const loansListByBorrower = (req, res) => {
     const {
         borrowerid
     } = req.params;
-    if (!borrowerid) {
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, borrowerid is required"
+                "message": "Not found, please enter a valid borrowerid."
             });
     } else {
         Loan

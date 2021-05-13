@@ -33,7 +33,7 @@ const postContact = (req, res) => {
 
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
-        return res.redirect('/');
+        return res.redirect('/#contact');
     }
     let path = '/api/sendMail';
     let requestOptions = {

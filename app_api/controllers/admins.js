@@ -57,11 +57,12 @@ const adminsReadOne = (req, res) => {
     const {
         adminid
     } = req.params;
-    if (!adminid) {
+    const isValid = mongoose.Types.ObjectId.isValid(adminid);
+    if (!adminid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, adminid is required"
+                "message": "Not found, please enter a valid adminid."
             });
     } else {
         Admin
@@ -82,6 +83,13 @@ const adminsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     res
                         .status(200)
                         .json(admin);
@@ -94,11 +102,12 @@ const adminsUpdateOne = (req, res) => {
     const {
         adminid
     } = req.params;
-    if (!adminid) {
+    const isValid = mongoose.Types.ObjectId.isValid(adminid);
+    if (!adminid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, adminid is required"
+                "message": "Not found, please enter a valid adminid."
             });
     } else {
         Admin
@@ -118,6 +127,13 @@ const adminsUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
+                    if ("Admin" == req.payload.type && admin.userId != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
                     admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
                     admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
@@ -156,11 +172,12 @@ const adminsDeleteOne = (req, res) => {
     const {
         adminid
     } = req.params;
-    if (!adminid) {
+    const isValid = mongoose.Types.ObjectId.isValid(adminid);
+    if (!adminid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, adminid is required"
+                "message": "Not found, please enter a valid adminid."
             });
     } else {
         Admin
@@ -191,42 +208,52 @@ const adminsDeleteOne = (req, res) => {
 const adminsGetEmailByUser = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
-    Admin.findOne({
-            'userId': mongoose.Types.ObjectId(originalUserId),
-        })
-        .exec((err, admin) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!admin) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "UserId not found."
-                    });
-            } else {
-                res
-                    .status(200)
-                    .json({
-                        'email': admin.profile.email
-                    });
-            }
-        });
+    const isValid = mongoose.Types.ObjectId.isValid(originalUserId);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid originalUserId."
+            });
+    } else {
+        Admin.findOne({
+                'userId': mongoose.Types.ObjectId(originalUserId),
+            })
+            .exec((err, admin) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!admin) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "UserId not found."
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json({
+                            'email': admin.profile.email
+                        });
+                }
+            });
+    }
 };
 
 const adminsSetEmailToken = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Admin
@@ -248,6 +275,13 @@ const adminsSetEmailToken = (req, res) => {
                             "message": "Email not found."
                         });
                 } else {
+                    if ("Admin" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
                     const createRandomToken = randomBytesAsync(16)
                         .then((buf) => buf.toString('hex'));
 
@@ -280,65 +314,82 @@ const adminsSetEmailToken = (req, res) => {
 };
 
 const adminsVerifyEmailToken = (req, res) => {
-    Admin.findOne({
-            "userId": mongoose.Types.ObjectId(req.body.userid)
-        })
-        .exec((err, admin) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!admin) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "Invalid token or expired token."
-                    });
-            } else {
-                let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-                let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-                if (admin.profile.emailVerificationToken == originalToken) {
-                    admin.profile.emailVerificationToken = '';
-                    admin.profile.emailVerified = true;
-                    admin.save((err) => {
-                        if (err) {
-                            console.log(err);
-                            res
-                                .status(404)
-                                .json({
-                                    "message": err._message
-                                });
-                        } else {
-                            res
-                                .status(200)
-                                .json({
-                                    "message": "Thank you for verifying your email address."
-                                });
-                        }
-                    });
-                } else {
+    const isValid = mongoose.Types.ObjectId.isValid(req.body.userid);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid userid."
+            });
+    } else {
+        Admin.findOne({
+                "userId": mongoose.Types.ObjectId(req.body.userid)
+            })
+            .exec((err, admin) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!admin) {
                     res
                         .status(404)
                         .json({
                             "message": "Invalid token or expired token."
                         });
+                } else {
+                    if ("Admin" == req.payload.type && req.body.userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+                    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                    if (admin.profile.emailVerificationToken == originalToken) {
+                        admin.profile.emailVerificationToken = '';
+                        admin.profile.emailVerified = true;
+                        admin.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        "message": "Thank you for verifying your email address."
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Invalid token or expired token."
+                            });
+                    }
                 }
-            }
-        });
+            });
+    }
 };
 
 const adminsReadOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Admin
@@ -381,11 +432,12 @@ const adminsUpdateOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Admin

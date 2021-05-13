@@ -52,11 +52,12 @@ const inquiriesReadOne = (req, res) => {
     const {
         inquiryid
     } = req.params;
-    if (!inquiryid) {
+    const isValid = mongoose.Types.ObjectId.isValid(inquiryid);
+    if (!inquiryid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, inquiryid is required"
+                "message": "Not found, please enter a valid inquiryid."
             });
     } else {
         Inquiry
@@ -88,11 +89,12 @@ const inquiriesUpdateOne = (req, res) => {
     const {
         inquiryid
     } = req.params;
-    if (!inquiryid) {
+    const isValid = mongoose.Types.ObjectId.isValid(inquiryid);
+    if (!inquiryid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, inquiryid is required"
+                "message": "Not found, please enter a valid inquiryid."
             });
     } else {
         Inquiry
@@ -144,11 +146,12 @@ const inquiriesDeleteOne = (req, res) => {
     const {
         inquiryid
     } = req.params;
-    if (!inquiryid) {
+    const isValid = mongoose.Types.ObjectId.isValid(inquiryid);
+    if (!inquiryid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, inquiryid is required"
+                "message": "Not found, please enter a valid inquiryid."
             });
     } else {
         Inquiry

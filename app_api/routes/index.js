@@ -62,23 +62,23 @@ router
 // employees
 router
     .route('/employees')
-    .get(auth, middleware.isAdmin, ctrlEmployees.employeesList)
+    .get(auth, middleware.isSafe, ctrlEmployees.employeesList)
     .post(auth, middleware.isModerator, ctrlEmployees.employeesCreate);
 
 router
     .route('/employees/:employeeid')
-    .get(auth, middleware.isModerator, ctrlEmployees.employeesReadOne)
+    .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOne)
     .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
 
 router.post('/employees/email', ctrlEmployees.employeesGetEmailByUser);
-router.get('/employees/setEmailToken/:userid', auth, middleware.isSafe, ctrlEmployees.employeesSetEmailToken);
-router.post('/employees/validateEmailToken', auth, middleware.isSafe, ctrlEmployees.employeesVerifyEmailToken);
+router.get('/employees/setEmailToken/:userid', auth, middleware.isModerator, ctrlEmployees.employeesSetEmailToken);
+router.post('/employees/validateEmailToken', auth, middleware.isModerator, ctrlEmployees.employeesVerifyEmailToken);
 
 router
     .route('/employees/users/:userid')
-    .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOneByUser)
-    .put(auth, middleware.isSafe, ctrlEmployees.employeesUpdateOneByUser);
+    .get(auth, middleware.isModerator, ctrlEmployees.employeesReadOneByUser)
+    .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOneByUser);
 
 // transactions
 router
@@ -206,17 +206,17 @@ router
 
 router
     .route('/admins/:adminid')
-    .get(auth, middleware.isModerator, ctrlAdmin.adminsReadOne)
-    .put(auth, middleware.isModerator, ctrlAdmin.adminsUpdateOne)
+    .get(auth, middleware.isAdmin, ctrlAdmin.adminsReadOne)
+    .put(auth, middleware.isAdmin, ctrlAdmin.adminsUpdateOne)
     .delete(auth, middleware.isAdmin, ctrlAdmin.adminsDeleteOne);
 
 router.post('/admins/email', ctrlAdmin.adminsGetEmailByUser);
-router.get('/admins/setEmailToken/:userid', auth, middleware.isSafe, ctrlAdmin.adminsSetEmailToken);
-router.post('/admins/validateEmailToken', auth, middleware.isSafe, ctrlAdmin.adminsVerifyEmailToken);
+router.get('/admins/setEmailToken/:userid', auth, middleware.isAdmin, ctrlAdmin.adminsSetEmailToken);
+router.post('/admins/validateEmailToken', auth, middleware.isAdmin, ctrlAdmin.adminsVerifyEmailToken);
 
 router
     .route('/admins/users/:userid')
-    .get(auth, middleware.isSafe, ctrlAdmin.adminsReadOneByUser)
-    .put(auth, middleware.isSafe, ctrlAdmin.adminsUpdateOneByUser);
+    .get(auth, middleware.isAdmin, ctrlAdmin.adminsReadOneByUser)
+    .put(auth, middleware.isAdmin, ctrlAdmin.adminsUpdateOneByUser);
 
 module.exports = router;

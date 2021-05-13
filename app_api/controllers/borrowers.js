@@ -71,11 +71,12 @@ const borrowersReadOne = (req, res) => {
     const {
         borrowerid
     } = req.params;
-    if (!borrowerid) {
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, borrowerid is required"
+                "message": "Not found, please enter a valid borrowerid."
             });
     } else {
         Borrower
@@ -115,11 +116,12 @@ const borrowersUpdateOne = (req, res) => {
     const {
         borrowerid
     } = req.params;
-    if (!borrowerid) {
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, borrowerid is required"
+                "message": "Not found, please enter a valid borrowerid."
             });
     } else {
         Borrower
@@ -231,11 +233,12 @@ const borrowersDeleteOne = (req, res) => {
     const {
         borrowerid
     } = req.params;
-    if (!borrowerid) {
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, borrowerid is required"
+                "message": "Not found, please enter a valid borrowerid."
             });
     } else {
         Borrower
@@ -266,42 +269,52 @@ const borrowersDeleteOne = (req, res) => {
 const borrowersGetEmailByUser = (req, res) => {
     let bytes = CryptoJS.AES.decrypt(req.body.userid, process.env.CRYPTOJS_SERVER_SECRET);
     let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
-    Borrower.findOne({
-            'userId': mongoose.Types.ObjectId(originalUserId),
-        })
-        .exec((err, borrower) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!borrower) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "UserId not found."
-                    });
-            } else {
-                res
-                    .status(200)
-                    .json({
-                        'email': borrower.profile.email
-                    });
-            }
-        });
+    const isValid = mongoose.Types.ObjectId.isValid(originalUserId);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid originalUserId."
+            });
+    } else {
+        Borrower.findOne({
+                'userId': mongoose.Types.ObjectId(originalUserId),
+            })
+            .exec((err, borrower) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (!borrower) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "UserId not found."
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json({
+                            'email': borrower.profile.email
+                        });
+                }
+            });
+    }
 };
 
 const borrowersSetEmailToken = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Borrower
@@ -362,72 +375,82 @@ const borrowersSetEmailToken = (req, res) => {
 };
 
 const borrowersVerifyEmailToken = (req, res) => {
-    Borrower.findOne({
-            "userId": mongoose.Types.ObjectId(req.body.userid)
-        })
-        .exec((err, borrower) => {
-            if (err) {
-                console.log(err);
-                res
-                    .status(404)
-                    .json({
-                        "message": err._message
-                    });
-            } else if (!borrower) {
-                res
-                    .status(404)
-                    .json({
-                        "message": "Invalid token or expired token."
-                    });
-            } else {
-                if ("Borrower" == req.payload.type && req.body.userid != req.payload._id) {
-                    return res
-                        .status(403)
+    const isValid = mongoose.Types.ObjectId.isValid(req.body.userid);
+    if (!isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid userid."
+            });
+    } else {
+        Borrower.findOne({
+                "userId": mongoose.Types.ObjectId(req.body.userid)
+            })
+            .exec((err, borrower) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
                         .json({
-                            "message": "You don\'t have permission to do that!"
+                            "message": err._message
                         });
-                }
-                let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-                let originalToken = bytes.toString(CryptoJS.enc.Utf8);
-                if (borrower.profile.emailVerificationToken == originalToken) {
-                    borrower.profile.emailVerificationToken = '';
-                    borrower.profile.emailVerified = true;
-                    borrower.save((err) => {
-                        if (err) {
-                            console.log(err);
-                            res
-                                .status(404)
-                                .json({
-                                    "message": err._message
-                                });
-                        } else {
-                            res
-                                .status(200)
-                                .json({
-                                    "message": "Thank you for verifying your email address."
-                                });
-                        }
-                    });
-                } else {
+                } else if (!borrower) {
                     res
                         .status(404)
                         .json({
                             "message": "Invalid token or expired token."
                         });
+                } else {
+                    if ("Borrower" == req.payload.type && req.body.userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+                    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                    if (borrower.profile.emailVerificationToken == originalToken) {
+                        borrower.profile.emailVerificationToken = '';
+                        borrower.profile.emailVerified = true;
+                        borrower.save((err) => {
+                            if (err) {
+                                console.log(err);
+                                res
+                                    .status(404)
+                                    .json({
+                                        "message": err._message
+                                    });
+                            } else {
+                                res
+                                    .status(200)
+                                    .json({
+                                        "message": "Thank you for verifying your email address."
+                                    });
+                            }
+                        });
+                    } else {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Invalid token or expired token."
+                            });
+                    }
                 }
-            }
-        });
+            });
+    }
 };
 
 const borrowersReadOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Borrower
@@ -470,11 +493,12 @@ const borrowersUpdateOneByUser = (req, res) => {
     const {
         userid
     } = req.params;
-    if (!userid) {
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
         res
             .status(404)
             .json({
-                "message": "Not found, userid is required"
+                "message": "Not found, please enter a valid userid."
             });
     } else {
         Borrower
