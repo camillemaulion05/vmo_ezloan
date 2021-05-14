@@ -75,7 +75,7 @@ html
               });
           });
 
-    if title.indexOf("Borrowers") != -1
+    if title.indexOf("Manage Borrowers") != -1
       script.
           $(function () {
               $('#addNewBorrower').on('click', function () {
@@ -260,7 +260,7 @@ html
                       let amount = parseFloat(data.loan.loanAmount) + parseFloat(data.remainingCreditLimit);
                       let monthlyInterestRate = (data.loan.requestedBy.type == 'Member') ? 3 : 5;
                       let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : '';
-                      let balance = ROUND(parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance));
+                      let balance = (parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance)).toFixed(2);
                       $('select#borrowerName').val(data.loan.requestedBy._id);
                       $('input#borrowerType').val(data.loan.requestedBy.type);
                       $('select#purposeOfLoan').val(data.loan.purposeOfLoan);
@@ -322,11 +322,11 @@ html
                           $('select#status option[value="Loan Debt"]').show();
                           $('select#status option[value="Fully Paid"]').show();
                         }
-                        if (data.loan.status == 'Fully Paid') {
+                        if (data.loan.status == 'Fully Paid' || data.loan.status == 'Declined') {
                           $('#updateTitle').text("Loan No. ");
                           $("#updateLoan .btn.btn-primary").hide();
                           $('select#status option[value="Approved"]').hide();
-                          $('select#status option[value="Declined"]').hide();
+                          $('select#status option[value="Declined"]').show();
                           $('select#status option[value="Loan Release"]').hide();
                           $('select#status option[value="Open"]').hide();
                           $('select#status option[value="Loan Debt"]').hide();
@@ -380,28 +380,7 @@ html
                     }
                 });
             });
-            $('select#postedBy').change(function () {
-                let token = $('input[name="_csrf"]').attr('value');
-                $.ajaxSetup({
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', token);
-                    }
-                });
-                $.ajax({
-                    url: "/employees/" + $('select#postedBy').val(),
-                    type: "GET",
-                    data: {},
-                    cache: false,
-                    success: function (data) {
-                        $('input#processorAcctNo').val(data.account.number);
-                    },
-                    error: function (xhr, status, error) {
-                       console.log(xhr.responseJSON.message);
-                    }
-                });
-            });
           });
-
     if title.indexOf("Security") != -1
       script.
         $(function () {
@@ -506,17 +485,11 @@ html
     if title.indexOf("Loan Details") != -1
       script.
         $(function () {
-          $('select[name="method"]').on("change",  function () {
-              if ($('select[name="method"]').val() == "G-Cash"){
-                $('input[name="receiverNum"]').val('9556993031');
-              }else{
-                $('input[name="receiverNum"]').val('3729457999')
-              }
-          });
           $('a#addRepayment').on('click',function () {
             let path = ($(this).prop('href')).split('/');
             let loanid = path[path.length-1];
-            $("#repayment").attr("action", "/repayments/" + loanid);
+            let borrowerid = path[path.length-2];
+            $("#repayment").attr("action", "/repayments/" + borrowerid + '/' + loanid);
             $('#repaymentModal').modal('show'); 
           });
         });

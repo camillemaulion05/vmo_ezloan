@@ -124,7 +124,7 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getCredits)
     .post(passportConfig.isAuthenticated, ctrlAccount.postCredits);
 
-router.post('/repayments/:loanid', passportConfig.isAuthenticated, ctrlAccount.postRepayment);
+router.post('/repayments/:borrowerid/:loanid', passportConfig.isAuthenticated, ctrlAccount.postRepayment);
 
 router.get('/download/loan/:loanid/soa', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSOA);
 router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSchedule);
