@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const lusca = require('lusca');
 const ctrlHome = require('../controllers/home');
 const ctrlUsers = require('../controllers/users');
 const ctrlAccount = require('../controllers/account');
@@ -100,8 +99,11 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
     .post(passportConfig.isAuthenticated, ctrlAccount.postBorrowers);
 
+router.get('/download/report/borrowers/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadReports);
+
 router.get('/borrowers/:borrowerid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteBorrowers);
 router.post('/borrowers/:borrowerid/update', passportConfig.isAuthenticated, ctrlAccount.postUpdateBorrowers);
+router.get('/borrowers/:borrowerid/view', passportConfig.isAuthenticated, ctrlAccount.getBorrowerDetails);
 
 router
     .route('/loans')

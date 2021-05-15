@@ -158,52 +158,62 @@ const borrowerSchema = mongoose.Schema({
         primaryIdFront: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         primaryIdBack: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         companyIdFront: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         companyIdBack: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         coe: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         payslip1: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         payslip2: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         bir: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         tinProof: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         },
         selfiewithId: {
             originalname: String,
             filename: String,
-            contentType: String
+            contentType: String,
+            uploaded: Date
         }
     },
     additionalDocuments: [{

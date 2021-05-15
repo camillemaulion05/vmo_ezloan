@@ -11,6 +11,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
 const borrowersList = (req, res) => {
     Borrower
         .find()
+        .populate('reviewedBy', 'profile.firstName profile.lastName')
         .exec((err, borrowers) => {
             if (err) {
                 console.log(err);

@@ -32,11 +32,15 @@ function usernameGen(firstName, lastName) {
 function parseDate(date, format) {
     let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    let month3 = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let d = (new Date(date)).toString().split(' ');
     let dateFormat = month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3];
     if (format) {
         if (format == "short") {
             dateFormat = d[1] + ' ' + d[2] + ', ' + d[3];
+        }
+        if (format == "month") {
+            dateFormat = (d[1]).toUpperCase() + ' ' + d[3];
         }
     }
     return dateFormat;
@@ -45,6 +49,14 @@ function parseDate(date, format) {
 function ROUND(num) {
     let newNum = +(Math.round(parseFloat(num) + "e+2") + "e-2");
     return (Number.isNaN(newNum)) ? (num.toFixed(2) == 0) ? 0.00 : num.toFixed(2) : newNum;
+}
+
+function getAge(bday) {
+    let dob = new Date(bday)
+    let diff_ms = Date.now() - dob.getTime();
+    let age_dt = new Date(diff_ms);
+    let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+    return age;
 }
 
 function getUserDetails(req, res, filename, title) {
@@ -690,21 +702,22 @@ const getVerificationsCancel = (req, res) => {
 };
 
 const getDownloadBorrowerInfo = (req, res) => {
-    function downloadNonMember(user, req, res) {
-        let fonts = {
-            Roboto: {
-                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
-                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
-                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
-                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
-            },
-            Fontello: {
-                normal: __basedir + '/public/fonts/fontello.ttf'
-            }
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
         }
-        let printer = new PdfPrinter(fonts);
-        let unchecked = '';
-        let checked = '';
+    }
+    let printer = new PdfPrinter(fonts);
+    let unchecked = '';
+    let checked = '';
+
+    function downloadNonMember(user, req, res) {
         let docDefinition = {
             content: [{
                     text: 'VMO EZ LOAN',
@@ -2090,20 +2103,6 @@ const getDownloadBorrowerInfo = (req, res) => {
     }
 
     function downloadMember(user, req, res) {
-        let fonts = {
-            Roboto: {
-                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
-                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
-                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
-                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
-            },
-            Fontello: {
-                normal: __basedir + '/public/fonts/fontello.ttf'
-            }
-        }
-        let printer = new PdfPrinter(fonts);
-        let unchecked = '';
-        let checked = '';
         let docDefinition = {
             content: [{
                     text: 'VMO EZ LOAN',
@@ -3460,52 +3459,62 @@ const postVerificationsDocuments = (req, res) => {
                     primaryIdFront: (req.files.primaryIdFront) ? {
                         originalname: req.files.primaryIdFront[0].originalname,
                         filename: req.files.primaryIdFront[0].filename,
-                        contentType: req.files.primaryIdFront[0].mimetype
+                        contentType: req.files.primaryIdFront[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     primaryIdBack: (req.files.primaryIdBack) ? {
                         originalname: req.files.primaryIdBack[0].originalname,
                         filename: req.files.primaryIdBack[0].filename,
-                        contentType: req.files.primaryIdBack[0].mimetype
+                        contentType: req.files.primaryIdBack[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     companyIdFront: (req.files.companyIdFront) ? {
                         originalname: req.files.companyIdFront[0].originalname,
                         filename: req.files.companyIdFront[0].filename,
-                        contentType: req.files.companyIdFront[0].mimetype
+                        contentType: req.files.companyIdFront[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     companyIdBack: (req.files.companyIdBack) ? {
                         originalname: req.files.companyIdBack[0].originalname,
                         filename: req.files.companyIdBack[0].filename,
-                        contentType: req.files.companyIdBack[0].mimetype
+                        contentType: req.files.companyIdBack[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     coe: (req.files.coe) ? {
                         originalname: req.files.coe[0].originalname,
                         filename: req.files.coe[0].filename,
-                        contentType: req.files.coe[0].mimetype
+                        contentType: req.files.coe[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     payslip1: (req.files.payslip1) ? {
                         originalname: req.files.payslip1[0].originalname,
                         filename: req.files.payslip1[0].filename,
-                        contentType: req.files.payslip1[0].mimetype
+                        contentType: req.files.payslip1[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     payslip2: (req.files.payslip2) ? {
                         originalname: req.files.payslip2[0].originalname,
                         filename: req.files.payslip2[0].filename,
-                        contentType: req.files.payslip2[0].mimetype
+                        contentType: req.files.payslip2[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     bir: (req.files.bir) ? {
                         originalname: req.files.bir[0].originalname,
                         filename: req.files.bir[0].filename,
-                        contentType: req.files.bir[0].mimetype
+                        contentType: req.files.bir[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     tinProof: (req.files.tinProof) ? {
                         originalname: req.files.tinProof[0].originalname,
                         filename: req.files.tinProof[0].filename,
-                        contentType: req.files.tinProof[0].mimetype
+                        contentType: req.files.tinProof[0].mimetype,
+                        uploaded: new Date()
                     } : '',
                     selfiewithId: (req.files.selfiewithId) ? {
                         originalname: req.files.selfiewithId[0].originalname,
                         filename: req.files.selfiewithId[0].filename,
-                        contentType: req.files.selfiewithId[0].mimetype
+                        contentType: req.files.selfiewithId[0].mimetype,
+                        uploaded: new Date()
                     } : ''
                 }
             }
@@ -3794,19 +3803,20 @@ const postCredits = (req, res) => {
 };
 
 const getDownloadLoanSOA = (req, res) => {
-    function download(data, req, res) {
-        let fonts = {
-            Roboto: {
-                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
-                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
-                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
-                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
-            },
-            Fontello: {
-                normal: __basedir + '/public/fonts/fontello.ttf'
-            }
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
         }
-        let printer = new PdfPrinter(fonts);
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function download(data, req, res) {
         let statementDate = (data.currentDue && data.currentDue.dueDate) ? new Date(data.currentDue.dueDate) : '';
         if (statementDate) {
             statementDate.setDate(statementDate.getDate() - 24);
@@ -4468,19 +4478,20 @@ const getDownloadLoanSOA = (req, res) => {
 };
 
 const getDownloadLoanSchedule = (req, res) => {
-    function download(data, req, res) {
-        let fonts = {
-            Roboto: {
-                normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
-                bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
-                italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
-                bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
-            },
-            Fontello: {
-                normal: __basedir + '/public/fonts/fontello.ttf'
-            }
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
         }
-        let printer = new PdfPrinter(fonts);
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function download(data, req, res) {
         let docDefinition = {
             content: [{
                     text: 'VMO EZ LOAN',
@@ -5303,6 +5314,656 @@ const postBorrowers = (req, res) => {
     );
 };
 
+const getDownloadReports = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadNonMembers(borrowers) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let borrowersTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF NON-MEMBERS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 11,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Borrower No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Age',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }, {
+                            text: 'Mobile No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Email Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Date Hired',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Monthly Income',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Total Credit Limit',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Officer',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Status',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        borrowers.forEach(d => {
+            if (d.type == "Non-Member") {
+                let borrowerRow = [{
+                        text: d.borrowerNum,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.firstName + ' ' + d.profile.lastName,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: getAge(d.profile.dateOfBirth),
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.mobileNum,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.email,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    }, {
+                        text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (d.workBusinessInfo && d.workBusinessInfo.monthlyIncome) ? d.workBusinessInfo.monthlyIncome : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.totalCreditLimit,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.status,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    }
+                ];
+                borrowersTable.table.body.push(borrowerRow);
+            }
+        });
+        docDefinition.content.push(borrowersTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=non-members-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadMembers(borrowers) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let borrowersTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF MEMBERS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 11,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Borrower No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Employee ID',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }, {
+                            text: 'Mobile No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Email Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Date Hired',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Shares/Payday',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Total Credit Limit',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+
+                        {
+                            text: 'Assigned Loan Officer',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Status',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        borrowers.forEach(d => {
+            if (d.type == "Member") {
+                let borrowerRow = [{
+                        text: d.borrowerNum,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.employeeID,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.firstName + ' ' + d.profile.lastName,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.mobileNum,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.profile.email,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    }, {
+                        text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.sharesPerPayDay,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.totalCreditLimit,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
+                        style: 'item',
+                        border: [true, true, true, true]
+                    },
+                    {
+                        text: d.status,
+                        style: 'item',
+                        border: [true, true, true, true]
+                    }
+                ];
+                borrowersTable.table.body.push(borrowerRow);
+            }
+        });
+        docDefinition.content.push(borrowersTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=members-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadBorrowers(borrowers) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let borrowersTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF BORROWERS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 10,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Borrower No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Age',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Mobile No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Email Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Total Credit Limit',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Officer',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Status',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        borrowers.forEach(d => {
+            let borrowerRow = [{
+                    text: d.borrowerNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.firstName + ' ' + d.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: getAge(d.profile.dateOfBirth),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.type,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.mobileNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.email,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: d.totalCreditLimit,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.status,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            borrowersTable.table.body.push(borrowerRow);
+        });
+        docDefinition.content.push(borrowersTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=borrowers-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    let userType = req.params.type;
+    if (userType == 'non-members' || userType == 'members' || userType == 'all') {
+        path = '/api/borrowers';
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {}
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, borrowers) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when loading list of borrowers. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    if (userType == 'non-members') downloadNonMembers(borrowers);
+                    if (userType == 'members') downloadMembers(borrowers);
+                    if (userType == 'all') downloadBorrowers(borrowers);
+                } else {
+                    req.flash('errors', {
+                        msg: borrowers.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    } else {
+        req.flash('errors', {
+            msg: 'Not existing user type. Please enter correct user type.'
+        });
+        return res.redirect('/borrowers');
+    }
+};
+
 const getDeleteBorrowers = (req, res) => {
     path = '/api/borrowers/' + req.params.borrowerid;
     requestOptions = {
@@ -5621,13 +6282,52 @@ const getBorrowerDetails = (req, res) => {
                                 status
                             }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
                             let remainingCreditLimit = ROUND(parseFloat(borrower.totalCreditLimit) - parseFloat(totalUsedCreditLimit));
-                            return res
-                                .status(200)
-                                .json({
-                                    borrower: borrower,
-                                    remainingCreditLimit: remainingCreditLimit,
-                                    totalUsedCreditLimit: totalUsedCreditLimit
-                                });
+                            if (req.path.indexOf('view') != -1) {
+                                path = '/api/admins/users/' + req.user.id;
+                                if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {}
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, user) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when loading your account. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            res.render('account/borrowers-details', {
+                                                title: 'Manage Borrower Details',
+                                                user: user,
+                                                borrower: borrower,
+                                                remainingCreditLimit: remainingCreditLimit,
+                                                totalUsedCreditLimit: totalUsedCreditLimit
+                                            });
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: user.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                return res
+                                    .status(200)
+                                    .json({
+                                        borrower: borrower,
+                                        remainingCreditLimit: remainingCreditLimit,
+                                        totalUsedCreditLimit: totalUsedCreditLimit
+                                    });
+                            }
                         } else {
                             req.flash('errors', {
                                 msg: loans.message
@@ -6913,6 +7613,7 @@ module.exports = {
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
     getBorrowers,
+    getDownloadReports,
     postBorrowers,
     getDeleteBorrowers,
     postUpdateBorrowers,

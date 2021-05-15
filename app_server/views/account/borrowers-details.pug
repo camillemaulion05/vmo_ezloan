@@ -1,0 +1,327 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-primary.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
+                        | Borrower No.
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{borrower.borrowerNum}
+                    .col-auto
+                      i.fas.fa-address-card.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-info.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                        | Total Used Credit Limit
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{totalUsedCreditLimit.toFixed(2)}
+                    .col-auto
+                      i.fas.fa-receipt.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-success.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                        | Remaining Credit Limit
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(remainingCreditLimit).toFixed(2)}
+                    .col-auto
+                      i.fas.fa-wallet.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-warning.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
+                        | Borrower Status
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{borrower.status}
+                    .col-auto
+                      i.fas.fa-user-tag.fa-2x.text-gray-300
+          .card.shadow.mb-4
+            .card-header.border-bottom
+              ul#dashboardNav.nav.nav-tabs.card-header-tabs(role='tablist')
+                li.nav-item.mr-1
+                  a#personal-pill.nav-link.active(href='#personal' data-toggle='tab' role='tab' aria-controls='personal' aria-selected='true') Personal Information
+                li.nav-item
+                  a#financial-pill.nav-link(href='#financial' data-toggle='tab' role='tab' aria-controls='financial' aria-selected='false') Financial
+                if borrower.type == "Member"
+                  li.nav-item
+                    a#beneficiaries-pill.nav-link(href='#beneficiaries' data-toggle='tab' role='tab' aria-controls='beneficiaries' aria-selected='false') Beneficiaries
+                if borrower.type == "Non-Member"
+                  li.nav-item
+                    a#documents-pill.nav-link(href='#documents' data-toggle='tab' role='tab' aria-controls='documents' aria-selected='false') Documents
+            .card-body
+              #dashboardNavContent.tab-content
+                #personal.tab-pane.fade.active.show(role='tabpanel' aria-labelledby='personal-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href='/download/borrower/'+borrower._id) Print Application Form
+                  .row
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Name
+                              td.text-right #{borrower.profile.firstName} #{borrower.profile.lastName}
+                            tr
+                              th Marital Status
+                              td.text-right #{borrower.profile.maritalStat}
+                            tr
+                              th Age / Gender
+                              - let dob = new Date(borrower.profile.dateOfBirth)
+                              - let diff_ms = Date.now() - dob.getTime();
+                              - let age_dt = new Date(diff_ms); 
+                              - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+                              td.text-right #{age} / #{borrower.profile.gender}
+                            if borrower.type == "Non-Member"
+                              tr
+                                th Place of Birth
+                                td.text-right #{borrower.profile.placeOfBirth}
+                              tr
+                                th Education Attainment
+                                td.text-right #{borrower.profile.educAttainment}
+                            tr
+                              th Home Ownership
+                              td.text-right #{borrower.profile.homeOwnership}
+                            tr
+                              th Present Address
+                              - let present = (borrower.profile.address && borrower.profile.address.present) ? borrower.profile.address.present.unitNo + ' ' + borrower.profile.address.present.houseNo + ' ' + borrower.profile.address.present.street + ' ' + borrower.profile.address.present.subdivision + ' ' + borrower.profile.address.present.barangay + ' ' + borrower.profile.address.present.city + ' ' + borrower.profile.address.present.province + ' ' + borrower.profile.address.present.zipCode : '';
+                              td.text-right #{present}
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Mobile No.
+                              td.text-right +63#{borrower.profile.mobileNum}
+                            tr
+                              th Email Address
+                              td.text-right #{borrower.profile.email}
+                            tr
+                              th TIN No.
+                              td.text-right #{borrower.profile.tin}
+                            if borrower.type == "Non-Member"
+                              tr
+                                th Nationality
+                                td.text-right #{borrower.profile.nationality}
+                              tr
+                                th No. of dependents
+                                td.text-right #{borrower.profile.dependents}
+                            tr
+                              th Home Phone No.
+                              td.text-right #{borrower.profile.homePhoneNum}
+                            tr
+                              th Permanent Address
+                              - let permanent = (borrower.profile.address && borrower.profile.address.permanent) ? borrower.profile.address.permanent.unitNo + ' ' + borrower.profile.address.permanent.houseNo + ' ' + borrower.profile.address.permanent.street + ' ' + borrower.profile.address.permanent.subdivision + ' ' + borrower.profile.address.permanent.barangay + ' ' + borrower.profile.address.permanent.city + ' ' + borrower.profile.address.permanent.province + ' ' + borrower.profile.address.permanent.zipCode: '';
+                              td.text-right #{permanent}
+                #financial.tab-pane.fade(role='tabpanel' aria-labelledby='financial-pill') 
+                  .row
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Company Name
+                              - let companyName = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.companyName : "";
+                              td.text-right #{companyName}
+                            tr
+                              th Office Phone No.
+                              - let officePhone = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.officePhone : "";
+                              td.text-right #{officePhone}
+                            tr
+                              th Employment Status
+                              - let employmentType = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.employmentType : "";
+                              td.text-right #{employmentType}
+                            if borrower.type == "Member" 
+                              tr
+                                th Employee ID No.
+                                td.text-right #{borrower.employeeID}
+                            if borrower.type == "Non-Member"
+                              tr
+                                th Occupation Type
+                                - let occupationType = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.occupationType : "";
+                                td.text-right #{occupationType}
+                              tr
+                                th Monthly Income
+                                - let monthlyIncome = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.monthlyIncome : "";
+                                td.text-right #{monthlyIncome}
+                            tr
+                              th GCash Account Name
+                              - let acctName = (borrower.account) ? borrower.account.name : "";
+                              td.text-right #{acctName}
+                    .col-lg-6
+                      .table-responsive.table-hover
+                        table.table.mb-0
+                          tbody
+                            tr
+                              th Company Address
+                              - let officeAddress = (borrower.workBusinessInfo && borrower.workBusinessInfo.officeAddress) ? borrower.workBusinessInfo.officeAddress.unitNo + ' ' + borrower.workBusinessInfo.officeAddress.houseNo + ' ' + borrower.workBusinessInfo.officeAddress.street + ' ' + borrower.workBusinessInfo.officeAddress.subdivision + ' ' + borrower.workBusinessInfo.officeAddress.barangay + ' ' + borrower.workBusinessInfo.officeAddress.city + ' ' + borrower.workBusinessInfo.officeAddress.province + ' ' +  borrower.workBusinessInfo.officeAddress.zipCode: "";
+                              td.text-right #{officeAddress}
+                            tr
+                              th Department
+                              - let department = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.department : "";
+                              td.text-right #{department}
+                            tr
+                              th Position
+                              - let position = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.position : "";
+                              td.text-right #{position}
+                            
+                            if borrower.type == "Non-Member"
+                              tr
+                                th Business
+                                - let businessType = (borrower.workBusinessInfo) ? borrower.workBusinessInfo.businessType : "";
+                                td.text-right #{businessType}
+                            tr
+                              th Date Hired
+                              - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                              - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                              - let d = (new Date(borrower.workBusinessInfo.dateHired)).toString().split(' ');
+                              - let dateFormat = (borrower.workBusinessInfo && borrower.workBusinessInfo.dateHired) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : '';
+                              td.text-right #{dateFormat}
+                            tr
+                              th Account No.
+                              - let acctNum = (borrower.account) ? borrower.account.number : "";
+                              td.text-right #{acctNum}
+                if borrower.type == "Member"
+                  #beneficiaries.tab-pane.fade(role='tabpanel' aria-labelledby='beneficiaries-pill') 
+                    .table-responsive
+                      table.table.table-hover.mb-0
+                        thead
+                          tr
+                            th Full Name 
+                            th Date of Birth
+                            th Relationship
+                        tfoot
+                          tr
+                            th Full Name 
+                            th Date of Birth
+                            th Relationship
+                        tbody 
+                          for x in borrower.beneficiaries
+                            tr
+                              td #{x.fullName}
+                              - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                              - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                              - let d = (new Date(x.dateOfBirth)).toString().split(' ');
+                              - let dateFormat = month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3];
+                              td #{dateFormat}
+                              td #{x.relationship}
+                if borrower.type == "Non-Member"
+                  #documents.tab-pane.fade(role='tabpanel' aria-labelledby='documents-pill')  
+                    .table-responsive
+                      table.table.table-hover.mb-0
+                        thead
+                          tr
+                            th Name
+                            th File
+                            th Uploaded
+                        tfoot
+                          tr
+                            th Name
+                            th File
+                            th Uploaded
+                        tbody
+                          - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                          if (borrower.documents && borrower.documents.primaryIdFront)
+                            tr
+                              td Government ID Card Front 
+                              td 
+                                a(href='/download/' + borrower.documents.primaryIdFront.filename + '/' + borrower.documents.primaryIdFront.originalname) #{borrower.documents.primaryIdFront.originalname}
+                              - let paramDate = new Date(borrower.documents.primaryIdFront.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.primaryIdBack)
+                            tr
+                              td Government ID Card Front 
+                              td 
+                                a(href='/download/' + borrower.documents.primaryIdBack.filename + '/' + borrower.documents.primaryIdBack.originalname) #{borrower.documents.primaryIdBack.originalname}
+                              - let paramDate = new Date(borrower.documents.primaryIdBack.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.companyIdFront)
+                            tr
+                              td Company ID Card Front 
+                              td 
+                                a(href='/download/' + borrower.documents.companyIdFront.filename + '/' + borrower.documents.companyIdFront.originalname) #{borrower.documents.companyIdFront.originalname}
+                              - let paramDate = new Date(borrower.documents.companyIdFront.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.companyIdBack)
+                            tr
+                              td Company ID Card Back 
+                              td 
+                                a(href='/download/' + borrower.documents.companyIdBack.filename + '/' + borrower.documents.companyIdBack.originalname) #{borrower.documents.companyIdBack.originalname}
+                              - let paramDate = new Date(borrower.documents.companyIdBack.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.coe)
+                            tr
+                              td Certificate of Employment 
+                              td 
+                                a(href='/download/' + borrower.documents.coe.filename + '/' + borrower.documents.coe.originalname) #{borrower.documents.coe.originalname}
+                              - let paramDate = new Date(borrower.documents.coe.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.payslip1)
+                            tr
+                              td Payslip 1
+                              td 
+                                a(href='/download/' + borrower.documents.payslip1.filename + '/' + borrower.documents.payslip1.originalname) #{borrower.documents.payslip1.originalname}
+                              - let paramDate = new Date(borrower.documents.payslip1.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.payslip2)
+                            tr
+                              td Payslip 2
+                              td 
+                                a(href='/download/' + borrower.documents.payslip2.filename + '/' + borrower.documents.payslip2.originalname) #{borrower.documents.payslip2.originalname}
+                              - let paramDate = new Date(borrower.documents.payslip2.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.bir)
+                            tr
+                              td BIR 2316
+                              td 
+                                a(href='/download/' + borrower.documents.bir.filename + '/' + borrower.documents.bir.originalname) #{borrower.documents.bir.originalname}
+                              - let paramDate = new Date(borrower.documents.bir.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.tinProof)
+                            tr
+                              td TIN proof
+                              td 
+                                a(href='/download/' + borrower.documents.tinProof.filename + '/' + borrower.documents.tinProof.originalname) #{borrower.documents.tinProof.originalname}
+                              - let paramDate = new Date(borrower.documents.tinProof.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+                          if (borrower.documents && borrower.documents.selfiewithId)
+                            tr
+                              td Selfie with ID
+                              td 
+                                a(href='/download/' + borrower.documents.selfiewithId.filename + '/' + borrower.documents.selfiewithId.originalname) #{borrower.documents.selfiewithId.originalname}
+                              - let paramDate = new Date(borrower.documents.selfiewithId.uploaded);
+                              - let date = paramDate.toString().split(' ');
+                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              td #{newDate}
+    include ../partials/page-footer
