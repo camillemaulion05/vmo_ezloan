@@ -48,7 +48,11 @@ const userSchema = mongoose.Schema({
         },
         answer: String //encrypted
     }],
-    picture: String
+    picture: {
+        originalname: String,
+        filename: String,
+        contentType: String
+    }
 }, {
     timestamps: true
 });

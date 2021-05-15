@@ -13,6 +13,8 @@ block content
               #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
                 .row.justify-content-center
                   .col-xxl-6.col-xl-8
+                    h3.text-primary Identity Documentation
+                    p *Limit of 5mb per file.  PDF, JPG, and PNG files only.
                     form(method='POST' enctype='multipart/form-data' action='/upload/documents')
                       input(type='hidden', name='_csrf', value=_csrf)
                       fieldset
@@ -24,18 +26,24 @@ block content
                         .form-row
                           .form-group.col-md-6.mb-md-0
                             .card
-                              img.card-img(src=(user.documents && user.documents.primaryIdFront) ? 'uploads/' + user.documents.primaryIdFront : 'img/group_a_front.jpg' alt='...')
+                              img.card-img(src='img/group_a_front.jpg' alt='...')
                           .form-group.col-md-6.mb-md-0
                             .card
-                              img.card-img(src=(user.documents && user.documents.primaryIdBack) ? 'uploads/' + user.documents.primaryIdBack : 'img/group_a_back.jpg' alt='...')
+                              img.card-img(src='img/group_a_back.jpg' alt='...')
                         .form-row
                           .form-group.col-md-6.mb-md-0
                             label.small.mb-1(for='') Front
+                            if (user.documents && user.documents.primaryIdFront)
+                              p 
+                                a(href='/download/' + user.documents.primaryIdFront.filename + '/' + user.documents.primaryIdFront.originalname) #{user.documents.primaryIdFront.originalname}
                             .custom-file
                               input#primaryIdFront.custom-file-input(type='file' name='primaryIdFront')
                               label.custom-file-label(for='primaryIdFront') Choose file
                           .form-group.col-md-6.mb-md-0
                             label.small.mb-1(for='') Back
+                            if (user.documents && user.documents.primaryIdBack)
+                              p
+                                a(href='/download/' + user.documents.primaryIdBack.filename + '/' + user.documents.primaryIdBack.originalname) #{user.documents.primaryIdBack.originalname}
                             .custom-file
                               input#primaryIdBack.custom-file-input(type='file' name='primaryIdBack')
                               label.custom-file-label(for='primaryIdBack') Choose file
@@ -58,25 +66,31 @@ block content
                               input#coeOption.form-check-input(type='radio' name='identity2Options' value='COE')
                               label.form-check-label(for='coeOption') COE
                         p
-                          | For Company ID, please upload FRONT and BACK side. If working under agency, provide Employee ID Issued by the Agency. For COE, issue date should be within 2 months. You may uokoad more than 1 file.
+                          | For Company ID, please upload FRONT and BACK side. If working under agency, provide Employee ID Issued by the Agency. For COE, issue date should be within 2 months. You may upload more than 1 file.
                           br
                           | Example:
                         .company-id
                           .form-row
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src=(user.documents && user.documents.companyIdFront) ? 'uploads/' + user.documents.companyIdFront : 'img/company_front.jpg' alt='...')
+                                img.card-img(src='img/company_front.jpg' alt='...')
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src=(user.documents && user.documents.companyIdBack) ? 'uploads/' + user.documents.companyIdBack : 'img/company_back.jpg' alt='...')
+                                img.card-img(src='img/company_back.jpg' alt='...')
                           .form-row
                             .form-group.col-md-6.mb-md-0
                               label.small.mb-1(for='') Company ID - Front
+                              if (user.documents && user.documents.companyIdFront)
+                                p
+                                  a(href='/download/' + user.documents.companyIdFront.filename + '/' + user.documents.companyIdFront.originalname) #{user.documents.companyIdFront.originalname}
                               .custom-file
                                 input#companyIdFront.custom-file-input(type='file' name='companyIdFront')
                                 label.custom-file-label(for='companyIdFront') Choose file
                             .form-group.col-md-6.mb-md-0
                               label.small.mb-1(for='') Company ID - Back
+                              if (user.documents && user.documents.companyIdBack)
+                                p
+                                  a(href='/download/' + user.documents.companyIdBack.filename + '/' + user.documents.companyIdBack.originalname) #{user.documents.companyIdBack.originalname}
                               .custom-file
                                 input#companyIdBack.custom-file-input(type='file' name='companyIdBack')
                                 label.custom-file-label(for='companyIdBack') Choose file
@@ -84,9 +98,12 @@ block content
                           .form-group.mb-md-0
                             .card
                               .text-center
-                                img.card-img(style='width: 25rem;' src=(user.documents && user.documents.coe) ? 'uploads/' + user.documents.coe : 'img/coe.jpg' alt='...')
+                                img.card-img(style='width: 25rem;' src='img/coe.jpg' alt='...')
                           .form-group.mb-md-0
                             label.small.mb-1(for='') Certificate of Employment
+                            if (user.documents && user.documents.coe)
+                              p
+                                a(href='/download/' + user.documents.coe.filename + '/' + user.documents.coe.originalname) #{user.documents.coe.originalname}
                             .custom-file
                               input#coe.custom-file-input(type='file' name='coe')
                               label.custom-file-label(for='coe') Choose file
@@ -116,18 +133,24 @@ block content
                           .form-row
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src=(user.documents && user.documents.payslip1) ? 'uploads/' + user.documents.payslip1 : 'img/payslip.png' alt='...')
+                                img.card-img(src='img/payslip.png' alt='...')
                             .form-group.col-md-6.mb-md-0
                               .card
-                                img.card-img(src=(user.documents && user.documents.payslip2) ? 'uploads/' + user.documents.payslip2 : 'img/payslip.png' alt='...')
+                                img.card-img(src='img/payslip.png' alt='...')
                           .form-row
                             .form-group.col-md-6.mb-md-0
                               label.small.mb-1(for='') Payslip File 1
+                              if (user.documents && user.documents.payslip1)
+                                p
+                                  a(href='/download/' + user.documents.payslip1.filename + '/' + user.documents.payslip1.originalname) #{user.documents.payslip1.originalname}
                               .custom-file
                                 input#payslip1.custom-file-input(type='file' name='payslip1')
                                 label.custom-file-label(for='payslip1') Choose file
                             .form-group.col-md-6.mb-md-0
                               label.small.mb-1(for='') Payslip File 2
+                              if (user.documents && user.documents.payslip2)
+                                p
+                                  a(href='/download/' + user.documents.payslip2.filename + '/' + user.documents.payslip2.originalname) #{user.documents.payslip2.originalname}
                               .custom-file
                                 input#payslip2.custom-file-input(type='file' name='payslip2')
                                 label.custom-file-label(for='payslip2') Choose file
@@ -135,9 +158,12 @@ block content
                           .form-group.mb-md-0
                             .card
                               .text-center
-                                img.card-img(style='width: 25rem;' src=(user.documents && user.documents.bir) ? 'uploads/' + user.documents.bir : 'img/bir_2316.png' alt='...')
+                                img.card-img(style='width: 25rem;' src='img/bir_2316.png' alt='...')
                           .form-group.mb-md-0
                             label.small.mb-1(for='') BIR 2316
+                            if (user.documents && user.documents.bir)
+                              p
+                                a(href='/download/' + user.documents.bir.filename + '/' + user.documents.bir.originalname) #{user.documents.bir.originalname}
                             .custom-file
                               input#bir.custom-file-input(type='file' name='bir')
                               label.custom-file-label(for='bir') Choose file
@@ -151,9 +177,12 @@ block content
                         .form-group.mb-md-0
                           .card
                             .text-center
-                              img.card-img(style='width: 25rem;' src=(user.documents && user.documents.tinProof) ? 'uploads/' + user.documents.tinProof : 'img/TIN.png' alt='...')
+                              img.card-img(style='width: 25rem;' src='img/TIN.png' alt='...')
                         .form-group.mb-md-0
                           label.small.mb-1(for='') TIN proof
+                          if (user.documents && user.documents.tinProof)
+                            p
+                              a(href='/download/' + user.documents.tinProof.filename + '/' + user.documents.tinProof.originalname) #{user.documents.tinProof.originalname}
                           .custom-file
                             input#tinProof.custom-file-input(type='file' name='tinProof')
                             label.custom-file-label(for='tinProof') Choose file
@@ -167,9 +196,12 @@ block content
                         .form-group.mb-md-0
                           .card
                             .text-center
-                              img.card-img(style='width: 25rem;' src=(user.documents && user.documents.selfiewithId) ? 'uploads/' + user.documents.selfiewithId : 'img/selfiewithId.png' alt='...')
+                              img.card-img(style='width: 25rem;' src='img/selfiewithId.png' alt='...')
                         .form-group.mb-md-0
                           label.small.mb-1(for='') Selfie with ID
+                          if (user.documents && user.documents.selfiewithId)
+                            p
+                              a(href='/download/' + user.documents.selfiewithId.filename + '/' + user.documents.selfiewithId.originalname) #{user.documents.selfiewithId.originalname}
                           .custom-file
                             input#selfiewithId.custom-file-input(type='file' name='selfiewithId')
                             label.custom-file-label(for='selfiewithId') Choose file

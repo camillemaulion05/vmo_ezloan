@@ -5,7 +5,6 @@ const ctrlHome = require('../controllers/home');
 const ctrlUsers = require('../controllers/users');
 const ctrlAccount = require('../controllers/account');
 const passportConfig = require('../config/passport');
-const multerConfig = require('../config/multer');
 
 router
     .route('/')
@@ -44,9 +43,7 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getProfile)
     .post(passportConfig.isAuthenticated, ctrlAccount.postProfile);
 
-router.post('/upload/pic', passportConfig.isAuthenticated, multerConfig.upload.single('profilePic'), lusca({
-    csrf: true
-}), ctrlAccount.postProfilePic);
+router.post('/upload/pic', passportConfig.isAuthenticated, ctrlAccount.postProfilePic);
 
 router.post('/verifyMobileNum', passportConfig.isAuthenticated, ctrlAccount.postVerifyMobileNum);
 router.get('/verifyEmail', passportConfig.isAuthenticated, ctrlAccount.getVerifyEmail);
@@ -63,6 +60,7 @@ router.get('/verifications', passportConfig.isAuthenticated, ctrlAccount.getVeri
 router.get('/verifications/submit', passportConfig.isAuthenticated, ctrlAccount.getVerificationsSubmit);
 router.get('/verifications/cancel', passportConfig.isAuthenticated, ctrlAccount.getVerificationsCancel);
 router.get('/download/borrower/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowerInfo);
+router.get('/download/:filename/:originalname', passportConfig.isAuthenticated, ctrlAccount.getDownloadFiles);
 
 router
     .route('/personal')
@@ -80,39 +78,7 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsFinancial);
 
 router.get('/documents', passportConfig.isAuthenticated, ctrlAccount.getVerificationsDocuments);
-router.post('/upload/documents', passportConfig.isAuthenticated, multerConfig.upload.fields([{
-    name: 'primaryIdFront',
-    maxCount: 1
-}, {
-    name: 'primaryIdBack',
-    maxCount: 1
-}, {
-    name: 'companyIdFront',
-    maxCount: 1
-}, {
-    name: 'companyIdBack',
-    maxCount: 1
-}, {
-    name: 'coe',
-    maxCount: 1
-}, {
-    name: 'payslip1',
-    maxCount: 1
-}, {
-    name: 'payslip2',
-    maxCount: 1
-}, {
-    name: 'bir',
-    maxCount: 1
-}, {
-    name: 'tinProof',
-    maxCount: 1
-}, {
-    name: 'selfiewithId',
-    maxCount: 1
-}]), lusca({
-    csrf: true
-}), ctrlAccount.postVerificationsDocuments);
+router.post('/upload/documents', passportConfig.isAuthenticated, ctrlAccount.postVerificationsDocuments);
 
 router
     .route('/declaration')

@@ -1,8 +1,11 @@
+const multerConfig = require('../config/multer');
 const validator = require('validator');
 const CryptoJS = require("crypto-js");
 const request = require('request');
 const PdfPrinter = require('pdfmake');
 const generator = require('generate-password');
+const uploadFolder = __basedir + '/uploads/';
+
 const apiOptions = {
     server: process.env.BASE_URL
 };
@@ -216,48 +219,61 @@ const postProfile = (req, res) => {
 };
 
 const postProfilePic = (req, res) => {
-    const validationErrors = [];
-    if (validator.isEmpty(req.file.filename)) validationErrors.push({
-        msg: 'Profile picture cannot be blank.'
-    });
-    if (validationErrors.length) {
-        req.flash('errors', validationErrors);
-        return res.redirect('back');
-    }
-    path = '/api/users/' + req.user.id;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'PUT',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {
-            picture: req.file.filename
+    const upload = multerConfig.uploadImage.single('profilePic');
+    upload(req, res, (err) => {
+        if (err) {
+            req.flash('errors', {
+                msg: "File format should be JPG, JPEG, PNG and size should be no larger than 1 MB."
+            });
+            return res.redirect('back');
         }
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, user) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when updating your profile picture. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Profile picture has been updated.'
-                });
-                return res.redirect('back');
-            } else {
-                req.flash('errors', {
-                    msg: user.message
-                });
-                return res.redirect('back');
+        const validationErrors = [];
+        if (validator.isEmpty(req.file.filename)) validationErrors.push({
+            msg: 'Profile picture cannot be blank.'
+        });
+        if (validationErrors.length) {
+            req.flash('errors', validationErrors);
+            return res.redirect('back');
+        }
+        path = '/api/users/' + req.user.id;
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {
+                picture: {
+                    originalname: req.file.originalname,
+                    filename: req.file.filename,
+                    contentType: req.file.mimetype
+                }
             }
-        }
-    );
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, user) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when updating your profile picture. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    req.flash('success', {
+                        msg: 'Profile picture has been updated.'
+                    });
+                    return res.redirect('back');
+                } else {
+                    req.flash('errors', {
+                        msg: user.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    });
 };
 
 const postVerifyMobileNum = (req, res) => {
@@ -1628,8 +1644,8 @@ const getDownloadBorrowerInfo = (req, res) => {
                                 border: [true, false, true, false],
                                 colSpan: 2
                             }, {}],
-                            [(user.documents && user.documents.primaryIdFront) ? {
-                                    image: __basedir + '/uploads/' + user.documents.primaryIdFront,
+                            [(user.documents && user.documents.primaryIdFront && (user.documents.primaryIdFront.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.primaryIdFront.filename,
                                     width: 240,
                                     border: [true, false, false, false],
                                     alignment: 'center'
@@ -1637,8 +1653,8 @@ const getDownloadBorrowerInfo = (req, res) => {
                                     text: '',
                                     border: [true, false, false, false],
                                 },
-                                (user.documents && user.documents.primaryIdBack) ? {
-                                    image: __basedir + '/uploads/' + user.documents.primaryIdBack,
+                                (user.documents && user.documents.primaryIdBack && (user.documents.primaryIdBack.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.primaryIdBack.filename,
                                     width: 240,
                                     border: [false, false, true, false],
                                     alignment: 'center'
@@ -1653,17 +1669,25 @@ const getDownloadBorrowerInfo = (req, res) => {
                                 border: [true, false, true, false],
                                 colSpan: 2
                             }, {}],
-                            [(user.documents && (user.documents.companyIdFront || user.documents.coe)) ? {
-                                    image: (user.documents.coe) ? __basedir + '/uploads/' + user.documents.coe : __basedir + '/uploads/' + user.documents.companyIdFront,
+                            [(user.documents && (user.documents.companyIdFront || user.documents.coe)) ?
+                                (user.documents.coe && (user.documents.coe.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.coe.filename,
+                                    width: 240,
+                                    border: [true, false, false, false],
+                                    alignment: 'center'
+                                } : (user.documents.companyIdFront && (user.documents.companyIdFront.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.companyIdFront.filename,
                                     width: 240,
                                     border: [true, false, false, false],
                                     alignment: 'center'
                                 } : {
                                     text: '',
                                     border: [true, false, false, false],
-                                },
-                                (user.documents && user.documents.companyIdBack) ? {
-                                    image: __basedir + '/uploads/' + user.documents.companyIdBack,
+                                } : {
+                                    text: '',
+                                    border: [true, false, false, false],
+                                }, (user.documents && user.documents.companyIdBack && (user.documents.companyIdBack.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.companyIdBack.filename,
                                     width: 240,
                                     border: [false, false, true, false],
                                     alignment: 'center'
@@ -1678,31 +1702,41 @@ const getDownloadBorrowerInfo = (req, res) => {
                                 border: [true, false, true, false],
                                 colSpan: 2
                             }, {}],
-                            [(user.documents && (user.documents.payslip1 || user.documents.bir)) ? {
-                                image: (user.documents.bir) ? __basedir + '/uploads/' + user.documents.bir : __basedir + '/uploads/' + user.documents.payslip1,
-                                width: 250,
-                                border: [true, false, false, false],
-                                alignment: 'center'
-                            } : {
-                                text: '',
-                                border: [true, false, false, false],
-                            }, (user.documents && user.documents.payslip2) ? {
-                                image: __basedir + '/uploads/' + user.documents.payslip2,
-                                width: 250,
-                                border: [false, false, true, false],
-                                alignment: 'center'
-                            } : {
-                                text: '',
-                                border: [false, false, true, false]
-                            }],
+                            [(user.documents && (user.documents.payslip1 || user.documents.bir)) ?
+                                (user.documents.bir && (user.documents.bir.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.bir.filename,
+                                    width: 240,
+                                    border: [true, false, false, false],
+                                    alignment: 'center'
+                                } : (user.documents.payslip1 && (user.documents.payslip1.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.payslip1.filename,
+                                    width: 240,
+                                    border: [true, false, false, false],
+                                    alignment: 'center'
+                                } : {
+                                    text: '',
+                                    border: [true, false, false, false],
+                                } : {
+                                    text: '',
+                                    border: [true, false, false, false],
+                                }, (user.documents && user.documents.payslip2 && (user.documents.payslip2.contentType).indexOf("image") != -1) ? {
+                                    image: uploadFolder + user.documents.payslip2.filename,
+                                    width: 250,
+                                    border: [false, false, true, false],
+                                    alignment: 'center'
+                                } : {
+                                    text: '',
+                                    border: [false, false, true, false]
+                                }
+                            ],
                             [{
                                 text: 'TIN PROOF',
                                 style: 'small',
                                 border: [true, false, true, false],
                                 colSpan: 2
                             }, {}],
-                            [(user.documents && user.documents.tinProof) ? {
-                                image: __basedir + '/uploads/' + user.documents.tinProof,
+                            [(user.documents && user.documents.tinProof && (user.documents.tinProof.contentType).indexOf("image") != -1) ? {
+                                image: uploadFolder + user.documents.tinProof.filename,
                                 width: 250,
                                 border: [true, false, true, false],
                                 alignment: 'center',
@@ -1718,8 +1752,8 @@ const getDownloadBorrowerInfo = (req, res) => {
                                 border: [true, false, true, false],
                                 colSpan: 2
                             }, {}],
-                            [(user.documents && user.documents.selfiewithId) ? {
-                                image: __basedir + '/uploads/' + user.documents.selfiewithId,
+                            [(user.documents && user.documents.selfiewithId && (user.documents.selfiewithId.contentType).indexOf("image") != -1) ? {
+                                image: uploadFolder + user.documents.selfiewithId.filename,
                                 width: 250,
                                 border: [true, false, true, false],
                                 alignment: 'center',
@@ -3148,6 +3182,12 @@ const getDownloadBorrowerInfo = (req, res) => {
     );
 };
 
+const getDownloadFiles = (req, res) => {
+    const filename = req.params.filename;
+    const originalname = req.params.originalname;
+    res.download(uploadFolder + filename, originalname);
+};
+
 const getVerificationsPersonal = (req, res) => {
     getUserDetails(req, res, 'account/personal', 'Account Management - Verifications - Personal Information');
 };
@@ -3370,51 +3410,130 @@ const getVerificationsDocuments = (req, res) => {
 };
 
 const postVerificationsDocuments = (req, res) => {
-    path = '/api/borrowers/users/' + req.user.id;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'PUT',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {
-            documents: {
-                primaryIdFront: (req.files.primaryIdFront) ? req.files.primaryIdFront[0].filename : '',
-                primaryIdBack: (req.files.primaryIdBack) ? req.files.primaryIdBack[0].filename : '',
-                companyIdFront: (req.files.companyIdFront) ? req.files.companyIdFront[0].filename : '',
-                companyIdBack: (req.files.companyIdBack) ? req.files.companyIdBack[0].filename : '',
-                coe: (req.files.coe) ? req.files.coe[0].filename : '',
-                payslip1: (req.files.payslip1) ? req.files.payslip1[0].filename : '',
-                payslip2: (req.files.payslip2) ? req.files.payslip2[0].filename : '',
-                bir: (req.files.bir) ? req.files.bir[0].filename : '',
-                tinProof: (req.files.tinProof) ? req.files.tinProof[0].filename : '',
-                selfiewithId: (req.files.selfiewithId) ? req.files.selfiewithId[0].filename : ''
-            }
+    const upload = multerConfig.uploadFiles.fields([{
+        name: 'primaryIdFront',
+        maxCount: 1
+    }, {
+        name: 'primaryIdBack',
+        maxCount: 1
+    }, {
+        name: 'companyIdFront',
+        maxCount: 1
+    }, {
+        name: 'companyIdBack',
+        maxCount: 1
+    }, {
+        name: 'coe',
+        maxCount: 1
+    }, {
+        name: 'payslip1',
+        maxCount: 1
+    }, {
+        name: 'payslip2',
+        maxCount: 1
+    }, {
+        name: 'bir',
+        maxCount: 1
+    }, {
+        name: 'tinProof',
+        maxCount: 1
+    }, {
+        name: 'selfiewithId',
+        maxCount: 1
+    }]);
+    upload(req, res, (err) => {
+        if (err) {
+            req.flash('errors', {
+                msg: "File format should be PDF, JPG, PNG and size should be no larger than 5 MB."
+            });
+            return res.redirect('back');
         }
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, user) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when updating your documents. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Documents have been updated.'
-                });
-                return res.redirect('back');
-            } else {
-                req.flash('errors', {
-                    msg: user.message
-                });
-                return res.redirect('back');
+        path = '/api/borrowers/users/' + req.user.id;
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {
+                documents: {
+                    primaryIdFront: (req.files.primaryIdFront) ? {
+                        originalname: req.files.primaryIdFront[0].originalname,
+                        filename: req.files.primaryIdFront[0].filename,
+                        contentType: req.files.primaryIdFront[0].mimetype
+                    } : '',
+                    primaryIdBack: (req.files.primaryIdBack) ? {
+                        originalname: req.files.primaryIdBack[0].originalname,
+                        filename: req.files.primaryIdBack[0].filename,
+                        contentType: req.files.primaryIdBack[0].mimetype
+                    } : '',
+                    companyIdFront: (req.files.companyIdFront) ? {
+                        originalname: req.files.companyIdFront[0].originalname,
+                        filename: req.files.companyIdFront[0].filename,
+                        contentType: req.files.companyIdFront[0].mimetype
+                    } : '',
+                    companyIdBack: (req.files.companyIdBack) ? {
+                        originalname: req.files.companyIdBack[0].originalname,
+                        filename: req.files.companyIdBack[0].filename,
+                        contentType: req.files.companyIdBack[0].mimetype
+                    } : '',
+                    coe: (req.files.coe) ? {
+                        originalname: req.files.coe[0].originalname,
+                        filename: req.files.coe[0].filename,
+                        contentType: req.files.coe[0].mimetype
+                    } : '',
+                    payslip1: (req.files.payslip1) ? {
+                        originalname: req.files.payslip1[0].originalname,
+                        filename: req.files.payslip1[0].filename,
+                        contentType: req.files.payslip1[0].mimetype
+                    } : '',
+                    payslip2: (req.files.payslip2) ? {
+                        originalname: req.files.payslip2[0].originalname,
+                        filename: req.files.payslip2[0].filename,
+                        contentType: req.files.payslip2[0].mimetype
+                    } : '',
+                    bir: (req.files.bir) ? {
+                        originalname: req.files.bir[0].originalname,
+                        filename: req.files.bir[0].filename,
+                        contentType: req.files.bir[0].mimetype
+                    } : '',
+                    tinProof: (req.files.tinProof) ? {
+                        originalname: req.files.tinProof[0].originalname,
+                        filename: req.files.tinProof[0].filename,
+                        contentType: req.files.tinProof[0].mimetype
+                    } : '',
+                    selfiewithId: (req.files.selfiewithId) ? {
+                        originalname: req.files.selfiewithId[0].originalname,
+                        filename: req.files.selfiewithId[0].filename,
+                        contentType: req.files.selfiewithId[0].mimetype
+                    } : ''
+                }
             }
-        }
-    );
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, user) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when updating your documents. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    req.flash('success', {
+                        msg: 'Documents have been updated.'
+                    });
+                    return res.redirect('back');
+                } else {
+                    req.flash('errors', {
+                        msg: user.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    });
 };
 
 const getVerificationsDeclaration = (req, res) => {
@@ -6777,6 +6896,7 @@ module.exports = {
     getVerificationsCancel,
     getVerificationsSubmit,
     getDownloadBorrowerInfo,
+    getDownloadFiles,
     getVerificationsPersonal,
     postVerificationsPersonal,
     getVerificationsAddress,

@@ -155,20 +155,62 @@ const borrowerSchema = mongoose.Schema({
     },
     signature: String,
     documents: {
-        primaryIdFront: String,
-        primaryIdBack: String,
-        companyIdFront: String,
-        companyIdBack: String,
-        coe: String,
-        payslip1: String,
-        payslip2: String,
-        bir: String,
-        tinProof: String,
-        selfiewithId: String
+        primaryIdFront: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        primaryIdBack: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        companyIdFront: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        companyIdBack: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        coe: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        payslip1: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        payslip2: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        bir: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        tinProof: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        },
+        selfiewithId: {
+            originalname: String,
+            filename: String,
+            contentType: String
+        }
     },
     additionalDocuments: [{
         name: String,
-        filename: String
+        originalname: String,
+        filename: String,
+        contentType: String
     }],
     beneficiaries: [{
         fullName: String,

@@ -25,7 +25,11 @@ const transactionSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    proof: String,
+    proof: {
+        originalname: String,
+        filename: String,
+        contentType: String
+    },
     postedDate: Date,
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
