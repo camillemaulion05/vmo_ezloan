@@ -240,11 +240,87 @@ const withdrawalsListByUser = (req, res) => {
     }
 };
 
+const withdrawalsListByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Withdrawal
+            .aggregate([{
+                $match: {
+                    'requestedBy': mongoose.Types.ObjectId(borrowerid)
+                }
+            }])
+            .exec((err, withdrawals) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(withdrawals);
+                }
+            });
+    }
+};
+
+const withdrawalsDeleteManyByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Withdrawal
+            .deleteMany({
+                "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            })
+            .exec((err, withdrawals) => {
+                if (!withdrawals) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
+    }
+};
+
 module.exports = {
     withdrawalsList,
     withdrawalsCreate,
     withdrawalsReadOne,
     withdrawalsUpdateOne,
     withdrawalsDeleteOne,
-    withdrawalsListByUser
+    withdrawalsListByUser,
+    withdrawalsListByBorrower,
+    withdrawalsDeleteManyByBorrower
 };

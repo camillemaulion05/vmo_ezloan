@@ -226,6 +226,80 @@ const transactionsDeleteOne = (req, res) => {
     }
 };
 
+const transactionsListByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Transaction
+            .aggregate([{
+                $match: {
+                    'borrowerId': mongoose.Types.ObjectId(borrowerid)
+                }
+            }])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsDeleteManyByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Transaction
+            .deleteMany({
+                "borrowerId": mongoose.Types.ObjectId(borrowerid)
+            })
+            .exec((err, transactions) => {
+                if (!transactions) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Transaction not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
+    }
+};
+
 const transactionsListByType = (req, res) => {
     const {
         type
@@ -342,6 +416,119 @@ const transactionsListByLoans = (req, res) => {
                     res
                         .status(200)
                         .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsDeleteManyByLoans = (req, res) => {
+    const {
+        loanid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(loanid);
+    if (!loanid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid loanid."
+            });
+    } else {
+        Transaction
+            .deleteMany({
+                "loanId": mongoose.Types.ObjectId(loanid)
+            })
+            .exec((err, transactions) => {
+                if (!transactions) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
+    }
+};
+
+const transactionsListByWithdrawals = (req, res) => {
+    const {
+        withdrawalid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(withdrawalid);
+    if (!withdrawalid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid withdrawalid."
+            });
+    } else {
+        Transaction
+            .aggregate([{
+                $match: {
+                    'withdrawalId': mongoose.Types.ObjectId(withdrawalid)
+                }
+            }])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsDeleteManyByWithdrawals = (req, res) => {
+    const {
+        withdrawalid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(withdrawalid);
+    if (!withdrawalid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid withdrawalid."
+            });
+    } else {
+        Transaction
+            .deleteMany({
+                "withdrawalId": mongoose.Types.ObjectId(withdrawalid)
+            })
+            .exec((err, transactions) => {
+                if (!transactions) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
                 }
             });
     }
@@ -467,9 +654,14 @@ module.exports = {
     transactionsReadOne,
     transactionsUpdateOne,
     transactionsDeleteOne,
+    transactionsListByBorrower,
+    transactionsDeleteManyByBorrower,
     transactionsListByType,
     transactionsListByUser,
     transactionsListByLoans,
+    transactionsDeleteManyByLoans,
+    transactionsListByWithdrawals,
+    transactionsDeleteManyByWithdrawals,
     transactionsSummary,
     contributionsListByMember
 };

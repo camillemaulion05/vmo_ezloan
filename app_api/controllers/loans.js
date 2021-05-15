@@ -840,6 +840,45 @@ const loansListByBorrower = (req, res) => {
     }
 };
 
+const loansDeleteManyByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Loan
+            .deleteMany({
+                "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            })
+            .exec((err, loans) => {
+                if (!loans) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
+    }
+};
+
 module.exports = {
     loansList,
     loansCreate,
@@ -855,5 +894,6 @@ module.exports = {
     loansSummary,
     loansInterestReport,
     loansListByUser,
-    loansListByBorrower
+    loansListByBorrower,
+    loansDeleteManyByBorrower
 };

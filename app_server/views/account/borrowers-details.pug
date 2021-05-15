@@ -98,6 +98,10 @@ block content
                               th Present Address
                               - let present = (borrower.profile.address && borrower.profile.address.present) ? borrower.profile.address.present.unitNo + ' ' + borrower.profile.address.present.houseNo + ' ' + borrower.profile.address.present.street + ' ' + borrower.profile.address.present.subdivision + ' ' + borrower.profile.address.present.barangay + ' ' + borrower.profile.address.present.city + ' ' + borrower.profile.address.present.province + ' ' + borrower.profile.address.present.zipCode : '';
                               td.text-right #{present}
+                            if borrower.type == "Member"
+                              tr
+                                th Name of Spouse
+                                td.text-right #{borrower.profile.nameOfSpouse}
                     .col-lg-6
                       .table-responsive.table-hover
                         table.table.mb-0
@@ -125,6 +129,10 @@ block content
                               th Permanent Address
                               - let permanent = (borrower.profile.address && borrower.profile.address.permanent) ? borrower.profile.address.permanent.unitNo + ' ' + borrower.profile.address.permanent.houseNo + ' ' + borrower.profile.address.permanent.street + ' ' + borrower.profile.address.permanent.subdivision + ' ' + borrower.profile.address.permanent.barangay + ' ' + borrower.profile.address.permanent.city + ' ' + borrower.profile.address.permanent.province + ' ' + borrower.profile.address.permanent.zipCode: '';
                               td.text-right #{permanent}
+                            if borrower.type == "Member"
+                              tr
+                                th Shares/Payday (Php)
+                                td.text-right #{borrower.sharesPerPayDay}
                 #financial.tab-pane.fade(role='tabpanel' aria-labelledby='financial-pill') 
                   .row
                     .col-lg-6

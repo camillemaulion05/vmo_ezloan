@@ -93,6 +93,11 @@ router
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteOne);
 
 router
+    .route('/transactions/borrowers/:borrowerid')
+    .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByBorrower)
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByBorrower);
+
+router
     .route('/transactions/type/:type')
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
 
@@ -102,7 +107,13 @@ router
 
 router
     .route('/transactions/loans/:loanid')
-    .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByLoans);
+    .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByLoans)
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByLoans);
+
+router
+    .route('/transactions/withdrawals/:withdrawalid')
+    .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByWithdrawals)
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByWithdrawals);
 
 router
     .route('/transactions/summary/:year')
@@ -127,6 +138,11 @@ router
 router
     .route('/withdrawals/users/:userid')
     .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsListByUser);
+
+router
+    .route('/withdrawals/borrowers/:borrowerid')
+    .get(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsListByBorrower)
+    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteManyByBorrower);
 
 // borrowers
 router
@@ -167,7 +183,8 @@ router
 
 router
     .route('/loans/borrowers/:borrowerid')
-    .get(auth, middleware.isAdmin, ctrlLoans.loansListByBorrower);
+    .get(auth, middleware.isAdmin, ctrlLoans.loansListByBorrower)
+    .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteManyByBorrower);
 
 router
     .route('/loans/:loanid/schedules')
