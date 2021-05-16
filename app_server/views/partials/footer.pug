@@ -214,12 +214,95 @@ else
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
           .modal-body
-            p Are you sure you want to delete transaction no.  
-              span#deleteTransactionNum 
-              | ? This action cannot be undone.
+            p#deleteTransactionMsg Are you sure you want to delete transaction no.? This action cannot be undone.
           .modal-footer
             button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
             a#deleteTransaction.btn.btn-primary(href='') Yes, delete it
+    #updateTransactionModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateTransactionModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#updateTransactionModalLabel.modal-title 
+              span#updateTitle Update 
+              span#updateTxnNum
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#updateTxn(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='type') Transaction Type
+                  input#type.form-control(type='text' name='type' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='amount') Amount
+                  input#amount.form-control(type='text' name='amount' disabled='')
+              .form-row.mb-2.notExpensesType
+                .col-md-6
+                  label.small.mb-1(for='borrowerName') Borrower Name
+                  input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='borrowerAcctNo') Borrower G-Cash No.
+                  .input-group.mb-1
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='postedBy') Assigned Loan Processor
+                  input#postedBy.form-control(type='text' name='postedBy' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='ProcessorAcctNo') Loan Processor G-Cash No.
+                  .input-group.mb-1
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#ProcessorAcctNo.form-control(type='text' name='ProcessorAcctNo' disabled='')
+              .form-row.mb-2.messageOnly
+                .col-md-12
+                  label.small.mb-1(for='message') Message
+                  textarea#message.form-control(name='message' disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='referenceNo') Reference No.
+                  input#referenceNo.form-control(type='text' name='referenceNo' disabled='')
+                .col-md-6 
+                  label.small.mb-1(for='status') Status
+                  select#status.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='') Status
+                     - let status = ["Processing", "Posted"]
+                    for x in status
+                      option(value=x) #{x}
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+    #addTransactionModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='TransactionModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addTransactionModalLabel.modal-title Add New Transaction
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addTransaction(method='POST' action='/transactions')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='txnPostedBy') Assigned Loan Processor
+                  select#txnPostedBy.form-control.selectpicker(type='text' name='postedBy')
+                    option(value='' selected='') Assigned Loan Processor
+                    for x in employees
+                      if (x.type == 'Loan Processor')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='referenceNo') Reference No.
+                  input#txnReferenceNo.form-control(type='text' name='referenceNo')
+              .form-row.mb-2
+                .col-md-12
+                  label.small.mb-1(for='message') Message
+                  textarea#txnMessage.form-control(name='message')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
 
   if title.indexOf("Manage Loans") != -1
     - let loanTerm = ["6", "12", "18", "24", "30", "36", "42", "48", "54", "60"]

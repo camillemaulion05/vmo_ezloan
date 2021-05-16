@@ -165,6 +165,10 @@ router
     .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOneByUser)
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOneByUser);
 
+router
+    .route('/borrowers/type/:type')
+    .get(auth, middleware.isModerator, ctrlBorrowers.borrowersListByType);
+
 // loans
 router
     .route('/loans')

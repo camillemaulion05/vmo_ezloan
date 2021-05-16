@@ -21,7 +21,7 @@ block content
                       th Name
                       th Email Address
                       th Messages
-                      th Response
+                      th Status
                       th Actions
                   tfoot
                     tr
@@ -29,7 +29,7 @@ block content
                       th Name
                       th Email Address
                       th Messages
-                      th Response
+                      th Status
                       th Actions
                   tbody
                     for x in inquiries
@@ -38,13 +38,13 @@ block content
                         td #{x.firstName} #{x.lastName}         
                         td #{x.email}
                         td #{x.message}
-                        if (x.response.message)
-                          td #{x.response.message}
+                        if x.response && x.response.message
+                          td Message sent
                         else 
-                          td
+                          td Pending
                         td 
                           a.updateInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.firstName+'/'+x.lastName) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
-                          a.deleteInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.firstName+'/'+x.lastName) data-toggle='modal' data-target='#')
+                          a.deleteInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-trash
     include ../partials/page-footer

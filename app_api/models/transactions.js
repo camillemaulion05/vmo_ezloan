@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 const transactionSchema = mongoose.Schema({
     transactionNum: String, // Date.now();
     amount: {
+        // Repayments (+)
+        // Release (-)
+        // Withdrawals (-)
+        // Contributions (+)
+        // Fees (+) Membership Fee
+        // Expenses (-)
         type: String,
         required: true
     },

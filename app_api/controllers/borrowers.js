@@ -8,6 +8,12 @@ const CryptoJS = require("crypto-js");
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
+function validBorrowerType(type) {
+    if (type == "Member") return true;
+    if (type == "Non-Member") return true;
+    return false;
+}
+
 const borrowersList = (req, res) => {
     Borrower
         .find()
@@ -609,6 +615,39 @@ const borrowersUpdateOneByUser = (req, res) => {
     }
 };
 
+const borrowersListByType = (req, res) => {
+    const {
+        type
+    } = req.params;
+    const isValid = validBorrowerType(type);
+    if (!type || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid transaction type."
+            });
+    } else {
+        Borrower
+            .find({
+                "type": type
+            })
+            .exec((err, borrowers) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(borrowers);
+                }
+            });
+    }
+};
+
 module.exports = {
     borrowersList,
     borrowersCreate,
@@ -619,5 +658,6 @@ module.exports = {
     borrowersSetEmailToken,
     borrowersVerifyEmailToken,
     borrowersReadOneByUser,
-    borrowersUpdateOneByUser
+    borrowersUpdateOneByUser,
+    borrowersListByType
 };

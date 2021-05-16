@@ -5965,7 +5965,7 @@ const getDownloadReports = (req, res) => {
 };
 
 const getDeleteBorrowers = (req, res) => {
-    path = '/api/borrowers/' + req.params.borrowerid;
+    path = '/api/transactions/borrowers/' + req.params.borrowerid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'DELETE',
@@ -5978,14 +5978,14 @@ const getDeleteBorrowers = (req, res) => {
         requestOptions,
         (err, {
             statusCode
-        }, borrower) => {
+        }, transactions) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when deleting borrower account. Please try again later.'
+                    msg: 'There was an error when deleting transactions record. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
-                path = '/api/users/' + req.params.userid;
+                path = '/api/loans/borrowers/' + req.params.borrowerid;
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
                     method: 'DELETE',
@@ -5998,20 +5998,104 @@ const getDeleteBorrowers = (req, res) => {
                     requestOptions,
                     (err, {
                         statusCode
-                    }, user) => {
+                    }, loans) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error when deleting user account. Please try again later.'
+                                msg: 'There was an error when deleting loans record. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting user account."
-                            });
-                            return res.redirect('back');
+                            path = '/api/withdrawals/borrowers/' + req.params.borrowerid;
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'DELETE',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, withdrawals) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when deleting withdrawals record. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 204) {
+                                        path = '/api/borrowers/' + req.params.borrowerid;
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'DELETE',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrower) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when deleting borrower account. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 204) {
+                                                    path = '/api/users/' + req.params.userid;
+                                                    requestOptions = {
+                                                        url: `${apiOptions.server}${path}`,
+                                                        method: 'DELETE',
+                                                        headers: {
+                                                            Authorization: 'Bearer ' + req.user.token
+                                                        },
+                                                        json: {}
+                                                    };
+                                                    request(
+                                                        requestOptions,
+                                                        (err, {
+                                                            statusCode
+                                                        }, user) => {
+                                                            if (err) {
+                                                                req.flash('errors', {
+                                                                    msg: 'There was an error when deleting user account. Please try again later.'
+                                                                });
+                                                                return res.redirect('back');
+                                                            } else if (statusCode === 204) {
+                                                                req.flash('success', {
+                                                                    msg: "Successfully deleting all borrower records."
+                                                                });
+                                                                return res.redirect('back');
+                                                            } else {
+                                                                req.flash('errors', {
+                                                                    msg: user.message
+                                                                });
+                                                                return res.redirect('back');
+                                                            }
+                                                        }
+                                                    );
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrower.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: withdrawals.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
-                                msg: user.message
+                                msg: loans.message
                             });
                             return res.redirect('back');
                         }
@@ -6019,7 +6103,7 @@ const getDeleteBorrowers = (req, res) => {
                 );
             } else {
                 req.flash('errors', {
-                    msg: borrower.message
+                    msg: transactions.message
                 });
                 return res.redirect('back');
             }
@@ -6638,8 +6722,8 @@ const postLoans = (req, res) => {
     );
 };
 
-const getDeleteData = (req, res) => {
-    path = '/api/' + req.params.table + '/' + req.params.dataid;
+const getDeleteLoans = (req, res) => {
+    path = '/api/transactions/loans/' + req.params.loanid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'DELETE',
@@ -6652,20 +6736,48 @@ const getDeleteData = (req, res) => {
         requestOptions,
         (err, {
             statusCode
-        }, body) => {
+        }, transactions) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when deleting ' + req.params.table + '. Please try again later.'
+                    msg: 'There was an error when deleting transactions record. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
-                req.flash('success', {
-                    msg: "Successfully deleting " + req.params.table + "."
-                });
-                return res.redirect('back');
+                path = '/api/loans/' + req.params.loanid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, body) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when deleting loan application. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting loan application and all transactions."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: body.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
-                    msg: body.message
+                    msg: transactions.message
                 });
                 return res.redirect('back');
             }
@@ -6855,7 +6967,7 @@ const postUpdateLoans = (req, res) => {
                                 }
                                 let transaction = {};
                                 if (req.body.status == "Loan Release" || req.body.status == "Fully Paid") {
-                                    transaction.amount = (req.body.status == "Loan Release") ? loan.newProceedsAmount : ROUND(parseFloat(currentDue.principalBalance) + parseFloat(currentDue.interestBalance));
+                                    transaction.amount = (req.body.status == "Loan Release") ? '-' + loan.newProceedsAmount : ROUND(parseFloat(currentDue.principalBalance) + parseFloat(currentDue.interestBalance));
                                     transaction.type = (req.body.status == "Loan Release") ? "Release" : "Repayments";
                                     transaction.receiverNum = (req.body.status == "Loan Release") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
                                     transaction.senderNum = (req.body.status == "Fully Paid") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
@@ -7284,7 +7396,293 @@ const getTransactions = (req, res) => {
 };
 
 const postTransactions = (req, res) => {
-    getUserDetails(req, res, 'account/index', 'Account Management');
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+        msg: 'Assigned Loan Processor cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+        msg: 'Reference No. cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/employees/' + req.body.postedBy;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, employee) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading employee information. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/borrowers/type/Member';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, borrowers) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of members. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            let result = [];
+                            borrowers.forEach(borrower => {
+                                if (parseFloat(borrower.sharesPerPayDay) > 0) {
+                                    path = '/api/transactions';
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'POST',
+                                        headers: {
+                                            Authorization: 'Bearer ' + req.user.token
+                                        },
+                                        json: {
+                                            amount: borrower.sharesPerPayDay,
+                                            type: "Contributions",
+                                            message: req.body.message,
+                                            senderNum: borrower.account.number,
+                                            receiverNum: employee.account.number,
+                                            postedBy: req.body.postedBy,
+                                            referenceNo: req.body.referenceNo,
+                                            borrowerId: borrower._id,
+                                            status: "Posted"
+                                        }
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, transaction) => {
+                                            if (err) {
+                                                console.log(err);
+                                            } else if (statusCode === 201) {
+                                                console.log(transaction.message);
+                                            } else {
+                                                console.log(transaction.message);
+                                            }
+                                        }
+                                    );
+                                }
+                            });
+                            req.flash('success', {
+                                msg: "Transactions has been added successfully."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: borrowers.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: employee.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getTransactionDetails = (req, res) => {
+    path = '/api/transactions/' + req.params.transactionid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transactions) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json('There was an error when loading transaction record. Please try again later.');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(transactions);
+            } else {
+                return res
+                    .status(404)
+                    .json(transactions.message);
+            }
+        }
+    );
+};
+
+const postUpdateTransactions = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.status)) validationErrors.push({
+        msg: 'Transaction status cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/transactions/' + req.params.transactionid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            status: req.body.status
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transaction) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating the transaction record. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/' + req.params.transactionid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, updatedTransaction) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading the transaction record. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            if (updatedTransaction.type == "Repayments" && updatedTransaction.status == "Posted") {
+                                path = '/api/loans/' + updatedTransaction.loanId + '/schedules';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'PUT',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        transactionDate: updatedTransaction.createdAt,
+                                        transactionAmount: updatedTransaction.amount
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, updatedLoan) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when adding new repayment. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            req.flash('success', {
+                                                msg: "Transaction has been updated successfully. New repayment has been added successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: updatedLoan.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                req.flash('success', {
+                                    msg: "Transaction has been updated successfully."
+                                });
+                                return res.redirect('back');
+                            }
+                        } else {
+                            req.flash('errors', {
+                                msg: updatedTransaction.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: transaction.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeleteTransactions = (req, res) => {
+    path = '/api/transactions/' + req.params.transactionid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transactions) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when deleting transaction record. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                req.flash('success', {
+                    msg: "Successfully deleting transaction record."
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: transactions.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
 };
 
 const getWithdrawals = (req, res) => {
@@ -7622,11 +8020,14 @@ module.exports = {
     getBorrowerDetails,
     getBorrowerLoans,
     getEmployeeDetails,
-    getDeleteData,
+    getDeleteLoans,
     postUpdateLoans,
     getLoanDetails,
     getTransactions,
     postTransactions,
+    getTransactionDetails,
+    postUpdateTransactions,
+    getDeleteTransactions,
     getWithdrawals,
     postWithdrawals,
     getEmployees,

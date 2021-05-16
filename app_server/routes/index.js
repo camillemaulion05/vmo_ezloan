@@ -110,7 +110,7 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getLoans)
     .post(passportConfig.isAuthenticated, ctrlAccount.postLoans);
 
-router.get('/delete/:dataid/:table', passportConfig.isAuthenticated, ctrlAccount.getDeleteData);
+router.get('/loans/:loanid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteLoans);
 
 router
     .route('/loans/:loanid')
@@ -125,6 +125,13 @@ router
     .route('/transactions')
     .get(passportConfig.isAuthenticated, ctrlAccount.getTransactions)
     .post(passportConfig.isAuthenticated, ctrlAccount.postTransactions);
+
+router
+    .route('/transactions/:transactionid')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getTransactionDetails)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateTransactions);
+
+router.get('/transactions/:transactionid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteTransactions);
 
 router
     .route('/withdrawals')

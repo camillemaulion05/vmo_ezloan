@@ -222,10 +222,75 @@ html
             $('#dataTable').on('click','.deleteTransaction',function () {
                 let path = ($(this).prop('href')).split('/');
                 let transactionNum = path[path.length-1];
-                let transactionid = path[path.length-2];
-                $('a#deleteTransaction').attr('href', '/delete/' + transactionid + '/transactions'); 
-                $('span#deleteTransactionNum').text(transactionNum);
+                if (path.length == 4) {
+                  $('#deleteTransactionModalLabel').text("Transaction No. " + transactionNum);
+                  $('#deleteTransactionMsg').text("Warning. You cannot delete this transaction.");
+                  $('a#deleteTransaction').hide();
+                } else {
+                  $('#deleteTransactionModalLabel').text("Delete Confirmation");
+                  $('#deleteTransactionMsg').text("Are you sure you want to delete transaction no. "+ transactionNum + "? This action cannot be undone.");
+                  let transactionid = path[path.length-2];
+                  $('a#deleteTransaction').attr('href', '/transactions/' + transactionid + '/delete'); 
+                  $('a#deleteTransaction').show();
+                }
                 $('#deleteTransactionModal').modal('show'); 
+            });
+            $('#dataTable').on('click','.updateTransaction',function () {
+                let path = ($(this).prop('href')).split('/');
+                let transactionid = path[path.length-1];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/transactions/" + transactionid,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                      $("span#updateTxnNum").text(data.transactionNum);
+                      $('input#type').val(data.type);
+                      $('input#amount').val(parseFloat(data.amount).toFixed(2));
+                      $('input#borrowerName').val(data.borrowerId.profile.firstName + ' ' + data.borrowerId.profile.lastName);
+                      $('input#postedBy').val(data.postedBy.profile.firstName + ' ' + data.postedBy.profile.lastName);
+                      $('textarea#message').val(data.message);
+                      if (data.type == "Release" || data.type == "Withdrawals") {
+                        $('input#borrowerAcctNo').val(data.receiverNum);
+                        $('input#ProcessorAcctNo').val(data.senderNum);
+                      } else {
+                        $('input#borrowerAcctNo').val(data.senderNum);
+                        $('input#ProcessorAcctNo').val(data.receiverNum);
+                      }
+                      if (data.type == "Expenses") {
+                        $('.notExpensesType').hide();
+                      } else{
+                        $('.notExpensesType').show();
+                      }
+                      if (data.message) {
+                        $('.messageOnly').show();
+                      } else {
+                        $('.messageOnly').hide();
+                      }
+                      $('input#referenceNo').val(data.referenceNo);
+                      $('select#status').val(data.status);
+                      if (data.status == "Posted") {
+                        $("select#status").prop('disabled', true);
+                        $("#updateTitle").text("Transaction No. ");
+                        $("#updateTxn .btn.btn-primary").hide();
+                      } else {
+                        $("select#status").prop('disabled', false);
+                        $("#updateTitle").text("Update ");
+                        $("#updateTxn .btn.btn-primary").show();
+                        $("#updateTxn").attr("action", "/transactions/" + transactionid);
+                      }
+                      $('#updateTransactionModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                      console.log(xhr.responseJSON.message);
+                    }
+                });
             });
           });
 
@@ -237,7 +302,7 @@ html
                 let borrowerName = (path[path.length-1]).replace(/%20/g," ");
                 let loanNum = path[path.length-2];
                 let loanid = path[path.length-3];
-                $('a#deleteLoan').attr('href', '/delete/' + loanid + '/loans'); 
+                $('a#deleteLoan').attr('href', '/loans/' + loanid + '/delete'); 
                 $('span#deleteLoanNum').text(loanNum);
                 $('span#deleteBorrowerName').text(borrowerName);
                 $('#deleteLoanModal').modal('show'); 

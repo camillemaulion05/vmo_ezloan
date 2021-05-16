@@ -12,7 +12,7 @@ block content
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary List of Transactions
               .dropdown.no-arrow
-                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addTransactionModal') Add New Transaction
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addTransactionModal') Add Contributions
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -50,7 +50,7 @@ block content
                         td #{x.senderNum}
                         td #{x.receiverNum}
                         - let date2 = (new Date(x.postedDate)).toString().split(' ');
-                        - let postedDate =  (x.postedDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                        - let postedDate =  (x.postedDate && x.status == "Posted") ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
                         td #{postedDate}
                         if x.status == "Processing"
                           td
@@ -59,9 +59,9 @@ block content
                           td
                             .badge.badge-success.badge-pill #{x.status}
                         td 
-                          - let referenceId = (x.type == 'Contributions' || x.type == 'Fees') ? x.borrowerId : (x.type == 'Repayments' || x.type == 'Release') ? loanId : withdrawalId;
-                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.transactionNum+'/'+x.type+'/'+x.amount+'/'+referenceId+'/'+x.senderNum+'/'+x.receiverNum+'/'+x.referenceNo+'/'+x.status+'/'+x.postedBy) data-toggle='modal' data-target='#')
+                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
-                          a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.transactionNum) data-toggle='modal' data-target='#')
+                          - let transactionId = (x.type == 'Contributions' || x.type == 'Expenses') ? '/'+x._id+'/'+x.transactionNum : '/'+x.transactionNum;
+                          a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=transactionId data-toggle='modal' data-target='#')
                             i.fas.fa-trash
     include ../partials/page-footer

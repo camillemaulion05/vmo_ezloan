@@ -31,7 +31,7 @@ function validTxnType(type) {
 const transactionsList = (req, res) => {
     Transaction
         .find()
-        .populate('borrowerId', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
+        .populate('borrowerId postedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
         .exec((err, transactions) => {
             if (err) {
                 console.log(err);
@@ -96,7 +96,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
+            .populate('borrowerId postedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
