@@ -124,12 +124,24 @@ html
                         $('input#sharesPerPayDay').val(data.borrower.sharesPerPayDay);
                         $('select#hrCertifiedBy').val(hrCertifiedBy);
                         $('select#employmentType').val(employmentType);
+                        $("#updateBorrower .btn.btn-primary").show();
+                        $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
+                        $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
                         if (data.borrower.type == 'Member') {
+                          $('select#type option[value="Member"]').show();
+                          $('select#type option[value="Non-Member"]').hide();
                           $('.membersOnly').removeClass('d-none');
                         } else{
+                          $('select#type option[value="Member"]').hide();
+                          $('select#type option[value="Non-Member"]').show();
+                          $('select#type option[value="Basic"]').hide();
                           $('.membersOnly').addClass('d-none');
                         }
                         if (data.borrower.status == 'Verified') {
+                          $('select#status option[value="Basic"]').hide();
+                          $('select#status option[value="Pending for Review"]').hide();
+                          $('select#status option[value="Declined"]').hide();
+                          $('select#status option[value="Verified"]').show();
                           $('.verifiedOnly').removeClass('d-none');
                           if (parseFloat(data.borrower.totalCreditLimit) > 0) {
                             $('.withCreditLimitOnly').removeClass('d-none');
@@ -142,12 +154,23 @@ html
                             $('.verifiedMemberOnly').addClass('d-none');
                           }
                         } else {
+                          $('select#status option[value="Basic"]').show();
+                          $('select#status option[value="Pending for Review"]').show();
+                          $('select#status option[value="Declined"]').show();
+                          $('select#status option[value="Verified"]').show();
+                          if (data.borrower.status == 'Pending for Review') {
+                            $('select#status option[value="Basic"]').hide();
+                          }
+                          if (data.borrower.status == 'Declined') {
+                            $('select#status option[value="Basic"]').hide();
+                            $('select#status option[value="Pending for Review"]').hide();
+                            $('select#status option[value="Verified"]').hide();
+                            $("#updateBorrower .btn.btn-primary").hide();
+                          }
                           $('.withCreditLimitOnly').addClass('d-none');
                           $('.verifiedOnly').addClass('d-none');
                           $('.verifiedMemberOnly').addClass('d-none');
                         }
-                        $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
-                        $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
                         $('#updateBorrowerModal').modal('show');
                     },
                     error: function (xhr, status, error) {
