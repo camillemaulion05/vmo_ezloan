@@ -191,7 +191,7 @@ router
 
 router
     .route('/loans/borrowers/:borrowerid')
-    .get(auth, middleware.isAdmin, ctrlLoans.loansListByBorrower)
+    .get(auth, middleware.isModerator, ctrlLoans.loansListByBorrower)
     .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteManyByBorrower);
 
 router

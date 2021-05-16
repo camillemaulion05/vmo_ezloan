@@ -8276,7 +8276,162 @@ const getEmployees = (req, res) => {
 };
 
 const postEmployees = (req, res) => {
-    getUserDetails(req, res, 'account/index', 'Account Management');
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.type)) validationErrors.push({
+        msg: 'Employee type cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+        msg: 'Employee ID cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.firstName)) validationErrors.push({
+        msg: 'First Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.lastName)) validationErrors.push({
+        msg: 'Last Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Birthday cannot be blank.'
+    });
+    if (!validator.isDate(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Enter a valid date.'
+    });
+    if (validator.isEmpty(req.body.gender)) validationErrors.push({
+        msg: 'Gender cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.mobileNum)) validationErrors.push({
+        msg: 'Mobile number cannot be blank.'
+    });
+    if (!validator.isEmail(req.body.email)) validationErrors.push({
+        msg: 'Please enter a valid email address.'
+    });
+    if (req.body.type == 'Loan Processor') {
+        if (validator.isEmpty(req.body.accountName)) validationErrors.push({
+            msg: 'G-Cash Account name cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
+            msg: 'G-Cash Account no. cannot be blank.'
+        });
+    }
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    req.body.email = validator.normalizeEmail(req.body.email, {
+        gmail_remove_dots: false
+    });
+    let username = usernameGen(req.body.firstName, req.body.lastName);
+    let password = passwordGen();
+    path = '/api/users';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            username: username,
+            password: CryptoJS.AES.encrypt(password, process.env.CRYPTOJS_CLIENT_SECRET).toString(),
+            type: (req.body.type == "Admin") ? "Admin" : "Employee"
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when creating user account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 201) {
+                path = '/api/employees';
+                if (req.body.type == 'Admin') path = '/api/admins';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + user.token
+                    },
+                    json: {
+                        type: req.body.type,
+                        profile: {
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            dateOfBirth: req.body.dateOfBirth,
+                            gender: req.body.gender,
+                            email: req.body.email,
+                            mobileNum: req.body.mobileNum,
+                            mobileNumVerified: true
+                        },
+                        employeeID: (req.body.employeeID) ? req.body.employeeID : '',
+                        sharesPerPayDay: (req.body.sharesPerPayDay) ? req.body.sharesPerPayDay : '0.00',
+                        account: {
+                            name: (req.body.accountName) ? req.body.accountName : '',
+                            number: (req.body.accountNum) ? req.body.accountNum : ''
+                        }
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, employee) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when creating employee account. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            path = '/api/sendMail';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                json: {
+                                    receiver: req.body.email,
+                                    subject: 'VMO EZ Loan Account',
+                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your 6 random alphanumeric.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, body) => {
+                                    if (err) {
+                                        req.flash('warnings', {
+                                            msg: 'There was an error when sending the password to respective email. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        req.flash('success', {
+                                            msg: 'Success! New Employee has been created and password has been sent to respective email.'
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: body.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: employee.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
 };
 
 const getInquiries = (req, res) => {
@@ -8348,6 +8503,132 @@ const postInquiries = (req, res) => {
     getUserDetails(req, res, 'account/index', 'Account Management');
 };
 
+const getDeleteEmployees = (req, res) => {
+    path = '/api/employees/' + req.params.employeeid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, employee) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when deleting employee account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                path = '/api/users/' + req.params.userid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, user) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when deleting user account. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting all employee records."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: user.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: employee.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeleteAdmins = (req, res) => {
+    path = '/api/admins/' + req.params.adminid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, admin) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when deleting admin account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                path = '/api/users/' + req.params.userid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, user) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when deleting user account. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting all admin records."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: user.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: admin.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -8406,5 +8687,7 @@ module.exports = {
     getEmployees,
     postEmployees,
     getInquiries,
-    postInquiries
+    postInquiries,
+    getDeleteEmployees,
+    getDeleteAdmins
 };

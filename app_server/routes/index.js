@@ -151,6 +151,9 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getEmployees)
     .post(passportConfig.isAuthenticated, ctrlAccount.postEmployees);
 
+router.get('/employees/:employeeid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteEmployees);
+router.get('/admins/:adminid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteAdmins);
+
 router
     .route('/inquiries')
     .get(passportConfig.isAuthenticated, ctrlAccount.getInquiries)

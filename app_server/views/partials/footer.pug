@@ -204,7 +204,85 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
-  
+
+  if title.indexOf("Manage Employees") != -1
+    - let type = ["Loan Officer", "Loan Processor", "HRD Authorized Officer", "Admin"]
+    #deleteEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteEmployeeModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteEmployeeModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete employee 
+              span#deleteEmployeeName
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteEmployee.btn.btn-primary(href='') Yes, delete it
+    #addEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addEmployeeModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addEmployeeModalLabel.modal-title Add Employee
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addEmployee(method='POST' action='/employees')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='type') Employee Type
+                  select#type.form-control.selectpicker(type='text' name='type')
+                    option(value='' selected='') Employee Type
+                    for x in type
+                      option(value=x) #{x}
+                .col-md-6 
+                  label.small.mb-1(for='employeeID') Employee ID
+                  input#employeeID.form-control(type='text' name='employeeID')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='firstName') First name
+                  input#firstName.form-control(type='text' name='firstName')
+                .col-md-6
+                  label.small.mb-1(for='lastName') Last name
+                  input#lastName.form-control(type='text' name='lastName')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='gender') Gender
+                  select#gender.form-control.selectpicker(type='text' name='gender')
+                    option(value='' selected='') Gender
+                    - let gender = ['Female', 'Male']
+                    for x in gender
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='dateOfBirth') Birthdate
+                  input#dateOfBirth.form-control(type='date' name='dateOfBirth')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='email') Email address
+                  input#email.form-control(type='email' name='email')
+                .col-md-6
+                  label.small.mb-1(for='mobileNum') Mobile Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#mobileNum.form-control(type='text' name='mobileNum' minlength='10' maxlength='10')
+              .form-row.mb-2.loanProcessorOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='accountName') G-Cash Account Name
+                  input#accountName.form-control(type='text' name='accountName')
+                .col-md-6
+                  label.small.mb-1(for='accountNum') G-Cash Account No.
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#accountNum.form-control(type='text' name='accountNum' minlength='10' maxlength='10')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+
   if title.indexOf("Manage Withdrawal Requests") != -1
     #addWithdrawalModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addWithdrawalModalLabel' aria-hidden='true')
       .modal-dialog(role='document')

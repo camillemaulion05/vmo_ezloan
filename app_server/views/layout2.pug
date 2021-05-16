@@ -243,6 +243,34 @@ html
               });
           });
     
+    if title.indexOf("Manage Employees") != -1
+      script.
+          $(function () {
+              $('select#type').change(function () {
+                if ($('select#type').val() == 'Loan Processor') {
+                  $('.loanProcessorOnly').removeClass('d-none');
+                } else{
+                  $('.loanProcessorOnly').addClass('d-none');
+                }
+              });
+              $('#dataTable').on('click','.deleteEmployee',function () {
+                let path = ($(this).prop('href')).split('/');
+                let type = (path[path.length-1]).replace(/%20/g," ");
+                let lastName = (path[path.length-2]).replace(/%20/g," ");
+                let firstName = (path[path.length-3]).replace(/%20/g," ");
+                let employeeid = path[path.length-4];
+                let userid = path[path.length-5];
+                if (type == "admin") {
+                  $('a#deleteEmployee').attr('href', '/admins/' + employeeid + '/' + userid + '/delete'); 
+                }
+                else{
+                  $('a#deleteEmployee').attr('href', '/employees/' + employeeid + '/' + userid + '/delete'); 
+                }
+                $('span#deleteEmployeeName').text(firstName + ' ' + lastName);
+                $('#deleteEmployeeModal').modal('show'); 
+              });
+          });
+
     if title.indexOf("Manage Withdrawal Requests") != -1
       script.
           $(function () {

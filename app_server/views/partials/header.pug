@@ -52,23 +52,27 @@ else
         a.nav-link(href='/credits')
           i.fas.fa-balance-scale
           span Loans
-    if user.userId.type == "Admin"
+    if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "Loan Processor")
       li.nav-item(class=(title.indexOf("Borrowers") != -1) ? 'active' : undefined)
         a.nav-link(href='/borrowers')
           i.fas.fa-user-friends
           span Borrowers
+    if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
       li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
         a.nav-link(href='/loans')
           i.fas.fa-balance-scale
           span Loans
+    if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Processor")
       li.nav-item(class=(title.indexOf("Transactions") != -1) ? 'active' : undefined)
         a.nav-link(href='/transactions')
           i.fas.fa-wallet
           span Transactions
+    if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
       li.nav-item(class=(title.indexOf("Withdrawals") != -1) ? 'active' : undefined)
         a.nav-link(href='/withdrawals')
           i.fas.fa-cash-register
           span Withdrawals
+    if user.userId.type == "Admin"
       li.nav-item(class=(title.indexOf("Employees") != -1) ? 'active' : undefined)
         a.nav-link(href='/employees')
           i.fas.fa-user-friends
@@ -77,6 +81,7 @@ else
         a.nav-link(href='/inquiries')
           i.fas.fa-comments
           span Inquiries
+    if user.userId.type == "Admin" || user.userId.type == "Employee" || user.userId.type == "Borrower"
     hr.sidebar-divider.d-none.d-md-block
     .text-center.d-none.d-md-inline
       button#sidebarToggle.rounded-circle.border-0

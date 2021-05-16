@@ -12,7 +12,7 @@ block content
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary List of Employees
               .dropdown.no-arrow
-                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addEmployeeModal') Add New Employee
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addEmployeeModal') Add Employee
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -38,41 +38,41 @@ block content
                       th Actions
                   tbody
                     for x in employees
-                      - let dob = new Date(x.profile.dateOfBirth)
-                      - let diff_ms = Date.now() - dob.getTime();
-                      - let age_dt = new Date(diff_ms); 
-                      - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
-                      tr
-                        td 
-                          a(href='/employees/'+x._id) #{x.employeeNum}
-                        td #{x.profile.firstName} #{x.profile.lastName}
-                        td #{age}          
-                        td #{x.profile.gender}          
-                        td #{x.type}          
-                        td #{x.profile.mobileNum}          
-                        td #{x.profile.email}
-                        td 
-                          a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
-                            i.fas.fa-edit
-                          a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
-                            i.fas.fa-trash
+                      if user._id != x._id
+                        - let dob = new Date(x.profile.dateOfBirth)
+                        - let diff_ms = Date.now() - dob.getTime();
+                        - let age_dt = new Date(diff_ms); 
+                        - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+                        tr
+                          td #{x.employeeNum}
+                          td #{x.profile.firstName} #{x.profile.lastName}
+                          td #{age}          
+                          td #{x.profile.gender}          
+                          td #{x.type}          
+                          td #{x.profile.mobileNum}          
+                          td #{x.profile.email}
+                          td 
+                            //- a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                            //-   i.fas.fa-edit
+                            a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/employee') data-toggle='modal' data-target='#')
+                              i.fas.fa-trash
                     for x in admins
-                      - let dob = new Date(x.profile.dateOfBirth)
-                      - let diff_ms = Date.now() - dob.getTime();
-                      - let age_dt = new Date(diff_ms); 
-                      - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
-                      tr
-                        td 
-                          a(href='/admins/'+x._id) #{x.adminNum}
-                        td #{x.profile.firstName} #{x.profile.lastName}
-                        td #{age}          
-                        td #{x.profile.gender}          
-                        td Admin         
-                        td #{x.profile.mobileNum}          
-                        td #{x.profile.email}
-                        td 
-                          a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
-                            i.fas.fa-edit
-                          a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
-                            i.fas.fa-trash
+                      if user._id != x._id
+                        - let dob = new Date(x.profile.dateOfBirth)
+                        - let diff_ms = Date.now() - dob.getTime();
+                        - let age_dt = new Date(diff_ms); 
+                        - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+                        tr
+                          td #{x.adminNum}
+                          td #{x.profile.firstName} #{x.profile.lastName}
+                          td #{age}          
+                          td #{x.profile.gender}          
+                          td Admin         
+                          td #{x.profile.mobileNum}          
+                          td #{x.profile.email}
+                          td 
+                            //- a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                            //-   i.fas.fa-edit
+                            a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/admin') data-toggle='modal' data-target='#')
+                              i.fas.fa-trash
     include ../partials/page-footer
