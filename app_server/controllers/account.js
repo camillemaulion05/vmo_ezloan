@@ -88,7 +88,6 @@ function getUserDetails(req, res, filename, title) {
                         (user.userId.security)[i].answer = bytes.toString(CryptoJS.enc.Utf8);
                     }
                 }
-                console.log(user);
                 res.render(filename, {
                     title: title,
                     user: user
