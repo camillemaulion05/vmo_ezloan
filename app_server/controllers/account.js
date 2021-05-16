@@ -7055,7 +7055,7 @@ const postUpdateLoans = (req, res) => {
                                         }
                                     );
                                 } else {
-                                    if (req.body.status == "Fully Paid" || req.body.status == "Loan Release") {
+                                    if (req.body.status == "Fully Paid") {
                                         addTransaction(transaction);
                                     } else {
                                         path = '/api/loans/' + req.params.loanid;
@@ -7081,10 +7081,14 @@ const postUpdateLoans = (req, res) => {
                                                     });
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
-                                                    req.flash('success', {
-                                                        msg: "Loan application has been updated successfully."
-                                                    });
-                                                    return res.redirect('back');
+                                                    if (req.body.status == "Loan Release") {
+                                                        addTransaction(transaction);
+                                                    } else {
+                                                        req.flash('success', {
+                                                            msg: "Loan application has been updated successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
                                                 } else {
                                                     req.flash('errors', {
                                                         msg: updatedLoan.message
