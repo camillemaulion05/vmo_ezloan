@@ -13,7 +13,7 @@ block content
               .card.mb-4
                 .card-header Profile Picture
                 .card-body.text-center
-                  img.img-account-profile.rounded-circle.mb-2(src=(user.userId.picture.filename) ? '/uploads/' + user.userId.picture.filename  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
+                  img.img-account-profile.rounded-circle.mb-2(src=(user.userId.picture && user.userId.picture.filename) ? '/uploads/' + user.userId.picture.filename  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
                   .small.font-italic.text-muted.mb-4 JPG or PNG no larger than 1 MB
                   span.btn.btn-primary.btn-file
                     | Upload new image

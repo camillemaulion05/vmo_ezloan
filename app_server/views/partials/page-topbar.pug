@@ -5,7 +5,7 @@ nav.navbar.navbar-expand.bg-gradient-primary.topbar.navbar-dark.static-top.shado
     li.nav-item.dropdown.no-arrow
       a.nav-link.dropdown-toggle(href='/profile')
         span.mr-2.small #{user.userId.username}
-        img.img-profile.rounded-circle(src=(user.userId.picture.filename) ? '/uploads/' + user.userId.picture.filename  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
+        img.img-profile.rounded-circle(src=(user.userId.picture && user.userId.picture.filename) ? '/uploads/' + user.userId.picture.filename  : (user.profile.gender == "Female") ? '/uploads/profile-1.png' : '/uploads/profile-2.png')
     .topbar-divider.d-none.d-sm-block
     li.nav-item.dropdown.no-arrow
       a.nav-link.dropdown-toggle(href='#' data-toggle='modal' data-target='#logoutModal')
