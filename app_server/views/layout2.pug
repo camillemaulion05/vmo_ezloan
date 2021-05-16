@@ -460,7 +460,6 @@ html
                       $('.fullyPaidOnly').addClass('d-none');
                       if (data.loan.status == 'Processing') {
                         $('select#purposeOfLoan').prop('disabled', false);
-                        $('input#loanAmount').prop('disabled', false);
                         $('.processingOnly').removeClass('d-none');
                         $('select#status').prop('disabled', false);
                         $('select#reviewedBy').prop('disabled', false);
@@ -473,7 +472,6 @@ html
                         $('select#status option[value="Loan Debt"]').hide(); 
                       } else{
                         $('select#purposeOfLoan').prop('disabled', true);
-                        $('input#loanAmount').prop('disabled', true);
                         $('.processingOnly').addClass('d-none');
                         $('select#status').prop('disabled', false);
                         $('select#reviewedBy').prop('disabled', true);

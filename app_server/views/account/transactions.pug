@@ -22,10 +22,10 @@ block content
                       th Payment Date
                       th Payment Amount
                       th Type
+                      th GCash Ref No.
                       th Sender Number
                       th Receiver Number 
                       th Posted Date
-                      th Status
                       th Actions
                   tfoot
                     tr
@@ -33,10 +33,10 @@ block content
                       th Payment Date
                       th Payment Amount
                       th Type
+                      th GCash Ref No.
                       th Sender Number
                       th Receiver Number 
                       th Posted Date
-                      th Status
                       th Actions
                   tbody
                     for x in transactions
@@ -47,17 +47,12 @@ block content
                         td #{createdAt}
                         td #{(parseFloat(x.amount)).toFixed(2)}
                         td #{x.type} 
+                        td #{x.referenceNo} 
                         td #{x.senderNum}
                         td #{x.receiverNum}
                         - let date2 = (new Date(x.postedDate)).toString().split(' ');
                         - let postedDate =  (x.postedDate && x.status == "Posted") ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
                         td #{postedDate}
-                        if x.status == "Processing"
-                          td
-                            .badge.badge-primary.badge-pill #{x.status}
-                        else if x.status == "Posted"
-                          td
-                            .badge.badge-success.badge-pill #{x.status}
                         td 
                           a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit

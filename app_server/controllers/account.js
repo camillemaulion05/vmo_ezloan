@@ -6785,114 +6785,6 @@ const getDeleteLoans = (req, res) => {
 };
 
 const postUpdateLoans = (req, res) => {
-    function addTransaction(transaction) {
-        path = '/api/employees/' + transaction.postedBy;
-        requestOptions = {
-            url: `${apiOptions.server}${path}`,
-            method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + req.user.token
-            },
-            json: {}
-        };
-        request(
-            requestOptions,
-            (err, {
-                statusCode
-            }, employee) => {
-                if (err) {
-                    req.flash('errors', {
-                        msg: 'There was an error when loading employee information. Please try again later.'
-                    });
-                    return res.redirect('back');
-                } else if (statusCode === 200) {
-                    transaction.receiverNum = (req.body.status == "Fully Paid") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.receiverNum;
-                    transaction.senderNum = (req.body.status == "Loan Release") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.senderNum;
-                    path = '/api/transactions';
-                    requestOptions = {
-                        url: `${apiOptions.server}${path}`,
-                        method: 'POST',
-                        headers: {
-                            Authorization: 'Bearer ' + req.user.token
-                        },
-                        json: transaction
-                    };
-                    request(
-                        requestOptions,
-                        (err, {
-                            statusCode
-                        }, newTransaction) => {
-                            if (err) {
-                                req.flash('errors', {
-                                    msg: 'There was an error when adding new transaction. Please try again later.'
-                                });
-                                return res.redirect('back');
-                            } else if (statusCode === 201) {
-                                if (req.body.status == "Fully Paid") {
-                                    path = '/api/loans/' + transaction.loanId + '/schedules';
-                                    requestOptions = {
-                                        url: `${apiOptions.server}${path}`,
-                                        method: 'PUT',
-                                        headers: {
-                                            Authorization: 'Bearer ' + req.user.token
-                                        },
-                                        json: {
-                                            transactionDate: parseDate(new Date),
-                                            transactionAmount: transaction.amount
-                                        }
-                                    };
-                                    request(
-                                        requestOptions,
-                                        (err, {
-                                            statusCode
-                                        }, updatedLoan) => {
-                                            if (err) {
-                                                req.flash('errors', {
-                                                    msg: 'There was an error when adding new repayment. Please try again later.'
-                                                });
-                                                return res.redirect('back');
-                                            } else if (statusCode === 200) {
-                                                req.flash('success', {
-                                                    msg: "Loan application has been updated successfully. New transaction has been added successfully. New repayment has been added successfully."
-                                                });
-                                                return res.redirect('back');
-                                            } else {
-                                                req.flash('errors', {
-                                                    msg: updatedLoan.message
-                                                });
-                                                return res.redirect('back');
-                                            }
-                                        }
-                                    );
-                                } else {
-                                    if (req.body.status == "Loan Release") {
-                                        req.flash('success', {
-                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
-                                        });
-                                        return res.redirect('back');
-                                    }
-                                    req.flash('success', {
-                                        msg: "Loan application has been updated successfully. New transaction has been added successfully. "
-                                    });
-                                    return res.redirect('back');
-                                }
-                            } else {
-                                req.flash('errors', {
-                                    msg: newTransaction.message
-                                });
-                                return res.redirect('back');
-                            }
-                        }
-                    );
-                } else {
-                    req.flash('errors', {
-                        msg: employee.message
-                    });
-                    return res.redirect('back');
-                }
-            }
-        );
-    }
     path = '/api/loans/' + req.params.loanid + '/due'
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -6933,7 +6825,7 @@ const postUpdateLoans = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            if (loan.status != "Fully Paid") {
+                            if (loan.status != "Fully Paid" || loan.status != "Declined") {
                                 const validationErrors = [];
                                 if (loan.status == "Processing" && validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
                                     msg: 'Assigned Loan Officer cannot be blank.'
@@ -6941,20 +6833,6 @@ const postUpdateLoans = (req, res) => {
                                 if (validator.isEmpty(req.body.status)) validationErrors.push({
                                     msg: 'Loan status cannot be blank.'
                                 });
-                                if (loan.status == "Processing" && req.body.status == "Loan Release") {
-                                    if (validator.isEmpty(req.body.loanAmount)) validationErrors.push({
-                                        msg: 'Loan amount cannot be blank.'
-                                    });
-                                    if (req.body.loanAmount == 0) validationErrors.push({
-                                        msg: 'Loan amount cannot be zero.'
-                                    });
-                                    if (req.body.loanAmount < 5000) validationErrors.push({
-                                        msg: 'Required minimum loan amount is 5000.'
-                                    });
-                                    if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
-                                        msg: 'Loan term amount cannot be blank.'
-                                    });
-                                }
                                 if (req.body.status == "Loan Release" || req.body.status == "Fully Paid") {
                                     if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
                                         msg: 'Assigned Loan Processor cannot be blank.'
@@ -6967,200 +6845,188 @@ const postUpdateLoans = (req, res) => {
                                     req.flash('errors', validationErrors);
                                     return res.redirect('back');
                                 }
-                                let transaction = {};
-                                if (req.body.status == "Loan Release" || req.body.status == "Fully Paid") {
-                                    transaction.amount = (req.body.status == "Loan Release") ? '-' + loan.newProceedsAmount : ROUND(parseFloat(currentDue.principalBalance) + parseFloat(currentDue.interestBalance));
-                                    transaction.type = (req.body.status == "Loan Release") ? "Release" : "Repayments";
-                                    transaction.receiverNum = (req.body.status == "Loan Release") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
-                                    transaction.senderNum = (req.body.status == "Fully Paid") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
-                                    transaction.status = "Posted";
-                                    transaction.borrowerId = loan.requestedBy._id;
-                                    transaction.loanId = loan._id;
-                                    transaction.postedBy = req.body.postedBy;
-                                    transaction.referenceNo = req.body.referenceNo;
-                                }
-                                if (loan.status == "Processing" && req.body.status == "Loan Release") {
-                                    path = '/api/loans/borrowers/' + loan.requestedBy._id;
-                                    requestOptions = {
-                                        url: `${apiOptions.server}${path}`,
-                                        method: 'GET',
-                                        headers: {
-                                            Authorization: 'Bearer ' + req.user.token
-                                        },
-                                        json: {}
-                                    };
-                                    request(
-                                        requestOptions,
-                                        (err, {
-                                            statusCode
-                                        }, loans) => {
-                                            if (err) {
-                                                req.flash('errors', {
-                                                    msg: 'There was an error when loading loans by borrower information. Please try again later.'
-                                                });
-                                                return res.redirect('back');
-                                            } else if (statusCode === 200) {
-                                                //validations
-                                                let totalUsedCreditLimit = (loans.length >= 1) ? loans.filter(({
-                                                    status
-                                                }) => status != "Declined").reduce((a, b) => parseFloat(a) + parseFloat(b.principalRemaining), 0) : 0;
-                                                let remainingCreditLimit = ROUND((parseFloat(loan.requestedBy.totalCreditLimit) - parseFloat(totalUsedCreditLimit)) + parseFloat(req.body.loanAmount));
-                                                if (parseFloat(req.body.loanAmount) <= parseFloat(remainingCreditLimit)) {
-                                                    path = '/api/loans/' + req.params.loanid;
-                                                    requestOptions = {
-                                                        url: `${apiOptions.server}${path}`,
-                                                        method: 'PUT',
-                                                        headers: {
-                                                            Authorization: 'Bearer ' + req.user.token
-                                                        },
-                                                        json: {
-                                                            loanTerm: req.body.loanTerm,
-                                                            loanAmount: req.body.loanAmount,
-                                                            monthlyInterestRate: (loan.requestedBy.type == "Member") ? 3 : 5,
-                                                            status: req.body.status,
-                                                            reviewedBy: req.body.reviewedBy
-                                                        }
-                                                    };
-                                                    request(
-                                                        requestOptions,
-                                                        (err, {
-                                                            statusCode
-                                                        }, updatedLoan) => {
-                                                            if (err) {
-                                                                req.flash('errors', {
-                                                                    msg: 'There was an error when updating loan application. Please try again later.'
-                                                                });
-                                                                return res.redirect('back');
-                                                            } else if (statusCode === 200) {
-                                                                path = '/api/sendMail';
-                                                                requestOptions = {
-                                                                    url: `${apiOptions.server}${path}`,
-                                                                    method: 'POST',
-                                                                    json: {
-                                                                        receiver: loan.requestedBy.profile.email,
-                                                                        subject: 'Your VMO EZ Loan application has been approved and released',
-                                                                        message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers for repayments. (${process.env.BASE_URL}/login) \n\n Thank you.\n`
-                                                                    }
-                                                                };
-                                                                request(
-                                                                    requestOptions,
-                                                                    (err, {
-                                                                        statusCode
-                                                                    }, body) => {
-                                                                        if (err) {
-                                                                            req.flash('warnings', {
-                                                                                msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
-                                                                            });
-                                                                            return res.redirect('back');
-                                                                        } else if (statusCode === 200) {
-                                                                            addTransaction(transaction);
-                                                                        } else {
-                                                                            req.flash('errors', {
-                                                                                msg: body.message
-                                                                            });
-                                                                            return res.redirect('back');
-                                                                        }
-                                                                    }
-                                                                );
-                                                            } else {
-                                                                req.flash('errors', {
-                                                                    msg: updatedLoan.message
-                                                                });
-                                                                return res.redirect('back');
-                                                            }
-                                                        }
-                                                    );
-                                                } else {
-                                                    req.flash('errors', {
-                                                        msg: "Invalid loan amount."
-                                                    });
-                                                    return res.redirect('back');
-                                                }
-                                            } else {
-                                                req.flash('errors', {
-                                                    msg: loans.message
-                                                });
-                                                return res.redirect('back');
-                                            }
-                                        }
-                                    );
-                                } else {
-                                    if (req.body.status == "Fully Paid") {
-                                        addTransaction(transaction);
-                                    } else {
-                                        path = '/api/loans/' + req.params.loanid;
-                                        requestOptions = {
-                                            url: `${apiOptions.server}${path}`,
-                                            method: 'PUT',
-                                            headers: {
-                                                Authorization: 'Bearer ' + req.user.token
-                                            },
-                                            json: {
-                                                status: req.body.status,
-                                                reviewedBy: req.body.reviewedBy
-                                            }
-                                        };
-                                        request(
-                                            requestOptions,
-                                            (err, {
-                                                statusCode
-                                            }, updatedLoan) => {
-                                                if (err) {
-                                                    req.flash('errors', {
-                                                        msg: 'There was an error when updating loan application. Please try again later.'
-                                                    });
-                                                    return res.redirect('back');
-                                                } else if (statusCode === 200) {
-                                                    if (req.body.status == "Loan Release") {
-                                                        path = '/api/sendMail';
-                                                        requestOptions = {
-                                                            url: `${apiOptions.server}${path}`,
-                                                            method: 'POST',
-                                                            json: {
-                                                                receiver: loan.requestedBy.profile.email,
-                                                                subject: 'Your VMO EZ Loan application has been approved and release',
-                                                                message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers where to send your repayment.\n\n  Thank you.\n`
-                                                            }
-                                                        };
-                                                        request(
-                                                            requestOptions,
-                                                            (err, {
-                                                                statusCode
-                                                            }, body) => {
-                                                                if (err) {
-                                                                    req.flash('warnings', {
-                                                                        msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
-                                                                    });
-                                                                    return res.redirect('back');
-                                                                } else if (statusCode === 200) {
-                                                                    addTransaction(transaction);
-                                                                } else {
-                                                                    req.flash('errors', {
-                                                                        msg: body.message
-                                                                    });
-                                                                    return res.redirect('back');
-                                                                }
-                                                            }
-                                                        );
-                                                    } else {
-                                                        req.flash('success', {
-                                                            msg: "Loan application has been updated successfully."
-                                                        });
-                                                        return res.redirect('back');
-                                                    }
-                                                } else {
-                                                    req.flash('errors', {
-                                                        msg: updatedLoan.message
-                                                    });
-                                                    return res.redirect('back');
-                                                }
-                                            }
-                                        );
+                                path = '/api/loans/' + req.params.loanid;
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'PUT',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        status: req.body.status,
+                                        reviewedBy: (loan.status == "Processing") ? req.body.reviewedBy : ''
                                     }
-                                }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, updatedLoan) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when updating loan application. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            if (req.body.status == "Loan Release" || req.body.status == "Fully Paid") {
+                                                let transaction = {};
+                                                transaction.amount = (req.body.status == "Loan Release") ? '-' + loan.newProceedsAmount : ROUND(parseFloat(currentDue.principalBalance) + parseFloat(currentDue.interestBalance));
+                                                transaction.type = (req.body.status == "Loan Release") ? "Release" : "Repayments";
+                                                transaction.receiverNum = (req.body.status == "Loan Release") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
+                                                transaction.senderNum = (req.body.status == "Fully Paid") ? (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : '' : '';
+                                                transaction.status = "Posted";
+                                                transaction.borrowerId = loan.requestedBy._id;
+                                                transaction.loanId = loan._id;
+                                                transaction.postedBy = req.body.postedBy;
+                                                transaction.referenceNo = req.body.referenceNo;
+
+                                                path = '/api/employees/' + transaction.postedBy;
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'GET',
+                                                    headers: {
+                                                        Authorization: 'Bearer ' + req.user.token
+                                                    },
+                                                    json: {}
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, employee) => {
+                                                        if (err) {
+                                                            req.flash('errors', {
+                                                                msg: 'There was an error when loading employee information. Please try again later.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 200) {
+                                                            transaction.receiverNum = (req.body.status == "Fully Paid") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.receiverNum;
+                                                            transaction.senderNum = (req.body.status == "Loan Release") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.senderNum;
+
+                                                            path = '/api/transactions';
+                                                            requestOptions = {
+                                                                url: `${apiOptions.server}${path}`,
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    Authorization: 'Bearer ' + req.user.token
+                                                                },
+                                                                json: transaction
+                                                            };
+                                                            request(
+                                                                requestOptions,
+                                                                (err, {
+                                                                    statusCode
+                                                                }, newTransaction) => {
+                                                                    if (err) {
+                                                                        req.flash('errors', {
+                                                                            msg: 'There was an error when adding new transaction. Please try again later.'
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else if (statusCode === 201) {
+                                                                        if (req.body.status == "Fully Paid") {
+                                                                            path = '/api/loans/' + transaction.loanId + '/schedules';
+                                                                            requestOptions = {
+                                                                                url: `${apiOptions.server}${path}`,
+                                                                                method: 'PUT',
+                                                                                headers: {
+                                                                                    Authorization: 'Bearer ' + req.user.token
+                                                                                },
+                                                                                json: {
+                                                                                    transactionDate: parseDate(new Date),
+                                                                                    transactionAmount: transaction.amount
+                                                                                }
+                                                                            };
+                                                                            request(
+                                                                                requestOptions,
+                                                                                (err, {
+                                                                                    statusCode
+                                                                                }, updatedLoan) => {
+                                                                                    if (err) {
+                                                                                        req.flash('errors', {
+                                                                                            msg: 'There was an error when adding new repayment. Please try again later.'
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    } else if (statusCode === 200) {
+                                                                                        req.flash('success', {
+                                                                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. New repayment has been added successfully."
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    } else {
+                                                                                        req.flash('errors', {
+                                                                                            msg: updatedLoan.message
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    }
+                                                                                }
+                                                                            );
+                                                                        } else {
+                                                                            path = '/api/sendMail';
+                                                                            requestOptions = {
+                                                                                url: `${apiOptions.server}${path}`,
+                                                                                method: 'POST',
+                                                                                json: {
+                                                                                    receiver: loan.requestedBy.profile.email,
+                                                                                    subject: 'Your VMO EZ Loan application has been approved and released',
+                                                                                    message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers for repayments. (${process.env.BASE_URL}/login) \n\n Thank you.\n`
+                                                                                }
+                                                                            };
+                                                                            request(
+                                                                                requestOptions,
+                                                                                (err, {
+                                                                                    statusCode
+                                                                                }, body) => {
+                                                                                    if (err) {
+                                                                                        req.flash('warnings', {
+                                                                                            msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    } else if (statusCode === 200) {
+                                                                                        req.flash('success', {
+                                                                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    } else {
+                                                                                        req.flash('errors', {
+                                                                                            msg: body.message
+                                                                                        });
+                                                                                        return res.redirect('back');
+                                                                                    }
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                    } else {
+                                                                        req.flash('errors', {
+                                                                            msg: newTransaction.message
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    }
+                                                                }
+                                                            );
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: employee.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
+                                                    }
+                                                );
+                                            } else {
+                                                req.flash('success', {
+                                                    msg: "Loan application has been updated successfully."
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: updatedLoan.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
                             } else {
                                 req.flash('errors', {
-                                    msg: 'Cannot update loan application. Status was already fully paid.'
+                                    msg: 'Cannot update the loan application.'
                                 });
                                 return res.redirect('back');
                             }
@@ -7889,42 +7755,79 @@ const postWithdrawals = (req, res) => {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/withdrawals';
+
+    path = '/api/transactions/borrowers/' + req.body.receiverName + '/contributions';
     requestOptions = {
         url: `${apiOptions.server}${path}`,
-        method: 'POST',
+        method: 'GET',
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {
-            amount: req.body.amount,
-            reason: req.body.reason,
-            requestedBy: req.body.receiverName
-        }
+        json: {}
     };
     request(
         requestOptions,
         (err, {
             statusCode
-        }, withdrawal) => {
+        }, transactions) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when creating withdrawal request. Please try again later.'
+                    msg: 'There was an error when loading members contribution. Please try again later.'
                 });
                 return res.redirect('back');
-            } else if (statusCode === 201) {
-                req.flash('success', {
-                    msg: "Withdrawal Request has been added successfully."
-                });
-                return res.redirect('back');
+            } else if (statusCode === 200) {
+                if (parseFloat(req.body.amount) <= parseFloat(transactions[0].total.$numberDecimal)) {
+                    path = '/api/withdrawals';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            amount: req.body.amount,
+                            reason: req.body.reason,
+                            requestedBy: req.body.receiverName
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, withdrawal) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when creating withdrawal request. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: "Withdrawal Request has been added successfully."
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: withdrawal.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
+                } else {
+                    req.flash('errors', {
+                        msg: "Invalid withdrawal amount."
+                    });
+                    return res.redirect('back');
+                }
             } else {
                 req.flash('errors', {
-                    msg: withdrawal.message
+                    msg: (transactions) ? transactions.message : 'There was an error when loading members contribution. Please try again later.'
                 });
                 return res.redirect('back');
             }
         }
     );
+
 };
 
 
@@ -8010,162 +7913,169 @@ const postUpdateWithdrawals = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                const validationErrors = [];
-                if (validator.isEmpty(req.body.status)) validationErrors.push({
-                    msg: 'Status cannot be blank.'
-                });
-                if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-                    msg: 'Assigned Loan Officer cannot be blank.'
-                });
-                if (req.body.status == "Cash Release") {
-                    if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+                if (withdrawal.status != "Declined" || withdrawal.status != "Cash Release") {
+                    const validationErrors = [];
+                    if (validator.isEmpty(req.body.status)) validationErrors.push({
+                        msg: 'Status cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
                         msg: 'Assigned Loan Officer cannot be blank.'
                     });
-                    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
-                        msg: 'Assigned Loan Officer cannot be blank.'
-                    });
-                }
-                if (validationErrors.length) {
-                    req.flash('errors', validationErrors);
-                    return res.redirect('back');
-                }
-                path = '/api/withdrawals/' + req.params.withdrawalid;
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'PUT',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {
-                        status: req.body.status,
-                        reviewedBy: req.body.reviewedBy
+                    if (req.body.status == "Cash Release") {
+                        if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+                            msg: 'Assigned Loan Officer cannot be blank.'
+                        });
+                        if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+                            msg: 'Assigned Loan Officer cannot be blank.'
+                        });
                     }
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, updatedWithdrawal) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when updating withdrawal request. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 200) {
-                            if (req.body.status == "Cash Release") {
-                                path = '/api/employees/' + req.body.postedBy;
-                                requestOptions = {
-                                    url: `${apiOptions.server}${path}`,
-                                    method: 'GET',
-                                    headers: {
-                                        Authorization: 'Bearer ' + req.user.token
-                                    },
-                                    json: {}
-                                };
-                                request(
-                                    requestOptions,
-                                    (err, {
-                                        statusCode
-                                    }, employee) => {
-                                        if (err) {
-                                            req.flash('errors', {
-                                                msg: 'There was an error when loading employee information. Please try again later.'
-                                            });
-                                            return res.redirect('back');
-                                        } else if (statusCode === 200) {
-                                            let transaction = {};
-                                            transaction.senderNum = employee.account.number;
-                                            transaction.amount = '-' + withdrawal.amount;
-                                            transaction.type = "Withdrawals";
-                                            transaction.receiverNum = withdrawal.requestedBy.account.number;
-                                            transaction.status = "Posted";
-                                            transaction.borrowerId = withdrawal.requestedBy._id;
-                                            transaction.withdrawalId = withdrawal._id;
-                                            transaction.postedBy = req.body.postedBy;
-                                            transaction.referenceNo = req.body.referenceNo;
-                                            path = '/api/transactions';
-                                            requestOptions = {
-                                                url: `${apiOptions.server}${path}`,
-                                                method: 'POST',
-                                                headers: {
-                                                    Authorization: 'Bearer ' + req.user.token
-                                                },
-                                                json: transaction
-                                            };
-                                            request(
-                                                requestOptions,
-                                                (err, {
-                                                    statusCode
-                                                }, newTransaction) => {
-                                                    if (err) {
-                                                        req.flash('errors', {
-                                                            msg: 'There was an error when adding new transaction. Please try again later.'
-                                                        });
-                                                        return res.redirect('back');
-                                                    } else if (statusCode === 201) {
-                                                        path = '/api/sendMail';
-                                                        requestOptions = {
-                                                            url: `${apiOptions.server}${path}`,
-                                                            method: 'POST',
-                                                            json: {
-                                                                receiver: withdrawal.requestedBy.profile.email,
-                                                                subject: 'Your VMO EZ Loan Withdrawal Request has been approved and release',
-                                                                message: `Hello,\n\nThis is a confirmation that the withdrawal request #${withdrawal.withdrawalNum} amounting of ${transaction.amount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\n Thank you.\n`
-                                                            }
-                                                        };
-                                                        request(
-                                                            requestOptions,
-                                                            (err, {
-                                                                statusCode
-                                                            }, body) => {
-                                                                if (err) {
-                                                                    req.flash('warnings', {
-                                                                        msg: 'Withdrawal request has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
-                                                                    });
-                                                                    return res.redirect('back');
-                                                                } else if (statusCode === 200) {
-                                                                    req.flash('success', {
-                                                                        msg: "Withdrawal request has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
-                                                                    });
-                                                                    return res.redirect('back');
-                                                                } else {
-                                                                    req.flash('errors', {
-                                                                        msg: body.message
-                                                                    });
-                                                                    return res.redirect('back');
+                    if (validationErrors.length) {
+                        req.flash('errors', validationErrors);
+                        return res.redirect('back');
+                    }
+                    path = '/api/withdrawals/' + req.params.withdrawalid;
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'PUT',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            status: req.body.status,
+                            reviewedBy: req.body.reviewedBy
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, updatedWithdrawal) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when updating withdrawal request. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 200) {
+                                if (req.body.status == "Cash Release") {
+                                    path = '/api/employees/' + req.body.postedBy;
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'GET',
+                                        headers: {
+                                            Authorization: 'Bearer ' + req.user.token
+                                        },
+                                        json: {}
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, employee) => {
+                                            if (err) {
+                                                req.flash('errors', {
+                                                    msg: 'There was an error when loading employee information. Please try again later.'
+                                                });
+                                                return res.redirect('back');
+                                            } else if (statusCode === 200) {
+                                                let transaction = {};
+                                                transaction.senderNum = employee.account.number;
+                                                transaction.amount = '-' + withdrawal.amount;
+                                                transaction.type = "Withdrawals";
+                                                transaction.receiverNum = withdrawal.requestedBy.account.number;
+                                                transaction.status = "Posted";
+                                                transaction.borrowerId = withdrawal.requestedBy._id;
+                                                transaction.withdrawalId = withdrawal._id;
+                                                transaction.postedBy = req.body.postedBy;
+                                                transaction.referenceNo = req.body.referenceNo;
+                                                path = '/api/transactions';
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'POST',
+                                                    headers: {
+                                                        Authorization: 'Bearer ' + req.user.token
+                                                    },
+                                                    json: transaction
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, newTransaction) => {
+                                                        if (err) {
+                                                            req.flash('errors', {
+                                                                msg: 'There was an error when adding new transaction. Please try again later.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 201) {
+                                                            path = '/api/sendMail';
+                                                            requestOptions = {
+                                                                url: `${apiOptions.server}${path}`,
+                                                                method: 'POST',
+                                                                json: {
+                                                                    receiver: withdrawal.requestedBy.profile.email,
+                                                                    subject: 'Your VMO EZ Loan Withdrawal Request has been approved and release',
+                                                                    message: `Hello,\n\nThis is a confirmation that the withdrawal request #${withdrawal.withdrawalNum} amounting of ${transaction.amount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\n Thank you.\n`
                                                                 }
-                                                            }
-                                                        );
-                                                    } else {
-                                                        req.flash('errors', {
-                                                            msg: newTransaction.message
-                                                        });
-                                                        return res.redirect('back');
+                                                            };
+                                                            request(
+                                                                requestOptions,
+                                                                (err, {
+                                                                    statusCode
+                                                                }, body) => {
+                                                                    if (err) {
+                                                                        req.flash('warnings', {
+                                                                            msg: 'Withdrawal request has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else if (statusCode === 200) {
+                                                                        req.flash('success', {
+                                                                            msg: "Withdrawal request has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else {
+                                                                        req.flash('errors', {
+                                                                            msg: body.message
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    }
+                                                                }
+                                                            );
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: newTransaction.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
                                                     }
-                                                }
-                                            );
-                                        } else {
-                                            req.flash('errors', {
-                                                msg: employee.message
-                                            });
-                                            return res.redirect('back');
+                                                );
+                                            } else {
+                                                req.flash('errors', {
+                                                    msg: employee.message
+                                                });
+                                                return res.redirect('back');
+                                            }
                                         }
-                                    }
-                                );
+                                    );
+                                } else {
+                                    req.flash('success', {
+                                        msg: "Withdrawal request has been updated successfully."
+                                    });
+                                    return res.redirect('back');
+                                }
                             } else {
-                                req.flash('success', {
-                                    msg: "Withdrawal request has been updated successfully."
+                                req.flash('errors', {
+                                    msg: updatedWithdrawal.message
                                 });
                                 return res.redirect('back');
                             }
-                        } else {
-                            req.flash('errors', {
-                                msg: updatedWithdrawal.message
-                            });
-                            return res.redirect('back');
                         }
-                    }
-                );
+                    );
+                } else {
+                    req.flash('errors', {
+                        msg: 'Cannot update the withdrawal request.'
+                    });
+                    return res.redirect('back');
+                }
             } else {
                 req.flash('errors', {
                     msg: withdrawal.message

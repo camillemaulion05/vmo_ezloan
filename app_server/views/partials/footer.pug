@@ -504,14 +504,14 @@ else
                   input#purposeOfLoan.form-control(type='text' name='purposeOfLoan' disabled='')
                 .col-md-6
                   label.small.mb-1(for='loanAmount') Loan Amount
-                  input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount')
+                  input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount' disabled='')
               .form-row.mb-2.processingOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='monthlyInterestRate') Monthly Interest Rate
                   input#monthlyInterestRate.form-control(type="number" step="1" min="3" name='monthlyInterestRate' disabled='')
                 .col-md-6
                   label.small.mb-1(for='loanTerm') Loan Term
-                  select#loanTerm.form-control.selectpicker(type='text' name='loanTerm')
+                  select#loanTerm.form-control.selectpicker(type='text' name='loanTerm'  disabled='')
                     option(value='' selected='' disabled='') Loan Term
                     for x in loanTerm
                       option(value=x) #{x} months
