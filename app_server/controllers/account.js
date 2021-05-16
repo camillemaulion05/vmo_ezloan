@@ -6392,8 +6392,8 @@ const getBorrowerDetails = (req, res) => {
                                                 title: 'Manage Borrower Details',
                                                 user: user,
                                                 borrower: borrower,
-                                                remainingCreditLimit: remainingCreditLimit,
-                                                totalUsedCreditLimit: totalUsedCreditLimit
+                                                remainingCreditLimit: remainingCreditLimit || 0.00,
+                                                totalUsedCreditLimit: totalUsedCreditLimit || 0.00
                                             });
                                         } else {
                                             req.flash('errors', {

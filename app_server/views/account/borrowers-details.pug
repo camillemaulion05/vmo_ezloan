@@ -26,7 +26,7 @@ block content
                     .col.mr-2
                       .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
                         | Total Used Credit Limit
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{totalUsedCreditLimit.toFixed(2)}
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{totalUsedCreditLimit}
                     .col-auto
                       i.fas.fa-receipt.fa-2x.text-gray-300
             .col-xl-3.col-md-6.mb-4
@@ -36,7 +36,7 @@ block content
                     .col.mr-2
                       .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
                         | Remaining Credit Limit
-                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{(remainingCreditLimit).toFixed(2)}
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{remainingCreditLimit}
                     .col-auto
                       i.fas.fa-wallet.fa-2x.text-gray-300
             .col-xl-3.col-md-6.mb-4
@@ -194,7 +194,7 @@ block content
                               th Date Hired
                               - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                               - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-                              - let d = (new Date(borrower.workBusinessInfo.dateHired)).toString().split(' ');
+                              - let d = (borrower.workBusinessInfo && borrower.workBusinessInfo.dateHired) ? (new Date(borrower.workBusinessInfo.dateHired)).toString().split(' ') : '';
                               - let dateFormat = (borrower.workBusinessInfo && borrower.workBusinessInfo.dateHired) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : '';
                               td.text-right #{dateFormat}
                             tr
