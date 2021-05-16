@@ -67,7 +67,7 @@ block content
                         .input-group
                           .input-group-prepend
                             span.input-group-text +63
-                          input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' value=user.profile.mobileNum)
+                          input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' minlength='10' maxlength='10' value=user.profile.mobileNum)
                         .text-danger.font-italic
                           if (!user.profile.mobileNumVerified)
                             | Unverified:  

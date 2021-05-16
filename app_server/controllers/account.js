@@ -6123,9 +6123,6 @@ const postUpdateBorrowers = (req, res) => {
         msg: 'Borrower status cannot be blank.'
     });
     if (req.body.type == 'Member') {
-        if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
-            msg: 'Employee ID cannot be blank.'
-        });
         if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
             msg: 'Shares/Payday cannot be blank.'
         });
@@ -6168,7 +6165,6 @@ const postUpdateBorrowers = (req, res) => {
             status: req.body.status,
             totalCreditLimit: (req.body.status == 'Verified') ? req.body.totalCreditLimit : '',
             reviewedBy: (req.body.status == 'Verified') ? req.body.reviewedBy : '',
-            employeeID: (req.body.type == 'Member') ? req.body.employeeID : '',
             sharesPerPayDay: (req.body.type == 'Member') ? req.body.sharesPerPayDay : '',
             hrCertifiedBy: (req.body.type == 'Member' && req.body.status == 'Verified') ? req.body.hrCertifiedBy : '',
             workBusinessInfo: {

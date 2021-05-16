@@ -81,7 +81,7 @@ block content
                           .input-group
                             .input-group-prepend
                               span.input-group-text +63
-                            input#homePhoneNum.form-control(type='text' placeholder='Enter your mobile number' name='homePhoneNum' value=user.profile.homePhoneNum)
+                            input#homePhoneNum.form-control(type='text' placeholder='Enter your mobile number' name='homePhoneNum' minlength='10' maxlength='10' value=user.profile.homePhoneNum)
                         .form-group.col-md-4.mb-4
                           label.small.mb-1(for='mobileNum') Mobile Number
                           .input-group

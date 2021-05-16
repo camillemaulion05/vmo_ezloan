@@ -87,7 +87,7 @@ else
                   .input-group
                     .input-group-prepend
                       span.input-group-text +63
-                    input#borrowerMobileNum.form-control(type='text' name='mobileNum')
+                    input#borrowerMobileNum.form-control(type='text' name='mobileNum' minlength='10' maxlength='10')
               .form-row.mb-2.membersOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='borrowerEmployeeID') Employee ID
@@ -165,7 +165,7 @@ else
               .form-row.mb-2.membersOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='employeeID') Employee ID
-                  input#employeeID.form-control(type='text' name='employeeID')
+                  input#employeeID.form-control(type='text' name='employeeID' disabled='')
                 .col-md-6
                   label.small.mb-1(for='sharesPerPayDay') Shares/Payday (Php)
                   input#sharesPerPayDay.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
