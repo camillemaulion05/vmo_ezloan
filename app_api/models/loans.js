@@ -4,19 +4,19 @@ const loanSchema = mongoose.Schema({
     loanNum: String, // Date.now();
     purposeOfLoan: {
         type: String,
-        enum: [
-            "Living Cost",
-            "Educational",
-            "Medical or Hospitalization",
-            "Purchasing Appliance",
-            "Travel or Vacation",
-            "Entertainment",
-            "Own Business",
-            "Wedding",
-            "House Repair",
-            "Repayments",
-            "Others"
-        ]
+        // enum: [
+        //     "Living Cost",
+        //     "Educational",
+        //     "Medical or Hospitalization",
+        //     "Purchasing Appliance",
+        //     "Travel or Vacation",
+        //     "Entertainment",
+        //     "Own Business",
+        //     "Wedding",
+        //     "House Repair",
+        //     "Repayments",
+        //     "Others"
+        // ]
     },
     loanTerm: {
         type: String,

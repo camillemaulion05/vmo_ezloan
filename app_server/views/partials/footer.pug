@@ -263,7 +263,7 @@ else
                   textarea#message.form-control(name='message' disabled='')
               .form-row.mb-2
                 .col-md-6
-                  label.small.mb-1(for='referenceNo') Reference No.
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type='text' name='referenceNo' disabled='')
                 .col-md-6 
                   label.small.mb-1(for='status') Status
@@ -294,7 +294,7 @@ else
                       if (x.type == 'Loan Processor')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
-                  label.small.mb-1(for='referenceNo') Reference No.
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#txnReferenceNo.form-control(type='text' name='referenceNo')
               .form-row.mb-2
                 .col-md-12
@@ -393,10 +393,7 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='purposeOfLoan') Purpose of Loan
-                  select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')
-                    option(value='' selected='' disabled='') Purpose of Loan
-                    for x in purposeOfLoan
-                      option(value=x) #{x}
+                  input#purposeOfLoan.form-control(type='text' name='purposeOfLoan' disabled='')
                 .col-md-6
                   label.small.mb-1(for='loanAmount') Loan Amount
                   input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount')
@@ -447,7 +444,7 @@ else
                       if (x.type == 'Loan Processor')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
                 .col-md-6
-                  label.small.mb-1(for='referenceNo') Reference No.
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type='text' name='referenceNo')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
@@ -481,7 +478,7 @@ else
             h5#loanModalLabel.modal-title Loan Application
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form(method='POST' action='/credits')
+          form#addCredits(method='POST' action='/credits')
             input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               - let interestRate = (user.type == "Member") ? 3: 5;
@@ -501,6 +498,9 @@ else
                   - let purposeOfLoan = ["Living Cost","Educational","Medical or Hospitalization","Purchasing Appliance","Travel or Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
                   for x in purposeOfLoan
                     option(value=x) #{x}
+              .form-row.mb-2.othersOnly.d-none
+                label.small.mb-1(for='purposeOfLoanOthers') Others
+                input#purposeOfLoanOthers.form-control(type="text" name='purposeOfLoanOthers')
               .form-row.mb-2
                 label.small.mb-1(for='loanTerm') Loan Term
                 select#loanTerm.form-control.selectpicker(type='text' name='loanTerm')
@@ -533,7 +533,7 @@ else
               p 
                 | You can pay your repayment thru G-Cash. Check account numbers below.
                 br
-                | Please note your confirmation/reference number.
+                | Please note your G-Cash reference number.
               .form-row.mb-2
                 .col-md-6
                   -let amountDue = (schedule.amountDue) ? (schedule.paymentAmount) ? (parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) < 0.00) ? '0.00' : parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) : (parseFloat(schedule.amountDue)).toFixed(2) : '0.00'
@@ -544,7 +544,7 @@ else
                   .input-group
                     .input-group-prepend
                       span.input-group-text +63
-                    input#senderNum.form-control(type="text" name='senderNum' minlength='10' maxlength='10')
+                    input#senderNum.form-control(type="text" name='senderNum' minlength='10' maxlength='10' value=loan.requestedBy.account.number)
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='postedBy') Receiver Number
@@ -554,7 +554,7 @@ else
                       if (x.type == 'Loan Processor')
                         option(value=x._id) #{x.account.number} - #{x.account.name}
                 .col-md-6
-                  label.small.mb-1(for='referenceNo') Reference No.
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type="text" name='referenceNo' )
               .form-row.mb-2
                 .col-md-12

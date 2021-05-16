@@ -3684,6 +3684,9 @@ const postCredits = (req, res) => {
     if (validator.isEmpty(req.body.purposeOfLoan)) validationErrors.push({
         msg: 'Purpose of loan cannot be blank.'
     });
+    if (req.body.purposeOfLoan == "Others" && validator.isEmpty(req.body.purposeOfLoanOthers)) validationErrors.push({
+        msg: 'Purpose of loan cannot be blank.'
+    });
     if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
         msg: 'Loan term amount cannot be blank.'
     });
@@ -3748,7 +3751,7 @@ const postCredits = (req, res) => {
                                         Authorization: 'Bearer ' + req.user.token
                                     },
                                     json: {
-                                        purposeOfLoan: req.body.purposeOfLoan,
+                                        purposeOfLoan: (req.body.purposeOfLoan == "Others") ? req.body.purposeOfLoanOthers : req.body.purposeOfLoan,
                                         loanTerm: req.body.loanTerm,
                                         loanAmount: req.body.loanAmount,
                                         monthlyInterestRate: (user.type == "Member") ? 3 : 5,
@@ -6392,8 +6395,8 @@ const getBorrowerDetails = (req, res) => {
                                                 title: 'Manage Borrower Details',
                                                 user: user,
                                                 borrower: borrower,
-                                                remainingCreditLimit: remainingCreditLimit || 0.00,
-                                                totalUsedCreditLimit: totalUsedCreditLimit || 0.00
+                                                remainingCreditLimit: remainingCreditLimit,
+                                                totalUsedCreditLimit: totalUsedCreditLimit
                                             });
                                         } else {
                                             req.flash('errors', {
@@ -6866,6 +6869,12 @@ const postUpdateLoans = (req, res) => {
                                         }
                                     );
                                 } else {
+                                    if (req.body.status == "Loan Release") {
+                                        req.flash('success', {
+                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                        });
+                                        return res.redirect('back');
+                                    }
                                     req.flash('success', {
                                         msg: "Loan application has been updated successfully. New transaction has been added successfully. "
                                     });
@@ -6946,9 +6955,6 @@ const postUpdateLoans = (req, res) => {
                                     if (req.body.loanAmount < 5000) validationErrors.push({
                                         msg: 'Required minimum loan amount is 5000.'
                                     });
-                                    if (validator.isEmpty(req.body.purposeOfLoan)) validationErrors.push({
-                                        msg: 'Purpose of loan cannot be blank.'
-                                    });
                                     if (validator.isEmpty(req.body.loanTerm)) validationErrors.push({
                                         msg: 'Loan term amount cannot be blank.'
                                     });
@@ -7012,7 +7018,6 @@ const postUpdateLoans = (req, res) => {
                                                             Authorization: 'Bearer ' + req.user.token
                                                         },
                                                         json: {
-                                                            purposeOfLoan: req.body.purposeOfLoan,
                                                             loanTerm: req.body.loanTerm,
                                                             loanAmount: req.body.loanAmount,
                                                             monthlyInterestRate: (loan.requestedBy.type == "Member") ? 3 : 5,
@@ -7031,7 +7036,36 @@ const postUpdateLoans = (req, res) => {
                                                                 });
                                                                 return res.redirect('back');
                                                             } else if (statusCode === 200) {
-                                                                addTransaction(transaction);
+                                                                path = '/api/sendMail';
+                                                                requestOptions = {
+                                                                    url: `${apiOptions.server}${path}`,
+                                                                    method: 'POST',
+                                                                    json: {
+                                                                        receiver: loan.requestedBy.profile.email,
+                                                                        subject: 'Your VMO EZ Loan application has been approved and released',
+                                                                        message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers for repayments. (${process.env.BASE_URL}/login) \n`
+                                                                    }
+                                                                };
+                                                                request(
+                                                                    requestOptions,
+                                                                    (err, {
+                                                                        statusCode
+                                                                    }, body) => {
+                                                                        if (err) {
+                                                                            req.flash('warnings', {
+                                                                                msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                                            });
+                                                                            return res.redirect('back');
+                                                                        } else if (statusCode === 200) {
+                                                                            addTransaction(transaction);
+                                                                        } else {
+                                                                            req.flash('errors', {
+                                                                                msg: body.message
+                                                                            });
+                                                                            return res.redirect('back');
+                                                                        }
+                                                                    }
+                                                                );
                                                             } else {
                                                                 req.flash('errors', {
                                                                     msg: updatedLoan.message
@@ -7082,7 +7116,36 @@ const postUpdateLoans = (req, res) => {
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
                                                     if (req.body.status == "Loan Release") {
-                                                        addTransaction(transaction);
+                                                        path = '/api/sendMail';
+                                                        requestOptions = {
+                                                            url: `${apiOptions.server}${path}`,
+                                                            method: 'POST',
+                                                            json: {
+                                                                receiver: loan.requestedBy.profile.email,
+                                                                subject: 'Your VMO EZ Loan application has been approved and release',
+                                                                message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers where to send your repayment.\n`
+                                                            }
+                                                        };
+                                                        request(
+                                                            requestOptions,
+                                                            (err, {
+                                                                statusCode
+                                                            }, body) => {
+                                                                if (err) {
+                                                                    req.flash('warnings', {
+                                                                        msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                } else if (statusCode === 200) {
+                                                                    addTransaction(transaction);
+                                                                } else {
+                                                                    req.flash('errors', {
+                                                                        msg: body.message
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                }
+                                                            }
+                                                        );
                                                     } else {
                                                         req.flash('success', {
                                                             msg: "Loan application has been updated successfully."

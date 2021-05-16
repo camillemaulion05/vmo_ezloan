@@ -21,7 +21,7 @@ function validYear(year) {
 const loansList = (req, res) => {
     Loan
         .find()
-        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
         .exec((err, loans) => {
             if (err) {
                 console.log(err);
@@ -84,7 +84,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -145,7 +145,6 @@ const loansUpdateOne = (req, res) => {
                         });
                 } else {
                     if (req.body.loanAmount && req.body.monthlyInterestRate && req.body.loanTerm && loan.status == 'Processing') {
-                        loan.purposeOfLoan = (req.body.purposeOfLoan) ? req.body.purposeOfLoan : loan.purposeOfLoan;
                         if (req.body.loanAmount != loan.loanAmount || req.body.loanTerm != loan.loanTerm || req.body.monthlyInterestRate != loan.monthlyInterestRate) {
                             loan.loanTerm = (req.body.loanTerm) ? req.body.loanTerm : loan.loanTerm;
                             loan.loanAmount = (req.body.loanAmount) ? req.body.loanAmount : loan.loanAmount;
@@ -290,7 +289,7 @@ const loansSchedulesList = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -343,7 +342,7 @@ const loansSchedulesReadOne = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -388,7 +387,7 @@ const loansDueListByLoan = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -468,7 +467,7 @@ const loansPastDueListByLoan = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -539,7 +538,7 @@ const loansPastDueListByLoan = (req, res) => {
 const loansDueRepaymentsList = (req, res) => {
     Loan
         .find()
-        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum totalCreditLimit')
+        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
         .exec((err, loans) => {
             if (err) {
                 console.log(err);

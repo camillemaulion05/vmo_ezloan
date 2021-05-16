@@ -124,6 +124,8 @@ html
                         $('input#sharesPerPayDay').val(data.borrower.sharesPerPayDay);
                         $('select#hrCertifiedBy').val(hrCertifiedBy);
                         $('select#employmentType').val(employmentType);
+                        $('select#type').prop('disabled', false);
+                        $('select#status').prop('disabled', false);
                         $("#updateBorrower .btn.btn-primary").show();
                         $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
                         $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
@@ -162,6 +164,8 @@ html
                             $('select#status option[value="Basic"]').hide();
                           }
                           if (data.borrower.status == 'Declined') {
+                            $('select#type').prop('disabled', true);
+                            $('select#status').prop('disabled', true);
                             $('select#status option[value="Basic"]').hide();
                             $('select#status option[value="Pending for Review"]').hide();
                             $('select#status option[value="Verified"]').hide();
@@ -351,7 +355,7 @@ html
                       let balance = (parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance)).toFixed(2);
                       $('select#borrowerName').val(data.loan.requestedBy._id);
                       $('input#borrowerType').val(data.loan.requestedBy.type);
-                      $('select#purposeOfLoan').val(data.loan.purposeOfLoan);
+                      $('input#purposeOfLoan').val(data.loan.purposeOfLoan);
                       $('input#loanAmount').val(parseFloat(data.loan.loanAmount));
                       $('input#loanAmount').prop('max', amount);
                       $('input#monthlyInterestRate').val(monthlyInterestRate);
@@ -560,15 +564,96 @@ html
     if title.indexOf("Account Management - Loans") != -1
       script.
         $(function () {
+          $("#addCredits .btn.btn-primary").hide();
           let boxChecked = function () {
             if ($('input[name="termsAndCondition"]:checked').length == 1) {
               $('input[name="termsAndCondition"]').val("true");
+              if ($('input#termsAndCondition').val() == "true" && $('select#purposeOfLoan').val() != '' && $('input#loanAmount').val() != '' && $('select#loanTerm').val() != ''){
+                if ($('select#purposeOfLoan').val() ==  'Others') {
+                  if ($('input#purposeOfLoanOthers').val() != '') {
+                    $("#addCredits .btn.btn-primary").show();
+                  } else{
+                    $("#addCredits .btn.btn-primary").hide();
+                  }
+                } else {
+                  $("#addCredits .btn.btn-primary").show();
+                }
+              } else {
+                $("#addCredits .btn.btn-primary").hide();
+              }
             } else {
               $('input[name="termsAndCondition"]').val("false");
+               $("#addCredits .btn.btn-primary").hide();
             }
           };
           boxChecked();
           $('input[type="checkbox"]').on("click", boxChecked);
+          $('input#loanAmount').on("keyup", function () {
+            if ($('select#purposeOfLoan').val() != '' && $('input#loanAmount').val() != '' && $('select#loanTerm').val() != '' && $('input[name="termsAndCondition"]').val() == "true"){
+              if ($('select#purposeOfLoan').val() ==  'Others') {
+                if ($('input#purposeOfLoanOthers').val() != '') {
+                  $("#addCredits .btn.btn-primary").show();
+                } else {
+                  $("#addCredits .btn.btn-primary").hide();
+                }
+              }
+              else {
+                $("#addCredits .btn.btn-primary").show();
+              }
+            } else {
+              $("#addCredits .btn.btn-primary").hide();
+            }
+          });
+          $('input#purposeOfLoanOthers').on("keyup", function () {
+            if ($('select#purposeOfLoan').val() != '' && $('input#loanAmount').val() != '' && $('select#loanTerm').val() != '' && $('input[name="termsAndCondition"]').val() == "true"){
+              if ($('select#purposeOfLoan').val() ==  'Others') {
+                if ($('input#purposeOfLoanOthers').val() != '') {
+                  $("#addCredits .btn.btn-primary").show();
+                } else {
+                  $("#addCredits .btn.btn-primary").hide();
+                }
+              }
+              else {
+                $("#addCredits .btn.btn-primary").show();
+              }
+            } else {
+              $("#addCredits .btn.btn-primary").hide();
+            }
+          });
+          $('select#purposeOfLoan').change(function () {
+            $('.othersOnly').addClass('d-none');
+            if ($('select#purposeOfLoan').val() == 'Others') {
+              $('.othersOnly').removeClass('d-none');
+            } 
+            if ($('select#purposeOfLoan').val() != '' && $('input#loanAmount').val() != '' && $('select#loanTerm').val() != '' && $('input[name="termsAndCondition"]').val() == "true"){
+              if ($('select#purposeOfLoan').val() ==  'Others') {
+                if ($('input#purposeOfLoanOthers').val() != '') {
+                  $("#addCredits .btn.btn-primary").show();
+                } else {
+                  $("#addCredits .btn.btn-primary").hide();
+                }
+              } else {
+                $("#addCredits .btn.btn-primary").show();
+              }
+            } else {
+              $("#addCredits .btn.btn-primary").hide();
+            }
+          });
+          $('select#loanTerm').change(function () {
+            if ($('select#loanTerm').val() != '' && $('input#loanAmount').val() != '' && $('select#purposeOfLoan').val() != '' &&  $('input[name="termsAndCondition"]').val() == "true"){
+              if ($('select#purposeOfLoan').val() ==  'Others') {
+                if ($('input#purposeOfLoanOthers').val() != '') {
+                  $("#addCredits .btn.btn-primary").show();
+                } else {
+                  $("#addCredits .btn.btn-primary").hide();
+                }
+              } else {
+                 $("#addCredits .btn.btn-primary").show();
+              }
+            } else {
+              $("#addCredits .btn.btn-primary").hide();
+            }
+          }); 
         });
 
     if title.indexOf("Loan Details") != -1

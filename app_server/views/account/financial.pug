@@ -19,14 +19,14 @@ block content
                         legend.text-primary G-Cash Enrollment
                         .form-row
                           .form-group.col-md-6.mb-md-0
-                            label.small.mb-1(for='accountName') Account name of G-Cash
+                            label.small.mb-1(for='accountName') G-Cash Account Name
                             input#accountName.form-control(type='text' placeholder='Enter your gcash name' name='accountName' value=(user.account) ? user.account.name : '')
                           .form-group.col-md-6.mb-md-0
-                            label.small.mb-1(for='accountNum') Account No.
+                            label.small.mb-1(for='accountNum') G-Cash Account Number
                             .input-group
                               .input-group-prepend
                                 span.input-group-text +63
-                              input#accountNum.form-control(type='text' placeholder='Enter your account no.' name='accountNum' value=(user.account) ? user.account.number : '')
+                              input#accountNum.form-control(type='text' placeholder='Enter your gcash account no.' name='accountNum' value=(user.account) ? user.account.number : '')
                       hr.my-4
                       fieldset
                         legend.text-primary Work / Business Information
