@@ -98,6 +98,10 @@ router
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByBorrower);
 
 router
+    .route('/transactions/borrowers/:borrowerid/contributions')
+    .get(auth, middleware.isModerator, ctrlTransactions.contributionsListByBorrower);
+
+router
     .route('/transactions/type/:type')
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
 
@@ -121,7 +125,7 @@ router
 
 router
     .route('/transactions/contributions/:year')
-    .get(auth, middleware.isAdmin, ctrlTransactions.contributionsListByMember);
+    .get(auth, middleware.isAdmin, ctrlTransactions.contributionsSummary);
 
 // withdrawals
 router

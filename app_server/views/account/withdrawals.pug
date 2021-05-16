@@ -10,9 +10,9 @@ block content
         .container-fluid
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
-              h6.m-0.font-weight-bold.text-primary List of Withdrawal Request
+              h6.m-0.font-weight-bold.text-primary List of Withdrawal Requests
               .dropdown.no-arrow
-                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addRequestModal') Add New Request
+                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addWithdrawalModal') Add New Withdrawal Request
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -58,8 +58,8 @@ block content
                           td
                             .badge.badge-info.badge-pill #{x.status}
                         td 
-                          a.updateWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.withdrawalNum) data-toggle='modal' data-target='#')
+                          a.updateWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
-                          a.deleteWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.withdrawalNum) data-toggle='modal' data-target='#')
+                          a.deleteWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.withdrawalNum+'/'+borrowerName) data-toggle='modal' data-target='#')
                             i.fas.fa-trash
     include ../partials/page-footer

@@ -7039,7 +7039,7 @@ const postUpdateLoans = (req, res) => {
                                                                     json: {
                                                                         receiver: loan.requestedBy.profile.email,
                                                                         subject: 'Your VMO EZ Loan application has been approved and released',
-                                                                        message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers for repayments. (${process.env.BASE_URL}/login) \n`
+                                                                        message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers for repayments. (${process.env.BASE_URL}/login) \n\n Thank you.\n`
                                                                     }
                                                                 };
                                                                 request(
@@ -7119,7 +7119,7 @@ const postUpdateLoans = (req, res) => {
                                                             json: {
                                                                 receiver: loan.requestedBy.profile.email,
                                                                 subject: 'Your VMO EZ Loan application has been approved and release',
-                                                                message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers where to send your repayment.\n`
+                                                                message: `Hello,\n\nThis is a confirmation that the loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\nCheck our website for the list of account numbers where to send your repayment.\n\n  Thank you.\n`
                                                             }
                                                         };
                                                         request(
@@ -7831,7 +7831,7 @@ const getWithdrawals = (req, res) => {
                                                     return res.redirect('back');
                                                 } else if (statusCode === 200) {
                                                     res.render('account/withdrawals', {
-                                                        title: 'Manage Withdrawals',
+                                                        title: 'Manage Withdrawal Requests',
                                                         user: user,
                                                         borrowers: borrowers,
                                                         employees: employees,
@@ -7872,7 +7872,403 @@ const getWithdrawals = (req, res) => {
 };
 
 const postWithdrawals = (req, res) => {
-    getUserDetails(req, res, 'account/index', 'Account Management');
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.receiverName)) validationErrors.push({
+        msg: 'Borrower Name cannot be blank.'
+    });
+    if (req.body.amount == 0) validationErrors.push({
+        msg: 'Withdrawal amount cannot be zero.'
+    });
+    if (req.body.amount < 500) validationErrors.push({
+        msg: 'Required minimum withdrawal amount is 500.'
+    });
+    if (validator.isEmpty(req.body.reason)) validationErrors.push({
+        msg: 'Reason cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/withdrawals';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            amount: req.body.amount,
+            reason: req.body.reason,
+            requestedBy: req.body.receiverName
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, withdrawal) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when creating withdrawal request. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 201) {
+                req.flash('success', {
+                    msg: "Withdrawal Request has been added successfully."
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: withdrawal.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+
+const getWithdrawalDetails = (req, res) => {
+    path = '/api/withdrawals/' + req.params.withdrawalid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, withdrawal) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json('There was an error when loading employee information. Please try again later.');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/borrowers/' + withdrawal.requestedBy._id + '/contributions';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            return res
+                                .status(404)
+                                .json('There was an error when loading members contribution. Please try again later.');
+                        } else if (statusCode === 200) {
+                            return res
+                                .status(200)
+                                .json({
+                                    total: transactions[0].total.$numberDecimal,
+                                    withdrawal: withdrawal
+                                });
+                        } else {
+                            return res
+                                .status(statusCode)
+                                .json('There was an error when loading members contribution. Please try again later.');
+                        }
+                    }
+                );
+            } else {
+                return res
+                    .status(statusCode)
+                    .json('There was an error when loading employee information. Please try again later.');
+            }
+        }
+    );
+};
+
+const postUpdateWithdrawals = (req, res) => {
+    path = '/api/withdrawals/' + req.params.withdrawalid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, withdrawal) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading withdrawal request. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                const validationErrors = [];
+                if (validator.isEmpty(req.body.status)) validationErrors.push({
+                    msg: 'Status cannot be blank.'
+                });
+                if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
+                    msg: 'Assigned Loan Officer cannot be blank.'
+                });
+                if (req.body.status == "Cash Release") {
+                    if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+                        msg: 'Assigned Loan Officer cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+                        msg: 'Assigned Loan Officer cannot be blank.'
+                    });
+                }
+                if (validationErrors.length) {
+                    req.flash('errors', validationErrors);
+                    return res.redirect('back');
+                }
+                path = '/api/withdrawals/' + req.params.withdrawalid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'PUT',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        status: req.body.status,
+                        reviewedBy: req.body.reviewedBy
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, updatedWithdrawal) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when updating withdrawal request. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            if (req.body.status == "Cash Release") {
+                                path = '/api/employees/' + req.body.postedBy;
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {}
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, employee) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when loading employee information. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            let transaction = {};
+                                            transaction.senderNum = employee.account.number;
+                                            transaction.amount = '-' + withdrawal.amount;
+                                            transaction.type = "Withdrawals";
+                                            transaction.receiverNum = withdrawal.requestedBy.account.number;
+                                            transaction.status = "Posted";
+                                            transaction.borrowerId = withdrawal.requestedBy._id;
+                                            transaction.withdrawalId = withdrawal._id;
+                                            transaction.postedBy = req.body.postedBy;
+                                            transaction.referenceNo = req.body.referenceNo;
+                                            path = '/api/transactions';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: transaction
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, newTransaction) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when adding new transaction. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        path = '/api/sendMail';
+                                                        requestOptions = {
+                                                            url: `${apiOptions.server}${path}`,
+                                                            method: 'POST',
+                                                            json: {
+                                                                receiver: withdrawal.requestedBy.profile.email,
+                                                                subject: 'Your VMO EZ Loan Withdrawal Request has been approved and release',
+                                                                message: `Hello,\n\nThis is a confirmation that the withdrawal request #${withdrawal.withdrawalNum} amounting of ${transaction.amount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\n Thank you.\n`
+                                                            }
+                                                        };
+                                                        request(
+                                                            requestOptions,
+                                                            (err, {
+                                                                statusCode
+                                                            }, body) => {
+                                                                if (err) {
+                                                                    req.flash('warnings', {
+                                                                        msg: 'Withdrawal request has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                } else if (statusCode === 200) {
+                                                                    req.flash('success', {
+                                                                        msg: "Withdrawal request has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                } else {
+                                                                    req.flash('errors', {
+                                                                        msg: body.message
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: newTransaction.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: employee.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                req.flash('success', {
+                                    msg: "Withdrawal request has been updated successfully."
+                                });
+                                return res.redirect('back');
+                            }
+                        } else {
+                            req.flash('errors', {
+                                msg: updatedWithdrawal.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: withdrawal.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeleteWithdrawals = (req, res) => {
+    path = '/api/transactions/withdrawals/' + req.params.withdrawalid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transactions) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when deleting transactions record. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                path = '/api/withdrawals/' + req.params.withdrawalid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, body) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when deleting withdrawal request. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting withdrawal request and all transactions."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: body.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: transactions.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getContributions = (req, res) => {
+    path = '/api/transactions/borrowers/' + req.params.borrowerid + '/contributions';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transactions) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json('There was an error when loading members contribution. Please try again later.');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(transactions[0].total.$numberDecimal);
+            } else {
+                return res
+                    .status(statusCode)
+                    .json('There was an error when loading members contribution. Please try again later.');
+            }
+        }
+    );
 };
 
 const getEmployees = (req, res) => {
@@ -8093,6 +8489,10 @@ module.exports = {
     getDeleteTransactions,
     getWithdrawals,
     postWithdrawals,
+    getWithdrawalDetails,
+    postUpdateWithdrawals,
+    getDeleteWithdrawals,
+    getContributions,
     getEmployees,
     postEmployees,
     getInquiries,

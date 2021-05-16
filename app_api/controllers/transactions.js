@@ -590,7 +590,7 @@ const transactionsSummary = (req, res) => {
     }
 };
 
-const contributionsListByMember = (req, res) => {
+const contributionsSummary = (req, res) => {
     const {
         year
     } = req.params;
@@ -648,6 +648,61 @@ const contributionsListByMember = (req, res) => {
     }
 };
 
+const contributionsListByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid borrower id."
+            });
+    } else {
+        Transaction
+            .aggregate([{
+                    $match: {
+                        borrowerId: mongoose.Types.ObjectId(borrowerid),
+                        status: "Posted",
+                        $or: [{
+                            type: 'Contributions'
+                        }, {
+                            type: 'Withdrawals'
+                        }]
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$borrowerId',
+                        total: {
+                            $sum: {
+                                $toDecimal: '$amount'
+                            }
+                        },
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
 module.exports = {
     transactionsList,
     transactionsCreate,
@@ -663,5 +718,6 @@ module.exports = {
     transactionsListByWithdrawals,
     transactionsDeleteManyByWithdrawals,
     transactionsSummary,
-    contributionsListByMember
+    contributionsSummary,
+    contributionsListByBorrower
 };

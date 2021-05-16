@@ -139,6 +139,14 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postWithdrawals);
 
 router
+    .route('/withdrawals/:withdrawalid')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getWithdrawalDetails)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateWithdrawals);
+
+router.get('/withdrawals/:withdrawalid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteWithdrawals);
+router.get('/contributions/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getContributions);
+
+router
     .route('/employees')
     .get(passportConfig.isAuthenticated, ctrlAccount.getEmployees)
     .post(passportConfig.isAuthenticated, ctrlAccount.postEmployees);

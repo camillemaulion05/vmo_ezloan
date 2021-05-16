@@ -204,6 +204,114 @@ else
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
+  
+  if title.indexOf("Manage Withdrawal Requests") != -1
+    #addWithdrawalModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addWithdrawalModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addWithdrawalModalLabel.modal-title Add New Withdrawal Request
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addWithdrawal(method='POST' action='/withdrawals')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='receiverName') Borrower Name
+                  select#receiverName.form-control.selectpicker(type='text' name='receiverName')
+                    option(value='' selected='') Borrower Name
+                    for x in borrowers
+                      if (x.type == 'Member')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='contributions') Total Contributions
+                  input#contributions.form-control(type='text' name='contributions' disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='reason') Reason
+                  select#reason.form-control.selectpicker(type='text' name='reason')
+                    option(value='' selected='') Reason
+                    - let reasons = ["Living Cost", "Educational", "Medical/Hospitalization","Purchasing Appliance","Travel/Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
+                    for x in reasons
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='amount') Loan Amount
+                  input#amount.form-control(type="number" step="500" min="500" name='amount' value="500")
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+    #deleteWithdrawalModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteWithdrawalModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteWithdrawalModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete withdrawal request no.  
+              span#deleteWithrawalNum 
+              |  of 
+              span#deleteBorrowerName
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteWithrawal.btn.btn-primary(href='') Yes, delete it
+    #updateWithdrawalModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateWithdrawalModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#updateWithdrawalModalLabel.modal-title 
+              span#updateTitle Update 
+              span#updateWithdrawalNum
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#updateWithdrawal(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='borrowerName') Borrower Name
+                  input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='shares') Total Contributions
+                  input#shares.form-control(type='text' name='shares' disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='withdrawReason') Reason
+                  input#withdrawReason.form-control(type='text' name='reason' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='withdrawAmount') Amount
+                  input#withdrawAmount.form-control(type='text' name='amount' disabled='')
+              .form-row.mb-2
+                .col-md-6 
+                  label.small.mb-1(for='status') Status
+                  select#status.form-control.selectpicker(type='text' name='status')
+                    option(value='' selected='') Status
+                     - let status =  ["Processing", "Approved", "Declined", "Cash Release"]
+                    for x in status
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='reviewedBy') Assigned Loan Officer
+                  select#reviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
+                    option(value='' selected='') Assigned Loan Officer
+                    for x in employees
+                      if (x.type == 'Loan Officer')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
+              .form-row.mb-2.addTransactionOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='postedBy') Assigned Loan Processor
+                  select#postedBy.form-control.selectpicker(type='text' name='postedBy')
+                    option(value='' selected='') Assigned Loan Processor
+                    for x in employees
+                      if (x.type == 'Loan Processor')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
+                .col-md-6
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
+                  input#referenceNo.form-control(type='text' name='referenceNo')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
 
   if title.indexOf("Manage Transactions") != -1
     #deleteTransactionModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteTransactionModalLabel' aria-hidden='true')

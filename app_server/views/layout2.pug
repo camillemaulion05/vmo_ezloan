@@ -242,6 +242,92 @@ html
                 }
               });
           });
+    
+    if title.indexOf("Manage Withdrawal Requests") != -1
+      script.
+          $(function () {
+            $('#dataTable').on('click','.deleteWithdrawal',function () {
+                let path = ($(this).prop('href')).split('/');
+                let borrowerName = (path[path.length-1]).replace(/%20/g," ");
+                let withdrawalNum = path[path.length-2];
+                let withdrawalid = path[path.length-3];
+                $('a#deleteWithrawal').attr('href', '/withdrawals/' + withdrawalid + '/delete'); 
+                $('span#deleteWithrawalNum').text(withdrawalNum);
+                $('span#deleteBorrowerName').text(borrowerName);
+                $('#deleteWithdrawalModal').modal('show'); 
+            });
+            $('#dataTable').on('click','.updateWithdrawal',function () {
+                let path = ($(this).prop('href')).split('/');
+                let withdrawalid = path[path.length-1];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/withdrawals/" + withdrawalid,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                      $('input#borrowerName').val(data.withdrawal.requestedBy.account.number + ' - ' + data.withdrawal.requestedBy.profile.firstName + ' ' + data.withdrawal.requestedBy.profile.lastName);
+                      $('input#shares').val(data.total);
+                      $('input#withdrawReason').val(data.withdrawal.reason);
+                      $('input#withdrawAmount').val(data.withdrawal.amount);
+                      $('select#status').val(data.withdrawal.status);
+                      $('select#reviewedBy').val(data.withdrawal.reviewedBy);
+                      $('.addTransactionOnly').addClass('d-none');
+                      $('select#status option[value="Processing"]').show();
+                      $('#updateWithdrawalNum').text(data.withdrawal.withdrawalNum);
+                      if (data.withdrawal.status == "Declined" || data.withdrawal.status == "Cash Release") {
+                        $('select#status').prop('disabled', true);
+                        $('select#reviewedBy').prop('disabled', true);
+                        $("#updateWithdrawal .btn.btn-primary").hide();
+                        $('#updateTitle').text("Withdrawal No. ");
+                      } else {
+                        $('select#status').prop('disabled', false);
+                        $('select#reviewedBy').prop('disabled', false);
+                        $("#updateWithdrawal .btn.btn-primary").show();
+                        $("#updateWithdrawal").attr("action", "/withdrawals/" + withdrawalid);
+                        $('#updateTitle').text("Update ");
+                      }
+                      if (data.withdrawal.status == "Approved"){
+                        $('select#status option[value="Processing"]').hide();
+                      } 
+                      $('#updateWithdrawalModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                      console.log(xhr.responseJSON.message);
+                    }
+                });
+            });
+            $('select#status').change(function () {
+              $('.addTransactionOnly').addClass('d-none');
+              if($('select#status').val() == "Cash Release") $('.addTransactionOnly').removeClass('d-none');
+            });
+            $('select#receiverName').change(function () {
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/contributions/" +  $('select#receiverName').val(),
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                      $('input#contributions').val(data);
+                      $('input#amount').prop('max', data);
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
+            });
+          });
 
     if title.indexOf("Manage Transactions") != -1
       script.
