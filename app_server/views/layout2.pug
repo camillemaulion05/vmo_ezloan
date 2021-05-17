@@ -75,6 +75,35 @@ html
               });
           });
 
+    if title.indexOf("Manage Inquiries") != -1
+      script.
+          $(function () {
+            $('#dataTable').on('click','.deleteInquiry',function () {
+                let path = ($(this).prop('href')).split('/');
+                let inquiryName = (path[path.length-1]).replace(/%20/g," ");
+                let inquiryNum = path[path.length-2];
+                let inquiryid = path[path.length-3];
+                $('a#deleteInquiry').attr('href', '/inquiries/' + inquiryid + '/delete'); 
+                $('span#deleteInquiryNum').text(inquiryNum);
+                $('span#deleteInquiryName').text(inquiryName);
+                $('#deleteInquiryModal').modal('show'); 
+            });
+            $('#dataTable').on('click','.updateInquiry',function () {
+                let path = ($(this).prop('href')).split('/');
+                let inquiryMessage = (path[path.length-1]).replace(/%20/g," ");
+                let inquiryEmail = (path[path.length-2]).replace(/%20/g," ");
+                let inquiryName = (path[path.length-3]).replace(/%20/g," ");
+                let inquiryNum = path[path.length-4];
+                let inquiryid = path[path.length-5];
+                $('input#name').val(inquiryName);
+                $('input#email').val(inquiryEmail);
+                $('textarea#message').val(inquiryMessage);
+                $('span#updateInquiryNum').text(" " + inquiryNum);
+                $("#updateInquiry").attr("action", "/inquiries/" + inquiryid + '/update');
+                $('#updateInquiryModal').modal('show');
+            });
+          });
+
     if title.indexOf("Manage Borrowers") != -1
       script.
           $(function () {

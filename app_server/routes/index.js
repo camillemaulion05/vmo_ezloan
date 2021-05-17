@@ -156,7 +156,9 @@ router.get('/admins/:adminid/:userid/delete', passportConfig.isAuthenticated, ct
 
 router
     .route('/inquiries')
-    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiries)
-    .post(passportConfig.isAuthenticated, ctrlAccount.postInquiries);
+    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiries);
+
+router.get('/inquiries/:inquiryid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteInquiries);
+router.post('/inquiries/:inquiryid/update', passportConfig.isAuthenticated, ctrlAccount.getUpdateInquiries);
 
 module.exports = router;

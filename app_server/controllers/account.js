@@ -8629,6 +8629,146 @@ const getDeleteAdmins = (req, res) => {
     );
 };
 
+const getUpdateInquiries = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.response)) validationErrors.push({
+        msg: 'Response message cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/inquiries/' + req.params.inquiryid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            response: {
+                message: req.body.response,
+                repliedBy: req.user.id
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, inquiry) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating inquiry. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/inquiries/' + req.params.inquiryid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, updatedInquiry) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when updating inquiry. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/sendMail';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                json: {
+                                    receiver: updatedInquiry.email,
+                                    subject: 'Your VMO EZ Loan Inquiry Response',
+                                    message: `Hello,\n\nThis is a response for your inquiry #${updatedInquiry.inquiryNum}: ${updatedInquiry.message}, ${updatedInquiry.response.message}.\n\n Thank you.\n`
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, body) => {
+                                    if (err) {
+                                        req.flash('warnings', {
+                                            msg: 'Inquiry has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        req.flash('success', {
+                                            msg: "Inquiry has been updated successfully. Email has been sent to respective email."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: body.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: updatedInquiry.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: inquiry.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeleteInquiries = (req, res) => {
+    path = '/api/inquiries/' + req.params.inquiryid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, inquiry) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when deleting inquiry. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 204) {
+                req.flash('success', {
+                    msg: "Successfully deleting inquiry record."
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: inquiry.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -8689,5 +8829,7 @@ module.exports = {
     getInquiries,
     postInquiries,
     getDeleteEmployees,
-    getDeleteAdmins
+    getDeleteAdmins,
+    getUpdateInquiries,
+    getDeleteInquiries
 };

@@ -205,6 +205,54 @@ else
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
 
+  if title.indexOf("Manage Inquiries") != -1
+    #deleteInquiryModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteInquiryModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#deleteInquiryModalLabel.modal-title Delete Confirmation
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p Are you sure you want to delete inquiry no.  
+              span#deleteInquiryNum 
+              |  of 
+              span#deleteInquiryName
+              | ? This action cannot be undone.
+          .modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            a#deleteInquiry.btn.btn-primary(href='') Yes, delete it
+    #updateInquiryModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateInquiryModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#updateInquiryModalLabel.modal-title 
+              | Reply to Inquiry
+              span#updateInquiryNum 
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#updateInquiry(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='name') Full name
+                  input#name.form-control(type='text' name='name' disabled='')
+                .col-md-6
+                  label.small.mb-1(for='email') Email address
+                  input#email.form-control(type='email' name='email' disabled='')
+              .form-row.mb-2
+                .col-md-12
+                  label.small.mb-1(for='message') Message
+                  textarea#message.form-control(name='message' disabled='')
+              .form-row.mb-2
+                .col-md-12
+                  label.small.mb-1(for='response') Response
+                  textarea#response.form-control(name='response')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+
   if title.indexOf("Manage Employees") != -1
     - let type = ["Loan Officer", "Loan Processor", "HRD Authorized Officer", "Admin"]
     #deleteEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteEmployeeModalLabel' aria-hidden='true')
