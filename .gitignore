@@ -39,6 +39,7 @@ jspm_packages/
 # Upload directories
 !uploads
 uploads/*
+!uploads/tmp
 
 # Typescript v1 declaration files
 typings/
