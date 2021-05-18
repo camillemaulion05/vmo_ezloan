@@ -207,7 +207,7 @@ const sendMail = async function (req, res) {
             text: req.body.message
         };
         if (req.body.sender) {
-            mailOptions.to = process.env.GMAIL_USER;
+            mailOptions.to = process.env.GMAIL_USER, req.body.sender;
             mailOptions.from = `${req.body.name} <${req.body.sender}>`;
         }
         if (req.body.receiver) {

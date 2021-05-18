@@ -5949,8 +5949,7 @@ a.close.disabled {
 
 .carousel-control-prev {
   left: 0;
-  /*UPDATES - Having our arrow icons outside the image slider*/
-  left: -110px;
+  /*UPDATES - Having our arrow icons change color*/
   border-bottom: 0;
   font-size: 40px;
   color: #444;
@@ -5958,8 +5957,7 @@ a.close.disabled {
 
 .carousel-control-next {
   right: 0;
-  /*UPDATES - Having our arrow icons outside the image slider*/
-  right: -110px;
+  /*UPDATES - Having our arrow icons change color*/
   border-bottom: 0;
   font-size: 40px;
   color: #444;
@@ -10691,7 +10689,7 @@ section#contact form#contactForm .form-control:focus {
   box-shadow: none;
 }
 section#contact form#contactForm ::-webkit-input-placeholder {
-  /*UPDATES - Chane font settings*/
+  /*UPDATES - Change font settings*/
   /* font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
   font-family: inherit;
   /* font-weight: 700; */
@@ -10699,7 +10697,7 @@ section#contact form#contactForm ::-webkit-input-placeholder {
   color: #bbb;
 }
 section#contact form#contactForm :-moz-placeholder {
-  /*UPDATES - Chane font settings*/
+  /*UPDATES - Change font settings*/
   /* font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
   font-family: inherit;
   /* font-weight: 700; */
@@ -10707,7 +10705,7 @@ section#contact form#contactForm :-moz-placeholder {
   color: #bbb;
 }
 section#contact form#contactForm ::-moz-placeholder {
-  /*UPDATES - Chane font settings*/
+  /*UPDATES - Change font settings*/
    /* font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
    font-family: inherit;
    /* font-weight: 700; */
@@ -10715,7 +10713,7 @@ section#contact form#contactForm ::-moz-placeholder {
   color: #bbb;
 }
 section#contact form#contactForm :-ms-input-placeholder {
-  /*UPDATES - Chane font settings*/
+  /*UPDATES - Change font settings*/
   /* font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
   font-family: inherit;
   /* font-weight: 700; */
