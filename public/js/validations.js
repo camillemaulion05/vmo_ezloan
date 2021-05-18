@@ -7,11 +7,6 @@
         if (mobile.charAt(0) != '9') {
             this.value = '';
         };
-        formatNumber(this.value);
-        $(this).text(this.value);
-    });
-
-    $('').on("keyup change blur", function () {
         $(this).val(formatNumber($(this).val()));
     });
 
