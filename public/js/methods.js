@@ -204,26 +204,7 @@ function formatEmail(f) {
 
 function formatNumber(f) {
     return f
-        .replace(/[^0-9-]/ig, '');
-}
-
-function formatAmount(f) {
-    return f
-        .replace(/[^0-9-.]/ig, '')
-        .replace(/\_/g, "")
-        .replace(/\^/g, "")
-        .replace(/\[/g, "")
-        .replace(/\`/g, "")
-        .replace(/\~/g, "")
-        .replace(/\]/g, "")
-        .replace(/\_\_/g, "")
-        .replace(/\\/g, "")
-        .replace(/\ \ /g, "")
-        .replace(/\-\-/g, "")
-        .replace(/\'\'/g, "")
-        .replace(/\.\ \./g, "")
-        .replace(/\-\ \-/g, "")
-        .replace(/\'\ \'/g, "");
+        .replace(/[^0-9]/ig, '');
 }
 
 function formatMsgs(f) {

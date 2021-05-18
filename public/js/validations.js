@@ -34,10 +34,6 @@
         $(this).val(formatNumber($(this).val()));
     });
 
-    $('input[name="amount"]').on("keyup change blur", function () {
-        $(this).val(formatAmount($(this).val()));
-    });
-
     $('input[name="dateOfBirth"]').attr("min", formatDate(dateNowMinusYrs(65)));
     $('input[name="dateOfBirth"]').attr("max", formatDate(dateNowMinusYrs(21)));
 
