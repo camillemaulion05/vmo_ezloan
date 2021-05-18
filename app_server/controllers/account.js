@@ -4,10 +4,11 @@ const CryptoJS = require("crypto-js");
 const request = require('request');
 const PdfPrinter = require('pdfmake');
 const generator = require('generate-password');
+const uploadFolder = __basedir
 if (process.env.NODE_ENV == "development") {
-    const uploadFolder = __basedir + '/uploads_dev/';
+    uploadFolder += '/uploads_dev/';
 } else {
-    const uploadFolder = __basedir + '/uploads/';
+    uploadFolder += '/uploads/';
 }
 
 const apiOptions = {
