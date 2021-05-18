@@ -207,6 +207,25 @@ function formatNumber(f) {
         .replace(/[^0-9-]/ig, '');
 }
 
+function formatAmount(f) {
+    return f
+        .replace(/[^0-9-.]/ig, '')
+        .replace(/\_/g, "")
+        .replace(/\^/g, "")
+        .replace(/\[/g, "")
+        .replace(/\`/g, "")
+        .replace(/\~/g, "")
+        .replace(/\]/g, "")
+        .replace(/\_\_/g, "")
+        .replace(/\\/g, "")
+        .replace(/\ \ /g, "")
+        .replace(/\-\-/g, "")
+        .replace(/\'\'/g, "")
+        .replace(/\.\ \./g, "")
+        .replace(/\-\ \-/g, "")
+        .replace(/\'\ \'/g, "");
+}
+
 function formatMsgs(f) {
     return f
         .replace(/[^A-z0-9-.,'?! ]/ig, '')

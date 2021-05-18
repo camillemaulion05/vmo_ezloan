@@ -172,10 +172,10 @@ else
               .form-row.mb-2.withCreditLimitOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='totalUsedCreditLimit') Total Used Credit Limit
-                  input#totalUsedCreditLimit.form-control(type="number" step="500" min="0" name='totalUsedCreditLimit' disabled='')
+                  input#totalUsedCreditLimit.form-control(type="text" name='totalUsedCreditLimit' disabled='')
                 .col-md-6
                   label.small.mb-1(for='remainingCreditLimit') Remaining Credit Limit
-                  input#remainingCreditLimit.form-control(type="number" step="500" min="0" name='remainingCreditLimit' disabled='')
+                  input#remainingCreditLimit.form-control(type="text" name='remainingCreditLimit' disabled='')
               .form-row.mb-2.verifiedOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='totalCreditLimit') Total Credit Limit
@@ -772,7 +772,7 @@ else
                 .col-md-6
                   -let amountDue = (schedule.amountDue) ? (schedule.paymentAmount) ? (parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) < 0.00) ? '0.00' : parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) : (parseFloat(schedule.amountDue)).toFixed(2) : '0.00'
                   label.small.mb-1(for='amount') Amount
-                  input#amount.form-control(type="number" min='0' name='amount' value=amountDue)
+                  input#amount.form-control(type="text" name='amount' value=amountDue)
                 .col-md-6
                   label.small.mb-1(for='senderNum') Sender Number
                   .input-group
