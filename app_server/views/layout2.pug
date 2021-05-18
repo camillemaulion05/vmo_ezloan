@@ -428,10 +428,10 @@ html
                       $('textarea#message').val(data.message);
                       if (data.type == "Release" || data.type == "Withdrawals") {
                         $('input#borrowerAcctNo').val(data.receiverNum);
-                        $('input#ProcessorAcctNo').val(data.senderNum);
+                        $('input#processorAcctNo').val(data.senderNum);
                       } else {
                         $('input#borrowerAcctNo').val(data.senderNum);
-                        $('input#ProcessorAcctNo').val(data.receiverNum);
+                        $('input#processorAcctNo').val(data.receiverNum);
                       }
                       if (data.type == "Expenses") {
                         $('.notExpensesType').hide();

@@ -352,7 +352,7 @@ else
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='contributions') Total Contributions
-                  input#contributions.form-control(type='text' name='contributions' disabled='')
+                  input#contributions.form-control(type='number' min='0' name='contributions' disabled='')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='reason') Reason
@@ -362,8 +362,8 @@ else
                     for x in reasons
                       option(value=x) #{x}
                 .col-md-6
-                  label.small.mb-1(for='amount') Loan Amount
-                  input#amount.form-control(type="number" step="500" min="500" name='amount' value="500")
+                  label.small.mb-1(for='amount') Amount
+                  input#amount.form-control(type="number" step="500" min="500" name='amount')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -401,14 +401,14 @@ else
                   input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
                 .col-md-6
                   label.small.mb-1(for='shares') Total Contributions
-                  input#shares.form-control(type='text' name='shares' disabled='')
+                  input#shares.form-control(type='number' min='0' name='shares' disabled='')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='withdrawReason') Reason
                   input#withdrawReason.form-control(type='text' name='reason' disabled='')
                 .col-md-6
                   label.small.mb-1(for='withdrawAmount') Amount
-                  input#withdrawAmount.form-control(type='text' name='amount' disabled='')
+                  input#withdrawAmount.form-control(type='number' min='0' name='amount' disabled='')
               .form-row.mb-2
                 .col-md-6 
                   label.small.mb-1(for='status') Status
@@ -434,7 +434,7 @@ else
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
-                  input#referenceNo.form-control(type='text' name='referenceNo')
+                  input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -480,17 +480,17 @@ else
                   .input-group.mb-1
                     .input-group-prepend
                       span.input-group-text +63
-                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' disabled='')
+                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' minlength='10' maxlength='10' disabled='')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='postedBy') Assigned Loan Processor
                   input#postedBy.form-control(type='text' name='postedBy' disabled='')
                 .col-md-6
-                  label.small.mb-1(for='ProcessorAcctNo') Loan Processor G-Cash No.
+                  label.small.mb-1(for='processorAcctNo') Loan Processor G-Cash No.
                   .input-group.mb-1
                     .input-group-prepend
                       span.input-group-text +63
-                    input#ProcessorAcctNo.form-control(type='text' name='ProcessorAcctNo' disabled='')
+                    input#processorAcctNo.form-control(type='text' name='processorAcctNo' minlength='10' maxlength='10' disabled='')
               .form-row.mb-2.messageOnly
                 .col-md-12
                   label.small.mb-1(for='message') Message
@@ -498,7 +498,7 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
-                  input#referenceNo.form-control(type='text' name='referenceNo' disabled='')
+                  input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10' disabled='')
                 .col-md-6 
                   label.small.mb-1(for='status') Status
                   select#status.form-control.selectpicker(type='text' name='status')
@@ -529,7 +529,7 @@ else
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
-                  input#txnReferenceNo.form-control(type='text' name='referenceNo')
+                  input#txnReferenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
               .form-row.mb-2
                 .col-md-12
                   label.small.mb-1(for='message') Message
@@ -659,7 +659,7 @@ else
               .form-row.mb-2
                 .col-md-6.loanReleaseOnly.d-none
                   label.small.mb-1(for='newProceedsAmount') New Proceeds of Loan
-                  input#newProceedsAmount.form-control(type='text' name='newProceedsAmount' disabled='')
+                  input#newProceedsAmount.form-control(type='number' min='0' name='newProceedsAmount' disabled='')
                 .col-md-6.fullyPaidOnly.d-none
                   label.small.mb-1(for='balance') Remaining Balance
                   input#balance.form-control(type='text' name='balance' disabled='')
@@ -668,7 +668,7 @@ else
                   .input-group.mb-1
                     .input-group-prepend
                       span.input-group-text +63
-                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' disabled='')
+                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' minlength='10' maxlength='10' disabled='')
               .form-row.mb-2.addTransactionOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='postedBy') Assigned Loan Processor
@@ -679,7 +679,7 @@ else
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
-                  input#referenceNo.form-control(type='text' name='referenceNo')
+                  input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -699,7 +699,7 @@ else
               p VMO EZ Loan will send a text message with a 6-digit verification code.
               .form-row
                 .form-group
-                  input#code.form-control(type='text' placeholder='Enter code' name='code')
+                  input#code.form-control(type='text' placeholder='Enter code' name='code' minlength='6' maxlength='6')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Verify
@@ -772,7 +772,7 @@ else
                 .col-md-6
                   -let amountDue = (schedule.amountDue) ? (schedule.paymentAmount) ? (parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) < 0.00) ? '0.00' : parseFloat(schedule.amountDue) - parseFloat(schedule.paymentAmount) : (parseFloat(schedule.amountDue)).toFixed(2) : '0.00'
                   label.small.mb-1(for='amount') Amount
-                  input#amount.form-control(type="text" name='amount' value=amountDue)
+                  input#amount.form-control(type="number" min='0' name='amount' value=amountDue)
                 .col-md-6
                   label.small.mb-1(for='senderNum') Sender Number
                   .input-group
@@ -789,7 +789,7 @@ else
                         option(value=x._id) #{x.account.number} - #{x.account.name}
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
-                  input#referenceNo.form-control(type="text" name='referenceNo' )
+                  input#referenceNo.form-control(type="text" name='referenceNo' minlength='10' maxlength='10')
               .form-row.mb-2
                 .col-md-12
                   label.small.mb-1(for='message') Message

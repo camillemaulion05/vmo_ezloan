@@ -242,7 +242,7 @@ block content
                         tbody
                           - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                           - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-                          if (borrower.documents && borrower.documents.primaryIdFront)
+                          if (borrower.documents && borrower.documents.primaryIdFront && borrower.documents.primaryIdFront.filename)
                             tr
                               td Government ID Card Front 
                               td 
@@ -251,7 +251,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.primaryIdFront.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.primaryIdBack)
+                          if (borrower.documents && borrower.documents.primaryIdBack &&  borrower.documents.primaryIdBack.filename)
                             tr
                               td Government ID Card Front 
                               td 
@@ -260,7 +260,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.primaryIdBack.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.companyIdFront)
+                          if (borrower.documents && borrower.documents.companyIdFront && borrower.documents.companyIdFront.filename)
                             tr
                               td Company ID Card Front 
                               td 
@@ -269,7 +269,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.companyIdFront.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.companyIdBack)
+                          if (borrower.documents && borrower.documents.companyIdBack && borrower.documents.companyIdBack.filename)
                             tr
                               td Company ID Card Back 
                               td 
@@ -278,7 +278,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.companyIdBack.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.coe)
+                          if (borrower.documents && borrower.documents.coe && borrower.documents.coe.filename)
                             tr
                               td Certificate of Employment 
                               td 
@@ -287,7 +287,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.coe.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.payslip1)
+                          if (borrower.documents && borrower.documents.payslip1 && borrower.documents.payslip1.filename)
                             tr
                               td Payslip 1
                               td 
@@ -296,7 +296,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.payslip1.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.payslip2)
+                          if (borrower.documents && borrower.documents.payslip2 && borrower.documents.payslip2.filename)
                             tr
                               td Payslip 2
                               td 
@@ -305,7 +305,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.payslip2.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.bir)
+                          if (borrower.documents && borrower.documents.bir && borrower.documents.bir.filename)
                             tr
                               td BIR 2316
                               td 
@@ -314,7 +314,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.bir.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.tinProof)
+                          if (borrower.documents && borrower.documents.tinProof && borrower.documents.tinProof.filename)
                             tr
                               td TIN proof
                               td 
@@ -323,7 +323,7 @@ block content
                               - let date = paramDate.toString().split(' ');
                               - let newDate = (borrower.documents.tinProof.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
-                          if (borrower.documents && borrower.documents.selfiewithId)
+                          if (borrower.documents && borrower.documents.selfiewithId && borrower.documents.selfiewithId.filename)
                             tr
                               td Selfie with ID
                               td 

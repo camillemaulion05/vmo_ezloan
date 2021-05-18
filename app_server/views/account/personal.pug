@@ -81,13 +81,13 @@ block content
                           .input-group
                             .input-group-prepend
                               span.input-group-text +63
-                            input#homePhoneNum.form-control(type='text' placeholder='Enter your mobile number' name='homePhoneNum' minlength='10' maxlength='10' value=user.profile.homePhoneNum)
+                            input#homePhoneNum.form-control(type='text' placeholder='Enter your mobile number' name='homePhoneNum' minlength='9' maxlength='9' value=user.profile.homePhoneNum)
                         .form-group.col-md-4.mb-4
                           label.small.mb-1(for='mobileNum') Mobile Number
                           .input-group
                             .input-group-prepend
                               span.input-group-text +63
-                            input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' value=user.profile.mobileNum)
+                            input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' minlength='10' maxlength='10' value=user.profile.mobileNum)
                       .form-row
                         .form-group.col-md-4.mb-md-0
                           label.small.mb-1(for='tin') TIN ID

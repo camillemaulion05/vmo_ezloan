@@ -26,7 +26,7 @@ block content
                             .input-group
                               .input-group-prepend
                                 span.input-group-text +63
-                              input#accountNum.form-control(type='text' placeholder='Enter your gcash account no.' name='accountNum' value=(user.account) ? user.account.number : '')
+                              input#accountNum.form-control(type='text' placeholder='Enter your gcash account no.' name='accountNum' minlength='10' maxlength='10' value=(user.account) ? user.account.number : '')
                       hr.my-4
                       fieldset
                         legend.text-primary Work / Business Information
@@ -43,7 +43,7 @@ block content
                             .input-group
                               .input-group-prepend
                                 span.input-group-text +63
-                              input#officePhone.form-control(type='text' placeholder='Enter your office phone no.' name='officePhone' value=(user.workBusinessInfo) ? user.workBusinessInfo.officePhone : '')
+                              input#officePhone.form-control(type='text' placeholder='Enter your office phone no.' name='officePhone' minlength='9' maxlength='9' value=(user.workBusinessInfo) ? user.workBusinessInfo.officePhone : '')
                         .form-row
                           .form-group.col-md-6
                             label.small.mb-1(for='employmentType') Employment Status
@@ -99,7 +99,7 @@ block content
                             .input-group
                               .input-group-prepend
                                 span.input-group-text ₱
-                              input#monthlyIncome.form-control(type='text' placeholder='Enter your monthly income' name='monthlyIncome' value=(user.workBusinessInfo) ? user.workBusinessInfo.monthlyIncome : '')
+                              input#monthlyIncome.form-control(type='number' min='0' placeholder='Enter your monthly income' name='monthlyIncome' value=(user.workBusinessInfo) ? user.workBusinessInfo.monthlyIncome : '')
                               .input-group-append
                                 span.input-group-text .00
                       hr.my-4
