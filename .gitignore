@@ -37,7 +37,8 @@ node_modules/
 jspm_packages/
 
 # Upload directories
-uploads_dev/
+!uploads
+uploads/*
 
 # Typescript v1 declaration files
 typings/

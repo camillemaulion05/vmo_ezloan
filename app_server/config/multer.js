@@ -3,11 +3,7 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (process.env.NODE_ENV == "development") {
-            cb(null, 'uploads_dev')
-        } else {
-            cb(null, 'uploads')
-        }
+        cb(null, 'uploads')
     },
     //file will save to folder as original file and filename as datestamp name
     filename: function (req, file, cb) {
