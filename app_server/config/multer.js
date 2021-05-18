@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
     },
     //file will save to folder as original file and filename as datestamp name
     filename: function (req, file, cb) {
-        console.log(file);
         var ext = path.extname(file.originalname);
         cb(null, Date.now() + ext)
     }
