@@ -571,7 +571,7 @@ else
                       option(value=x) #{x}
                 .col-md-6
                   label.small.mb-1(for='amount') Loan Amount
-                  input#amount.form-control(type="number" step="500" min="0" name='loanAmount')
+                  input#amount.form-control(type="number" step="500" min="5000" name='loanAmount')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='interest') Monthly Interest Rate
@@ -724,7 +724,7 @@ else
                 | Continuing Interest of #{interestRate}% per month against Outstanding Balance after the loan terms.
               .form-row.mb-2
                 label.small.mb-1(for='loanAmount') Loan Amount
-                input#loanAmount.form-control(type="number" step="500" min="0" max=remainingCreditLimit name='loanAmount' value=remainingCreditLimit)
+                input#loanAmount.form-control(type="number" step="500" min="5000" max=remainingCreditLimit name='loanAmount' value=remainingCreditLimit)
               .form-row.mb-2
                 label.small.mb-1(for='purposeOfLoan') Purpose of Loan
                 select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')
