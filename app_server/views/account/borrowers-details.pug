@@ -249,7 +249,7 @@ block content
                                 a(href='/download/' + borrower.documents.primaryIdFront.filename + '/' + borrower.documents.primaryIdFront.originalname) #{borrower.documents.primaryIdFront.originalname}
                               - let paramDate = new Date(borrower.documents.primaryIdFront.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.primaryIdFront.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.primaryIdBack)
                             tr
@@ -258,7 +258,7 @@ block content
                                 a(href='/download/' + borrower.documents.primaryIdBack.filename + '/' + borrower.documents.primaryIdBack.originalname) #{borrower.documents.primaryIdBack.originalname}
                               - let paramDate = new Date(borrower.documents.primaryIdBack.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.primaryIdBack.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.companyIdFront)
                             tr
@@ -267,7 +267,7 @@ block content
                                 a(href='/download/' + borrower.documents.companyIdFront.filename + '/' + borrower.documents.companyIdFront.originalname) #{borrower.documents.companyIdFront.originalname}
                               - let paramDate = new Date(borrower.documents.companyIdFront.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.companyIdFront.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.companyIdBack)
                             tr
@@ -276,7 +276,7 @@ block content
                                 a(href='/download/' + borrower.documents.companyIdBack.filename + '/' + borrower.documents.companyIdBack.originalname) #{borrower.documents.companyIdBack.originalname}
                               - let paramDate = new Date(borrower.documents.companyIdBack.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.companyIdBack.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.coe)
                             tr
@@ -285,7 +285,7 @@ block content
                                 a(href='/download/' + borrower.documents.coe.filename + '/' + borrower.documents.coe.originalname) #{borrower.documents.coe.originalname}
                               - let paramDate = new Date(borrower.documents.coe.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.coe.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.payslip1)
                             tr
@@ -294,7 +294,7 @@ block content
                                 a(href='/download/' + borrower.documents.payslip1.filename + '/' + borrower.documents.payslip1.originalname) #{borrower.documents.payslip1.originalname}
                               - let paramDate = new Date(borrower.documents.payslip1.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.payslip1.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.payslip2)
                             tr
@@ -303,7 +303,7 @@ block content
                                 a(href='/download/' + borrower.documents.payslip2.filename + '/' + borrower.documents.payslip2.originalname) #{borrower.documents.payslip2.originalname}
                               - let paramDate = new Date(borrower.documents.payslip2.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.payslip2.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.bir)
                             tr
@@ -312,7 +312,7 @@ block content
                                 a(href='/download/' + borrower.documents.bir.filename + '/' + borrower.documents.bir.originalname) #{borrower.documents.bir.originalname}
                               - let paramDate = new Date(borrower.documents.bir.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.bir.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.tinProof)
                             tr
@@ -321,7 +321,7 @@ block content
                                 a(href='/download/' + borrower.documents.tinProof.filename + '/' + borrower.documents.tinProof.originalname) #{borrower.documents.tinProof.originalname}
                               - let paramDate = new Date(borrower.documents.tinProof.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.tinProof.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
                           if (borrower.documents && borrower.documents.selfiewithId)
                             tr
@@ -330,6 +330,6 @@ block content
                                 a(href='/download/' + borrower.documents.selfiewithId.filename + '/' + borrower.documents.selfiewithId.originalname) #{borrower.documents.selfiewithId.originalname}
                               - let paramDate = new Date(borrower.documents.selfiewithId.uploaded);
                               - let date = paramDate.toString().split(' ');
-                              - let newDate = date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4];
+                              - let newDate = (borrower.documents.selfiewithId.uploaded) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
                               td #{newDate}
     include ../partials/page-footer
