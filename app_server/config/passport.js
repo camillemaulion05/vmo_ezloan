@@ -24,9 +24,10 @@ passport.deserializeUser((user, done) => {
  */
 passport.use(new LocalStrategy({
     usernameField: 'username',
-
-}, (username, password, done) => {
-    let path = '/api/login';
+    passReqToCallback: true
+}, (req, username, password, done) => {
+    let path = '/api/login/' + req.userType;
+    delete req.userType;
     let requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'POST',

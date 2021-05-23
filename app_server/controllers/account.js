@@ -18,15 +18,8 @@ function passwordGen() {
     });
 }
 
-function usernameGen(firstName, lastName) {
-    firstName.trim()
-    lastName.trim()
-    let random = generator.generate({
-        length: 6,
-        numbers: true,
-        symbols: false
-    });
-    return (firstName.substr(0, 1)).toUpperCase() + (lastName).toUpperCase() + random;
+function usernameGen(firstName, bday) {
+    return firstName.replace(/\ /g, "").replace(/\./g, "").replace(/\-/g, "").replace(/\'/g, "").toLowerCase() + bday.replace(/\-/g, "");
 }
 
 function parseDate(date, format) {
@@ -5100,12 +5093,44 @@ const getBorrowers = (req, res) => {
 };
 
 const postBorrowers = (req, res) => {
+    function sendMail(data) {
+        path = '/api/sendMail';
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'POST',
+            json: {
+                receiver: data.email,
+                subject: 'VMO EZ Loan Account',
+                message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${data.username} \n\t\t These are your first name plus your birthdate in YYYYMMDD.\n\t PASSWORD: \t ${data.password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
+            }
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, body) => {
+                if (err) {
+                    req.flash('warnings', {
+                        msg: 'There was an error when sending the password to respective email. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    req.flash('success', {
+                        msg: data.message
+                    });
+                    return res.redirect('back');
+                } else {
+                    req.flash('errors', {
+                        msg: body.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    }
     const validationErrors = [];
     if (validator.isEmpty(req.body.type)) validationErrors.push({
         msg: 'Borrower type cannot be blank.'
-    });
-    if (validator.isEmpty(req.body.status)) validationErrors.push({
-        msg: 'Borrower status cannot be blank.'
     });
     if (validator.isEmpty(req.body.firstName)) validationErrors.push({
         msg: 'First Name cannot be blank.'
@@ -5138,24 +5163,14 @@ const postBorrowers = (req, res) => {
         if (validator.equals(req.body.sharesPerPayDay, '0')) validationErrors.push({
             msg: 'Shares/Payday cannot be zero.'
         });
-    }
-    if (req.body.status == 'Verified') {
-        if (validator.isEmpty(req.body.totalCreditLimit)) validationErrors.push({
-            msg: 'Total Credit Limit cannot be blank.'
+        if (validator.isEmpty(req.body.borrowerAcctNo)) validationErrors.push({
+            msg: 'Borrower G-Cash No. cannot be blank.'
         });
-        if (validator.equals(req.body.totalCreditLimit, '0')) validationErrors.push({
-            msg: 'Total Credit Limit cannot be zero.'
+        if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+            msg: 'Assigned Loan Processor cannot be blank.'
         });
-        if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-            msg: 'Assigned Loan Officer cannot be blank.'
-        });
-    }
-    if (req.body.type == 'Member' && req.body.status == 'Verified') {
-        if (validator.isEmpty(req.body.hrCertifiedBy)) validationErrors.push({
-            msg: 'HRD Authorized Officer cannot be blank.'
-        });
-        if (validator.isEmpty(req.body.employmentType)) validationErrors.push({
-            msg: 'Employment Status cannot be blank.'
+        if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+            msg: 'G-Cash Reference No. cannot be blank.'
         });
     }
     if (validationErrors.length) {
@@ -5165,7 +5180,7 @@ const postBorrowers = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    let username = usernameGen(req.body.firstName, req.body.lastName);
+    let username = usernameGen(req.body.firstName, req.body.dateOfBirth);
     let password = passwordGen();
     path = '/api/users';
     requestOptions = {
@@ -5191,50 +5206,9 @@ const postBorrowers = (req, res) => {
                 return res.redirect('back');
             } else if (statusCode === 201) {
                 let data;
-                if (req.body.status == 'Verified') {
-                    if (req.body.type == 'Member') {
-                        data = {
-                            type: req.body.type,
-                            status: req.body.status,
-                            profile: {
-                                firstName: req.body.firstName,
-                                lastName: req.body.lastName,
-                                dateOfBirth: req.body.dateOfBirth,
-                                gender: req.body.gender,
-                                email: req.body.email,
-                                mobileNum: req.body.mobileNum
-                            },
-                            totalCreditLimit: req.body.totalCreditLimit,
-                            reviewedBy: req.body.reviewedBy,
-                            employeeID: req.body.employeeID,
-                            sharesPerPayDay: req.body.sharesPerPayDay,
-                            hrCertifiedBy: req.body.hrCertifiedBy,
-                            workBusinessInfo: {
-                                employmentType: req.body.employmentType
-                            },
-                            userId: user.id
-                        };
-                    } else {
-                        data = {
-                            type: req.body.type,
-                            status: req.body.status,
-                            profile: {
-                                firstName: req.body.firstName,
-                                lastName: req.body.lastName,
-                                dateOfBirth: req.body.dateOfBirth,
-                                gender: req.body.gender,
-                                email: req.body.email,
-                                mobileNum: req.body.mobileNum
-                            },
-                            totalCreditLimit: req.body.totalCreditLimit,
-                            reviewedBy: req.body.reviewedBy,
-                            userId: user.id
-                        };
-                    }
-                } else {
+                if (req.body.type == 'Member') {
                     data = {
                         type: req.body.type,
-                        status: req.body.status,
                         profile: {
                             firstName: req.body.firstName,
                             lastName: req.body.lastName,
@@ -5243,7 +5217,23 @@ const postBorrowers = (req, res) => {
                             email: req.body.email,
                             mobileNum: req.body.mobileNum
                         },
-                        userId: user.id
+                        employeeID: req.body.employeeID,
+                        sharesPerPayDay: req.body.sharesPerPayDay,
+                        account: {
+                            number: req.body.borrowerAcctNo
+                        }
+                    };
+                } else {
+                    data = {
+                        type: req.body.type,
+                        profile: {
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            dateOfBirth: req.body.dateOfBirth,
+                            gender: req.body.gender,
+                            email: req.body.email,
+                            mobileNum: req.body.mobileNum
+                        }
                     };
                 }
                 path = '/api/borrowers';
@@ -5259,49 +5249,157 @@ const postBorrowers = (req, res) => {
                     requestOptions,
                     (err, {
                         statusCode
-                    }, borrower) => {
+                    }, newBorrower) => {
                         if (err) {
                             req.flash('errors', {
                                 msg: 'There was an error when creating borrower account. Please try again later.'
                             });
                             return res.redirect('back');
                         } else if (statusCode === 201) {
-                            path = '/api/sendMail';
-                            requestOptions = {
-                                url: `${apiOptions.server}${path}`,
-                                method: 'POST',
-                                json: {
-                                    receiver: req.body.email,
-                                    subject: 'VMO EZ Loan Account',
-                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your 6 random alphanumeric.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
-                                }
-                            };
-                            request(
-                                requestOptions,
-                                (err, {
-                                    statusCode
-                                }, body) => {
-                                    if (err) {
-                                        req.flash('warnings', {
-                                            msg: 'There was an error when sending the password to respective email. Please try again later.'
-                                        });
-                                        return res.redirect('back');
-                                    } else if (statusCode === 200) {
-                                        req.flash('success', {
-                                            msg: 'Success! New Borrower has been created and password has been sent to respective email.'
-                                        });
-                                        return res.redirect('back');
-                                    } else {
-                                        req.flash('errors', {
-                                            msg: body.message
-                                        });
-                                        return res.redirect('back');
+                            if (req.body.type == "Member") {
+                                let bytes = CryptoJS.AES.decrypt(newBorrower.id, process.env.CRYPTOJS_SERVER_SECRET);
+                                let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
+                                path = '/api/borrowers/users/' + originalUserId;
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {}
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, borrower) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when borrower information. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 200) {
+                                            let transaction = {};
+                                            transaction.amount = "1000.00";
+                                            transaction.type = "Fees";
+                                            transaction.senderNum = borrower.account.number;
+                                            transaction.status = "Posted";
+                                            transaction.borrowerId = borrower._id;
+                                            transaction.postedBy = req.body.postedBy;
+                                            transaction.referenceNo = req.body.referenceNo;
+
+                                            path = '/api/employees/' + transaction.postedBy;
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'GET',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {}
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, employee) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when loading employee information. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 200) {
+                                                        transaction.receiverNum = (employee.account && employee.account.number) ? employee.account.number : '';
+                                                        path = '/api/transactions';
+                                                        requestOptions = {
+                                                            url: `${apiOptions.server}${path}`,
+                                                            method: 'POST',
+                                                            headers: {
+                                                                Authorization: 'Bearer ' + req.user.token
+                                                            },
+                                                            json: transaction
+                                                        };
+                                                        request(
+                                                            requestOptions,
+                                                            (err, {
+                                                                statusCode
+                                                            }, newTransaction) => {
+                                                                if (err) {
+                                                                    req.flash('errors', {
+                                                                        msg: 'There was an error when adding new transaction for membership fee. Please try again later.'
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                } else if (statusCode === 201) {
+                                                                    transaction.amount = req.body.sharesPerPayDay;
+                                                                    transaction.type = "Contributions";
+                                                                    path = '/api/transactions';
+                                                                    requestOptions = {
+                                                                        url: `${apiOptions.server}${path}`,
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            Authorization: 'Bearer ' + req.user.token
+                                                                        },
+                                                                        json: transaction
+                                                                    };
+                                                                    request(
+                                                                        requestOptions,
+                                                                        (err, {
+                                                                            statusCode
+                                                                        }, newTransaction2) => {
+                                                                            if (err) {
+                                                                                req.flash('errors', {
+                                                                                    msg: 'There was an error when adding new transaction for new contribution. Please try again later.'
+                                                                                });
+                                                                                return res.redirect('back');
+                                                                            } else if (statusCode === 201) {
+                                                                                sendMail({
+                                                                                    username: username,
+                                                                                    password: password,
+                                                                                    email: req.body.email,
+                                                                                    message: 'Success! New Borrower has been created, password has been sent to respective email and new transaction has been added.'
+                                                                                });
+                                                                            } else {
+                                                                                req.flash('errors', {
+                                                                                    msg: newTransaction2.message
+                                                                                });
+                                                                                return res.redirect('back');
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    req.flash('errors', {
+                                                                        msg: newTransaction.message
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: employee.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: borrower.message
+                                            });
+                                            return res.redirect('back');
+                                        }
                                     }
-                                }
-                            );
+                                );
+                            } else {
+                                sendMail({
+                                    username: username,
+                                    password: password,
+                                    email: req.body.email,
+                                    message: 'Success! New Borrower has been created and password has been sent to respective email.'
+                                });
+                            }
                         } else {
                             req.flash('errors', {
-                                msg: borrower.message
+                                msg: newBorrower.message
                             });
                             return res.redirect('back');
                         }
@@ -5317,7 +5415,7 @@ const postBorrowers = (req, res) => {
     );
 };
 
-const getDownloadReports = (req, res) => {
+const getDownloadBorrowersReport = (req, res) => {
     let fonts = {
         Roboto: {
             normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
@@ -6115,62 +6213,14 @@ const getDeleteBorrowers = (req, res) => {
 };
 
 const postUpdateBorrowers = (req, res) => {
-    const validationErrors = [];
-    if (validator.isEmpty(req.body.type)) validationErrors.push({
-        msg: 'Borrower type cannot be blank.'
-    });
-    if (validator.isEmpty(req.body.status)) validationErrors.push({
-        msg: 'Borrower status cannot be blank.'
-    });
-    if (req.body.type == 'Member') {
-        if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
-            msg: 'Shares/Payday cannot be blank.'
-        });
-        if (validator.equals(req.body.sharesPerPayDay, '0')) validationErrors.push({
-            msg: 'Shares/Payday cannot be zero.'
-        });
-    }
-    if (req.body.status == 'Verified') {
-        if (validator.isEmpty(req.body.totalCreditLimit)) validationErrors.push({
-            msg: 'Total Credit Limit cannot be blank.'
-        });
-        if (validator.equals(req.body.totalCreditLimit, '0')) validationErrors.push({
-            msg: 'Total Credit Limit cannot be zero.'
-        });
-        if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
-            msg: 'Assigned Loan Officer cannot be blank.'
-        });
-    }
-    if (req.body.type == 'Member' && req.body.status == 'Verified') {
-        if (validator.isEmpty(req.body.hrCertifiedBy)) validationErrors.push({
-            msg: 'HRD Authorized Officer cannot be blank.'
-        });
-        if (validator.isEmpty(req.body.employmentType)) validationErrors.push({
-            msg: 'Employment Status cannot be blank.'
-        });
-    }
-    if (validationErrors.length) {
-        req.flash('errors', validationErrors);
-        return res.redirect('back');
-    }
     path = '/api/borrowers/' + req.params.borrowerid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
-        method: 'PUT',
+        method: 'GET',
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {
-            type: req.body.type,
-            status: req.body.status,
-            totalCreditLimit: (req.body.status == 'Verified') ? req.body.totalCreditLimit : '',
-            reviewedBy: (req.body.status == 'Verified') ? req.body.reviewedBy : '',
-            sharesPerPayDay: (req.body.type == 'Member') ? req.body.sharesPerPayDay : '',
-            hrCertifiedBy: (req.body.type == 'Member' && req.body.status == 'Verified') ? req.body.hrCertifiedBy : '',
-            workBusinessInfo: {
-                employmentType: (req.body.type == 'Member' && req.body.status == 'Verified') ? req.body.employmentType : ''
-            }
-        }
+        json: {}
     };
     request(
         requestOptions,
@@ -6179,14 +6229,99 @@ const postUpdateBorrowers = (req, res) => {
         }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating borrower information. Please try again later.'
+                    msg: 'There was an error when loading borrower information. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Borrower information has been updated.'
-                });
-                return res.redirect('back');
+                if (borrower.status != "Declined") {
+                    const validationErrors = [];
+                    if (borrower.status != "Verified") {
+                        if (validator.isEmpty(req.body.status)) validationErrors.push({
+                            msg: 'Borrower status cannot be blank.'
+                        });
+                        if (req.body.status == "Verified") {
+                            if (validator.isEmpty(req.body.reviewedBy)) validationErrors.push({
+                                msg: 'Assigned Loan Officer cannot be blank.'
+                            });
+                        }
+                        if (borrower.type == 'Member' && req.body.status == "Verified") {
+                            if (validator.isEmpty(req.body.hrCertifiedBy)) validationErrors.push({
+                                msg: 'HRD Authorized Officer cannot be blank.'
+                            });
+                        }
+                    }
+                    if (borrower.type == 'Member') {
+                        if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+                            msg: 'Shares/Payday cannot be blank.'
+                        });
+                        if (validator.equals(req.body.sharesPerPayDay, '0')) validationErrors.push({
+                            msg: 'Shares/Payday cannot be zero.'
+                        });
+                        if (req.body.status == "Verified") {
+                            if (validator.isEmpty(req.body.employmentType)) validationErrors.push({
+                                msg: 'Employment Type cannot be blank.'
+                            });
+                        }
+                    }
+                    if (req.body.status == "Verified") {
+                        if (validator.isEmpty(req.body.totalCreditLimit)) validationErrors.push({
+                            msg: 'Total Credit Limit cannot be blank.'
+                        });
+                        if (validator.equals(req.body.totalCreditLimit, '0')) validationErrors.push({
+                            msg: 'Total Credit Limit cannot be zero.'
+                        });
+                    }
+                    if (validationErrors.length) {
+                        req.flash('errors', validationErrors);
+                        return res.redirect('back');
+                    }
+                    path = '/api/borrowers/' + req.params.borrowerid;
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'PUT',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            status: (borrower.status == 'Verified') ? borrower.status : req.body.status,
+                            totalCreditLimit: (borrower.status == 'Verified') ? req.body.totalCreditLimit : (req.body.status == 'Verified') ? req.body.totalCreditLimit : '',
+                            reviewedBy: (req.body.status == 'Verified') ? req.body.reviewedBy : '',
+                            sharesPerPayDay: (borrower.type == 'Member') ? req.body.sharesPerPayDay : '',
+                            hrCertifiedBy: (borrower.type == 'Member' && req.body.status == 'Verified') ? req.body.hrCertifiedBy : '',
+                            workBusinessInfo: {
+                                employmentType: (borrower.status == 'Verified') ? req.body.employmentType : (borrower.type == 'Member' && req.body.status == 'Verified') ? req.body.employmentType : ''
+                            }
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, borrower) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when updating borrower information. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 200) {
+                                req.flash('success', {
+                                    msg: 'Borrower information has been updated.'
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: borrower.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
+                } else {
+                    req.flash('errors', {
+                        msg: 'Cannot update the borrower information.'
+                    });
+                    return res.redirect('back');
+                }
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -7199,6 +7334,746 @@ const getLoanDetails = (req, res) => {
             }
         }
     );
+};
+
+const getDownloadLoansReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadLoans(loans) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let loansTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF LOANS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 10,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Loan No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Purpose of Loan',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Release Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Maturity Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Monthly Payment',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Status',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        loans.forEach(d => {
+            let date = (new Date(d.paymentStartDate)).toString().split(' ');
+            let paymentStartDate = (d.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+            let date2 = (new Date(d.paymentEndDate)).toString().split(' ');
+            let paymentEndDate = (d.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+            let loanRow = [{
+                    text: d.loanNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.profile.firstName + ' ' + d.requestedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.type,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.purposeOfLoan,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: paymentStartDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: paymentEndDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanAmount,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.monthlyAmortization,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+
+                {
+                    text: d.principalRemaining,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.status,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            loansTable.table.body.push(loanRow);
+        });
+        docDefinition.content.push(loansTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loans-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadMaturityLoans(loans) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let loansTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF PAST MATURITY DATE',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 11,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Loan No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Purpose of Loan',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Release Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Maturity Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Monthly Payment',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Interest Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Total Amount Due',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        loans.forEach(d => {
+            let date = (new Date(d.paymentStartDate)).toString().split(' ');
+            let paymentStartDate = (d.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+            let date2 = (new Date(d.paymentEndDate)).toString().split(' ');
+            let paymentEndDate = (d.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+            let balance = (parseFloat(d.loanPaymentSchedule[0].principalBalance) + parseFloat(d.loanPaymentSchedule[0].interestBalance)).toFixed(2);
+            let loanRow = [{
+                    text: d.loanNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.profile.firstName + ' ' + d.requestedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.type,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.purposeOfLoan,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: paymentStartDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: paymentEndDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanAmount,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.monthlyAmortization,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+
+                {
+                    text: d.loanPaymentSchedule[0].principalBalance,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanPaymentSchedule[0].interestBalance,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: balance,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            loansTable.table.body.push(loanRow);
+        });
+        docDefinition.content.push(loansTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loans-maturity-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadCurrentLoans(loans) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let loansTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF CURRENT DUE',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 12,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Loan No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Purpose of Loan',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Release Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Maturity Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Due Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Amount Due',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Interest',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Principal Balance',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        loans.forEach(d => {
+            let date = (new Date(d.paymentStartDate)).toString().split(' ');
+            let paymentStartDate = (d.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+            let date2 = (new Date(d.paymentEndDate)).toString().split(' ');
+            let paymentEndDate = (d.paymentEndDate) ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+            let date3 = (new Date(d.loanPaymentSchedule[0].dueDate)).toString().split(' ');
+            let dueDate = (d.loanPaymentSchedule[0].dueDate) ? date3[1] + ' ' + date3[2] + ', ' + date3[3] : "";
+            let loanRow = [{
+                    text: d.loanNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.profile.firstName + ' ' + d.requestedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.type,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.purposeOfLoan,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: paymentStartDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: paymentEndDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanAmount,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: dueDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanPaymentSchedule[0].amountDue,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanPaymentSchedule[0].interest,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanPaymentSchedule[0].principal,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanPaymentSchedule[0].principalBalance,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            loansTable.table.body.push(loanRow);
+        });
+        docDefinition.content.push(loansTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loans-current-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    let userType = req.params.type;
+    if (userType == 'maturityDue' || userType == 'currentDue' || userType == 'all') {
+        if (userType == 'all') {
+            path = '/api/loans';
+            requestOptions = {
+                url: `${apiOptions.server}${path}`,
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + req.user.token
+                },
+                json: {}
+            };
+            request(
+                requestOptions,
+                (err, {
+                    statusCode
+                }, loans) => {
+                    if (err) {
+                        req.flash('errors', {
+                            msg: 'There was an error when loading list of loans. Please try again later.'
+                        });
+                        return res.redirect('back');
+                    } else if (statusCode === 200) {
+                        downloadLoans(loans);
+                    } else {
+                        req.flash('errors', {
+                            msg: loans.message
+                        });
+                        return res.redirect('back');
+                    }
+                }
+            );
+        }
+
+        if (userType == 'maturityDue') {
+            path = '/api/loans/pastMaturity/repayments';
+            requestOptions = {
+                url: `${apiOptions.server}${path}`,
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + req.user.token
+                },
+                json: {}
+            };
+            request(
+                requestOptions,
+                (err, {
+                    statusCode
+                }, loans) => {
+                    if (err) {
+                        req.flash('errors', {
+                            msg: 'There was an error when loading list of loans. Please try again later.'
+                        });
+                        return res.redirect('back');
+                    } else if (statusCode === 200) {
+                        downloadMaturityLoans(loans);
+                    } else {
+                        req.flash('errors', {
+                            msg: loans.message
+                        });
+                        return res.redirect('back');
+                    }
+                }
+            );
+        }
+
+        if (userType == 'currentDue') {
+            path = '/api/loans/due/repayments';
+            requestOptions = {
+                url: `${apiOptions.server}${path}`,
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + req.user.token
+                },
+                json: {}
+            };
+            request(
+                requestOptions,
+                (err, {
+                    statusCode
+                }, loans) => {
+                    if (err) {
+                        req.flash('errors', {
+                            msg: 'There was an error when loading list of loans. Please try again later.'
+                        });
+                        return res.redirect('back');
+                    } else if (statusCode === 200) {
+                        downloadCurrentLoans(loans);
+                    } else {
+                        req.flash('errors', {
+                            msg: loans.message
+                        });
+                        return res.redirect('back');
+                    }
+                }
+            );
+        }
+
+    } else {
+        req.flash('errors', {
+            msg: 'Not existing user type. Please enter correct user type.'
+        });
+        return res.redirect('/borrowers');
+    }
 };
 
 const getTransactions = (req, res) => {
@@ -8801,7 +9676,7 @@ module.exports = {
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
     getBorrowers,
-    getDownloadReports,
+    getDownloadBorrowersReport,
     postBorrowers,
     getDeleteBorrowers,
     postUpdateBorrowers,
@@ -8813,6 +9688,7 @@ module.exports = {
     getDeleteLoans,
     postUpdateLoans,
     getLoanDetails,
+    getDownloadLoansReport,
     getTransactions,
     postTransactions,
     getTransactionDetails,

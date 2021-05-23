@@ -21,7 +21,7 @@ function validYear(year) {
 const loansList = (req, res) => {
     Loan
         .find()
-        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+        .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
         .exec((err, loans) => {
             if (err) {
                 console.log(err);
@@ -31,6 +31,10 @@ const loansList = (req, res) => {
                         "message": err._message
                     });
             } else {
+                loans.forEach(loan => {
+                    loan.validateRepayments();
+                    loan.save();
+                });
                 res
                     .status(200)
                     .json(loans);
@@ -84,7 +88,7 @@ const loansReadOne = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -289,7 +293,7 @@ const loansSchedulesList = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -342,7 +346,7 @@ const loansSchedulesReadOne = (req, res) => {
                 "loanPaymentSchedule.$": 1,
                 "_id": 0
             })
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loanPaymentSchedule) => {
                 if (!loanPaymentSchedule) {
                     res
@@ -387,7 +391,7 @@ const loansDueListByLoan = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -467,7 +471,7 @@ const loansPastDueListByLoan = (req, res) => {
     } else {
         Loan
             .findById(loanid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -537,8 +541,9 @@ const loansPastDueListByLoan = (req, res) => {
 
 const loansDueRepaymentsList = (req, res) => {
     Loan
-        .find()
-        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+        .find({
+            "status": "Open"
+        })
         .exec((err, loans) => {
             if (err) {
                 console.log(err);
@@ -548,26 +553,112 @@ const loansDueRepaymentsList = (req, res) => {
                         "message": err._message
                     });
             } else {
-                function filterDues(array) {
-                    let dateNow = new Date();
-                    dateNow.setHours(0);
-                    dateNow.setMinutes(0);
-                    dateNow.setSeconds(0);
-                    for (let i = 0; i < array.length; i++) {
-                        let loanPaymentSchedule = array[i].loanPaymentSchedule.filter(function (schedule) {
-                            return dateNow <= new Date(schedule.dueDate);
-                        });
-                        if (loanPaymentSchedule.length >= 1) {
-                            array[i].loanPaymentSchedule = loanPaymentSchedule[0];
+                loans.forEach(loan => {
+                    loan.validateRepayments();
+                    loan.save();
+                });
+                Loan
+                    .find({
+                        "status": "Open"
+                    })
+                    .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+                    .exec((err, updatedLoans) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
                         } else {
-                            array[i].loanPaymentSchedule = [];
+                            function filterDues(array) {
+                                let dateNow = new Date();
+                                dateNow.setHours(0);
+                                dateNow.setMinutes(0);
+                                dateNow.setSeconds(0);
+                                for (let i = 0; i < array.length; i++) {
+                                    let loanPaymentSchedule = array[i].loanPaymentSchedule.filter(function (schedule) {
+                                        return dateNow <= new Date(schedule.dueDate);
+                                    });
+                                    if (loanPaymentSchedule.length >= 1) {
+                                        array[i].loanPaymentSchedule = loanPaymentSchedule[0];
+                                    } else {
+                                        array[i].loanPaymentSchedule = [];
+                                    }
+                                }
+                                return array;
+                            }
+                            res
+                                .status(200)
+                                .json(filterDues(updatedLoans));
                         }
-                    }
-                    return array;
-                }
+                    });
+            }
+        });
+};
+
+const loansPastMaturityRepaymentsList = (req, res) => {
+    const dateToday = new Date();
+    Loan
+        .find({
+            paymentEndDate: {
+                $lt: dateToday
+            },
+            $expr: {
+                $gt: [{
+                    $toDouble: "$principalRemaining"
+                }, 0]
+            }
+        })
+        .exec((err, loans) => {
+            if (err) {
+                console.log(err);
                 res
-                    .status(200)
-                    .json(filterDues(loans));
+                    .status(404)
+                    .json({
+                        "message": err._message
+                    });
+            } else {
+                loans.forEach(loan => {
+                    loan.validateRepayments();
+                    loan.save();
+                });
+                Loan
+                    .find({
+                        "status": "Loan Debt"
+                    })
+                    .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email totalCreditLimit')
+                    .exec((err, updatedLoans) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            function filterDues(array) {
+                                let dateNow = new Date();
+                                dateNow.setHours(0);
+                                dateNow.setMinutes(0);
+                                dateNow.setSeconds(0);
+                                for (let i = 0; i < array.length; i++) {
+                                    let loanPaymentSchedule = array[i].loanPaymentSchedule.filter(function (schedule) {
+                                        return dateNow <= new Date(schedule.dueDate);
+                                    });
+                                    if (loanPaymentSchedule.length >= 1) {
+                                        array[i].loanPaymentSchedule = loanPaymentSchedule[0];
+                                    } else {
+                                        array[i].loanPaymentSchedule = [];
+                                    }
+                                }
+                                return array;
+                            }
+                            res
+                                .status(200)
+                                .json(filterDues(updatedLoans));
+                        }
+                    });
             }
         });
 };
@@ -584,10 +675,10 @@ const loansSummary = (req, res) => {
                 "message": "Invalid year."
             });
     } else {
-        let date1 = new Date('2020-01-01');
-        date1.setFullYear(year);
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
         let date2 = new Date(date1);
-        date2.setFullYear(year + 1);
+        date2.setFullYear(parseInt(year));
         Loan
             .aggregate([{
                     $match: {
@@ -692,10 +783,10 @@ const loansInterestReport = (req, res) => {
                 "message": "Invalid year."
             });
     } else {
-        let date1 = new Date('2020-01-01');
-        date1.setFullYear(year);
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
         let date2 = new Date(date1);
-        date2.setFullYear(year + 1);
+        date2.setFullYear(parseInt(year));
         Loan
             .aggregate([{
                     $lookup: {
@@ -812,7 +903,6 @@ const loansListByBorrower = (req, res) => {
                 "requestedBy": mongoose.Types.ObjectId(borrowerid)
             }, {
                 "loanPaymentSchedule": 0,
-                "reviewedDate": 0,
                 "updatedAt": 0,
                 "__v": 0
             })
@@ -890,6 +980,7 @@ module.exports = {
     loansDueListByLoan,
     loansPastDueListByLoan,
     loansDueRepaymentsList,
+    loansPastMaturityRepaymentsList,
     loansSummary,
     loansInterestReport,
     loansListByUser,

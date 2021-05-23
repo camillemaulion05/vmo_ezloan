@@ -89,7 +89,10 @@ block content
                 .form-group
                   input#employeeID.form-control(type='text' name='employeeID' placeholder='Employee ID')
                   em.invalid-feedback 
-          if type == "employee"
+        if type == "employee"
+          .tab.d-none
+            p.hint-text
+              span Additional Information Required
             .row
               .col-sm-12
                 .form-group
@@ -112,13 +115,41 @@ block content
                       span.input-group-text +63
                     input#accountNum.form-control(type='text' name='accountNum' placeholder='G-Cash Account No.' minlength='10' maxlength='10')
                     em.invalid-feedback 
-          if type == "member"
+        if type == "member"
+          .tab.d-none
+            p.hint-text
+              span Additional Information Required
             .row
-              .col-sm-12
-                .form-group
-                  input#sharesPerPayDay.form-control(type="number" step="300" min="300" name='sharesPerPayDay' value="300")
-                  em.invalid-feedback 
-                  p.label-text Shares/Payday (Php)
+                .col-sm-6
+                  .form-group
+                    input#sharesPerPayDay.form-control(type="number" step="100" min="300" name='sharesPerPayDay')
+                    em.invalid-feedback 
+                    p.label-text Shares/Payday
+                .col-sm-6
+                  .form-group
+                    input#amount.form-control(type="number" step="100" min="1000" name='amount' value="1000" disabled='')
+                    em.invalid-feedback 
+                    p.label-text Total Payment
+            .row
+                .col-sm-12
+                  .form-group.mb-md-0
+                    .input-group.mb-3
+                      .input-group-prepend
+                        span.input-group-text +63
+                      input#senderNum.form-control(type='text' name='senderNum' placeholder='Sender G-Cash No.' minlength='10' maxlength='10')
+                      em.invalid-feedback 
+            .row
+                .col-sm-6
+                  .form-group
+                    select#receiverNum.form-control.selectpicker(type='text' name='receiverNum')
+                      option(value='' selected='') Receiver G-Cash No.
+                      for x in employees
+                        option(value=x._id) #{x.account.number} - #{x.account.name} 
+                    em.invalid-feedback
+                .col-sm-6
+                  .form-group
+                    input#referenceNo.form-control(type='text' name='referenceNo' placeholder='G-Cash Reference No.')
+                    em.invalid-feedback 
         div(style='overflow:auto;')
           div(style='float:right;')
             button#prevBtn.btn.btn-danger.d-none(type='button') Previous
@@ -132,4 +163,5 @@ block content
           span.step
       .text-center
         | Already have an account? 
-        a(href='/login') Login here!
+        - let userType = (type) ? (type != 'borrower') ? '/' + type : '' : '';
+        a(href='/login' + userType) Login here!

@@ -31,7 +31,7 @@ function validTxnType(type) {
 const transactionsList = (req, res) => {
     Transaction
         .find()
-        .populate('borrowerId postedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
+        .populate('borrowerId postedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum  profile.email')
         .exec((err, transactions) => {
             if (err) {
                 console.log(err);
@@ -63,7 +63,7 @@ const transactionsCreate = (req, res) => {
         withdrawalId
     } = req.body);
     transaction.transactionNum = Date.now();
-    if (req.body.postedBy) transaction.postedDate = Date.now();
+    if (req.body.status == "Posted") transaction.postedDate = Date.now();
     transaction.save((err) => {
         if (err) {
             console.log(err);
@@ -96,7 +96,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId postedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum')
+            .populate('borrowerId postedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum  profile.email')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -163,7 +163,7 @@ const transactionsUpdateOne = (req, res) => {
                     transaction.receiverNum = (req.body.receiverNum) ? req.body.receiverNum : transaction.receiverNum;
                     transaction.referenceNo = (req.body.referenceNo) ? req.body.referenceNo : transaction.referenceNo;
                     transaction.postedBy = (req.body.postedBy) ? req.body.postedBy : transaction.postedBy;
-                    transaction.postedDate = (req.body.postedBy) ? Date.now() : transaction.postedDate;
+                    transaction.postedDate = (req.body.status == "Posted") ? Date.now() : transaction.postedDate;
                     transaction.status = (req.body.status) ? req.body.status : transaction.status;
                     transaction.borrowerId = (req.body.borrowerId) ? req.body.borrowerId : transaction.borrowerId;
                     transaction.loanId = (req.body.loanId) ? req.body.loanId : transaction.loanId;
@@ -546,17 +546,18 @@ const transactionsSummary = (req, res) => {
                 "message": "Invalid year."
             });
     } else {
-        let date1 = new Date('2020-01-01');
-        date1.setFullYear(year);
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
         let date2 = new Date(date1);
-        date2.setFullYear(year + 1);
+        date2.setFullYear(parseInt(year));
         Transaction
             .aggregate([{
                     $match: {
                         postedDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
-                        }
+                        },
+                        status: "Posted"
                     }
                 },
                 {
@@ -602,10 +603,10 @@ const contributionsSummary = (req, res) => {
                 "message": "Invalid year."
             });
     } else {
-        let date1 = new Date('2020-01-01');
-        date1.setFullYear(year);
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
         let date2 = new Date(date1);
-        date2.setFullYear(year + 1);
+        date2.setFullYear(parseInt(year));
         Transaction
             .aggregate([{
                     $match: {
@@ -613,6 +614,7 @@ const contributionsSummary = (req, res) => {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         },
+                        status: "Posted",
                         $or: [{
                             type: 'Contributions'
                         }, {

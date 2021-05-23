@@ -16,6 +16,11 @@ router
     .post(ctrlUsers.postLogin);
 
 router
+    .route('/login/:type')
+    .get(ctrlUsers.getLogin)
+    .post(ctrlUsers.postLogin);
+
+router
     .route('/forgot')
     .get(ctrlUsers.getForgot)
     .post(ctrlUsers.postForgot);
@@ -26,9 +31,14 @@ router
     .post(ctrlUsers.postReset);
 
 router
+    .route('/signup')
+    .get(ctrlUsers.getSignup)
+    .post(ctrlUsers.postSignup);
+
+router
     .route('/signup/:type')
-    .get(ctrlUsers.getSignupByType)
-    .post(ctrlUsers.postSignupByType);
+    .get(ctrlUsers.getSignup)
+    .post(ctrlUsers.postSignup);
 
 router.get('/logout', ctrlUsers.getLogout);
 
@@ -99,7 +109,7 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
     .post(passportConfig.isAuthenticated, ctrlAccount.postBorrowers);
 
-router.get('/download/report/borrowers/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadReports);
+router.get('/download/report/borrowers/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowersReport);
 
 router.get('/borrowers/:borrowerid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteBorrowers);
 router.post('/borrowers/:borrowerid/update', passportConfig.isAuthenticated, ctrlAccount.postUpdateBorrowers);
@@ -116,6 +126,8 @@ router
     .route('/loans/:loanid')
     .get(passportConfig.isAuthenticated, ctrlAccount.getLoanDetails)
     .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateLoans);
+
+router.get('/download/report/loans/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoansReport);
 
 router.get('/borrowers/loans/:loanid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerLoans);
 router.get('/borrowers/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerDetails);

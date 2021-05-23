@@ -8,7 +8,16 @@ function showTab(n) {
     } else {
         $(".signup-form #prevBtn").removeClass("d-none");
     }
-    if (n == (x.length - 1)) {
+
+    if (n == 4 && x.length == 5) {
+        $(".signup-form #prevBtn").attr("onclick", "nextPrev(-1,4)");
+        $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,4)");
+        $(".signup-form #nextBtn").text("Submit");
+    } else if (n == 3 && x.length == 5) {
+        $(".signup-form #prevBtn").attr("onclick", "nextPrev(-2,3)");
+        $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,3)");
+        $(".signup-form #user").text($(".signup-form #firstName").val());
+    } else if (n == 3 && x.length == 4) {
         $(".signup-form #prevBtn").attr("onclick", "nextPrev(-2,3)");
         $(".signup-form #nextBtn").attr("onclick", "nextPrev(1,3)");
         $(".signup-form #nextBtn").text("Submit");
@@ -23,7 +32,7 @@ function showTab(n) {
         $(".signup-form #nextBtn").text("Send");
         $(".signup-form #code").val("");
         $(".signup-form #sendOTP").text("");
-    } else {
+    } else if (n == 0) {
         $(".signup-form #errorSendOtp").hide();
         $(".signup-form #mobileNum").val("");
         $(".signup-form #password, .signup-form #confirmPassword").val("");

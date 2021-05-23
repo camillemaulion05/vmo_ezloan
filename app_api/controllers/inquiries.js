@@ -62,6 +62,7 @@ const inquiriesReadOne = (req, res) => {
     } else {
         Inquiry
             .findById(inquiryid)
+            .populate('response.repliedBy', 'profile.firstName profile.lastName')
             .exec((err, inquiry) => {
                 if (!inquiry) {
                     res

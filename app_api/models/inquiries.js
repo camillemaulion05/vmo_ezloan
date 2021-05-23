@@ -23,7 +23,7 @@ const inquirySchema = mongoose.Schema({
         message: String,
         repliedBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            ref: "Admin"
         }
     }
 }, {

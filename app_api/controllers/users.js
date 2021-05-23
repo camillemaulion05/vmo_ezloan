@@ -26,6 +26,13 @@ function validToken(token) {
     }
 }
 
+function validUserType(type) {
+    if (type == "Borrower") return true;
+    if (type == "Employee") return true;
+    if (type == "Admin") return true;
+    return false;
+}
+
 const usersList = (req, res) => {
     User
         .find({}, {
@@ -266,7 +273,8 @@ const usersDeleteOne = (req, res) => {
 
 const usersAuthenticate = (req, res) => {
     const isValid = validUsername(req.body.username);
-    if (!isValid) {
+    const isValidType = validUserType(req.params.type);
+    if (!isValid || !isValidType) {
         res
             .status(404)
             .json({
@@ -274,7 +282,8 @@ const usersAuthenticate = (req, res) => {
             });
     } else {
         User.findOne({
-                username: req.body.username
+                username: req.body.username,
+                type: req.params.type
             })
             .exec((err, user) => {
                 if (err) {
@@ -434,8 +443,19 @@ const usersSetPasswordToken = (req, res) => {
 };
 
 const usersValidatePasswordToken = (req, res) => {
-    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+    let bytes = "",
+        originalToken = "";
+    try {
+        bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+        originalToken = bytes.toString(CryptoJS.enc.Utf8);
+    } catch (err) {
+        console.log(err);
+        res
+            .status(404)
+            .json({
+                "message": "Invalid token or expired token."
+            });
+    }
     const isValid = validToken(originalToken);
     if (!isValid) {
         res
@@ -474,8 +494,19 @@ const usersValidatePasswordToken = (req, res) => {
 };
 
 const usersResetPassword = (req, res) => {
-    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+    let bytes = "",
+        originalToken = "";
+    try {
+        bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+        originalToken = bytes.toString(CryptoJS.enc.Utf8);
+    } catch (err) {
+        console.log(err);
+        res
+            .status(404)
+            .json({
+                "message": "Invalid token or expired token."
+            });
+    }
     const isValid = validToken(originalToken);
     if (!isValid) {
         res

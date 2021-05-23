@@ -11,8 +11,18 @@ block content
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary List of Loans
-              .dropdown.no-arrow
-                button.btn.btn-sm.btn-primary(type='button' href='#' data-toggle='modal' data-target='#addLoanModal') Add Loan
+              .dropdown.no-caret
+                button#areaChartDropdownExample.btn.btn-transparent-dark.btn-icon.dropdown-toggle(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true')
+                  svg.feather.feather-more-vertical.text-gray-500(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+                    circle(cx='12' cy='12' r='1')
+                    circle(cx='12' cy='5' r='1')
+                    circle(cx='12' cy='19' r='1')
+                .dropdown-menu.dropdown-menu-right.animated--fade-in-up(aria-labelledby='areaChartDropdownExample' x-placement='top-end' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-116px, -182px, 0px);')
+                  a.dropdown-item(href='/download/report/loans/all') List of Loans
+                  a.dropdown-item(href='/download/report/loans/maturityDue') List of Past Maturity Date
+                  a.dropdown-item(href='/download/report/loans/currentDue') List of Current Due
+                  .dropdown-divider
+                  a#addNewLoan.dropdown-item(href='#' data-toggle='modal' data-target='#addLoanModal') Add Loan
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')

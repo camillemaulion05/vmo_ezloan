@@ -153,19 +153,12 @@ html
                         $('input#sharesPerPayDay').val(data.borrower.sharesPerPayDay);
                         $('select#hrCertifiedBy').val(hrCertifiedBy);
                         $('select#employmentType').val(employmentType);
-                        $('select#type').prop('disabled', false);
-                        $('select#status').prop('disabled', false);
                         $("#updateBorrower .btn.btn-primary").show();
                         $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
                         $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
                         if (data.borrower.type == 'Member') {
-                          $('select#type option[value="Member"]').show();
-                          $('select#type option[value="Non-Member"]').hide();
                           $('.membersOnly').removeClass('d-none');
                         } else{
-                          $('select#type option[value="Member"]').hide();
-                          $('select#type option[value="Non-Member"]').show();
-                          $('select#type option[value="Basic"]').hide();
                           $('.membersOnly').addClass('d-none');
                         }
                         if (data.borrower.status == 'Verified') {
@@ -173,6 +166,9 @@ html
                           $('select#status option[value="Pending for Review"]').hide();
                           $('select#status option[value="Declined"]').hide();
                           $('select#status option[value="Verified"]').show();
+                          $('select#status').prop('disabled', true);
+                          $('select#employmentType option[value="Unaffiliated"]').show();
+                          $('select#reviewedBy').prop('disabled', true);
                           $('.verifiedOnly').removeClass('d-none');
                           if (parseFloat(data.borrower.totalCreditLimit) > 0) {
                             $('.withCreditLimitOnly').removeClass('d-none');
@@ -180,16 +176,23 @@ html
                             $('.withCreditLimitOnly').addClass('d-none');
                           }
                           if (data.borrower.type == 'Member') {
+                            $('select#hrCertifiedBy').prop('disabled', true);
                             $('.verifiedMemberOnly').removeClass('d-none');
                           } else{
+                            $('select#hrCertifiedBy').prop('disabled', false);
                             $('.verifiedMemberOnly').addClass('d-none');
                           }
                         } else {
+                          $('select#status').prop('disabled', false);
+                          $('select#reviewedBy').prop('disabled', false);
+                          $('select#hrCertifiedBy').prop('disabled', false);
                           $('select#status option[value="Basic"]').show();
-                          $('select#status option[value="Pending for Review"]').show();
+                          $('select#status option[value="Pending for Review"]').hide();
                           $('select#status option[value="Declined"]').show();
                           $('select#status option[value="Verified"]').show();
+                          $('select#employmentType option[value="Unaffiliated"]').hide();
                           if (data.borrower.status == 'Pending for Review') {
+                            $('select#status option[value="Pending for Review"]').show();
                             $('select#status option[value="Basic"]').hide();
                           }
                           if (data.borrower.status == 'Declined') {
@@ -199,6 +202,7 @@ html
                             $('select#status option[value="Pending for Review"]').hide();
                             $('select#status option[value="Verified"]').hide();
                             $("#updateBorrower .btn.btn-primary").hide();
+                            $('#updateBorrowerModalLabel').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
                           }
                           $('.withCreditLimitOnly').addClass('d-none');
                           $('.verifiedOnly').addClass('d-none');
@@ -214,40 +218,8 @@ html
               $('select#borrowerType').change(function () {
                 if ($('select#borrowerType').val() == 'Member') {
                   $('.membersOnly').removeClass('d-none');
-                  if ($('select#borrowerStatus').val() == 'Verified') {
-                    $('.verifiedMemberOnly').removeClass('d-none');
-                  } else{
-                    $('.verifiedMemberOnly').addClass('d-none');
-                  }
                 } else{
                   $('.membersOnly').addClass('d-none');
-                  $('.verifiedMemberOnly').addClass('d-none');
-                }
-              });
-              $('select#borrowerStatus').change(function () {
-                if ($('select#borrowerStatus').val() == 'Verified') {
-                   $('.verifiedOnly').removeClass('d-none');
-                  if ($('select#borrowerType').val() == 'Member') {
-                    $('.verifiedMemberOnly').removeClass('d-none');
-                  } else{
-                    $('.verifiedMemberOnly').addClass('d-none');
-                  }
-                } else {
-                  $('.verifiedOnly').addClass('d-none');
-                  $('.verifiedMemberOnly').addClass('d-none');
-                }
-              });
-              $('select#type').change(function () {
-                if ($('select#type').val() == 'Member') {
-                  $('.membersOnly').removeClass('d-none');
-                  if ($('select#status').val() == 'Verified') {
-                    $('.verifiedMemberOnly').removeClass('d-none');
-                  } else{
-                    $('.verifiedMemberOnly').addClass('d-none');
-                  }
-                } else{
-                  $('.membersOnly').addClass('d-none');
-                  $('.verifiedMemberOnly').addClass('d-none');
                 }
               });
               $('select#status').change(function () {
@@ -269,6 +241,14 @@ html
                   $('.verifiedOnly').addClass('d-none');
                   $('.verifiedMemberOnly').addClass('d-none');
                 }
+              });
+              $('input#borrowerShares').on("keyup change blur", function () {
+                $('input#amount').val(parseInt($('input#borrowerShares').val()) + 1000);
+              });
+              $('input#borrowerFirstName, input#borrowerDateOfBirth').on("keyup change blur", function () {
+                let fname = ($('input#borrowerFirstName').val()) ? ($('input#borrowerFirstName').val().replace(/\ /g, "").replace(/\./g, "").replace(/\-/g, "").replace(/\'/g, "")).toLowerCase() : "";
+                let bday =  ($('input#borrowerDateOfBirth').val()) ? ($('input#borrowerDateOfBirth').val()).replace(/\-/g, "") : '';
+                $('input#username').val(fname + '' + bday);
               });
           });
     
@@ -328,12 +308,13 @@ html
                     data: {},
                     cache: false,
                     success: function (data) {
+                      let reviewedBy = (data.withdrawal.reviewedBy && data.withdrawal.reviewedBy._id) ? data.withdrawal.reviewedBy._id : '';
                       $('input#borrowerName').val(data.withdrawal.requestedBy.account.number + ' - ' + data.withdrawal.requestedBy.profile.firstName + ' ' + data.withdrawal.requestedBy.profile.lastName);
                       $('input#shares').val(data.total);
                       $('input#withdrawReason').val(data.withdrawal.reason);
                       $('input#withdrawAmount').val(data.withdrawal.amount);
                       $('select#status').val(data.withdrawal.status);
-                      $('select#reviewedBy').val(data.withdrawal.reviewedBy);
+                      $('select#reviewedBy').val(reviewedBy);
                       $('.addTransactionOnly').addClass('d-none');
                       $('select#status option[value="Processing"]').show();
                       $('#updateWithdrawalNum').text(data.withdrawal.withdrawalNum);
@@ -420,11 +401,12 @@ html
                     data: {},
                     cache: false,
                     success: function (data) {
+                      let postedBy = (data.postedBy && data.postedBy._id) ? data.postedBy._id : '';
                       $("span#updateTxnNum").text(data.transactionNum);
                       $('input#type').val(data.type);
                       $('input#amount').val(parseFloat(data.amount).toFixed(2));
-                      $('input#borrowerName').val(data.borrowerId.profile.firstName + ' ' + data.borrowerId.profile.lastName);
-                      $('input#postedBy').val(data.postedBy.profile.firstName + ' ' + data.postedBy.profile.lastName);
+                      $('select#borrowerName').val(data.borrowerId._id);
+                      $('select#postedBy').val(postedBy);
                       $('textarea#message').val(data.message);
                       if (data.type == "Release" || data.type == "Withdrawals") {
                         $('input#borrowerAcctNo').val(data.receiverNum);
@@ -496,6 +478,7 @@ html
                       let monthlyInterestRate = (data.loan.requestedBy.type == 'Member') ? 3 : 5;
                       let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : '';
                       let balance = (parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance)).toFixed(2);
+                      let reviewedBy = (data.loan.reviewedBy && data.loan.reviewedBy._id) ? data.loan.reviewedBy._id : '';
                       $('select#borrowerName').val(data.loan.requestedBy._id);
                       $('input#borrowerType').val(data.loan.requestedBy.type);
                       $('input#purposeOfLoan').val(data.loan.purposeOfLoan);
@@ -504,13 +487,13 @@ html
                       $('input#monthlyInterestRate').val(monthlyInterestRate);
                       $('select#loanTerm').val(data.loan.loanTerm);
                       $('select#status').val(data.loan.status);
-                      $('select#reviewedBy').val(data.loan.reviewedBy);
+                      $('select#reviewedBy').val(reviewedBy);
                       $('input#borrowerAcctNo').val(accountNum);
                       $('input#newProceedsAmount').val(parseFloat(data.loan.newProceedsAmount));
                       $('input#balance').val(balance);
                       $("#updateLoan .btn.btn-primary").show();
                       $("#updateLoan").attr("action", "/loans/" + loanid);
-                      $('#updateTitle').text("Update ");
+                      $('#updateTitle').text("Update Loan No. ");
                       $('#updateLoanNum').text(data.loan.loanNum);
                       $('.addTransactionOnly').addClass('d-none');
                       $('.loanReleaseOnly').addClass('d-none');
@@ -539,12 +522,11 @@ html
                         $('select#status option[value="Open"]').hide();
                         $('select#status option[value="Fully Paid"]').hide();
                         $('select#status option[value="Loan Debt"]').hide();
-                        if (data.loan.status == 'Open' || data.loan.status == 'Loan Debt') {
+                        if (data.loan.status == 'Open') {
                           $('select#status option[value="Approved"]').hide();
                           $('select#status option[value="Declined"]').hide();
                           $('select#status option[value="Loan Release"]').hide();
                           $('select#status option[value="Open"]').show();
-                          $('select#status option[value="Loan Debt"]').show();
                           $('select#status option[value="Fully Paid"]').show();
                         }
                         if (data.loan.status == 'Loan Debt') {

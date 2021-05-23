@@ -34,8 +34,8 @@ else
   
   if title.indexOf("Manage Borrowers") != -1
     - let type = ["Non-Member", "Member"]
-    - let status = ["Basic", "Pending for Review", "Verified", "Declined"]
-    - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+    - let status = ["Basic", "Verified", "Declined"]
+    - let employmentType = ["Regular", "Probation", "Unaffiliated"]
     #addBorrowerModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addBorrowerModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
@@ -53,13 +53,12 @@ else
                     option(value='' selected='') Borrower Type
                     for x in type
                       option(value=x) #{x}
-                .col-md-6 
-                  label.small.mb-1(for='borrowerStatus') Status
-                  select#borrowerStatus.form-control.selectpicker(type='text' name='status')
-                    option(value='' selected='') Status
-                    - let borrowerStatus = ["Basic", "Verified"]
-                    for x in borrowerStatus
-                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='borrowerMobileNum') Mobile Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#borrowerMobileNum.form-control(type='text' name='mobileNum' minlength='10' maxlength='10')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='borrowerFirstName') First name
@@ -83,43 +82,36 @@ else
                   label.small.mb-1(for='borrowerEmail') Email address
                   input#borrowerEmail.form-control(type='email' name='email')
                 .col-md-6
-                  label.small.mb-1(for='borrowerMobileNum') Mobile Number
-                  .input-group
-                    .input-group-prepend
-                      span.input-group-text +63
-                    input#borrowerMobileNum.form-control(type='text' name='mobileNum' minlength='10' maxlength='10')
+                  label.small.mb-1(for='username') Username
+                  input#username.form-control(type='text' name='username' disabled='')
               .form-row.mb-2.membersOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='borrowerEmployeeID') Employee ID
                   input#borrowerEmployeeID.form-control(type='text' name='employeeID')
                 .col-md-6
-                  label.small.mb-1(for='borrowerShares') Shares/Payday (Php)
-                  input#borrowerShares.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
-              .form-row.mb-2.verifiedOnly.d-none
+                  label.small.mb-1(for='borrowerShares') Shares/Payday
+                  input#borrowerShares.form-control(type="number" step="100" min="300" name='sharesPerPayDay' value="0")
+              .form-row.mb-2.membersOnly.d-none
                 .col-md-6
-                  label.small.mb-1(for='borrowerTotalCreditLimit') Total Credit Limit
-                  input#borrowerTotalCreditLimit.form-control(type="number" step="500" min="0" name='totalCreditLimit')
+                  label.small.mb-1(for='amount') Total Payment
+                  input#amount.form-control(type="number" step="100" min="1000" name='amount' value="1000" disabled='')
                 .col-md-6
-                  label.small.mb-1(for='borrowerReviewedBy') Assigned Loan Officer
-                  select#borrowerReviewedBy.form-control.selectpicker(type='text' name='reviewedBy')
-                    option(value='' selected='') Assigned Loan Officer
+                  label.small.mb-1(for='borrowerAcctNo') Borrower G-Cash No.
+                  .input-group.mb-1
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#borrowerAcctNo.form-control(type='text' name='borrowerAcctNo' minlength='10' maxlength='10')
+              .form-row.mb-2.membersOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='postedBy') Assigned Loan Processor
+                  select#postedBy.form-control.selectpicker(type='text' name='postedBy')
+                    option(value='' selected='') Assigned Loan Processor
                     for x in employees
-                      if (x.type == 'Loan Officer')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
-              .form-row.mb-2.verifiedMemberOnly.d-none
+                      if (x.type == 'Loan Processor')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
                 .col-md-6
-                  label.small.mb-1(for='borrowerHrCertifiedBy') HRD Authorized Officer
-                  select#borrowerHrCertifiedBy.form-control.selectpicker(type='text' name='hrCertifiedBy')
-                    option(value='' selected='') HRD Authorized Officer
-                    for x in employees
-                      if (x.type == 'HRD Authorized Officer')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
-                .col-md-6
-                  label.small.mb-1(for='borrowerEmploymentType') Employment Status
-                  select#borrowerEmploymentType.form-control.selectpicker(type='text' name='employmentType')
-                    option(value='' selected='') Employment Status
-                    for x in employmentType
-                      option(value=x) #{x}
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
+                  input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -152,7 +144,7 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='type') Borrower Type
-                  select#type.form-control.selectpicker(type='text' name='type')
+                  select#type.form-control.selectpicker(type='text' name='type' disabled='')
                     option(value='' selected='' disabled='') Borrower Type
                     for x in type
                       option(value=x) #{x}
@@ -167,8 +159,8 @@ else
                   label.small.mb-1(for='employeeID') Employee ID
                   input#employeeID.form-control(type='text' name='employeeID' disabled='')
                 .col-md-6
-                  label.small.mb-1(for='sharesPerPayDay') Shares/Payday (Php)
-                  input#sharesPerPayDay.form-control(type="number" step="300" min="0" name='sharesPerPayDay')
+                  label.small.mb-1(for='sharesPerPayDay') Shares/Payday
+                  input#sharesPerPayDay.form-control(type="number" step="100" min="0" name='sharesPerPayDay')
               .form-row.mb-2.withCreditLimitOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='totalUsedCreditLimit') Total Used Credit Limit
@@ -196,9 +188,9 @@ else
                       if (x.type == 'HRD Authorized Officer')
                         option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
-                  label.small.mb-1(for='employmentType') Employment Status
+                  label.small.mb-1(for='employmentType') Employment Type
                   select#employmentType.form-control.selectpicker(type='text' name='employmentType')
-                    option(value='' selected='') Employment Status
+                    option(value='' selected='') Employment Type
                     for x in employmentType
                       option(value=x) #{x}
             .modal-footer
@@ -363,7 +355,7 @@ else
                       option(value=x) #{x}
                 .col-md-6
                   label.small.mb-1(for='amount') Amount
-                  input#amount.form-control(type="number" step="500" min="500" name='amount')
+                  input#amount.form-control(type="number" step="100" min="500" name='amount')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -474,7 +466,10 @@ else
               .form-row.mb-2.notExpensesType
                 .col-md-6
                   label.small.mb-1(for='borrowerName') Borrower Name
-                  input#borrowerName.form-control(type='text' name='borrowerName' disabled='')
+                  select#borrowerName.form-control.selectpicker(type='text' name='borrowerName' disabled='')
+                    option(value='' selected='') Borrower Name
+                    for x in borrowers
+                      option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='borrowerAcctNo') Borrower G-Cash No.
                   .input-group.mb-1
@@ -484,7 +479,11 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='postedBy') Assigned Loan Processor
-                  input#postedBy.form-control(type='text' name='postedBy' disabled='')
+                  select#postedBy.form-control.selectpicker(type='text' name='postedBy' disabled='')
+                    option(value='' selected='') Assigned Loan Processor
+                    for x in employees
+                      if (x.type == 'Loan Processor')
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='processorAcctNo') Loan Processor G-Cash No.
                   .input-group.mb-1
@@ -571,7 +570,7 @@ else
                       option(value=x) #{x}
                 .col-md-6
                   label.small.mb-1(for='amount') Loan Amount
-                  input#amount.form-control(type="number" step="500" min="5000" max="500000" name='loanAmount')
+                  input#amount.form-control(type="number" step="100" min="5000" max="500000" name='loanAmount')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='interest') Monthly Interest Rate
@@ -630,7 +629,7 @@ else
                   input#purposeOfLoan.form-control(type='text' name='purposeOfLoan' disabled='')
                 .col-md-6
                   label.small.mb-1(for='loanAmount') Loan Amount
-                  input#loanAmount.form-control(type="number" step="500" min="0" name='loanAmount' disabled='')
+                  input#loanAmount.form-control(type="number" step="100" min="5000" name='loanAmount' disabled='')
               .form-row.mb-2.processingOnly.d-none
                 .col-md-6
                   label.small.mb-1(for='monthlyInterestRate') Monthly Interest Rate
@@ -724,7 +723,7 @@ else
                 | Continuing Interest of #{interestRate}% per month against Outstanding Balance after the loan terms.
               .form-row.mb-2
                 label.small.mb-1(for='loanAmount') Loan Amount
-                input#loanAmount.form-control(type="number" step="500" min="5000" max=remainingCreditLimit name='loanAmount' value=remainingCreditLimit)
+                input#loanAmount.form-control(type="number" step="100" min="5000" max=remainingCreditLimit name='loanAmount' value=remainingCreditLimit)
               .form-row.mb-2
                 label.small.mb-1(for='purposeOfLoan') Purpose of Loan
                 select#purposeOfLoan.form-control.selectpicker(type='text' name='purposeOfLoan')

@@ -4,7 +4,7 @@ const Withdrawal = mongoose.model('Withdrawal');
 const withdrawalsList = (req, res) => {
     Withdrawal
         .find()
-        .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email')
+        .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email')
         .exec((err, withdrawals) => {
             if (err) {
                 console.log(err);
@@ -63,7 +63,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy', 'profile.firstName profile.lastName type userId borrowerNum account profile.address profile.mobileNum profile.email')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res

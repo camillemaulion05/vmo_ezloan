@@ -16,18 +16,24 @@ function capitalizeFirstLetter(str) {
  * GET /login
  * Login page.
  */
-const getLogin = (req, res) => {
+const getLogin = (req, res, next) => {
     if (req.user) {
         return res.redirect('/account');
     }
-    res.render('user/login', {
-        title: 'Login'
-    });
+    let userType = (req.params.type) ? req.params.type : 'borrower';
+    if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
+        res.render('user/login', {
+            title: 'Login',
+            type: userType
+        });
+    } else {
+        next();
+    }
 };
 
 /**
  * POST /login
- * Sign in using email and password.
+ * Sign in using username and password.
  */
 const postLogin = (req, res, next) => {
     const validationErrors = [];
@@ -54,13 +60,20 @@ const postLogin = (req, res, next) => {
         req.flash('errors', validationErrors);
         return res.redirect('/login');
     }
+    let userType = (req.params.type) ? req.params.type : 'borrower';
+    if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
+        if (userType == 'member') userType = 'borrower';
+        req.userType = capitalizeFirstLetter(userType);
+    } else {
+        next();
+    }
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
         }
         if (!user) {
             req.flash('errors', info);
-            return res.redirect('/login');
+            return res.redirect('back');
         }
         req.login(user, (err) => {
             if (err) {
@@ -79,43 +92,74 @@ const postLogin = (req, res, next) => {
  * Log out.
  */
 const getLogout = (req, res) => {
+    let userType = (req.user.type != "Borrower") ? '/' + (req.user.type).toLowerCase() : '';
     req.logout();
     req.session.destroy((err) => {
         if (err) console.log('Error : Failed to destroy the session during logout.', err);
         req.user = null;
-        res.redirect('/login');
+        res.redirect('/login' + userType);
     });
 };
 
 /**
- * GET /signup/:type
+ * GET /signup or /signup/:type
  * Signup page.
  */
-const getSignupByType = (req, res) => {
+const getSignup = (req, res, next) => {
     if (req.user) {
         return res.redirect('/account');
     }
-    let userType = req.params.type;
+    let userType = (req.params.type) ? req.params.type : 'borrower';
     if (userType == 'employee' || userType == 'member' || userType == 'admin' || userType == 'borrower') {
-        res.render('user/signup', {
-            title: 'Signup',
-            type: (req.params.type == 'admin' || req.params.type == 'employee' || req.params.type == 'member' || req.params.type == 'borrower') ? req.params.type : 'borrower'
-        });
+        if (userType == 'member') {
+            path = '/api/employees/account';
+            requestOptions = {
+                url: `${apiOptions.server}${path}`,
+                method: 'GET',
+                json: {}
+            };
+            request(
+                requestOptions,
+                (err, {
+                    statusCode
+                }, employees) => {
+                    if (err) {
+                        req.flash('errors', {
+                            msg: 'There was an error when loading list of employees. Please try again later.'
+                        });
+                        return res.redirect('/signup/borrower');
+                    } else if (statusCode === 200) {
+                        res.render('user/signup', {
+                            title: 'Signup',
+                            type: 'member',
+                            employees: employees
+                        });
+                    } else {
+                        req.flash('errors', {
+                            msg: user.message
+                        });
+                        return res.redirect('/signup/borrower');
+                    }
+                }
+            );
+        } else {
+            res.render('user/signup', {
+                title: 'Signup',
+                type: userType
+            });
+        }
     } else {
-        req.flash('errors', {
-            msg: 'Not existing user type. Please enter correct user type.'
-        });
-        return res.redirect('/signup/borrower');
+        next();
     }
 };
 
 /**
- * POST /signup/:type
+ * POST /signup or /signup/:type
  * Create a new local account.
  */
-const postSignupByType = (req, res, next) => {
+const postSignup = (req, res, next) => {
     const validationErrors = [];
-    let userType = req.params.type;
+    let userType = (req.params.type) ? req.params.type : 'borrower';
     let type = '',
         employeeID = '',
         sharesPerPayDay = '',
@@ -172,21 +216,31 @@ const postSignupByType = (req, res, next) => {
                     if (validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
                         msg: 'Shares per payday cannot be blank.'
                     });
+                    if (validator.isEmpty(req.body.senderNum)) validationErrors.push({
+                        msg: 'Sender G-Cash No. cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.receiverNum)) validationErrors.push({
+                        msg: 'Receiver G-Cash No. cannot be blank.'
+                    });
+                    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+                        msg: 'G-Cash Reference No. cannot be blank.'
+                    });
                     if (req.body.userCode != originalMemberCode) validationErrors.push({
                         msg: 'User code is invalid.'
                     });
+                    //override userType
                     userType = 'borrower';
                     type = 'Member';
                     employeeID = req.body.employeeID;
                     sharesPerPayDay = req.body.sharesPerPayDay;
+                    accountNum = req.body.senderNum;
                 }
             }
         } else {
             type = 'Non-Member';
         }
     } else {
-        userType = 'borrower'
-        type = 'Non-Member';
+        next();
     }
     if (validator.isEmpty(req.body.username)) validationErrors.push({
         msg: 'Username cannot be blank.'
@@ -315,20 +369,153 @@ const postSignupByType = (req, res, next) => {
                                 requestOptions,
                                 (err, {
                                     statusCode
-                                }, borrower) => {
+                                }, account) => {
                                     if (err) {
                                         req.flash('errors', {
                                             msg: 'There was an error in creating your account profile.'
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 201) {
-                                        req.flash("success", {
-                                            msg: "Successfully Signed Up! Please login your credentials. "
-                                        });
-                                        return res.redirect('/login');
+                                        if (type == "Member") {
+                                            let bytes = CryptoJS.AES.decrypt(account.id, process.env.CRYPTOJS_SERVER_SECRET);
+                                            let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
+                                            path = '/api/borrowers/users/' + originalUserId;
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'GET',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + user.token
+                                                },
+                                                json: {}
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, borrower) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when borrower information. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 200) {
+                                                        let transaction = {};
+                                                        transaction.amount = "1000.00";
+                                                        transaction.type = "Fees";
+                                                        transaction.senderNum = borrower.account.number;
+                                                        transaction.borrowerId = borrower._id;
+                                                        transaction.postedBy = req.body.receiverNum;
+                                                        transaction.referenceNo = req.body.referenceNo;
+
+                                                        path = '/api/employees/' + transaction.postedBy;
+                                                        requestOptions = {
+                                                            url: `${apiOptions.server}${path}`,
+                                                            method: 'GET',
+                                                            headers: {
+                                                                Authorization: 'Bearer ' + user.token
+                                                            },
+                                                            json: {}
+                                                        };
+                                                        request(
+                                                            requestOptions,
+                                                            (err, {
+                                                                statusCode
+                                                            }, employee) => {
+                                                                if (err) {
+                                                                    req.flash('errors', {
+                                                                        msg: 'There was an error when loading employee information. Please try again later.'
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                } else if (statusCode === 200) {
+                                                                    transaction.receiverNum = (employee.account && employee.account.number) ? employee.account.number : '';
+                                                                    path = '/api/transactions';
+                                                                    requestOptions = {
+                                                                        url: `${apiOptions.server}${path}`,
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            Authorization: 'Bearer ' + user.token
+                                                                        },
+                                                                        json: transaction
+                                                                    };
+                                                                    request(
+                                                                        requestOptions,
+                                                                        (err, {
+                                                                            statusCode
+                                                                        }, newTransaction) => {
+                                                                            if (err) {
+                                                                                req.flash('errors', {
+                                                                                    msg: 'There was an error when adding new transaction for membership fee. Please try again later.'
+                                                                                });
+                                                                                return res.redirect('back');
+                                                                            } else if (statusCode === 201) {
+                                                                                transaction.amount = req.body.sharesPerPayDay;
+                                                                                transaction.type = "Contributions";
+                                                                                path = '/api/transactions';
+                                                                                requestOptions = {
+                                                                                    url: `${apiOptions.server}${path}`,
+                                                                                    method: 'POST',
+                                                                                    headers: {
+                                                                                        Authorization: 'Bearer ' + user.token
+                                                                                    },
+                                                                                    json: transaction
+                                                                                };
+                                                                                request(
+                                                                                    requestOptions,
+                                                                                    (err, {
+                                                                                        statusCode
+                                                                                    }, newTransaction2) => {
+                                                                                        if (err) {
+                                                                                            req.flash('errors', {
+                                                                                                msg: 'There was an error when adding new transaction for new contribution. Please try again later.'
+                                                                                            });
+                                                                                            return res.redirect('back');
+                                                                                        } else if (statusCode === 201) {
+                                                                                            req.flash("success", {
+                                                                                                msg: "Successfully Signed Up! Please login your credentials. "
+                                                                                            });
+                                                                                            return res.redirect('/login');
+                                                                                        } else {
+                                                                                            req.flash('errors', {
+                                                                                                msg: newTransaction2.message
+                                                                                            });
+                                                                                            return res.redirect('back');
+                                                                                        }
+                                                                                    }
+                                                                                );
+                                                                            } else {
+                                                                                req.flash('errors', {
+                                                                                    msg: newTransaction.message
+                                                                                });
+                                                                                return res.redirect('back');
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    req.flash('errors', {
+                                                                        msg: employee.message
+                                                                    });
+                                                                    return res.redirect('back');
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: borrower.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
+                                        } else {
+                                            req.flash("success", {
+                                                msg: "Successfully Signed Up! Please login your credentials. "
+                                            });
+                                            userType = (userType != "borrower") ? '/' + userType : '';
+                                            return res.redirect('/login' + userType);
+                                        }
                                     } else {
                                         req.flash('errors', {
-                                            msg: borrower.message
+                                            msg: account.message
                                         });
                                         return res.redirect('back');
                                     }
@@ -662,8 +849,8 @@ const postReset = (req, res, next) => {
 module.exports = {
     getLogin,
     postLogin,
-    getSignupByType,
-    postSignupByType,
+    getSignup,
+    postSignup,
     getLogout,
     getForgot,
     postForgot,

@@ -33,4 +33,5 @@ block content
               button.btn.btn-primary.btn-block(type='submit') Submit
       .text-center
         | Don&apos;t have an account? 
-        a(href='/signup/borrower') Sign up here!
+        - let userType = (type) ? (type != 'borrower') ? '/' + type : '' : '';
+        a(href='/signup' + userType) Sign up here!

@@ -43,4 +43,8 @@ html
                   $('.loanProcessorOnly').addClass('d-none');
                 }
               });
+              $('input#sharesPerPayDay').on("keyup change blur", function () {
+                let shares = ($('input#sharesPerPayDay').val()) ? parseInt($('input#sharesPerPayDay').val()) : 0;
+                $('input#amount').val(shares + 1000);
+              });
           });

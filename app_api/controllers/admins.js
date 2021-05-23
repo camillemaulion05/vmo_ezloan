@@ -206,8 +206,19 @@ const adminsDeleteOne = (req, res) => {
 };
 
 const adminsGetEmailByUser = (req, res) => {
-    let bytes = CryptoJS.AES.decrypt(req.body.userId, process.env.CRYPTOJS_SERVER_SECRET);
-    let originalUserId = bytes.toString(CryptoJS.enc.Utf8);
+    let bytes = "",
+        originalUserId = "";
+    try {
+        bytes = CryptoJS.AES.decrypt(req.body.userid, process.env.CRYPTOJS_SERVER_SECRET);
+        originalUserId = bytes.toString(CryptoJS.enc.Utf8);
+    } catch (err) {
+        console.log(err);
+        res
+            .status(404)
+            .json({
+                "message": "Invalid userid."
+            });
+    }
     const isValid = mongoose.Types.ObjectId.isValid(originalUserId);
     if (!isValid) {
         res
@@ -347,8 +358,18 @@ const adminsVerifyEmailToken = (req, res) => {
                                 "message": "You don\'t have permission to do that!"
                             });
                     }
-                    let bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
-                    let originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                    let bytes = "",
+                        originalToken = "";
+                    try {
+                        bytes = CryptoJS.AES.decrypt(req.body.token, process.env.CRYPTOJS_CLIENT_SECRET);
+                        originalToken = bytes.toString(CryptoJS.enc.Utf8);
+                    } catch (err) {
+                        res
+                            .status(404)
+                            .json({
+                                "message": "Invalid token or expired token."
+                            });
+                    }
                     if (admin.profile.emailVerificationToken == originalToken) {
                         admin.profile.emailVerificationToken = '';
                         admin.profile.emailVerified = true;
