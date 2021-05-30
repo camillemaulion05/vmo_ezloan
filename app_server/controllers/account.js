@@ -31,7 +31,6 @@ function usernameGen(firstName, bday) {
 function parseDate(date, format) {
     let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    let month3 = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let d = (new Date(date)).toString().split(' ');
     let dateFormat = month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3];
     if (format) {
@@ -6412,13 +6411,13 @@ const getDownloadBorrowersReport = (req, res) => {
                             border: [true, true, true, true]
                         },
                         {
-                            text: 'Age',
+                            text: 'Type',
                             style: 'medium',
                             bold: true,
                             border: [true, true, true, true]
                         },
                         {
-                            text: 'Type',
+                            text: 'Age',
                             style: 'medium',
                             bold: true,
                             border: [true, true, true, true]
@@ -6475,12 +6474,12 @@ const getDownloadBorrowersReport = (req, res) => {
                     border: [true, true, true, true]
                 },
                 {
-                    text: getAge(d.profile.dateOfBirth),
+                    text: d.type,
                     style: 'item',
                     border: [true, true, true, true]
                 },
                 {
-                    text: d.type,
+                    text: getAge(d.profile.dateOfBirth),
                     style: 'item',
                     border: [true, true, true, true]
                 },
@@ -10756,7 +10755,7 @@ const postEmployees = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    let username = usernameGen(req.body.firstName, req.body.lastName);
+    let username = usernameGen(req.body.firstName, req.body.dateOfBirth);
     let password = passwordGen();
     path = '/api/users';
     requestOptions = {
@@ -10827,7 +10826,7 @@ const postEmployees = (req, res) => {
                                 json: {
                                     receiver: req.body.email,
                                     subject: 'VMO EZ Loan Account',
-                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are the initials of your first name, and your last name plus your 6 random alphanumeric.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
+                                    message: `Hi, \n\nTo activate your account, follow these four (3) simple steps: \n 1. Click this url to access the site. (${process.env.BASE_URL}/login) \n 2. Log-on using these access credentials:\n\t USERNAME: \t ${username} \n\t\t These are your first name plus your birthdate in YYYYMMDD.\n\t PASSWORD: \t ${password} \n 3. Change the initial password provided to your preferred password. \n\n Thank you and welcome to VMO EZ Loan.`
                                 }
                             };
                             request(
@@ -10873,6 +10872,7 @@ const postEmployees = (req, res) => {
 
 const getEmployeeDetails = (req, res) => {
     path = '/api/employees/' + req.params.employeeid;
+    if (req.params.type == "admin") path = '/api/admins/' + req.params.employeeid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -10906,10 +10906,101 @@ const getEmployeeDetails = (req, res) => {
 };
 
 const postUpdateEmployees = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.employeeID)) validationErrors.push({
+        msg: 'Employee ID cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.firstName)) validationErrors.push({
+        msg: 'First Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.lastName)) validationErrors.push({
+        msg: 'Last Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Birthday cannot be blank.'
+    });
+    if (!validator.isDate(req.body.dateOfBirth)) validationErrors.push({
+        msg: 'Enter a valid date.'
+    });
+    if (validator.isEmpty(req.body.gender)) validationErrors.push({
+        msg: 'Gender cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.mobileNum)) validationErrors.push({
+        msg: 'Mobile number cannot be blank.'
+    });
+    if (!validator.isEmail(req.body.email)) validationErrors.push({
+        msg: 'Please enter a valid email address.'
+    });
+    if (req.params.type == "processor") {
+        if (validator.isEmpty(req.body.accountName)) validationErrors.push({
+            msg: 'G-Cash Account name cannot be blank.'
+        });
+        if (validator.isEmpty(req.body.accountNum)) validationErrors.push({
+            msg: 'G-Cash Account no. cannot be blank.'
+        });
+    }
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    req.body.email = validator.normalizeEmail(req.body.email, {
+        gmail_remove_dots: false
+    });
     path = '/api/employees/' + req.params.employeeid;
+    if (req.params.type == "admin") path = '/api/admins/' + req.params.employeeid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
-        method: 'GET',
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            profile: {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                gender: req.body.gender,
+                dateOfBirth: req.body.dateOfBirth,
+                email: req.body.email,
+                mobileNum: req.body.mobileNum
+            },
+            employeeID: req.body.employeeID,
+            account: {
+                name: (req.params.type == "processor" && req.body.accountName) ? req.body.accountName : '',
+                number: (req.params.type == "processor" && req.body.accountNum) ? req.body.accountNum : ''
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, employee) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating employee account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Employee account has been updated.'
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: employee.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeleteEmployees = (req, res) => {
+    path = '/api/employees/' + req.params.employeeid;
+    if (req.params.type == "admin") path = '/api/admins/' + req.params.employeeid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'DELETE',
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
@@ -10922,16 +11013,298 @@ const postUpdateEmployees = (req, res) => {
         }, employee) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when loading employee information. Please try again later.'
+                    msg: 'There was an error when deleting employee account. Please try again later.'
                 });
                 return res.redirect('back');
-            } else if (statusCode === 200) {
-                return res
-                    .status(200)
-                    .json(employee);
+            } else if (statusCode === 204) {
+                path = '/api/users/' + req.params.userid;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, user) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when deleting employee account. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 204) {
+                            req.flash('success', {
+                                msg: "Successfully deleting all employee records."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: user.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: employee.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDownloadEmployeesReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadEmployees(employees) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let employeesTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF EMPLOYEES',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 9,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Employee No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'ID No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Employee Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Age',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Gender',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Mobile Number',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Email Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Present Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        employees.forEach(d => {
+            let employeeRow = [{
+                    text: d.employeeNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.employeeID,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.firstName + ' ' + d.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.type) ? d.type : "Admin",
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: getAge(d.profile.dateOfBirth),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.gender,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.mobileNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.email,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            employeesTable.table.body.push(employeeRow);
+        });
+        docDefinition.content.push(employeesTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=employees-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    path = '/api/employees';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, employees) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading list of employees. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/admins';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, admins) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of admins. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            downloadEmployees(employees.concat(admins))
+                        } else {
+                            req.flash('errors', {
+                                msg: admins.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: employees.message
                 });
                 return res.redirect('back');
             }
@@ -11006,132 +11379,6 @@ const getInquiries = (req, res) => {
 
 const postInquiries = (req, res) => {
     getUserDetails(req, res, 'account/index', 'Account Management');
-};
-
-const getDeleteEmployees = (req, res) => {
-    path = '/api/employees/' + req.params.employeeid;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'DELETE',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, employee) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when deleting employee account. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 204) {
-                path = '/api/users/' + req.params.userid;
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {}
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, user) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when deleting user account. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting all employee records."
-                            });
-                            return res.redirect('back');
-                        } else {
-                            req.flash('errors', {
-                                msg: user.message
-                            });
-                            return res.redirect('back');
-                        }
-                    }
-                );
-            } else {
-                req.flash('errors', {
-                    msg: employee.message
-                });
-                return res.redirect('back');
-            }
-        }
-    );
-};
-
-const getDeleteAdmins = (req, res) => {
-    path = '/api/admins/' + req.params.adminid;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'DELETE',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, admin) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when deleting admin account. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 204) {
-                path = '/api/users/' + req.params.userid;
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {}
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, user) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when deleting user account. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting all admin records."
-                            });
-                            return res.redirect('back');
-                        } else {
-                            req.flash('errors', {
-                                msg: user.message
-                            });
-                            return res.redirect('back');
-                        }
-                    }
-                );
-            } else {
-                req.flash('errors', {
-                    msg: admin.message
-                });
-                return res.redirect('back');
-            }
-        }
-    );
 };
 
 const getUpdateInquiries = (req, res) => {
@@ -11335,10 +11582,10 @@ module.exports = {
     postEmployees,
     getEmployeeDetails,
     postUpdateEmployees,
+    getDeleteEmployees,
+    getDownloadEmployeesReport,
     getInquiries,
     postInquiries,
-    getDeleteEmployees,
-    getDeleteAdmins,
     getUpdateInquiries,
     getDeleteInquiries
 };

@@ -267,7 +267,7 @@ else
         .modal-content
           .modal-header
             h5#updateEmployeeModalLabel.modal-title 
-              | Update 
+              | Update Employee No. 
               span#updateEmployeeName
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
@@ -277,7 +277,7 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='type') Employee Type
-                  select#type.form-control.selectpicker(type='text' name='type')
+                  select#type.form-control.selectpicker(type='text' name='type' disabled='true')
                     option(value='' selected='') Employee Type
                     for x in type
                       option(value=x) #{x}

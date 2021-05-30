@@ -164,12 +164,12 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postEmployees);
 
 router
-    .route('/employees/:employeeid')
+    .route('/employees/:employeeid/:type')
     .get(passportConfig.isAuthenticated, ctrlAccount.getEmployeeDetails)
     .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateEmployees);
 
-router.get('/employees/:employeeid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteEmployees);
-router.get('/admins/:adminid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteAdmins);
+router.get('/employees/:employeeid/:userid/delete/:type', passportConfig.isAuthenticated, ctrlAccount.getDeleteEmployees);
+router.get('/download/report/employees/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadEmployeesReport);
 
 router
     .route('/inquiries')

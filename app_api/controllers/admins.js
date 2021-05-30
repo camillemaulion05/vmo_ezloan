@@ -83,13 +83,6 @@ const adminsReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(admin);
@@ -127,13 +120,6 @@ const adminsUpdateOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Admin" == req.payload.type && admin.userId != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
                     admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
                     admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;
@@ -433,13 +419,6 @@ const adminsReadOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(admin);
@@ -480,13 +459,6 @@ const adminsUpdateOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Admin" == req.payload.type && admin.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     admin.profile.firstName = (req.body.profile && req.body.profile.firstName) ? req.body.profile.firstName : admin.profile.firstName;
                     admin.profile.middleName = (req.body.profile && req.body.profile.middleName) ? req.body.profile.middleName : admin.profile.middleName;
                     admin.profile.lastName = (req.body.profile && req.body.profile.lastName) ? req.body.profile.lastName : admin.profile.lastName;

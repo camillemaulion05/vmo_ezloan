@@ -60,7 +60,7 @@ block content
                           td #{x.profile.mobileNum}          
                           td #{x.profile.email}
                           td 
-                            a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                            a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/employee') data-toggle='modal' data-target='#')
                               i.fas.fa-edit
                             a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/employee') data-toggle='modal' data-target='#')
                               i.fas.fa-trash
@@ -79,7 +79,7 @@ block content
                           td #{x.profile.mobileNum}          
                           td #{x.profile.email}
                           td 
-                            a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                            a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/admin') data-toggle='modal' data-target='#')
                               i.fas.fa-edit
                             a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/admin') data-toggle='modal' data-target='#')
                               i.fas.fa-trash

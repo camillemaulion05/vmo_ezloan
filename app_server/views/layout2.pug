@@ -273,20 +273,57 @@ html
                 let firstName = (path[path.length-3]).replace(/%20/g," ");
                 let employeeid = path[path.length-4];
                 let userid = path[path.length-5];
-                if (type == "admin") {
-                  $('a#deleteEmployee').attr('href', '/admins/' + employeeid + '/' + userid + '/delete'); 
-                }
-                else{
-                  $('a#deleteEmployee').attr('href', '/employees/' + employeeid + '/' + userid + '/delete'); 
-                }
+                $('a#deleteEmployee').attr('href', '/employees/' + employeeid + '/' + userid + '/delete' + '/' + type); 
                 $('span#deleteEmployeeName').text(firstName + ' ' + lastName);
                 $('#deleteEmployeeModal').modal('show'); 
               });
               $('#dataTable').on('click','.updateEmployee',function () {
                 let path = ($(this).prop('href')).split('/');
-                let employeeid = path[path.length-1];
-                $('#updateEmployeeModal').modal('show');
-                console.log(employeeid);
+                let type = (path[path.length-1]).replace(/%20/g," ");
+                let employeeid = path[path.length-2];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/employees/" + employeeid + "/" + type,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (employee) {
+                        $('select#type').val(employee.type);
+                        $('input#employeeID').val(employee.employeeID);
+                        $('input#firstName').val(employee.profile.firstName);
+                        $('input#lastName').val(employee.profile.lastName);
+                        $('select#gender').val(employee.profile.gender);
+                        let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                        let date = (new Date(employee.profile.dateOfBirth)).toString().split(' ');
+                        let dateOfBirth =  (employee.profile.dateOfBirth) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] : "";
+                        $('input#dateOfBirth').val(dateOfBirth);
+                        $('input#email').val(employee.profile.email);
+                        $('input#mobileNum').val(employee.profile.mobileNum);
+                        if (employee.type == "Loan Processor") {
+                          $('.loanProcessorOnly').removeClass('d-none');
+                          $('input#accountName').val(employee.account.name);
+                          $('input#accountNum').val(employee.account.number);
+                          $("#updateEmployee").attr("action", "/employees/" + employeeid + "/processor");
+                        } else {
+                          $('.loanProcessorOnly').addClass('d-none');
+                          $('input#accountName').val();
+                          $('input#accountNum').val();
+                          $("#updateEmployee").attr("action", "/employees/" + employeeid + "/" + type);
+                        }
+                        $("#updateEmployee .btn.btn-primary").show();
+                        $('span#updateEmployeeName').text(employee.employeeNum);
+                        $('#updateEmployeeModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
               });
           });
 
