@@ -7149,6 +7149,40 @@ const postUpdateLoans = (req, res) => {
                                                         }
                                                     }
                                                 );
+                                            } else if (req.body.status == "Declined") {
+                                                path = '/api/sendMail';
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'POST',
+                                                    json: {
+                                                        receiver: loan.requestedBy.profile.email,
+                                                        subject: 'Your VMO EZ Loan application has been declined',
+                                                        message: `Hello,\n\nWe are sorry to inform you that your loan application #${loan.loanNum} amounting of ${loan.loanAmount} has just been declined.\n \n\n Thank you.\n`
+                                                    }
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, body) => {
+                                                        if (err) {
+                                                            req.flash('warnings', {
+                                                                msg: 'Loan has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 200) {
+                                                            req.flash('success', {
+                                                                msg: "Loan application has been updated successfully. Email has been sent to respective email."
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: body.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
+                                                    }
+                                                );
                                             } else {
                                                 req.flash('success', {
                                                     msg: "Loan application has been updated successfully."
@@ -10213,8 +10247,8 @@ const postUpdateWithdrawals = (req, res) => {
                                                                 method: 'POST',
                                                                 json: {
                                                                     receiver: withdrawal.requestedBy.profile.email,
-                                                                    subject: 'Your VMO EZ Loan Withdrawal Request has been approved and release',
-                                                                    message: `Hello,\n\nThis is a confirmation that the withdrawal request #${withdrawal.withdrawalNum} amounting of ${transaction.amount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\n Thank you.\n`
+                                                                    subject: 'Your VMO EZ Withdrawal Request has been approved and release',
+                                                                    message: `Hello,\n\nThis is a confirmation that the withdrawal request #${withdrawal.withdrawalNum} amounting of ${withdrawal.amount} has just been approved and release.\nPlease check your G-Cash wallet if it is credited.\n\n Thank you.\n`
                                                                 }
                                                             };
                                                             request(
@@ -10251,6 +10285,40 @@ const postUpdateWithdrawals = (req, res) => {
                                             } else {
                                                 req.flash('errors', {
                                                     msg: employee.message
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        }
+                                    );
+                                } else if (req.body.status == "Declined") {
+                                    path = '/api/sendMail';
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'POST',
+                                        json: {
+                                            receiver: withdrawal.requestedBy.profile.email,
+                                            subject: 'Your VMO EZ Withdrawal Request has been declined',
+                                            message: `Hello,\n\nWe are sorry to inform you that your withrawal request #${withdrawal.withdrawalNum} amounting of ${withdrawal.amount} has just been declined.\n \n\n Thank you.\n`
+                                        }
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, body) => {
+                                            if (err) {
+                                                req.flash('warnings', {
+                                                    msg: 'Withdrawal request has been updated, however we were unable to send a confirmation email to the recipient. We will be looking into it shortly.'
+                                                });
+                                                return res.redirect('back');
+                                            } else if (statusCode === 200) {
+                                                req.flash('success', {
+                                                    msg: "Withdrawal request has been updated successfully. Email has been sent to respective email."
+                                                });
+                                                return res.redirect('back');
+                                            } else {
+                                                req.flash('errors', {
+                                                    msg: body.message
                                                 });
                                                 return res.redirect('back');
                                             }
