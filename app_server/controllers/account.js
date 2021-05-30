@@ -10,6 +10,12 @@ const apiOptions = {
     server: process.env.BASE_URL
 };
 
+function capitalizeFirstLetter(str) {
+    // converting first letter to uppercase
+    let capitalized = str.charAt(0).toUpperCase() + str.slice(1);
+    return capitalized;
+}
+
 function passwordGen() {
     return generator.generate({
         length: 8,
@@ -5560,64 +5566,62 @@ const getDownloadBorrowersReport = (req, res) => {
             }
         };
         borrowers.forEach(d => {
-            if (d.type == "Non-Member") {
-                let borrowerRow = [{
-                        text: d.borrowerNum,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.firstName + ' ' + d.profile.lastName,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: getAge(d.profile.dateOfBirth),
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.mobileNum,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.email,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    }, {
-                        text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: (d.workBusinessInfo && d.workBusinessInfo.monthlyIncome) ? d.workBusinessInfo.monthlyIncome : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.totalCreditLimit,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.status,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    }
-                ];
-                borrowersTable.table.body.push(borrowerRow);
-            }
+            let borrowerRow = [{
+                    text: d.borrowerNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.firstName + ' ' + d.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: getAge(d.profile.dateOfBirth),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.mobileNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.email,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.workBusinessInfo && d.workBusinessInfo.monthlyIncome) ? d.workBusinessInfo.monthlyIncome : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.totalCreditLimit,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.status,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            borrowersTable.table.body.push(borrowerRow);
         });
         docDefinition.content.push(borrowersTable);
         // Make sure the browser knows this is a PDF.
@@ -5763,64 +5767,62 @@ const getDownloadBorrowersReport = (req, res) => {
             }
         };
         borrowers.forEach(d => {
-            if (d.type == "Member") {
-                let borrowerRow = [{
-                        text: d.borrowerNum,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.employeeID,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.firstName + ' ' + d.profile.lastName,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.mobileNum,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.profile.email,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    }, {
-                        text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.sharesPerPayDay,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.totalCreditLimit,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
-                        style: 'item',
-                        border: [true, true, true, true]
-                    },
-                    {
-                        text: d.status,
-                        style: 'item',
-                        border: [true, true, true, true]
-                    }
-                ];
-                borrowersTable.table.body.push(borrowerRow);
-            }
+            let borrowerRow = [{
+                    text: d.borrowerNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.employeeID,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.firstName + ' ' + d.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.mobileNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.profile.email,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.profile.address && d.profile.address.present) ? d.profile.address.present.city + ' ' + d.profile.address.present.province : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }, {
+                    text: (d.workBusinessInfo && d.workBusinessInfo.dateHired) ? parseDate(d.workBusinessInfo.dateHired) : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.sharesPerPayDay,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.totalCreditLimit,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.reviewedBy) ? d.reviewedBy.profile.firstName + ' ' + d.reviewedBy.profile.lastName : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.status,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            borrowersTable.table.body.push(borrowerRow);
         });
         docDefinition.content.push(borrowersTable);
         // Make sure the browser knows this is a PDF.
@@ -6027,6 +6029,8 @@ const getDownloadBorrowersReport = (req, res) => {
     let userType = req.params.type;
     if (userType == 'non-members' || userType == 'members' || userType == 'all') {
         path = '/api/borrowers';
+        if (userType == 'non-members') path = '/api/borrowers/type/Non-Member';
+        if (userType == 'members') path = '/api/borrowers/type/Member';
         requestOptions = {
             url: `${apiOptions.server}${path}`,
             method: 'GET',
@@ -7970,109 +7974,46 @@ const getDownloadLoansReport = (req, res) => {
         pdfDoc.end();
     }
 
-    let userType = req.params.type;
-    if (userType == 'maturityDue' || userType == 'currentDue' || userType == 'all') {
-        if (userType == 'all') {
-            path = '/api/loans';
-            requestOptions = {
-                url: `${apiOptions.server}${path}`,
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + req.user.token
-                },
-                json: {}
-            };
-            request(
-                requestOptions,
-                (err, {
-                    statusCode
-                }, loans) => {
-                    if (err) {
-                        req.flash('errors', {
-                            msg: 'There was an error when loading list of loans. Please try again later.'
-                        });
-                        return res.redirect('back');
-                    } else if (statusCode === 200) {
-                        downloadLoans(loans);
-                    } else {
-                        req.flash('errors', {
-                            msg: loans.message
-                        });
-                        return res.redirect('back');
-                    }
+    let loanType = req.params.type;
+    if (loanType == 'maturityDue' || loanType == 'currentDue' || loanType == 'all') {
+        path = '/api/loans';
+        if (loanType == 'maturityDue') path = '/api/loans/pastMaturity/repayments';
+        if (loanType == 'currentDue') path = '/api/loans/due/repayments';
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {}
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, loans) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when loading list of loans. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    if (loanType == 'all') downloadLoans(loans);
+                    if (loanType == 'maturityDue') downloadMaturityLoans(loans);
+                    if (loanType == 'currentDue') downloadCurrentLoans(loans);
+                } else {
+                    req.flash('errors', {
+                        msg: loans.message
+                    });
+                    return res.redirect('back');
                 }
-            );
-        }
-
-        if (userType == 'maturityDue') {
-            path = '/api/loans/pastMaturity/repayments';
-            requestOptions = {
-                url: `${apiOptions.server}${path}`,
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + req.user.token
-                },
-                json: {}
-            };
-            request(
-                requestOptions,
-                (err, {
-                    statusCode
-                }, loans) => {
-                    if (err) {
-                        req.flash('errors', {
-                            msg: 'There was an error when loading list of loans. Please try again later.'
-                        });
-                        return res.redirect('back');
-                    } else if (statusCode === 200) {
-                        downloadMaturityLoans(loans);
-                    } else {
-                        req.flash('errors', {
-                            msg: loans.message
-                        });
-                        return res.redirect('back');
-                    }
-                }
-            );
-        }
-
-        if (userType == 'currentDue') {
-            path = '/api/loans/due/repayments';
-            requestOptions = {
-                url: `${apiOptions.server}${path}`,
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + req.user.token
-                },
-                json: {}
-            };
-            request(
-                requestOptions,
-                (err, {
-                    statusCode
-                }, loans) => {
-                    if (err) {
-                        req.flash('errors', {
-                            msg: 'There was an error when loading list of loans. Please try again later.'
-                        });
-                        return res.redirect('back');
-                    } else if (statusCode === 200) {
-                        downloadCurrentLoans(loans);
-                    } else {
-                        req.flash('errors', {
-                            msg: loans.message
-                        });
-                        return res.redirect('back');
-                    }
-                }
-            );
-        }
-
+            }
+        );
     } else {
         req.flash('errors', {
-            msg: 'Not existing user type. Please enter correct user type.'
+            msg: 'Not existing loan type. Please enter correct loan type.'
         });
-        return res.redirect('/borrowers');
+        return res.redirect('/loans');
     }
 };
 
@@ -8201,6 +8142,25 @@ const getTransactions = (req, res) => {
 
 const postTransactions = (req, res) => {
     const validationErrors = [];
+    let data = {};
+    data.type = req.body.type;
+    data.message = req.body.message;
+    data.postedBy = req.body.postedBy;
+    data.referenceNo = req.body.referenceNo;
+    data.status = "Posted"
+    if (validator.isEmpty(req.body.type)) validationErrors.push({
+        msg: 'Transaction type cannot be blank.'
+    });
+    if (req.body.amount) {
+        if (validator.isEmpty(req.body.amount)) validationErrors.push({
+            msg: 'Amount cannot be blank.'
+        });
+    }
+    if (req.body.type == "Contributions") {
+        if (validator.isEmpty(req.body.borrowerName)) validationErrors.push({
+            msg: 'Borrower Name cannot be blank.'
+        });
+    }
     if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
         msg: 'Assigned Loan Processor cannot be blank.'
     });
@@ -8231,76 +8191,108 @@ const postTransactions = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/borrowers/type/Member';
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'GET',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {}
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, borrowers) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when loading list of members. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 200) {
-                            let result = [];
-                            borrowers.forEach(borrower => {
-                                if (parseFloat(borrower.sharesPerPayDay) > 0) {
-                                    path = '/api/transactions';
-                                    requestOptions = {
-                                        url: `${apiOptions.server}${path}`,
-                                        method: 'POST',
-                                        headers: {
-                                            Authorization: 'Bearer ' + req.user.token
-                                        },
-                                        json: {
-                                            amount: borrower.sharesPerPayDay,
-                                            type: "Contributions",
-                                            message: req.body.message,
-                                            senderNum: borrower.account.number,
-                                            receiverNum: employee.account.number,
-                                            postedBy: req.body.postedBy,
-                                            referenceNo: req.body.referenceNo,
-                                            borrowerId: borrower._id,
-                                            status: "Posted"
+                if (req.body.type == "Contributions") {
+                    path = '/api/borrowers/' + req.body.borrowerName;
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'GET',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {}
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, borrower) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when borrowers information. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 200) {
+                                data.amount = req.body.amount;
+                                data.senderNum = (borrower.account.number) ? borrower.account.number : borrower.profile.mobileNum;
+                                data.receiverNum = employee.account.number;
+                                data.borrowerId = borrower._id;
+                                path = '/api/transactions';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: data
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, transaction) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when adding new transaction. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Transactions has been added successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: transaction.message
+                                            });
+                                            return res.redirect('back');
                                         }
-                                    };
-                                    request(
-                                        requestOptions,
-                                        (err, {
-                                            statusCode
-                                        }, transaction) => {
-                                            if (err) {
-                                                console.log(err);
-                                            } else if (statusCode === 201) {
-                                                console.log(transaction.message);
-                                            } else {
-                                                console.log(transaction.message);
-                                            }
-                                        }
-                                    );
-                                }
-                            });
-                            req.flash('success', {
-                                msg: "Transactions has been added successfully."
-                            });
-                            return res.redirect('back');
-                        } else {
-                            req.flash('errors', {
-                                msg: borrowers.message
-                            });
-                            return res.redirect('back');
+                                    }
+                                );
+                            } else {
+                                req.flash('errors', {
+                                    msg: borrower.message
+                                });
+                                return res.redirect('back');
+                            }
                         }
-                    }
-                );
+                    );
+                } else {
+                    data.amount = '-' + req.body.amount;
+                    data.senderNum = employee.account.number;
+                    data.receiverNum = employee.account.number;
+                    path = '/api/transactions';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: data
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, transaction) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when adding new transaction. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: "Transactions has been added successfully."
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: transaction.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
+                }
             } else {
                 req.flash('errors', {
                     msg: employee.message
@@ -8487,6 +8479,1339 @@ const getDeleteTransactions = (req, res) => {
             }
         }
     );
+};
+
+const getDownloadTransactionsReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadTransactions(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF TRANSACTIONS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 9,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Transaction Type',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Sender No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Message',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.type,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.senderNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.message,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=transactions-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadLoansRelease(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF LOANS RELEASE',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 10,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Loan No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Purpose of Loan',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower G-Cash No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanId.loanNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanId.purposeOfLoan,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.profile.firstName + ' ' + d.borrowerId.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.receiverNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=loans-release-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadRepayments(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF REPAYMENTS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 9,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Loan No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower G-Cash No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.loanId.loanNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.profile.firstName + ' ' + d.borrowerId.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.senderNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=repayments-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadContributions(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF CONTRIBUTIONS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 10,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower G-Cash No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Message',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.borrowerNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.profile.firstName + ' ' + d.borrowerId.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.senderNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.message,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=contributions-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadWithdrawals(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF WITHDRAWAL REQUESTS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 10,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Withdrawal Request No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Reason',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower G-Cash No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.withdrawalId.withdrawalNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.withdrawalId.reason,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.profile.firstName + ' ' + d.borrowerId.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.receiverNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=withdrawals-request-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadFees(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF MEMBERSHIP FEES',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 9,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Payment Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Borrower G-Cash No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.borrowerNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerId.profile.firstName + ' ' + d.borrowerId.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.senderNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status == "Posted" && d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=fees-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    function downloadExpenses(transactions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let transactionsTable = {
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'LIST OF EXPENSES',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 7,
+                    }, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Transaction No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Assigned Loan Processor',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Transaction Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'G-Cash Reference No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Message',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Posted Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        transactions.forEach(d => {
+            let transactionRow = [{
+                    text: d.transactionNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.postedBy.profile.firstName + ' ' + d.postedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.referenceNo,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.message,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.postedDate) ? parseDate(d.postedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            transactionsTable.table.body.push(transactionRow);
+        });
+        docDefinition.content.push(transactionsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=expenses-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    let txnType = req.params.type;
+    let txnTypes = ["all", "release", "repayments", "contributions", "withdrawals", "fees", "expenses"]
+    if (txnTypes.indexOf(txnType) !== -1) {
+        path = '/api/transactions';
+        if (txnType != 'all') path = '/api/transactions/type/' + capitalizeFirstLetter(txnType);
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {}
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, transactions) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when loading list of transactions. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    if (txnType == 'all') downloadTransactions(transactions);
+                    if (txnType == 'release') downloadLoansRelease(transactions);
+                    if (txnType == 'repayments') downloadRepayments(transactions);
+                    if (txnType == 'contributions') downloadContributions(transactions);
+                    if (txnType == 'withdrawals') downloadWithdrawals(transactions);
+                    if (txnType == 'fees') downloadFees(transactions);
+                    if (txnType == 'expenses') downloadExpenses(transactions);
+                } else {
+                    req.flash('errors', {
+                        msg: transactions.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    } else {
+        req.flash('errors', {
+            msg: 'Not existing transaction type. Please enter correct transaction type.'
+        });
+        return res.redirect('/transactions');
+    }
 };
 
 const getWithdrawals = (req, res) => {
@@ -9694,6 +11019,7 @@ module.exports = {
     getTransactionDetails,
     postUpdateTransactions,
     getDeleteTransactions,
+    getDownloadTransactionsReport,
     getWithdrawals,
     postWithdrawals,
     getWithdrawalDetails,

@@ -109,10 +109,7 @@ html
           $(function () {
               $('#addNewBorrower').on('click', function () {
                 $('select#borrowerType').val("");
-                $('select#borrowerStatus').val("");
                 $('.membersOnly').addClass('d-none');
-                $('.verifiedOnly').addClass('d-none');
-                $('.verifiedMemberOnly').addClass('d-none');
                 $('#addBorrowerModal').modal('show'); 
               });
               $('#dataTable').on('click','.deleteBorrower',function () {
@@ -370,6 +367,50 @@ html
     if title.indexOf("Manage Transactions") != -1
       script.
           $(function () {
+            $('#addNewTransaction').on('click', function () {
+                $('select#txnType').val("");
+                $('select#txnBorrowerName').val("");
+                $('input#txnBorrowerAcctNo').val("");
+                $('input#txnAmount').val("");
+                $('input#txnAmount').prop('disabled', true);
+                $('.contributionsOnly').addClass('d-none');
+                $('#addTransactionModal').modal('show'); 
+              });
+            $('select#txnType').change(function () {
+                if ($('select#txnType').val() == 'Contributions') {
+                  $('.contributionsOnly').removeClass('d-none');
+                } else if ($('select#txnType').val() == 'Expenses') {
+                  $('input#txnAmount').prop('disabled', false);
+                  $('.contributionsOnly').addClass('d-none');
+                } else{
+                  $('.contributionsOnly').addClass('d-none');
+                }
+              });
+            $('select#txnBorrowerName').change(function () {
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/borrowers/" + $('select#txnBorrowerName').val(),
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        let accountNum = (data.borrower.account.number) ? data.borrower.account.number : data.borrower.profile.mobileNum;
+                        $('input#txnBorrowerAcctNo').val(accountNum);
+                        $('input#txnAmount').val(data.borrower.sharesPerPayDay);
+                        $('input#txnAmount').prop('min', data.borrower.sharesPerPayDay);
+                        $('input#txnAmount').prop('step', "100");
+                        $('input#txnAmount').prop('disabled', false);
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
+             });
             $('#dataTable').on('click','.deleteTransaction',function () {
                 let path = ($(this).prop('href')).split('/');
                 let transactionNum = path[path.length-1];
@@ -405,7 +446,6 @@ html
                       $("span#updateTxnNum").text(data.transactionNum);
                       $('input#type').val(data.type);
                       $('input#amount').val(parseFloat(data.amount).toFixed(2));
-                      $('select#borrowerName').val(data.borrowerId._id);
                       $('select#postedBy').val(postedBy);
                       $('textarea#message').val(data.message);
                       if (data.type == "Release" || data.type == "Withdrawals") {
@@ -416,8 +456,10 @@ html
                         $('input#processorAcctNo').val(data.receiverNum);
                       }
                       if (data.type == "Expenses") {
+                        $('input#processorAcctNo').val(data.senderNum);
                         $('.notExpensesType').hide();
                       } else{
+                         $('select#borrowerName').val(data.borrowerId._id);
                         $('.notExpensesType').show();
                       }
                       if (data.message) {
@@ -476,7 +518,7 @@ html
                     success: function (data) {
                       let amount = parseFloat(data.loan.loanAmount) + parseFloat(data.remainingCreditLimit);
                       let monthlyInterestRate = (data.loan.requestedBy.type == 'Member') ? 3 : 5;
-                      let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : '';
+                      let accountNum = (data.loan.requestedBy.account && data.loan.requestedBy.account.number) ? data.loan.requestedBy.account.number : data.loan.requestedBy.profile.mobileNum;
                       let balance = (parseFloat(data.currentDue.principalBalance) + parseFloat(data.currentDue.interestBalance)).toFixed(2);
                       let reviewedBy = (data.loan.reviewedBy && data.loan.reviewedBy._id) ? data.loan.reviewedBy._id : '';
                       $('select#borrowerName').val(data.loan.requestedBy._id);

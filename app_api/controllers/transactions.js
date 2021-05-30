@@ -316,6 +316,7 @@ const transactionsListByType = (req, res) => {
             .find({
                 "type": type
             })
+            .populate('borrowerId postedBy loanId withdrawalId', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum  profile.email loanNum purposeOfLoan withdrawalNum reason')
             .exec((err, transactions) => {
                 if (err) {
                     console.log(err);

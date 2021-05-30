@@ -145,6 +145,8 @@ router
 
 router.get('/transactions/:transactionid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteTransactions);
 
+router.get('/download/report/transactions/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadTransactionsReport);
+
 router
     .route('/withdrawals')
     .get(passportConfig.isAuthenticated, ctrlAccount.getWithdrawals)

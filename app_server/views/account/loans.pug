@@ -18,11 +18,11 @@ block content
                     circle(cx='12' cy='5' r='1')
                     circle(cx='12' cy='19' r='1')
                 .dropdown-menu.dropdown-menu-right.animated--fade-in-up(aria-labelledby='areaChartDropdownExample' x-placement='top-end' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-116px, -182px, 0px);')
+                  a#addNewLoan.dropdown-item(href='#' data-toggle='modal' data-target='#addLoanModal') Add New Loan
+                  .dropdown-divider
                   a.dropdown-item(href='/download/report/loans/all') List of Loans
                   a.dropdown-item(href='/download/report/loans/maturityDue') List of Past Maturity Date
                   a.dropdown-item(href='/download/report/loans/currentDue') List of Current Due
-                  .dropdown-divider
-                  a#addNewLoan.dropdown-item(href='#' data-toggle='modal' data-target='#addLoanModal') Add Loan
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
