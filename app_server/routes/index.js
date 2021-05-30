@@ -160,6 +160,8 @@ router
 router.get('/withdrawals/:withdrawalid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteWithdrawals);
 router.get('/contributions/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getContributions);
 
+router.get('/download/report/withdrawals/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadWithdrawalsReport);
+
 router
     .route('/employees')
     .get(passportConfig.isAuthenticated, ctrlAccount.getEmployees)

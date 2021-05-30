@@ -10449,6 +10449,210 @@ const getContributions = (req, res) => {
     );
 };
 
+const getDownloadWithdrawalsReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadWithdrawals(withdrawals) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let withdrawalsTable = {
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'LIST OF WITHDRAWAL REQUESTS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 7,
+                    }, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Withdrawal Request No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Member Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Request Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Amount',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Reason',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Review Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Status',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        withdrawals.forEach(d => {
+            let withdrawalRow = [{
+                    text: d.withdrawalNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.requestedBy.profile.firstName + ' ' + d.requestedBy.profile.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.amount,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.reason,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.status != "Processing" && d.reviewedDate) ? parseDate(d.reviewedDate, 'short') : "",
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.status,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            withdrawalsTable.table.body.push(withdrawalRow);
+        });
+        docDefinition.content.push(withdrawalsTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=withdrawal-requests-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    path = '/api/withdrawals';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, withdrawals) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading list of withdrawal requests. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                downloadWithdrawals(withdrawals);
+            } else {
+                req.flash('errors', {
+                    msg: withdrawals.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getEmployees = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -11094,6 +11298,7 @@ module.exports = {
     postUpdateWithdrawals,
     getDeleteWithdrawals,
     getContributions,
+    getDownloadWithdrawalsReport,
     getEmployees,
     postEmployees,
     getInquiries,
