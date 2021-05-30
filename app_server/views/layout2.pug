@@ -151,7 +151,7 @@ html
                         $('select#hrCertifiedBy').val(hrCertifiedBy);
                         $('select#employmentType').val(employmentType);
                         $("#updateBorrower .btn.btn-primary").show();
-                        $("#updateBorrower").attr("action", "/borrowers/" + borrowerid + '/update');
+                        $("#updateBorrower").attr("action", "/borrowers/" + borrowerid);
                         $('span#updateBorrowerName').text(data.borrower.profile.firstName + ' ' + data.borrower.profile.lastName);
                         if (data.borrower.type == 'Member') {
                           $('.membersOnly').removeClass('d-none');
@@ -252,8 +252,15 @@ html
     if title.indexOf("Manage Employees") != -1
       script.
           $(function () {
-              $('select#type').change(function () {
-                if ($('select#type').val() == 'Loan Processor') {
+              $('#addNewEmployee').on('click', function () {
+                $('select#empType').val("");
+                $('input#empAccountName').val("");
+                $('input#empAccountNum').val("");
+                $('.loanProcessorOnly').addClass('d-none');
+                $('#addEmployeeModal').modal('show'); 
+              });
+              $('select#empType').change(function () {
+                if ($('select#empType').val() == 'Loan Processor') {
                   $('.loanProcessorOnly').removeClass('d-none');
                 } else{
                   $('.loanProcessorOnly').addClass('d-none');
@@ -274,6 +281,12 @@ html
                 }
                 $('span#deleteEmployeeName').text(firstName + ' ' + lastName);
                 $('#deleteEmployeeModal').modal('show'); 
+              });
+              $('#dataTable').on('click','.updateEmployee',function () {
+                let path = ($(this).prop('href')).split('/');
+                let employeeid = path[path.length-1];
+                $('#updateEmployeeModal').modal('show');
+                console.log(employeeid);
               });
           });
 

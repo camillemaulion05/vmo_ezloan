@@ -247,6 +247,7 @@ else
 
   if title.indexOf("Manage Employees") != -1
     - let type = ["Loan Officer", "Loan Processor", "HRD Authorized Officer", "Admin"]
+    - let gender = ['Female', 'Male']
     #deleteEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='deleteEmployeeModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
@@ -261,14 +262,16 @@ else
           .modal-footer
             button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
             a#deleteEmployee.btn.btn-primary(href='') Yes, delete it
-    #addEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addEmployeeModalLabel' aria-hidden='true')
+    #updateEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='updateEmployeeModalLabel' aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
           .modal-header
-            h5#addEmployeeModalLabel.modal-title Add Employee
+            h5#updateEmployeeModalLabel.modal-title 
+              | Update 
+              span#updateEmployeeName
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form#addEmployee(method='POST' action='/employees')
+          form#updateEmployee(method='POST')
             input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               .form-row.mb-2
@@ -293,7 +296,6 @@ else
                   label.small.mb-1(for='gender') Gender
                   select#gender.form-control.selectpicker(type='text' name='gender')
                     option(value='' selected='') Gender
-                    - let gender = ['Female', 'Male']
                     for x in gender
                       option(value=x) #{x}
                 .col-md-6
@@ -319,6 +321,66 @@ else
                     .input-group-prepend
                       span.input-group-text +63
                     input#accountNum.form-control(type='text' name='accountNum' minlength='10' maxlength='10')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+    #addEmployeeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='addEmployeeModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#addEmployeeModalLabel.modal-title Add Employee
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form#addEmployee(method='POST' action='/employees')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='empType') Employee Type
+                  select#empType.form-control.selectpicker(type='text' name='type')
+                    option(value='' selected='') Employee Type
+                    for x in type
+                      option(value=x) #{x}
+                .col-md-6 
+                  label.small.mb-1(for='empID') Employee ID
+                  input#empID.form-control(type='text' name='employeeID')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='empFirstName') First name
+                  input#empFirstName.form-control(type='text' name='firstName')
+                .col-md-6
+                  label.small.mb-1(for='empLastName') Last name
+                  input#empLastName.form-control(type='text' name='lastName')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='empGender') Gender
+                  select#empGender.form-control.selectpicker(type='text' name='gender')
+                    option(value='' selected='') Gender
+                    for x in gender
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='empDateOfBirth') Birthdate
+                  input#empDateOfBirth.form-control(type='date' name='dateOfBirth')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='empEmail') Email address
+                  input#empEmail.form-control(type='email' name='email')
+                .col-md-6
+                  label.small.mb-1(for='empMobileNum') Mobile Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#empMobileNum.form-control(type='text' name='mobileNum' minlength='10' maxlength='10')
+              .form-row.mb-2.loanProcessorOnly.d-none
+                .col-md-6
+                  label.small.mb-1(for='empAccountName') G-Cash Account Name
+                  input#empAccountName.form-control(type='text' name='accountName')
+                .col-md-6
+                  label.small.mb-1(for='empAccountNum') G-Cash Account No.
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#empAccountNum.form-control(type='text' name='accountNum' minlength='10' maxlength='10')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
