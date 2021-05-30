@@ -90,17 +90,40 @@ html
             });
             $('#dataTable').on('click','.updateInquiry',function () {
                 let path = ($(this).prop('href')).split('/');
-                let inquiryMessage = (path[path.length-1]).replace(/%20/g," ");
-                let inquiryEmail = (path[path.length-2]).replace(/%20/g," ");
-                let inquiryName = (path[path.length-3]).replace(/%20/g," ");
-                let inquiryNum = path[path.length-4];
-                let inquiryid = path[path.length-5];
-                $('input#name').val(inquiryName);
-                $('input#email').val(inquiryEmail);
-                $('textarea#message').val(inquiryMessage);
-                $('span#updateInquiryNum').text(" " + inquiryNum);
-                $("#updateInquiry").attr("action", "/inquiries/" + inquiryid + '/update');
-                $('#updateInquiryModal').modal('show');
+                let inquiryid = path[path.length-1];
+                let token = $('input[name="_csrf"]').attr('value');
+                $.ajaxSetup({
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', token);
+                    }
+                });
+                $.ajax({
+                    url: "/inquiries/" + inquiryid,
+                    type: "GET",
+                    data: {},
+                    cache: false,
+                    success: function (inquiry) {
+                        $('input#name').val(inquiry.firstName + ' ' + inquiry.lastName);
+                        $('input#email').val(inquiry.email);
+                        $('textarea#message').val(inquiry.message);
+                        if (inquiry.response && inquiry.response.message) {
+                          $('textarea#response').val(inquiry.response.message);
+                          $('textarea#response').prop('disabled', true);
+                          $('#updateInquiryModalLabel').text("Inquiry No. " + inquiry.inquiryNum);
+                          $("#updateInquiry .btn.btn-primary").hide();
+                        } else {
+                          $('textarea#response').val("");
+                          $('textarea#response').prop('disabled', false);
+                          $('#updateInquiryModalLabel').text("Reply to Inquiry No. " + inquiry.inquiryNum);
+                          $("#updateInquiry .btn.btn-primary").show();
+                          $("#updateInquiry").attr("action", "/inquiries/" + inquiryid);
+                        }
+                        $('#updateInquiryModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                       console.log(xhr.responseJSON.message);
+                    }
+                });
             });
           });
 

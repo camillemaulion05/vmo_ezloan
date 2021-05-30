@@ -12,6 +12,7 @@ block content
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
               h6.m-0.font-weight-bold.text-primary List of Inquiries
               .dropdown.no-arrow
+                a.btn.btn-sm.btn-primary(href='/download/report/inquiries/all') Download Report
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -45,7 +46,7 @@ block content
                           td
                             .badge.badge-warning.badge-pill Pending
                         td 
-                          a.updateInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/'+x.inquiryNum+'/'+x.firstName+' '+x.lastName+'/'+x.email+'/'+x.message) data-toggle='modal' data-target='#')
+                          a.updateInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
                           a.deleteInquiry.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.inquiryNum+'/'+x.firstName+' '+x.lastName) data-toggle='modal' data-target='#')
                             i.fas.fa-trash

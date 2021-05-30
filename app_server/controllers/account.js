@@ -11377,8 +11377,38 @@ const getInquiries = (req, res) => {
     );
 };
 
-const postInquiries = (req, res) => {
-    getUserDetails(req, res, 'account/index', 'Account Management');
+const getInquiryDerails = (req, res) => {
+    path = '/api/inquiries/' + req.params.inquiryid;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, inquiry) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading inquiry information. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(inquiry);
+            } else {
+                req.flash('errors', {
+                    msg: inquiry.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
 };
 
 const getUpdateInquiries = (req, res) => {
@@ -11521,6 +11551,218 @@ const getDeleteInquiries = (req, res) => {
     );
 };
 
+const getDownloadInquiriesReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadInquiries(inquiries) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let inquiriesTable = {
+            table: {
+                headerRows: 2,
+                body: [
+                    [{
+                        text: 'LIST OF INQUIRIES',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 7,
+                    }, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'Inquiry No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Name',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Email Address',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Inquiry Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Messages',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Replied Date',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Response',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        inquiries.forEach(d => {
+            let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+            let paramDate = new Date(d.createdAt);
+            let date = paramDate.toString().split(' ');
+            let newDate = (d.createdAt) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
+            let responseDate = (d.response && d.response.createdAt) ? d.response.createdAt : "";
+            let paramDate2 = new Date(responseDate);
+            let date2 = paramDate2.toString().split(' ');
+            let newDate2 = (responseDate) ? date2[3] + '-' + month2[month.indexOf(date2[1])] + '-' + date2[2] + ' ' + date2[4] : '';
+            let inquiryRow = [{
+                    text: d.inquiryNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.firstName + ' ' + d.lastName,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.email,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: newDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.message,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: newDate2,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.response) ? d.response.message : "",
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            inquiriesTable.table.body.push(inquiryRow);
+        });
+        docDefinition.content.push(inquiriesTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=inquiries-list.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    path = '/api/inquiries';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, inquiries) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading list of inquiries. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                downloadInquiries(inquiries)
+            } else {
+                req.flash('errors', {
+                    msg: inquiries.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -11585,7 +11827,8 @@ module.exports = {
     getDeleteEmployees,
     getDownloadEmployeesReport,
     getInquiries,
-    postInquiries,
+    getInquiryDerails,
     getUpdateInquiries,
-    getDeleteInquiries
+    getDeleteInquiries,
+    getDownloadInquiriesReport
 };

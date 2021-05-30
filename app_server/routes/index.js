@@ -175,7 +175,12 @@ router
     .route('/inquiries')
     .get(passportConfig.isAuthenticated, ctrlAccount.getInquiries);
 
+router
+    .route('/inquiries/:inquiryid')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiryDerails)
+    .post(passportConfig.isAuthenticated, ctrlAccount.getUpdateInquiries);
+
 router.get('/inquiries/:inquiryid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteInquiries);
-router.post('/inquiries/:inquiryid/update', passportConfig.isAuthenticated, ctrlAccount.getUpdateInquiries);
+router.get('/download/report/inquiries/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadInquiriesReport);
 
 module.exports = router;

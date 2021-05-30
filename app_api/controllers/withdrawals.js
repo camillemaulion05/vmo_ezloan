@@ -63,7 +63,7 @@ const withdrawalsReadOne = (req, res) => {
     } else {
         Withdrawal
             .findById(withdrawalid)
-            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email')
+            .populate('requestedBy reviewedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum profile.email userId')
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res

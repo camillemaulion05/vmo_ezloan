@@ -96,7 +96,7 @@ const transactionsReadOne = (req, res) => {
     } else {
         Transaction
             .findById(transactionid)
-            .populate('borrowerId postedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum  profile.email')
+            .populate('borrowerId postedBy', 'profile.firstName profile.lastName type borrowerNum account profile.address profile.mobileNum  profile.email userId')
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
