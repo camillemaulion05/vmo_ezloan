@@ -1,0 +1,206 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-primary.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-primary.text-uppercase.mb-1
+                        | Borrower No.
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{user.borrowerNum}
+                    .col-auto
+                      i.fas.fa-address-card.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-info.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-info.text-uppercase.mb-1
+                        | Shares/Payday
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{parseFloat(user.sharesPerPayDay).toFixed(2)}
+                    .col-auto
+                      i.fas.fa-money-check.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-success.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-success.text-uppercase.mb-1
+                        | No. of Posted Contributions
+                      - let postedContributions = transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").length;
+                      .h5.mb-0.font-weight-bold.text-gray-800 #{postedContributions}
+                    .col-auto
+                      i.fas.fa-clipboard.fa-2x.text-gray-300
+            .col-xl-3.col-md-6.mb-4
+              .card.border-left-warning.shadow.h-100.py-2
+                .card-body
+                  .row.no-gutters.align-items-center
+                    .col.mr-2
+                      .text-xs.font-weight-bold.text-warning.text-uppercase.mb-1
+                        | Total Funds
+                      - let totalFund = transactions.filter(obj => (obj.type == "Withdrawals" || obj.type == "Contributions") && obj.status == "Posted").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0);
+                      .h5.mb-0.font-weight-bold.text-gray-800 ₱ #{parseFloat(totalFund).toFixed(2)}
+                    .col-auto
+                      i.fas.fa-piggy-bank.fa-2x.text-gray-300
+          .card.shadow.mb-4
+            .card-header.border-bottom
+              ul#dashboardNav.nav.nav-tabs.card-header-tabs(role='tablist')
+                li.nav-item.mr-1
+                  a#premiums-pill.nav-link.active(href='#premiums' data-toggle='tab' role='tab' aria-controls='premiums' aria-selected='true') Monthly Premiums
+                li.nav-item.mr-1
+                  a#contributions-pill.nav-link(href='#contributions' data-toggle='tab' role='tab' aria-controls='contributions' aria-selected='false') Contributions
+                li.nav-item
+                  a#withdrawals-pill.nav-link(href='#withdrawals' data-toggle='tab' role='tab' aria-controls='withdrawals' aria-selected='false') Withdrawal Requests
+            .card-body
+              #dashboardNavContent.tab-content
+                #premiums.tab-pane.fade.active.show(role='tabpanel' aria-labelledby='premiums-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/contributions") Download Statement
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      thead
+                        tr
+                          th YEAR
+                          th JAN
+                          th FEB
+                          th MAR
+                          th APR
+                          th MAY
+                          th JUN
+                          th JUL
+                          th AUG
+                          th SEP
+                          th OCT
+                          th NOV
+                          th DEC
+                      tbody
+                        - let result = transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").reduce(function (r, a) { let yy = (new Date(a.createdAt)).getFullYear(); r[yy] = r[yy] || []; r[yy].push(a); return r; }, {});
+                        - function getAmountPerMonth(year, month) { let amount = 0.00; for (var m = 0; m < result[year].length; m++) { let mm = (new Date(result[year][m].createdAt)).getMonth(); if (month == mm) { amount += parseFloat(result[year][m].amount); } if (m == (result[year].length - 1)) { return (amount).toFixed(2); }}}
+                        - let years = Object.keys(result);
+                        for year in years
+                          tr
+                            td #{year}
+                            - let i = 0;
+                            while i < 12
+                              - let amount = getAmountPerMonth(year, i) || '0.00';
+                              td #{amount}
+                              - i++;
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      tbody
+                        tr
+                          th Total Amount of Contributions
+                          td.text-right ₱
+                          - let totalContributions = transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0.00);
+                          td.text-right #{parseFloat(totalContributions).toFixed(2)}
+                        tr
+                          th Total Amount of Withdrawals
+                          td.text-right ₱
+                          - let totalWithdrawals = withdrawals.filter(obj => obj.status == "Cash Release").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0.00);
+                          td.text-right #{parseFloat(totalWithdrawals).toFixed(2)}
+                        tr
+                          th Total Guaranteed Earnings (Every Year-End)
+                          td.text-right ₱
+                          - let year = ((new Date()).getFullYear() -1).toString();
+                          - let patronageRefund = (user.patronageRefund && user.patronageRefund.length > 0) ? user.patronageRefund.find(o => o.year == year) : {"amount": 0.00};
+                          - let dividend = (user.dividend && user.dividend.length > 0) ? user.dividend.find(o => o.year == year) :  {"amount": 0.00};
+                          - let earnings = parseFloat(patronageRefund.amount) + parseFloat(dividend.amount);
+                          td.text-right #{parseFloat(earnings).toFixed(2)}
+                #contributions.tab-pane.fade(role='tabpanel' aria-labelledby='contributions-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href='#' data-toggle='modal' data-target='#contributionModal') Add Contribution
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      thead
+                        tr
+                          th Transaction No.
+                          th Transaction Date
+                          th Amount
+                          th Reference Code
+                          th Sender Number
+                          th Receiver Number 
+                          th Posted Date
+                          th Status
+                      tfoot
+                        tr
+                          th Transaction No.
+                          th Transaction Date
+                          th Amount
+                          th Reference Code
+                          th Sender Number
+                          th Receiver Number 
+                          th Posted Date
+                          th Status
+                      tbody
+                        for x in transactions
+                          if (x.type == "Contributions")
+                            tr
+                              td #{x.transactionNum}
+                              - let date4 = (new Date(x.createdAt)).toString().split(' ');
+                              - let createdAt =  (x.createdAt) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
+                              td #{createdAt}
+                              td #{(parseFloat(x.amount)).toFixed(2)} 
+                              td #{x.referenceNo}
+                              td #{x.senderNum}
+                              td #{x.receiverNum}
+                              - let date5 = (new Date(x.postedDate)).toString().split(' ');
+                              - let postedDate =  (x.postedDate && x.status == "Posted") ? date5[1] + ' ' + date5[2] + ', ' + date5[3] : "";
+                              td #{postedDate}
+                              if x.status == "Processing"
+                                td
+                                  .badge.badge-primary.badge-pill #{x.status}
+                              else if x.status == "Posted"
+                                td
+                                  .badge.badge-success.badge-pill #{x.status}
+                #withdrawals.tab-pane.fade(role='tabpanel' aria-labelledby='withdrawals-pill')
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href='#' data-toggle='modal' data-target='#withdrawalModal') Request Withdrawal
+                  .table-responsive
+                    table.table.table-hover.mb-0
+                      thead
+                        tr
+                          th Withdrawal Request No.
+                          th Request Date
+                          th Amount
+                          th Reason
+                          th Release Date
+                          th Status
+                      tfoot
+                        tr
+                          th Withdrawal Request No.
+                          th Request Date
+                          th Amount
+                          th Reason
+                          th Release Date
+                          th Status  
+                      tbody
+                        for x in withdrawals
+                          tr
+                            td #{x.withdrawalNum}
+                            - let date4 = (new Date(x.createdAt)).toString().split(' ');
+                            - let createdAt =  (x.createdAt) ? date4[1] + ' ' + date4[2] + ', ' + date4[3] : "";
+                            td #{createdAt}
+                            td #{(parseFloat(x.amount)).toFixed(2)} 
+                            td #{x.reason}
+                            - let date5 = (new Date(x.reviewedDate)).toString().split(' ');
+                            - let reviewedDate =  (x.status == "Cash Release" && x.reviewedDate) ? date5[1] + ' ' + date5[2] + ', ' + date5[3] : "";
+                            td #{reviewedDate}
+                            if x.status == "Processing"
+                              td
+                                .badge.badge-primary.badge-pill #{x.status}
+                            else if x.status == "Approved"
+                              td
+                                .badge.badge-success.badge-pill #{x.status}
+                            else if x.status == "Declined"
+                              td
+                                .badge.badge-danger.badge-pill #{x.status}
+                            else if x.status == "Cash Release"
+                              td
+                                .badge.badge-info.badge-pill #{x.status}
+    include ../partials/page-footer

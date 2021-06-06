@@ -105,6 +105,14 @@ router.get('/download/loan/:loanid/soa', passportConfig.isAuthenticated, ctrlAcc
 router.get('/download/loan/:loanid/schedule', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoanSchedule);
 
 router
+    .route('/contributions')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getContributions)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postContributions);
+
+router.post('/withdrawalRequest', passportConfig.isAuthenticated, ctrlAccount.postWithdrawalRequest);
+router.get('/contributions/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getContributionDetails);
+router.get('/download/contributions', passportConfig.isAuthenticated, ctrlAccount.getDownloadContributions);
+router
     .route('/borrowers')
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
     .post(passportConfig.isAuthenticated, ctrlAccount.postBorrowers);
@@ -155,7 +163,6 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateWithdrawals);
 
 router.get('/withdrawals/:withdrawalid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteWithdrawals);
-router.get('/contributions/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getContributions);
 router.get('/download/report/withdrawals/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadWithdrawalsReport);
 
 router

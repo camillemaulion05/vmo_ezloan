@@ -52,6 +52,11 @@ else
         a.nav-link(href='/credits')
           i.fas.fa-balance-scale
           span Loans
+    if user.userId.type == "Borrower" && user.type == "Member"
+      li.nav-item(class=(title.indexOf("Contributions") != -1) ? 'active' : undefined)
+        a.nav-link(href='/contributions')
+          i.fas.fa-wallet
+          span Contributions
     if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "Loan Processor")
       li.nav-item(class=(title.indexOf("Borrowers") != -1) ? 'active' : undefined)
         a.nav-link(href='/borrowers')

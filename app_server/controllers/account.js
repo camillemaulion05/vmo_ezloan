@@ -2803,7 +2803,7 @@ const getDownloadBorrowerInfo = (req, res) => {
                             text: (parseFloat(user.sharesPerPayDay) != 300.00 && parseFloat(user.sharesPerPayDay) > 0) ? checked : unchecked,
                             style: 'icon'
                         }, {
-                            text: '  ________________ (amount of your choice)',
+                            text: (parseFloat(user.sharesPerPayDay) != 300.00 && parseFloat(user.sharesPerPayDay) > 0) ? ' ' + user.sharesPerPayDay + ' (amount of your choice)' : '  ________________ (amount of your choice)',
                             bold: true,
                             style: 'item',
                         }, ],
@@ -3841,6 +3841,7 @@ const postRepayment = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
+                let employeeAccountNum = (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum;
                 path = '/api/transactions';
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
@@ -3853,7 +3854,7 @@ const postRepayment = (req, res) => {
                         type: "Repayments",
                         message: req.body.message,
                         senderNum: req.body.senderNum,
-                        receiverNum: employee.account.number,
+                        receiverNum: employeeAccountNum,
                         postedBy: req.body.postedBy,
                         referenceNo: req.body.referenceNo,
                         loanId: req.params.loanid,
@@ -5003,6 +5004,941 @@ const getDownloadLoanSchedule = (req, res) => {
     );
 };
 
+const getContributions = (req, res) => {
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/users/' + req.user.id;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading your transactions. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/withdrawals/users/' + req.user.id;
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, withdrawals) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading your withdrawal requests. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/employees';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, employees) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when loading list of employees. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/contributions', {
+                                                        title: 'Account Management - Contributions',
+                                                        user: user,
+                                                        transactions: transactions,
+                                                        withdrawals: withdrawals,
+                                                        employees: employees
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: employees.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: withdrawals.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: transactions.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+}
+
+const postContributions = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.amount)) validationErrors.push({
+        msg: 'Amount cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.senderNum)) validationErrors.push({
+        msg: 'Sender number cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.postedBy)) validationErrors.push({
+        msg: 'Receiver Name cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.referenceNo)) validationErrors.push({
+        msg: 'Reference no. cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/employees/' + req.body.postedBy;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, employee) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of employees. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            let employeeAccountNum = (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum;
+                            path = '/api/transactions';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    amount: req.body.amount,
+                                    type: "Contributions",
+                                    message: req.body.message,
+                                    senderNum: req.body.senderNum,
+                                    receiverNum: employeeAccountNum,
+                                    postedBy: req.body.postedBy,
+                                    referenceNo: req.body.referenceNo,
+                                    borrowerId: user._id
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, transaction) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when adding your contribution. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: "Successfully added new contribution."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: transaction.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: employee.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+}
+
+const postWithdrawalRequest = (req, res) => {
+    const validationErrors = [];
+    if (req.body.amount == 0) validationErrors.push({
+        msg: 'Withdrawal amount cannot be zero.'
+    });
+    if (validator.isEmpty(req.body.reason)) validationErrors.push({
+        msg: 'Reason cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/borrowers/' + user._id + '/contributions';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading your funds details. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            if (parseFloat(req.body.amount) <= parseFloat(transactions[0].total.$numberDecimal)) {
+                                path = '/api/withdrawals';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        amount: req.body.amount,
+                                        reason: req.body.reason,
+                                        requestedBy: user._id
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, withdrawal) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when creating withdrawal request. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Withdrawal Request has been added successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: withdrawal.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
+                            } else {
+                                req.flash('errors', {
+                                    msg: "Invalid withdrawal amount."
+                                });
+                                return res.redirect('back');
+                            }
+                        } else {
+                            req.flash('errors', {
+                                msg: (transactions) ? transactions.message : 'There was an error when loading your funds details. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+}
+
+const getContributionDetails = (req, res) => {
+    path = '/api/transactions/borrowers/' + req.params.borrowerid + '/contributions';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, transactions) => {
+            if (err) {
+                return res
+                    .status(404)
+                    .json('There was an error when loading members contribution. Please try again later.');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(transactions[0].total.$numberDecimal);
+            } else {
+                return res
+                    .status(statusCode)
+                    .json('There was an error when loading members contribution. Please try again later.');
+            }
+        }
+    );
+};
+
+const getDownloadContributions = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function download(data, req, res) {
+        let result = data.transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").reduce(function (r, a) {
+            let yy = (new Date(a.createdAt)).getFullYear();
+            r[yy] = r[yy] || [];
+            r[yy].push(a);
+            return r;
+        }, {});
+
+        function getAmountPerMonth(year, month) {
+            let amount = 0.00;
+            for (var m = 0; m < result[year].length; m++) {
+                let mm = (new Date(result[year][m].createdAt)).getMonth();
+                if (month == mm) {
+                    amount += parseFloat(result[year][m].amount);
+                }
+                if (m == (result[year].length - 1)) {
+                    return (amount).toFixed(2);
+                }
+            }
+        }
+        let years = Object.keys(result);
+        let postedContributions = data.transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").length;
+        let notPostedContributions = data.transactions.filter(obj => obj.type == "Contributions" && obj.status == "Processing").length;
+        let totalContributions = data.transactions.filter(obj => obj.type == "Contributions" && obj.status == "Posted").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0.00);
+        let totalWithdrawals = data.withdrawals.filter(obj => obj.status == "Cash Release").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0.00);
+        let totalFund = data.transactions.filter(obj => (obj.type == "Withdrawals" || obj.type == "Contributions") && obj.status == "Posted").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0);
+        let year = ((new Date()).getFullYear() - 1).toString();
+        let patronageRefund = (data.user.patronageRefund && data.user.patronageRefund.length > 0) ? data.user.patronageRefund.find(o => o.year == year) : {
+            "amount": 0.00
+        };
+        let dividend = (data.user.dividend && data.user.dividend.length > 0) ? data.user.dividend.find(o => o.year == year) : {
+            "amount": 0.00
+        };
+        let earnings = parseFloat(patronageRefund.amount) + parseFloat(dividend.amount);
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        'STATEMENT OF ACCOUNT\n\n'
+                    ],
+                    style: 'subheader'
+                },
+                {
+                    table: {
+                        widths: ['*', '*', '*', '*', '*'],
+                        body: [
+                            [{
+                                    text: [{
+                                            text: data.user.profile.firstName + ' ' + data.user.profile.lastName + '\n'
+                                        },
+                                        {
+                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.unitNo && data.user.profile.address.present.houseNo && data.user.profile.address.present.street) ? data.user.profile.address.present.unitNo + ' ' + data.user.profile.address.present.houseNo + ' ' + data.user.profile.address.present.street + ',\n' : ''
+                                        },
+                                        {
+                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.subdivision && data.user.profile.address.present.barangay) ? data.user.profile.address.present.subdivision + ', ' + data.user.rofile.address.present.barangay + ',\n' : ''
+                                        },
+                                        {
+                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.city && data.user.profile.address.present.province && data.user.profile.address.present.zipCode) ? data.user.address.present.city + ', ' + data.user.profile.address.present.province + ' ' + data.user.profile.address.present.zipCode + '\n' : ''
+                                        },
+                                        {
+                                            text: (data.user.profile.mobileNum) ? '+63' + data.user.profile.mobileNum + '\n' : ''
+                                        },
+                                    ],
+                                    style: 'medium',
+                                    border: [false, false, false, false],
+                                    colSpan: 3
+                                }, {}, {},
+                                {
+                                    text: [{
+                                            text: 'Voluntary Member\n'
+                                        },
+                                        {
+                                            text: 'Member No. ' + data.user.borrowerNum + '\n'
+                                        },
+                                        {
+                                            text: 'Total amount due \n'
+                                        },
+                                        {
+                                            text: '(₱) ' + (parseFloat(data.user.sharesPerPayDay)).toFixed(2) + '\n',
+                                            fontSize: 17,
+                                            bold: true
+                                        },
+                                    ],
+                                    style: 'medium',
+                                    border: [false, false, false, false],
+                                    colSpan: 2
+                                }, {}
+                            ]
+                        ]
+                    }
+                },
+                {
+                    text: '\n'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                table: {
+                    margin: [0, 15, 0, 0]
+                }
+            }
+        };
+        let contributionsTable = {
+            style: 'table',
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'MONTHLY CONTRIBUTIONS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 13,
+                    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'YEAR',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'JAN',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'FEB',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'MAR',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'APR',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'MAY',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'JUN',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'JUL',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'AUG',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'SEP',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'OCT',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'NOV',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'DEC',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        years.forEach(yy => {
+            let yearRow = [{
+                text: yy,
+                style: 'item',
+                border: [true, true, true, true]
+            }];
+            let count = 0;
+            while (count < 12) {
+                let monthRow = {
+                    text: getAmountPerMonth(yy, count) || '0.00',
+                    style: 'item',
+                    border: [true, true, true, true]
+                };
+                yearRow.push(monthRow);
+                count++;
+            }
+            contributionsTable.table.body.push(yearRow);
+        });
+        let withdrawalsTable = {
+            style: 'table',
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'WITHDRAWAL REQUESTS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 5,
+                    }, {}, {}, {}, {}],
+                    [{
+                            text: 'Withdrawal Request No.',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Request Date',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Amount',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Reason',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Release Date',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        data.withdrawals.forEach(d => {
+            let withdrawalsRow = [{
+                    text: d.withdrawalNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseDate(d.createdAt, 'short'),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (parseFloat(d.amount)).toFixed(2),
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.reason,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: (d.reviewedDate && d.status == "Cash Release") ? parseDate(d.reviewedDate, 'short') : '',
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            withdrawalsTable.table.body.push(withdrawalsRow);
+        });
+        let summaryTable = {
+            style: 'table',
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'SUMMARY',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 5,
+                    }, {}, {}, {}, {}],
+                    [{
+                            text: 'Total Number of Contributions Posted',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '',
+                            style: 'medium',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: postedContributions,
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ],
+                    [{
+                            text: 'Total Number of Contributions not Posted',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '',
+                            style: 'medium',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: notPostedContributions,
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ],
+                    [{
+                            text: 'Total Amount of Contributions',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '₱',
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: parseFloat(totalContributions).toFixed(2),
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ],
+                    [{
+                            text: 'Total Amount of Withdrawals',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '₱',
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: parseFloat(totalWithdrawals).toFixed(2),
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ],
+                    [{
+                            text: 'Total Amount of Funds',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '₱',
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: parseFloat(totalFund).toFixed(2),
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ],
+                    [{
+                            text: 'Total Guaranteed Earnings (Every Year-End)',
+                            style: 'medium',
+                            border: [true, true, true, true],
+                            colSpan: 3
+                        }, {}, {},
+                        {
+                            text: '₱',
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [true, true, false, true]
+                        },
+                        {
+                            text: parseFloat(earnings).toFixed(2),
+                            style: 'medium',
+                            alignment: 'right',
+                            border: [false, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        docDefinition.content.push(contributionsTable);
+        docDefinition.content.push(withdrawalsTable);
+        docDefinition.content.push(summaryTable);
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=contributions-soa-` + data.user.borrowerNum + `.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions/users/' + req.user.id;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading your transactions. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/withdrawals/users/' + req.user.id;
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, withdrawals) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading your withdrawal requests. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        download({
+                                            user: user,
+                                            transactions: transactions,
+                                            withdrawals: withdrawals,
+                                        }, req, res);
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: withdrawals.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: transactions.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getBorrowers = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -5313,7 +6249,7 @@ const postBorrowers = (req, res) => {
                                                         });
                                                         return res.redirect('back');
                                                     } else if (statusCode === 200) {
-                                                        transaction.receiverNum = (employee.account && employee.account.number) ? employee.account.number : '';
+                                                        transaction.receiverNum = (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum;
                                                         path = '/api/transactions';
                                                         requestOptions = {
                                                             url: `${apiOptions.server}${path}`,
@@ -7094,8 +8030,8 @@ const postUpdateLoans = (req, res) => {
                                                             });
                                                             return res.redirect('back');
                                                         } else if (statusCode === 200) {
-                                                            transaction.receiverNum = (req.body.status == "Fully Paid") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.receiverNum;
-                                                            transaction.senderNum = (req.body.status == "Loan Release") ? (employee.account && employee.account.number) ? employee.account.number : '' : transaction.senderNum;
+                                                            transaction.receiverNum = (req.body.status == "Fully Paid") ? (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum : transaction.receiverNum;
+                                                            transaction.senderNum = (req.body.status == "Loan Release") ? (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum : transaction.senderNum;
 
                                                             path = '/api/transactions';
                                                             requestOptions = {
@@ -8213,7 +9149,7 @@ const postTransactions = (req, res) => {
                             } else if (statusCode === 200) {
                                 data.amount = req.body.amount;
                                 data.senderNum = (borrower.account.number) ? borrower.account.number : borrower.profile.mobileNum;
-                                data.receiverNum = employee.account.number;
+                                data.receiverNum = (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum;
                                 data.borrowerId = borrower._id;
                                 path = '/api/transactions';
                                 requestOptions = {
@@ -9944,9 +10880,6 @@ const postWithdrawals = (req, res) => {
     if (req.body.amount == 0) validationErrors.push({
         msg: 'Withdrawal amount cannot be zero.'
     });
-    if (req.body.amount < 500) validationErrors.push({
-        msg: 'Required minimum withdrawal amount is 500.'
-    });
     if (validator.isEmpty(req.body.reason)) validationErrors.push({
         msg: 'Reason cannot be blank.'
     });
@@ -10026,7 +10959,6 @@ const postWithdrawals = (req, res) => {
             }
         }
     );
-
 };
 
 const getWithdrawalDetails = (req, res) => {
@@ -10176,7 +11108,7 @@ const postUpdateWithdrawals = (req, res) => {
                                                 return res.redirect('back');
                                             } else if (statusCode === 200) {
                                                 let transaction = {};
-                                                transaction.senderNum = employee.account.number;
+                                                transaction.senderNum = (employee.account && employee.account.number) ? employee.account.number : employee.profile.mobileNum;
                                                 transaction.amount = '-' + withdrawal.amount;
                                                 transaction.type = "Withdrawals";
                                                 transaction.receiverNum = withdrawal.requestedBy.account.number;
@@ -10376,38 +11308,6 @@ const getDeleteWithdrawals = (req, res) => {
                     msg: transactions.message
                 });
                 return res.redirect('back');
-            }
-        }
-    );
-};
-
-const getContributions = (req, res) => {
-    path = '/api/transactions/borrowers/' + req.params.borrowerid + '/contributions';
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, transactions) => {
-            if (err) {
-                return res
-                    .status(404)
-                    .json('There was an error when loading members contribution. Please try again later.');
-            } else if (statusCode === 200) {
-                return res
-                    .status(200)
-                    .json(transactions[0].total.$numberDecimal);
-            } else {
-                return res
-                    .status(statusCode)
-                    .json('There was an error when loading members contribution. Please try again later.');
             }
         }
     );
@@ -11794,6 +12694,11 @@ module.exports = {
     postRepayment,
     getDownloadLoanSOA,
     getDownloadLoanSchedule,
+    getContributions,
+    postContributions,
+    postWithdrawalRequest,
+    getContributionDetails,
+    getDownloadContributions,
     getBorrowers,
     postBorrowers,
     getBorrowerDetails,
@@ -11818,7 +12723,6 @@ module.exports = {
     getWithdrawalDetails,
     postUpdateWithdrawals,
     getDeleteWithdrawals,
-    getContributions,
     getDownloadWithdrawalsReport,
     getEmployees,
     postEmployees,

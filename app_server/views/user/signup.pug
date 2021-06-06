@@ -144,7 +144,8 @@ block content
                     select#receiverNum.form-control.selectpicker(type='text' name='receiverNum')
                       option(value='' selected='') Receiver G-Cash No.
                       for x in employees
-                        option(value=x._id) #{x.account.number} - #{x.account.name} 
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{mobileNum} - #{x.profile.firstName} #{x.profile.lastName}
                     em.invalid-feedback
                 .col-sm-6
                   .form-group

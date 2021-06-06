@@ -99,7 +99,7 @@ router
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByBorrower)
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByBorrower);
 
-router.get('/transactions/borrowers/:borrowerid/contributions', auth, middleware.isModerator, ctrlTransactions.contributionsListByBorrower);
+router.get('/transactions/borrowers/:borrowerid/contributions', auth, middleware.isSafe, ctrlTransactions.contributionsListByBorrower);
 
 router.get('/transactions/type/:type', auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
 

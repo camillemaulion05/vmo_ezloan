@@ -252,6 +252,20 @@ const borrowerSchema = mongoose.Schema({
         type: String,
         default: "0.00"
     }, // default: "300.00" For Members Only
+    patronageRefund: [{
+        year: String,
+        amount: {
+            type: String,
+            default: "0.00"
+        } //For Members Only
+    }],
+    dividend: [{
+        year: String,
+        amount: {
+            type: String,
+            default: "0.00"
+        } //For Members Only
+    }]
 }, {
     timestamps: true
 });

@@ -95,7 +95,7 @@ block content
               #dashboardNavContent.tab-content
                 #repayments.tab-pane.fade.active.show(role='tabpanel' aria-labelledby='repayments-pill')
                   if loan.status == "Loan Release" || loan.status == "Open" || loan.status == "Loan Debt"
-                    a#addRepayment.btn.btn-sm.btn-primary.mr-2.mb-4(href=('/'+loan.requestedBy._id+'/'+loan._id) data-toggle='modal' data-target='#') Add Repayment
+                    a.btn.btn-sm.btn-primary.mr-2.mb-4(href='#' data-toggle='modal' data-target='#repaymentModal') Add Repayment
                   .table-responsive
                     table.table.table-hover.mb-0
                       thead
@@ -140,7 +140,7 @@ block content
                                 td
                                   .badge.badge-success.badge-pill #{x.status}
                 #loan-details.tab-pane.fade(role='tabpanel' aria-labelledby='loan-details-pill')
-                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/soa") Print Statement
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/soa") Download Statement
                   .row
                     .col-lg-6
                       .table-responsive.table-hover
@@ -241,7 +241,7 @@ block content
                               td Php
                               td.text-right #{(parseFloat(loan.unpaidInterest)).toFixed(2)}
                 #loan-schedule.tab-pane.fade(role='tabpanel' aria-labelledby='loan-schedule-pill')
-                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/schedule") Print Schedule
+                  a.btn.btn-sm.btn-primary.mr-2.mb-4(href="/download/loan/"+loan._id+"/schedule") Download Schedule
                   .table-responsive
                     table.table.table-hover.mb-0
                       thead

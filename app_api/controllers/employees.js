@@ -536,6 +536,9 @@ const employeesAccountList = (req, res) => {
         .find({
             "type": "Loan Processor"
         }, {
+            "profile.firstName": 1,
+            "profile.lastName": 1,
+            "profile.mobileNum": 1,
             "account": 1,
             "_id": 1
         })

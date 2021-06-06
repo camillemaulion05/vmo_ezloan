@@ -108,7 +108,8 @@ else
                     option(value='' selected='') Assigned Loan Processor
                     for x in employees
                       if (x.type == 'Loan Processor')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{mobileNum} 
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
@@ -275,7 +276,7 @@ else
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='type') Employee Type
-                  select#type.form-control.selectpicker(type='text' name='type' disabled='true')
+                  select#type.form-control.selectpicker(type='text' name='type' disabled='')
                     option(value='' selected='') Employee Type
                     for x in type
                       option(value=x) #{x}
@@ -415,7 +416,7 @@ else
                       option(value=x) #{x}
                 .col-md-6
                   label.small.mb-1(for='amount') Amount
-                  input#amount.form-control(type="number" step="100" min="500" name='amount')
+                  input#amount.form-control(type="number" step="0.01" min="0.00" name='amount')
             .modal-footer
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
@@ -483,7 +484,8 @@ else
                     option(value='' selected='') Assigned Loan Processor
                     for x in employees
                       if (x.type == 'Loan Processor')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{mobileNum} 
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
@@ -602,7 +604,7 @@ else
                   .input-group.mb-1
                     .input-group-prepend
                       span.input-group-text +63
-                    input#txnBorrowerAcctNo.form-control(type='text' name='borrowerAcctNo' minlength='10' maxlength='10' disabled='true')
+                    input#txnBorrowerAcctNo.form-control(type='text' name='borrowerAcctNo' minlength='10' maxlength='10' disabled='')
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='txnPostedBy') Assigned Loan Processor
@@ -760,7 +762,8 @@ else
                     option(value='' selected='') Assigned Loan Processor
                     for x in employees
                       if (x.type == 'Loan Processor')
-                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{x.account.number} 
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{x.profile.firstName} #{x.profile.lastName} - #{mobileNum} 
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type='text' name='referenceNo' minlength='10' maxlength='10')
@@ -845,7 +848,7 @@ else
             h5#repaymentModalLabel.modal-title Add Repayment
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form#repayment(method='POST')
+          form(method='POST' action='/repayments/' + loan.requestedBy._id + '/' + loan._id)
             input(type='hidden', name='_csrf', value=_csrf)
             .modal-body
               p 
@@ -862,7 +865,8 @@ else
                   .input-group
                     .input-group-prepend
                       span.input-group-text +63
-                    input#senderNum.form-control(type="text" name='senderNum' minlength='10' maxlength='10' value=loan.requestedBy.account.number)
+                    - let borrowerAccountNum = (loan.requestedBy.account && loan.requestedBy.account.number) ? loan.requestedBy.account.number : loan.requestedBy.profile.mobileNum;
+                    input#senderNum.form-control(type="text" name='senderNum' minlength='10' maxlength='10' value=borrowerAccountNum)
               .form-row.mb-2
                 .col-md-6
                   label.small.mb-1(for='postedBy') Receiver Number
@@ -870,7 +874,8 @@ else
                     option(value='' selected='') Receiver Number
                     for x in employees
                       if (x.type == 'Loan Processor')
-                        option(value=x._id) #{x.account.number} - #{x.account.name}
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{mobileNum} - #{x.profile.firstName} #{x.profile.lastName}
                 .col-md-6
                   label.small.mb-1(for='referenceNo') G-Cash Reference No.
                   input#referenceNo.form-control(type="text" name='referenceNo' minlength='10' maxlength='10')
@@ -882,6 +887,89 @@ else
               button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
               button.btn.btn-primary(type='submit') Submit
   
+  if title.indexOf("Account Management - Contributions") != -1
+    #contributionModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='contributionModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#contributionModalLabel.modal-title Add Contribution
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form(method='POST' action='/contributions')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              p 
+                | You can deposit your contributions thru G-Cash. Check account numbers below.
+                br
+                | Please note your G-Cash reference number.
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='amount') Amount
+                  input#amount.form-control(type="number" min='300' step='100' name='amount' value=user.sharesPerPayDay)
+                .col-md-6
+                  label.small.mb-1(for='senderNum') Sender Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    - let borrowerAccountNum = (user.account && user.account.number) ? user.account.number : user.profile.mobileNum;
+                    input#senderNum.form-control(type="text" name='senderNum' minlength='10' maxlength='10' value=borrowerAccountNum)
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='postedBy') Receiver Number
+                  select#postedBy.form-control.selectpicker(type='text' name='postedBy')
+                    option(value='' selected='') Receiver Number
+                    for x in employees
+                      if (x.type == 'Loan Processor')
+                        - let mobileNum = (x.account && x.account.number) ? x.account.number : x.profile.mobileNum;
+                        option(value=x._id) #{mobileNum} - #{x.profile.firstName} #{x.profile.lastName}
+                .col-md-6
+                  label.small.mb-1(for='referenceNo') G-Cash Reference No.
+                  input#referenceNo.form-control(type="text" name='referenceNo' minlength='10' maxlength='10')
+              .form-row.mb-2
+                .col-md-12
+                  label.small.mb-1(for='message') Message
+                  textarea#message.form-control(name='message' placeholder='(Optional)')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+    #withdrawalModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='withdrawalModalLabel' aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#withdrawalModalLabel.modal-title Withdrawal Request
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') ×
+          form(method='POST' action='/withdrawalRequest')
+            input(type='hidden', name='_csrf', value=_csrf)
+            .modal-body
+              p 
+                | You will receive an SMS when your withdrawal request has been approved and your funds are already available. 
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='receiverNumber') Receiver Number
+                  .input-group
+                    .input-group-prepend
+                      span.input-group-text +63
+                    input#receiverNumber.form-control(type="text" name='receiverNumber' minlength='10' maxlength='10' value=user.profile.mobileNum disabled='')
+                .col-md-6
+                  label.small.mb-1(for='contributions') Total Contributions
+                  - let totalFund = transactions.filter(obj => (obj.type == "Withdrawals" || obj.type == "Contributions") && obj.status == "Posted").reduce((a, b) => parseFloat(a) + parseFloat(b.amount), 0);
+                  input#contributions.form-control(type='number' min='0.00' max=totalFund name='contributions' value=totalFund disabled='')
+              .form-row.mb-2
+                .col-md-6
+                  label.small.mb-1(for='reason') Reason
+                  select#reason.form-control.selectpicker(type='text' name='reason')
+                    option(value='' selected='') Reason
+                    - let reasons = ["Living Cost", "Educational", "Medical/Hospitalization","Purchasing Appliance","Travel/Vacation","Entertainment","Own Business","Wedding","House Repair","Repayments","Others"]
+                    for x in reasons
+                      option(value=x) #{x}
+                .col-md-6
+                  label.small.mb-1(for='amount') Amount
+                  input#amount.form-control(type="number" step="100.00" min="0.00" max=totalFund name='amount')
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Submit
+
   if title.indexOf("KYC Declaration") != -1
     #signatureModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='signatureModalLabel' aria-hidden='true')
       .modal-dialog(role='document')

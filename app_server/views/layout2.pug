@@ -894,18 +894,6 @@ html
           }); 
         });
 
-    if title.indexOf("Loan Details") != -1
-      script.
-        $(function () {
-          $('a#addRepayment').on('click',function () {
-            let path = ($(this).prop('href')).split('/');
-            let loanid = path[path.length-1];
-            let borrowerid = path[path.length-2];
-            $("#repayment").attr("action", "/repayments/" + borrowerid + '/' + loanid);
-            $('#repaymentModal').modal('show'); 
-          });
-        });
-
     if title.indexOf("KYC Declaration") != -1
       script.
         $(function () {
