@@ -10,6 +10,10 @@ const apiOptions = {
     server: process.env.BASE_URL
 };
 
+function endOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
 function capitalizeFirstLetter(str) {
     // converting first letter to uppercase
     let capitalized = str.charAt(0).toUpperCase() + str.slice(1);
@@ -5480,6 +5484,7 @@ const getDownloadContributions = (req, res) => {
             "amount": 0.00
         };
         let earnings = parseFloat(patronageRefund.amount) + parseFloat(dividend.amount);
+        let endDate = new Date();
         let docDefinition = {
             pageOrientation: 'landscape',
             pageMargins: [40, 20, 40, 40],
@@ -5526,7 +5531,7 @@ const getDownloadContributions = (req, res) => {
                                             text: 'Member No. ' + data.user.borrowerNum + '\n'
                                         },
                                         {
-                                            text: 'Total amount due \n'
+                                            text: 'Total amount due ' + parseDate(endOfMonth(endDate), 'short') + '\n'
                                         },
                                         {
                                             text: '(₱) ' + (parseFloat(data.user.sharesPerPayDay)).toFixed(2) + '\n',
