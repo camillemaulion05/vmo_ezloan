@@ -105,7 +105,50 @@ function getUserDetails(req, res, filename, title) {
  * Accoun page.
  */
 const getAccount = (req, res) => {
+    // if (req.user.type == "Borrower") {
     getUserDetails(req, res, 'account/index', 'Account Management');
+    // } else {
+    //     path = '/api/admins/users/' + req.user.id;
+    //     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    //     requestOptions = {
+    //         url: `${apiOptions.server}${path}`,
+    //         method: 'GET',
+    //         headers: {
+    //             Authorization: 'Bearer ' + req.user.token
+    //         },
+    //         json: {}
+    //     };
+    //     request(
+    //         requestOptions,
+    //         (err, {
+    //             statusCode
+    //         }, user) => {
+    //             if (err) {
+    //                 req.flash('errors', {
+    //                     msg: 'There was an error when loading your account. Please try again later.'
+    //                 });
+    //                 return res.redirect('back');
+    //             } else if (statusCode === 200) {
+    //                 if (user.type == "HRD Authorized Officer") {
+    //                     res.render('account/index', {
+    //                         title: 'Account Management',
+    //                         user: user
+    //                     });
+    //                 } else {
+    //                     res.render('account/dashboard', {
+    //                         title: 'Manage Dashboard',
+    //                         user: user
+    //                     });
+    //                 }
+    //             } else {
+    //                 req.flash('errors', {
+    //                     msg: user.message
+    //                 });
+    //                 return res.redirect('back');
+    //             }
+    //         }
+    //     );
+    // }
 };
 
 const getProfile = (req, res) => {

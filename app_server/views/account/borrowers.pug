@@ -89,29 +89,56 @@ block content
                       - let diff_ms = Date.now() - dob.getTime();
                       - let age_dt = new Date(diff_ms); 
                       - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
-                      tr
-                        td 
-                          a(href='/borrowers/'+x._id + '/view') #{x.borrowerNum}
-                        td #{x.profile.firstName} #{x.profile.lastName}
-                        td #{age}          
-                        td #{x.type}          
-                        td #{x.profile.mobileNum}          
-                        td #{x.profile.email}
-                        if x.status == "Basic"
-                          td
-                            .badge.badge-primary.badge-pill #{x.status}
-                        else if x.status == "Verified"
-                          td
-                            .badge.badge-success.badge-pill #{x.status}
-                        else if x.status == "Declined"
-                          td
-                            .badge.badge-danger.badge-pill #{x.status} 
-                        else if x.status == "Pending for Review"
-                          td
-                            .badge.badge-warning.badge-pill #{x.status} 
-                        td 
-                          a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
-                            i.fas.fa-edit
-                          a.deleteBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
-                            i.fas.fa-trash
+                      if user.type == "HRD Authorized Officer"
+                        if x.type == "Member"
+                          tr
+                            td 
+                              a(href='/borrowers/'+x._id + '/view') #{x.borrowerNum}
+                            td #{x.profile.firstName} #{x.profile.lastName}
+                            td #{age}          
+                            td #{x.type}          
+                            td #{x.profile.mobileNum}          
+                            td #{x.profile.email}
+                            if x.status == "Basic"
+                              td
+                                .badge.badge-primary.badge-pill #{x.status}
+                            else if x.status == "Verified"
+                              td
+                                .badge.badge-success.badge-pill #{x.status}
+                            else if x.status == "Declined"
+                              td
+                                .badge.badge-danger.badge-pill #{x.status} 
+                            else if x.status == "Pending for Review"
+                              td
+                                .badge.badge-warning.badge-pill #{x.status} 
+                            td 
+                              a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                                i.fas.fa-edit
+                      else
+                        tr
+                          td 
+                            a(href='/borrowers/'+x._id + '/view') #{x.borrowerNum}
+                          td #{x.profile.firstName} #{x.profile.lastName}
+                          td #{age}          
+                          td #{x.type}          
+                          td #{x.profile.mobileNum}          
+                          td #{x.profile.email}
+                          if x.status == "Basic"
+                            td
+                              .badge.badge-primary.badge-pill #{x.status}
+                          else if x.status == "Verified"
+                            td
+                              .badge.badge-success.badge-pill #{x.status}
+                          else if x.status == "Declined"
+                            td
+                              .badge.badge-danger.badge-pill #{x.status} 
+                          else if x.status == "Pending for Review"
+                            td
+                              .badge.badge-warning.badge-pill #{x.status} 
+                          td 
+                            a.updateBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                              i.fas.fa-edit
+                            if user.userId.type == "Admin"
+                              a.deleteBorrower.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName) data-toggle='modal' data-target='#')
+                                i.fas.fa-trash
     include ../partials/page-footer

@@ -78,7 +78,8 @@ block content
                         td 
                           a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
                             i.fas.fa-edit
-                          - let transactionId = (x.type == 'Contributions' || x.type == 'Expenses') ? '/'+x._id+'/'+x.transactionNum : '/'+x.transactionNum;
-                          a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=transactionId data-toggle='modal' data-target='#')
-                            i.fas.fa-trash
+                          if user.userId.type == "Admin"
+                            - let transactionId = (x.type == 'Contributions' || x.type == 'Expenses') ? '/'+x._id+'/'+x.transactionNum : '/'+x.transactionNum;
+                            a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=transactionId data-toggle='modal' data-target='#')
+                              i.fas.fa-trash
     include ../partials/page-footer

@@ -1,6 +1,23 @@
 const mongoose = require('mongoose');
 const Withdrawal = mongoose.model('Withdrawal');
 
+function validYear(year) {
+    const text = /^[0-9]+$/;
+    if (year != 0) {
+        if ((year != "") && (!text.test(year))) {
+            return false;
+        }
+        if (year.length != 4) {
+            return false;
+        }
+        var current_year = new Date().getFullYear();
+        if ((year < 1920) || (year > current_year)) {
+            return false;
+        }
+        return true;
+    }
+}
+
 const withdrawalsList = (req, res) => {
     Withdrawal
         .find()
@@ -314,6 +331,57 @@ const withdrawalsDeleteManyByBorrower = (req, res) => {
     }
 };
 
+const withdrawalsSummary = (req, res) => {
+    const {
+        year
+    } = req.params;
+    const isValid = validYear(year);
+    if (!year || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid year."
+            });
+    } else {
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
+        let date2 = new Date(date1);
+        date2.setFullYear(parseInt(year));
+        Withdrawal
+            .aggregate([{
+                    $match: {
+                        createdAt: {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$status',
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
+            .exec((err, withdrawals) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(withdrawals);
+                }
+            });
+    }
+};
+
 module.exports = {
     withdrawalsList,
     withdrawalsCreate,
@@ -322,5 +390,6 @@ module.exports = {
     withdrawalsDeleteOne,
     withdrawalsListByUser,
     withdrawalsListByBorrower,
-    withdrawalsDeleteManyByBorrower
+    withdrawalsDeleteManyByBorrower,
+    withdrawalsSummary
 };

@@ -21,14 +21,15 @@ block content
                   br
                   br
                   h4(style=' font-weight: bold;') Welcome to VMO EZ Loan!
-                  br
-                  h5
-                    | In this challenging time, get the financial boost you 
+                  if user.userId.type == "Borrower"
                     br
-                    |  need with our low-interest personal loan.
-                  br
-                  a.btn.btn-primary.p-3(href='/credits#loanModal')
-                    | Apply Now!
+                    h5
+                      | In this challenging time, get the financial boost you 
+                      br
+                      |  need with our low-interest personal loan.
+                    br
+                    a.btn.btn-primary.p-3(href='/credits#loanModal')
+                      | Apply Now!
     //- footer.sticky-footer.bg-white
     //-   .container.my-auto
     //-     .copyright.text-center.my-auto

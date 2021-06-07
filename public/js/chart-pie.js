@@ -5,7 +5,6 @@ Chart.defaults.global.defaultFontColor = '#858796';
 // Pie Chart Example
 var ctx = $("#myVerificationChart");
 var status = $("#userStatus")[0].innerHTML;
-console.log(status);
 var myVerificationChart;
 if (status == "Basic") {
   myVerificationChart = new Chart(ctx, {

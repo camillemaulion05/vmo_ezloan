@@ -21,4 +21,12 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
                 i.fas.fa-cash-register
               if title.indexOf("Inquiries") != -1
                 i.fas.fa-comments
+              if title.indexOf("Dashboard") != -1
+                i.fas.fa-home
             |  #{title}
+        if title.indexOf("Dashboard") != -1
+          .col-12.col-xl-auto.mb-3
+            .dropdown
+              select#year.form-control.selectpicker(type='text' name='year')
+                option(value='2021') Year 2021
+                option(value='2020') Year 2020

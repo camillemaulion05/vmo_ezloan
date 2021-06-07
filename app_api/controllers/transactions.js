@@ -554,6 +554,57 @@ const transactionsSummary = (req, res) => {
         Transaction
             .aggregate([{
                     $match: {
+                        createdAt: {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$status',
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsSummaryByType = (req, res) => {
+    const {
+        year
+    } = req.params;
+    const isValid = validYear(year);
+    if (!year || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid year."
+            });
+    } else {
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
+        let date2 = new Date(date1);
+        date2.setFullYear(parseInt(year));
+        Transaction
+            .aggregate([{
+                    $match: {
                         postedDate: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
@@ -721,6 +772,7 @@ module.exports = {
     transactionsListByWithdrawals,
     transactionsDeleteManyByWithdrawals,
     transactionsSummary,
+    transactionsSummaryByType,
     contributionsSummary,
     contributionsListByBorrower
 };

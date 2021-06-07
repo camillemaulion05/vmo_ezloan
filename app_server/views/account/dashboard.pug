@@ -1,0 +1,206 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .row
+            if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")
+              .col-lg-6.col-xl-3.mb-4
+                .card.bg-primary.text-white.h-100
+                  .card-body
+                    .d-flex.justify-content-between.align-items-center
+                      .me-3
+                        .text-white-75.small Registered Borrowers
+                        .text-lg.fw-bold 9
+                      i.fas.fa-user.fa-2x.text-white-300
+                  .card-footer.bg-primary.d-flex.align-items-center.justify-content-between.small
+                    a.text-white.stretched-link(href='/borrowers') View Borrowers
+                    .text-white
+                      i.fas.fa-angle-right 
+              .col-lg-6.col-xl-3.mb-4
+                .card.bg-warning.text-white.h-100
+                  .card-body
+                    .d-flex.justify-content-between.align-items-center
+                      .me-3
+                        .text-white-75.small Borrowers Application
+                        .text-lg.fw-bold 3
+                      i.fas.fa-address-card.fa-2x.text-white-300
+                  .card-footer.bg-warning.d-flex.align-items-center.justify-content-between.small
+                    a.text-white.stretched-link(href='/borrowers') Manage Borrowers
+                    .text-white
+                      i.fas.fa-angle-right 
+            else 
+              .col-lg-6.col-xl-3.mb-4
+                .card.bg-primary.text-white.h-100
+                  .card-body
+                    .d-flex.justify-content-between.align-items-center
+                      .me-3
+                        .text-white-75.small Not Posted Contrbutions
+                        .text-lg.fw-bold 9
+                      i.fas.fa-clipboard.fa-2x.text-white-300
+                  .card-footer.bg-primary.d-flex.align-items-center.justify-content-between.small
+                    a.text-white.stretched-link(href='/transactions') Manage Contributions
+                    .text-white
+                      i.fas.fa-angle-right 
+              .col-lg-6.col-xl-3.mb-4
+                .card.bg-warning.text-white.h-100
+                  .card-body
+                    .d-flex.justify-content-between.align-items-center
+                      .me-3
+                        .text-white-75.small Not Posted Repayments
+                        .text-lg.fw-bold 3
+                      i.fas.fa-money-check.fa-2x.text-white-300
+                  .card-footer.bg-warning.d-flex.align-items-center.justify-content-between.small
+                    a.text-white.stretched-link(href='/transactions') Manage Repayments
+                    .text-white
+                      i.fas.fa-angle-right          
+            .col-lg-6.col-xl-3.mb-4
+              .card.bg-success.text-white.h-100
+                .card-body
+                  .d-flex.justify-content-between.align-items-center
+                    .me-3
+                      .text-white-75.small Loans Application
+                      .text-lg.fw-bold 2
+                    i.fas.fa-balance-scale.fa-2x.text-white-300
+                .card-footer.bg-success.d-flex.align-items-center.justify-content-between.small
+                  a.text-white.stretched-link(href='/loans') Manage Applications
+                  .text-white
+                    i.fas.fa-angle-right 
+            .col-lg-6.col-xl-3.mb-4
+              .card.bg-danger.text-white.h-100
+                .card-body
+                  .d-flex.justify-content-between.align-items-center
+                    .me-3
+                      .text-white-75.small Withdrawal Requests
+                      .text-lg.fw-bold 1
+                    i.fas.fa-cash-register.fa-2x.text-white-300 
+                .card-footer.bg-danger.d-flex.align-items-center.justify-content-between.small
+                  a.text-white.stretched-link(href='/withdrawals') Manage Requests
+                  .text-white
+                    i.fas.fa-angle-right 
+          .row
+            .col-xl-6.col-lg-6
+              if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")
+                // Bar Chart
+                .card.shadow.mb-4
+                  .card-header.py-3
+                    h6.m-0.font-weight-bold.text-primary Bar Chart
+                  .card-body
+                    .chart-bar
+                      canvas#myBarChart
+                    hr
+                    | Styling for the bar chart can be found in the
+                    code /js/demo/chart-bar-demo.js
+                    |  file.
+              .card.shadow.mb-4
+                .card-header.py-3
+                  h6.m-0.font-weight-bold.text-primary Financial Statements
+                .list-grouplist-group-flush
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Balance Statement
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Contributions
+                    .fw-500.text-dark ₱ 7000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Withdrawals
+                    .fw-500.text-dark ₱ -2000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Loans Statement
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Loans Released (Principal)
+                    .fw-500.text-dark ₱ -2000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Loans Repayments
+                    .fw-500.text-dark ₱ 1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Income Statement
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Interest Income
+                    .fw-500.text-dark ₱ 1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Membership Fees
+                    .fw-500.text-dark ₱ 1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Service Fees
+                    .fw-500.text-dark ₱ 1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Expenses
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Net Surplus Before Distribution
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | General Reserved Funds (10%)
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Dividend (Interest on Share Capital)
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Patronage Refund
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Net Surplus for Distribution
+                    .fw-500.text-dark ₱ -1000.00
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Total Balance
+                    .fw-500.text-dark ₱ -1000.00
+            .col-xl-6.col-lg-6
+              if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")
+                // Donut Chart
+                .card.shadow.mb-4
+                  // Card Header - Dropdown
+                  .card-header.py-3
+                    h6.m-0.font-weight-bold.text-primary Donut Chart
+                  // Card Body
+                  .card-body
+                    .chart-pie.pt-4
+                      canvas#myPieChart
+                    hr
+                    | Styling for the donut chart can be found in the
+                    code /js/demo/chart-pie-demo.js
+                    |  file.
+              // Area Chart
+              .card.shadow.mb-4
+                .card-header.py-3
+                  h6.m-0.font-weight-bold.text-primary Area Chart
+                .card-body
+                  .chart-area
+                    canvas#myAreaChart
+                  hr
+                  | Styling for the area chart can be found in the
+                  code /js/demo/chart-area-demo.js
+                  |  file.
+              // Area Chart
+              .card.shadow.mb-4
+                .card-header.py-3
+                  h6.m-0.font-weight-bold.text-primary Area Chart
+                .card-body
+                  .chart-area
+                    canvas#myAreaChart
+                  hr
+                  | Styling for the area chart can be found in the
+                  code /js/demo/chart-area-demo.js
+                  |  file.
+    include ../partials/page-footer

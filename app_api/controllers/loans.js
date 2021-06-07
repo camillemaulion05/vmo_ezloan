@@ -663,7 +663,194 @@ const loansPastMaturityRepaymentsList = (req, res) => {
         });
 };
 
+const loansListByUser = (req, res) => {
+    const {
+        userid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(userid);
+    if (!userid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid userid."
+            });
+    } else {
+        Loan
+            .aggregate([{
+                $lookup: {
+                    from: 'borrowers',
+                    localField: 'requestedBy',
+                    foreignField: '_id',
+                    as: 'borrower'
+                }
+            }, {
+                $match: {
+                    'borrower.userId': mongoose.Types.ObjectId(userid),
+                }
+            }, {
+                $project: {
+                    borrower: 0,
+                    loanPaymentSchedule: 0
+                }
+            }])
+            .exec((err, loans) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
+                        return res
+                            .status(403)
+                            .json({
+                                "message": "You don\'t have permission to do that!"
+                            });
+                    }
+                    res
+                        .status(200)
+                        .json(loans);
+                }
+            });
+    }
+};
+
+const loansListByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Loan
+            .find({
+                "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            }, {
+                "loanPaymentSchedule": 0,
+                "updatedAt": 0,
+                "__v": 0
+            })
+            .exec((err, loans) => {
+                if (!loans) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Borrower not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(loans);
+                }
+            });
+    }
+};
+
+const loansDeleteManyByBorrower = (req, res) => {
+    const {
+        borrowerid
+    } = req.params;
+    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
+    if (!borrowerid || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, please enter a valid borrowerid."
+            });
+    } else {
+        Loan
+            .deleteMany({
+                "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            })
+            .exec((err, loans) => {
+                if (!loans) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "Loan not found."
+                        });
+                } else if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(204)
+                        .json(null);
+                }
+            });
+    }
+};
+
 const loansSummary = (req, res) => {
+    const {
+        year
+    } = req.params;
+    const isValid = validYear(year);
+    if (!year || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid year."
+            });
+    } else {
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
+        let date2 = new Date(date1);
+        date2.setFullYear(parseInt(year));
+        Loan
+            .aggregate([{
+                    $match: {
+                        createdAt: {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$status',
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
+            .exec((err, loans) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(loans);
+                }
+            });
+    }
+};
+
+const loansSummaryByType = (req, res) => {
     const {
         year
     } = req.params;
@@ -832,142 +1019,6 @@ const loansInterestReport = (req, res) => {
     }
 };
 
-const loansListByUser = (req, res) => {
-    const {
-        userid
-    } = req.params;
-    const isValid = mongoose.Types.ObjectId.isValid(userid);
-    if (!userid || !isValid) {
-        res
-            .status(404)
-            .json({
-                "message": "Not found, please enter a valid userid."
-            });
-    } else {
-        Loan
-            .aggregate([{
-                $lookup: {
-                    from: 'borrowers',
-                    localField: 'requestedBy',
-                    foreignField: '_id',
-                    as: 'borrower'
-                }
-            }, {
-                $match: {
-                    'borrower.userId': mongoose.Types.ObjectId(userid),
-                }
-            }, {
-                $project: {
-                    borrower: 0,
-                    loanPaymentSchedule: 0
-                }
-            }])
-            .exec((err, loans) => {
-                if (err) {
-                    console.log(err);
-                    res
-                        .status(404)
-                        .json({
-                            "message": err._message
-                        });
-                } else {
-                    if ("Borrower" == req.payload.type && userid != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
-                    res
-                        .status(200)
-                        .json(loans);
-                }
-            });
-    }
-};
-
-const loansListByBorrower = (req, res) => {
-    const {
-        borrowerid
-    } = req.params;
-    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
-    if (!borrowerid || !isValid) {
-        res
-            .status(404)
-            .json({
-                "message": "Not found, please enter a valid borrowerid."
-            });
-    } else {
-        Loan
-            .find({
-                "requestedBy": mongoose.Types.ObjectId(borrowerid)
-            }, {
-                "loanPaymentSchedule": 0,
-                "updatedAt": 0,
-                "__v": 0
-            })
-            .exec((err, loans) => {
-                if (!loans) {
-                    res
-                        .status(404)
-                        .json({
-                            "message": "Borrower not found."
-                        });
-                } else if (err) {
-                    console.log(err);
-                    res
-                        .status(404)
-                        .json({
-                            "message": err._message
-                        });
-                } else {
-                    res
-                        .status(200)
-                        .json(loans);
-                }
-            });
-    }
-};
-
-const loansDeleteManyByBorrower = (req, res) => {
-    const {
-        borrowerid
-    } = req.params;
-    const isValid = mongoose.Types.ObjectId.isValid(borrowerid);
-    if (!borrowerid || !isValid) {
-        res
-            .status(404)
-            .json({
-                "message": "Not found, please enter a valid borrowerid."
-            });
-    } else {
-        Loan
-            .deleteMany({
-                "requestedBy": mongoose.Types.ObjectId(borrowerid)
-            })
-            .exec((err, loans) => {
-                if (!loans) {
-                    res
-                        .status(404)
-                        .json({
-                            "message": "Loan not found."
-                        });
-                } else if (err) {
-                    console.log(err);
-                    res
-                        .status(404)
-                        .json({
-                            "message": err._message
-                        });
-                } else {
-                    res
-                        .status(204)
-                        .json(null);
-                }
-            });
-    }
-};
-
 module.exports = {
     loansList,
     loansCreate,
@@ -981,9 +1032,10 @@ module.exports = {
     loansPastDueListByLoan,
     loansDueRepaymentsList,
     loansPastMaturityRepaymentsList,
-    loansSummary,
-    loansInterestReport,
     loansListByUser,
     loansListByBorrower,
-    loansDeleteManyByBorrower
+    loansDeleteManyByBorrower,
+    loansSummary,
+    loansSummaryByType,
+    loansInterestReport
 };

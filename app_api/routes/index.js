@@ -100,9 +100,7 @@ router
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByBorrower);
 
 router.get('/transactions/borrowers/:borrowerid/contributions', auth, middleware.isSafe, ctrlTransactions.contributionsListByBorrower);
-
 router.get('/transactions/type/:type', auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
-
 router.get('/transactions/users/:userid', auth, middleware.isSafe, ctrlTransactions.transactionsListByUser);
 
 router
@@ -115,9 +113,9 @@ router
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByWithdrawals)
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByWithdrawals);
 
-router.get('/transactions/summary/:year', auth, middleware.isAdmin, ctrlTransactions.transactionsSummary);
-
-router.get('/transactions/contributions/:year', auth, middleware.isAdmin, ctrlTransactions.contributionsSummary);
+router.get('/transactions/summary/:year', auth, middleware.isModerator, ctrlTransactions.transactionsSummary);
+router.get('/transactions/summary/type/:year', auth, middleware.isModerator, ctrlTransactions.transactionsSummaryByType);
+router.get('/transactions/contributions/:year', auth, middleware.isModerator, ctrlTransactions.contributionsSummary);
 
 // withdrawals
 router
@@ -132,7 +130,7 @@ router
     .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteOne);
 
 router.get('/withdrawals/users/:userid', auth, middleware.isSafe, ctrlWithdrawals.withdrawalsListByUser);
-
+router.get('/withdrawals/summary/:year', auth, middleware.isModerator, ctrlWithdrawals.withdrawalsSummary);
 router
     .route('/withdrawals/borrowers/:borrowerid')
     .get(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsListByBorrower)
@@ -160,6 +158,7 @@ router
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOneByUser);
 
 router.get('/borrowers/type/:type', auth, middleware.isModerator, ctrlBorrowers.borrowersListByType);
+router.get('/borrowers/summary/:year', auth, middleware.isModerator, ctrlBorrowers.borrowersSummary);
 
 // loans
 router
@@ -186,18 +185,13 @@ router
     .put(auth, middleware.isModerator, ctrlLoans.loansSchedulesUpdate);
 
 router.get('/loans/:loanid/schedules/:scheduleid', auth, middleware.isSafe, ctrlLoans.loansSchedulesReadOne);
-
 router.get('/loans/:loanid/due', auth, middleware.isSafe, ctrlLoans.loansDueListByLoan);
-
 router.get('/loans/:loanid/pastDue', auth, middleware.isSafe, ctrlLoans.loansPastDueListByLoan);
-
 router.get('/loans/due/repayments', auth, middleware.isAdmin, ctrlLoans.loansDueRepaymentsList);
-
 router.get('/loans/pastMaturity/repayments', auth, middleware.isAdmin, ctrlLoans.loansPastMaturityRepaymentsList);
-
-router.get('/loans/summary/:year', auth, middleware.isAdmin, ctrlLoans.loansSummary);
-
-router.get('/loans/interest/report/:year', auth, middleware.isAdmin, ctrlLoans.loansInterestReport);
+router.get('/loans/summary/:year', auth, middleware.isModerator, ctrlLoans.loansSummary);
+router.get('/loans/summary/type/:year', auth, middleware.isModerator, ctrlLoans.loansSummaryByType);
+router.get('/loans/interest/report/:year', auth, middleware.isModerator, ctrlLoans.loansInterestReport);
 
 // admin
 router

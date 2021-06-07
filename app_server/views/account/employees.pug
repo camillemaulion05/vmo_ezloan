@@ -62,8 +62,9 @@ block content
                           td 
                             a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/employee') data-toggle='modal' data-target='#')
                               i.fas.fa-edit
-                            a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/employee') data-toggle='modal' data-target='#')
-                              i.fas.fa-trash
+                            if user.userId.type == "Admin"
+                              a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/employee') data-toggle='modal' data-target='#')
+                                i.fas.fa-trash
                     for x in admins
                       if user._id != x._id
                         - let dob = new Date(x.profile.dateOfBirth)
@@ -81,6 +82,7 @@ block content
                           td 
                             a.updateEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id+'/admin') data-toggle='modal' data-target='#')
                               i.fas.fa-edit
-                            a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/admin') data-toggle='modal' data-target='#')
-                              i.fas.fa-trash
+                            if user.userId.type == "Admin"
+                              a.deleteEmployee.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x.userId+'/'+x._id+'/'+x.profile.firstName+'/'+x.profile.lastName+'/admin') data-toggle='modal' data-target='#')
+                                i.fas.fa-trash
     include ../partials/page-footer
