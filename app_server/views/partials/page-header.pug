@@ -27,6 +27,14 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
         if title.indexOf("Dashboard") != -1
           .col-12.col-xl-auto.mb-3
             input(type='hidden', name='_csrf', value=_csrf)
-            select#year.form-control.selectpicker(type='text' name='year')
+            select#year.mr-2(type='text' name='year')
               option(value='2021') Year 2021
               option(value='2020') Year 2020
+            a.btn.btn-sm.btn-success.mr-2(href='#') 
+              i.fas.fa-share-alt.fa-sm.text-white
+                span 
+                |  Distribute
+            a.btn.btn-sm.btn-primary.mr-2(href='#') 
+              i.fas.fa-download.fa-sm.text-white
+                span 
+                |  Generate Report
