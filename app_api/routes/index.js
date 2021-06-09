@@ -114,7 +114,8 @@ router
     .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByWithdrawals);
 
 router.get('/transactions/summary/:year', auth, middleware.isModerator, ctrlTransactions.transactionsSummary);
-router.get('/transactions/summary/type/:year', auth, middleware.isModerator, ctrlTransactions.transactionsSummaryByType);
+router.get('/transactions/summary/type/:year', auth, middleware.isModerator, ctrlTransactions.transactionsTypeSummary);
+router.get('/transactions/summary/type/:type/:year', auth, middleware.isModerator, ctrlTransactions.transactionsMonthlySummaryByType);
 router.get('/transactions/contributions/:year', auth, middleware.isModerator, ctrlTransactions.contributionsSummary);
 
 // withdrawals
@@ -190,7 +191,7 @@ router.get('/loans/:loanid/pastDue', auth, middleware.isSafe, ctrlLoans.loansPas
 router.get('/loans/due/repayments', auth, middleware.isAdmin, ctrlLoans.loansDueRepaymentsList);
 router.get('/loans/pastMaturity/repayments', auth, middleware.isAdmin, ctrlLoans.loansPastMaturityRepaymentsList);
 router.get('/loans/summary/:year', auth, middleware.isModerator, ctrlLoans.loansSummary);
-router.get('/loans/summary/type/:year', auth, middleware.isModerator, ctrlLoans.loansSummaryByType);
+router.get('/loans/summary/type/:year', auth, middleware.isModerator, ctrlLoans.loansTypeSummary);
 router.get('/loans/interest/report/:year', auth, middleware.isModerator, ctrlLoans.loansInterestReport);
 
 // admin

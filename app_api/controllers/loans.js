@@ -850,7 +850,7 @@ const loansSummary = (req, res) => {
     }
 };
 
-const loansSummaryByType = (req, res) => {
+const loansTypeSummary = (req, res) => {
     const {
         year
     } = req.params;
@@ -925,23 +925,9 @@ const loansSummaryByType = (req, res) => {
                             $sum: 1
                         }
                     }
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        'borrower.type': 1,
-                        loanAmount: 1,
-                        totalPrincipalPaid: 1,
-                        principalRemaining: 1,
-                        totalInterestPaid: 1,
-                        unpaidInterest: 1,
-                        totalPayments: 1,
-                        serviceFee: 1,
-                        count: 1
-                    }
                 }
             ])
-            .exec((err, transactions) => {
+            .exec((err, loans) => {
                 if (err) {
                     console.log(err);
                     res
@@ -952,7 +938,7 @@ const loansSummaryByType = (req, res) => {
                 } else {
                     res
                         .status(200)
-                        .json(transactions);
+                        .json(loans);
                 }
             });
     }
@@ -1002,7 +988,7 @@ const loansInterestReport = (req, res) => {
                     }
                 }
             ])
-            .exec((err, transactions) => {
+            .exec((err, loans) => {
                 if (err) {
                     console.log(err);
                     res
@@ -1013,7 +999,7 @@ const loansInterestReport = (req, res) => {
                 } else {
                     res
                         .status(200)
-                        .json(transactions);
+                        .json(loans);
                 }
             });
     }
@@ -1036,6 +1022,6 @@ module.exports = {
     loansListByBorrower,
     loansDeleteManyByBorrower,
     loansSummary,
-    loansSummaryByType,
+    loansTypeSummary,
     loansInterestReport
 };

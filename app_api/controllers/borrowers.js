@@ -716,10 +716,27 @@ const borrowersSummary = (req, res) => {
                 },
                 {
                     $group: {
-                        _id: '$status',
-                        count: {
+                        _id: {
+                            type: '$type',
+                            status: '$status',
+                        },
+                        borrowerCount: {
                             $sum: 1
-                        }
+                        },
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id.type',
+                        borrowers: {
+                            $push: {
+                                status: '$_id.status',
+                                count: '$borrowerCount'
+                            },
+                        },
+                        count: {
+                            $sum: '$borrowerCount'
+                        },
                     }
                 }
             ])

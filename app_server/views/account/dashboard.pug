@@ -16,7 +16,8 @@ block content
                     .d-flex.justify-content-between.align-items-center
                       .me-3
                         .text-white-75.small Registered Borrowers
-                        .text-lg.fw-bold 9
+                        - let registeredBorrower = borrowers.reduce((a, b) => parseFloat(a) + parseFloat(b.count), 0);
+                        .text-lg.fw-bold #{registeredBorrower}
                       i.fas.fa-user.fa-2x.text-white-300
                   .card-footer.bg-primary.d-flex.align-items-center.justify-content-between.small
                     a.text-white.stretched-link(href='/borrowers') View Borrowers
@@ -28,7 +29,8 @@ block content
                     .d-flex.justify-content-between.align-items-center
                       .me-3
                         .text-white-75.small Borrowers Application
-                        .text-lg.fw-bold 3
+                        - let pendingBorrowers = borrowers.reduce((a, b) => parseFloat(a) + parseFloat(b.borrowers.filter(obj => obj.status == "Pending for Review").length > 0 ? b.borrowers.filter(obj => obj.status == "Pending for Review")[0].count : 0), 0);
+                        .text-lg.fw-bold #{pendingBorrowers}
                       i.fas.fa-address-card.fa-2x.text-white-300
                   .card-footer.bg-warning.d-flex.align-items-center.justify-content-between.small
                     a.text-white.stretched-link(href='/borrowers') Manage Borrowers
@@ -41,7 +43,8 @@ block content
                     .d-flex.justify-content-between.align-items-center
                       .me-3
                         .text-white-75.small Not Posted Contrbutions
-                        .text-lg.fw-bold 9
+                        - let processingContributions = transactions.filter(obj => obj._id == "Contributions").length > 0 ? transactions.filter(obj => obj._id == "Contributions")[0].transactions.filter(obj => obj.status == "Processing").length > 0 ? transactions.filter(obj => obj._id == "Contributions")[0].transactions.filter(obj => obj.status == "Processing")[0].count : 0 : 0;
+                        .text-lg.fw-bold #{processingContributions}
                       i.fas.fa-clipboard.fa-2x.text-white-300
                   .card-footer.bg-primary.d-flex.align-items-center.justify-content-between.small
                     a.text-white.stretched-link(href='/transactions') Manage Contributions
@@ -53,7 +56,8 @@ block content
                     .d-flex.justify-content-between.align-items-center
                       .me-3
                         .text-white-75.small Not Posted Repayments
-                        .text-lg.fw-bold 3
+                        - let processingRepayments = transactions.filter(obj => obj._id == "Repayments").length > 0 ? transactions.filter(obj => obj._id == "Repayments")[0].transactions.filter(obj => obj.status == "Processing").length > 0 ? transactions.filter(obj => obj._id == "Repayments")[0].transactions.filter(obj => obj.status == "Processing")[0].count : 0 : 0;
+                        .text-lg.fw-bold #{processingRepayments}
                       i.fas.fa-money-check.fa-2x.text-white-300
                   .card-footer.bg-warning.d-flex.align-items-center.justify-content-between.small
                     a.text-white.stretched-link(href='/transactions') Manage Repayments
@@ -65,7 +69,8 @@ block content
                   .d-flex.justify-content-between.align-items-center
                     .me-3
                       .text-white-75.small Loans Application
-                      .text-lg.fw-bold 2
+                      - let processingLoans = loans.filter(obj => obj._id == "Processing").length > 0 ? loans.filter(obj => obj._id == "Processing")[0].count : 0;
+                      .text-lg.fw-bold #{processingLoans}
                     i.fas.fa-balance-scale.fa-2x.text-white-300
                 .card-footer.bg-success.d-flex.align-items-center.justify-content-between.small
                   a.text-white.stretched-link(href='/loans') Manage Applications
@@ -77,7 +82,8 @@ block content
                   .d-flex.justify-content-between.align-items-center
                     .me-3
                       .text-white-75.small Withdrawal Requests
-                      .text-lg.fw-bold 1
+                      - let processingWithdrawals = withdrawalRequests.filter(obj => obj._id == "Processing").length > 0 ? withdrawalRequests.filter(obj => obj._id == "Processing")[0].count : 0;
+                      .text-lg.fw-bold #{processingWithdrawals}
                     i.fas.fa-cash-register.fa-2x.text-white-300 
                 .card-footer.bg-danger.d-flex.align-items-center.justify-content-between.small
                   a.text-white.stretched-link(href='/withdrawals') Manage Requests
@@ -103,69 +109,93 @@ block content
                 .list-grouplist-group-flush
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
-                      | Balance Statement
+                      | Share Capital Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Contributions
-                    .fw-500.text-dark ₱ 7000.00
+                    - let contributions = summary.filter(obj => obj._id == "Contributions").length > 0 ? summary.filter(obj => obj._id == "Contributions")[0].total["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(contributions).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Withdrawals
-                    .fw-500.text-dark ₱ -2000.00
+                    - let withdrawals = summary.filter(obj => obj._id == "Withdrawals").length > 0 ? summary.filter(obj => obj._id == "Withdrawals")[0].total["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(withdrawals).toFixed(2)}
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Total Share Capital
+                    - let totalCapital = parseFloat(contributions) + parseFloat(withdrawals);
+                    .fw-500.text-dark ₱ #{totalCapital.toFixed(2)}
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | Average Share Capital
+                    - let monthToday = (new Date()).getMonth() + 1;
+                    - let aveCapital = parseFloat(totalCapital) / 12;
+                    .fw-500.text-dark ₱ #{aveCapital.toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Loans Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Loans Released (Principal)
-                    .fw-500.text-dark ₱ -2000.00
+                    - let loansReleased = summary.filter(obj => obj._id == "Release").length > 0 ? summary.filter(obj => obj._id == "Release")[0].total["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(loansReleased).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Loans Repayments
-                    .fw-500.text-dark ₱ 1000.00
+                    - let loansRepayments = summary.filter(obj => obj._id == "Repayments").length > 0 ? summary.filter(obj => obj._id == "Repayments")[0].total["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(loansRepayments).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Income Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Interest Income
-                    .fw-500.text-dark ₱ 1000.00
+                      | Interest Income (Interest Paid by Members)
+                    - let interestPaidByMember = interest.filter(obj => obj._id[0] == "Member").length > 0 ? interest.filter(obj => obj._id[0] == "Member")[0].totalInterestPaid["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(interestPaidByMember).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Membership Fees
-                    .fw-500.text-dark ₱ 1000.00
-                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
-                    .me-3
-                      | Service Fees
-                    .fw-500.text-dark ₱ 1000.00
+                      | Other Income 
+                      br
+                      .medium
+                        | (Membership Fees, Service Fees, Interest Paid by Non-Members)
+                      - let membershipFees = summary.filter(obj => obj._id == "Fees").length > 0 ? summary.filter(obj => obj._id == "Fees")[0].total["$numberDecimal"] : 0.00;
+                      - let otherIncome = parseFloat(membershipFees) + parseFloat(loansRepayments) + parseFloat(loansReleased);
+                      - let totalOtherIncome = parseFloat(otherIncome) - parseFloat(interestPaidByMember);
+                    .fw-500.text-dark ₱ #{parseFloat(totalOtherIncome).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Expenses
-                    .fw-500.text-dark ₱ -1000.00
+                    - let expenses = summary.filter(obj => obj._id == "Expenses").length > 0 ? summary.filter(obj => obj._id == "Expenses")[0].total["$numberDecimal"] : 0.00;
+                    .fw-500.text-dark ₱ #{parseFloat(expenses).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
+                      | Balance
+                    - let balance = parseFloat(contributions) + parseFloat(withdrawals)+ parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
+                    .fw-500.text-dark ₱ #{parseFloat(balance).toFixed(2)}
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
                       | Net Surplus Before Distribution
-                    .fw-500.text-dark ₱ -1000.00
+                    .fw-500.text-dark ₱ 
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | General Reserved Funds (10%)
-                    .fw-500.text-dark ₱ -1000.00
+                    .fw-500.text-dark ₱ 
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
+                    .me-3.font-weight-bold
+                      | Net Surplus for Distribution
+                    .fw-500.text-dark ₱
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Dividend (Interest on Share Capital)
-                    .fw-500.text-dark ₱ -1000.00
+                    .fw-500.text-dark ₱ 
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Patronage Refund
-                    .fw-500.text-dark ₱ -1000.00
-                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
-                    .me-3
-                      | Net Surplus for Distribution
-                    .fw-500.text-dark ₱ -1000.00
+                    .fw-500.text-dark ₱ 
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Total Balance
-                    .fw-500.text-dark ₱ -1000.00
+                    .fw-500.text-dark ₱ 
             .col-xl-6.col-lg-6
               if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")
                 // Donut Chart

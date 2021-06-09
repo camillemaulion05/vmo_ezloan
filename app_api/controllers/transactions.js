@@ -562,7 +562,92 @@ const transactionsSummary = (req, res) => {
                 },
                 {
                     $group: {
-                        _id: '$status',
+                        _id: {
+                            type: '$type',
+                            status: '$status',
+                        },
+                        txnCount: {
+                            $sum: 1
+                        },
+                        txnTotal: {
+                            $sum: {
+                                $toDecimal: '$amount'
+                            }
+                        },
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id.type',
+                        transactions: {
+                            $push: {
+                                status: '$_id.status',
+                                count: '$txnCount',
+                                total: '$txnTotal'
+                            },
+                        },
+                        count: {
+                            $sum: '$txnCount'
+                        },
+                        total: {
+                            $sum: {
+                                $toDecimal: '$txnTotal'
+                            }
+                        }
+                    }
+                }
+            ])
+            .exec((err, transactions) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(404)
+                        .json({
+                            "message": err._message
+                        });
+                } else {
+                    res
+                        .status(200)
+                        .json(transactions);
+                }
+            });
+    }
+};
+
+const transactionsTypeSummary = (req, res) => {
+    const {
+        year
+    } = req.params;
+    const isValid = validYear(year);
+    if (!year || !isValid) {
+        res
+            .status(404)
+            .json({
+                "message": "Invalid year."
+            });
+    } else {
+        let date1 = new Date('2020-12-31');
+        date1.setFullYear(parseInt(year) - 1);
+        let date2 = new Date(date1);
+        date2.setFullYear(parseInt(year));
+        Transaction
+            .aggregate([{
+                    $match: {
+                        createdAt: {
+                            $gte: new Date(date1),
+                            $lt: new Date(date2)
+                        },
+                        status: "Posted"
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$type',
+                        total: {
+                            $sum: {
+                                $toDecimal: '$amount'
+                            }
+                        },
                         count: {
                             $sum: 1
                         }
@@ -586,16 +671,18 @@ const transactionsSummary = (req, res) => {
     }
 };
 
-const transactionsSummaryByType = (req, res) => {
+const transactionsMonthlySummaryByType = (req, res) => {
     const {
+        type,
         year
     } = req.params;
-    const isValid = validYear(year);
-    if (!year || !isValid) {
+    const isValidType = validTxnType(type);
+    const isValidYear = validYear(year);
+    if (!type || !year || !isValidType || !isValidYear) {
         res
             .status(404)
             .json({
-                "message": "Invalid year."
+                "message": "Invalid year or transaction type."
             });
     } else {
         let date1 = new Date('2020-12-31');
@@ -605,16 +692,25 @@ const transactionsSummaryByType = (req, res) => {
         Transaction
             .aggregate([{
                     $match: {
-                        postedDate: {
+                        createdAt: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         },
-                        status: "Posted"
+                        status: "Posted",
+                        type: type
+                    }
+                },
+                {
+                    "$project": {
+                        "txnMonth": {
+                            "$month": "$createdAt"
+                        },
+                        "amount": 1
                     }
                 },
                 {
                     $group: {
-                        _id: '$type',
+                        _id: '$txnMonth',
                         total: {
                             $sum: {
                                 $toDecimal: '$amount'
@@ -662,7 +758,7 @@ const contributionsSummary = (req, res) => {
         Transaction
             .aggregate([{
                     $match: {
-                        postedDate: {
+                        createdAt: {
                             $gte: new Date(date1),
                             $lt: new Date(date2)
                         },
@@ -675,11 +771,46 @@ const contributionsSummary = (req, res) => {
                     }
                 },
                 {
+                    "$project": {
+                        "txnMonth": {
+                            "$month": "$createdAt"
+                        },
+                        "amount": 1,
+                        "borrowerId": 1
+                    }
+                },
+                {
                     $group: {
-                        _id: '$borrowerId',
-                        shares: {
+                        _id: {
+                            borrower: '$borrowerId',
+                            month: '$txnMonth',
+                        },
+                        txnCount: {
+                            $sum: 1
+                        },
+                        txnTotal: {
                             $sum: {
                                 $toDecimal: '$amount'
+                            }
+                        },
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id.borrower',
+                        transactions: {
+                            $push: {
+                                month: '$_id.month',
+                                count: '$txnCount',
+                                total: '$txnTotal'
+                            },
+                        },
+                        count: {
+                            $sum: '$txnCount'
+                        },
+                        total: {
+                            $sum: {
+                                $toDecimal: '$txnTotal'
                             }
                         }
                     }
@@ -772,7 +903,8 @@ module.exports = {
     transactionsListByWithdrawals,
     transactionsDeleteManyByWithdrawals,
     transactionsSummary,
-    transactionsSummaryByType,
+    transactionsTypeSummary,
+    transactionsMonthlySummaryByType,
     contributionsSummary,
     contributionsListByBorrower
 };

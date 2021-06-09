@@ -109,50 +109,225 @@ function getUserDetails(req, res, filename, title) {
  * Accoun page.
  */
 const getAccount = (req, res) => {
-    // if (req.user.type == "Borrower") {
-    getUserDetails(req, res, 'account/index', 'Account Management');
-    // } else {
-    //     path = '/api/admins/users/' + req.user.id;
-    //     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
-    //     requestOptions = {
-    //         url: `${apiOptions.server}${path}`,
-    //         method: 'GET',
-    //         headers: {
-    //             Authorization: 'Bearer ' + req.user.token
-    //         },
-    //         json: {}
-    //     };
-    //     request(
-    //         requestOptions,
-    //         (err, {
-    //             statusCode
-    //         }, user) => {
-    //             if (err) {
-    //                 req.flash('errors', {
-    //                     msg: 'There was an error when loading your account. Please try again later.'
-    //                 });
-    //                 return res.redirect('back');
-    //             } else if (statusCode === 200) {
-    //                 if (user.type == "HRD Authorized Officer") {
-    //                     res.render('account/index', {
-    //                         title: 'Account Management',
-    //                         user: user
-    //                     });
-    //                 } else {
-    //                     res.render('account/dashboard', {
-    //                         title: 'Manage Dashboard',
-    //                         user: user
-    //                     });
-    //                 }
-    //             } else {
-    //                 req.flash('errors', {
-    //                     msg: user.message
-    //                 });
-    //                 return res.redirect('back');
-    //             }
-    //         }
-    //     );
-    // }
+    if (req.user.type == "Borrower") {
+        getUserDetails(req, res, 'account/index', 'Account Management');
+    } else {
+        path = '/api/admins/users/' + req.user.id;
+        if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {}
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, user) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when loading your account. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    if (user.type == "HRD Authorized Officer") {
+                        res.render('account/index', {
+                            title: 'Account Management',
+                            user: user
+                        });
+                    } else {
+                        let yearNow = (new Date()).getFullYear();
+                        path = '/api/borrowers/summary/' + yearNow;
+                        requestOptions = {
+                            url: `${apiOptions.server}${path}`,
+                            method: 'GET',
+                            headers: {
+                                Authorization: 'Bearer ' + req.user.token
+                            },
+                            json: {}
+                        };
+                        request(
+                            requestOptions,
+                            (err, {
+                                statusCode
+                            }, borrowers) => {
+                                if (err) {
+                                    req.flash('errors', {
+                                        msg: 'There was an error when loading summary of borrowers. Please try again later.'
+                                    });
+                                    return res.redirect('back');
+                                } else if (statusCode === 200) {
+                                    path = '/api/loans/summary/' + yearNow;
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'GET',
+                                        headers: {
+                                            Authorization: 'Bearer ' + req.user.token
+                                        },
+                                        json: {}
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, loans) => {
+                                            if (err) {
+                                                req.flash('errors', {
+                                                    msg: 'There was an error when loading summary of loans. Please try again later.'
+                                                });
+                                                return res.redirect('back');
+                                            } else if (statusCode === 200) {
+                                                path = '/api/withdrawals/summary/' + yearNow;
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'GET',
+                                                    headers: {
+                                                        Authorization: 'Bearer ' + req.user.token
+                                                    },
+                                                    json: {}
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, withdrawalRequests) => {
+                                                        if (err) {
+                                                            req.flash('errors', {
+                                                                msg: 'There was an error when loading summary of withdrawal requests. Please try again later.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 200) {
+                                                            path = '/api/transactions/summary/' + yearNow;
+                                                            requestOptions = {
+                                                                url: `${apiOptions.server}${path}`,
+                                                                method: 'GET',
+                                                                headers: {
+                                                                    Authorization: 'Bearer ' + req.user.token
+                                                                },
+                                                                json: {}
+                                                            };
+                                                            request(
+                                                                requestOptions,
+                                                                (err, {
+                                                                    statusCode
+                                                                }, transactions) => {
+                                                                    if (err) {
+                                                                        req.flash('errors', {
+                                                                            msg: 'There was an error when loading summary of transactions. Please try again later.'
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else if (statusCode === 200) {
+                                                                        path = '/api/transactions/summary/type/' + yearNow;
+                                                                        requestOptions = {
+                                                                            url: `${apiOptions.server}${path}`,
+                                                                            method: 'GET',
+                                                                            headers: {
+                                                                                Authorization: 'Bearer ' + req.user.token
+                                                                            },
+                                                                            json: {}
+                                                                        };
+                                                                        request(
+                                                                            requestOptions,
+                                                                            (err, {
+                                                                                statusCode
+                                                                            }, summary) => {
+                                                                                if (err) {
+                                                                                    req.flash('errors', {
+                                                                                        msg: 'There was an error when loading summary of transactions type. Please try again later.'
+                                                                                    });
+                                                                                    return res.redirect('back');
+                                                                                } else if (statusCode === 200) {
+                                                                                    path = '/api/loans/summary/type/' + yearNow;
+                                                                                    requestOptions = {
+                                                                                        url: `${apiOptions.server}${path}`,
+                                                                                        method: 'GET',
+                                                                                        headers: {
+                                                                                            Authorization: 'Bearer ' + req.user.token
+                                                                                        },
+                                                                                        json: {}
+                                                                                    };
+                                                                                    request(
+                                                                                        requestOptions,
+                                                                                        (err, {
+                                                                                            statusCode
+                                                                                        }, interest) => {
+                                                                                            if (err) {
+                                                                                                req.flash('errors', {
+                                                                                                    msg: 'There was an error when loading summary of loans type. Please try again later.'
+                                                                                                });
+                                                                                                return res.redirect('back');
+                                                                                            } else if (statusCode === 200) {
+                                                                                                res.render('account/dashboard', {
+                                                                                                    title: 'Manage Dashboard',
+                                                                                                    user: user,
+                                                                                                    borrowers: borrowers,
+                                                                                                    loans: loans,
+                                                                                                    withdrawalRequests: withdrawalRequests,
+                                                                                                    transactions: transactions,
+                                                                                                    summary: summary,
+                                                                                                    interest: interest
+                                                                                                });
+                                                                                            } else {
+                                                                                                req.flash('errors', {
+                                                                                                    msg: interest.message
+                                                                                                });
+                                                                                                return res.redirect('back');
+                                                                                            }
+                                                                                        }
+                                                                                    );
+                                                                                } else {
+                                                                                    req.flash('errors', {
+                                                                                        msg: summary.message
+                                                                                    });
+                                                                                    return res.redirect('back');
+                                                                                }
+                                                                            }
+                                                                        );
+                                                                    } else {
+                                                                        req.flash('errors', {
+                                                                            msg: transactions.message
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    }
+                                                                }
+                                                            );
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: withdrawalRequests.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
+                                                    }
+                                                );
+                                            } else {
+                                                req.flash('errors', {
+                                                    msg: loans.message
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        }
+                                    );
+                                } else {
+                                    req.flash('errors', {
+                                        msg: borrowers.message
+                                    });
+                                    return res.redirect('back');
+                                }
+                            }
+                        );
+                    }
+                } else {
+                    req.flash('errors', {
+                        msg: user.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    }
 };
 
 const getProfile = (req, res) => {
@@ -9713,7 +9888,7 @@ const getDownloadTransactionsReport = (req, res) => {
                 headerRows: 2,
                 body: [
                     [{
-                        text: 'LIST OF LOANS RELEASE',
+                        text: 'LIST OF LOANS RELEASED',
                         style: 'tableHeader',
                         alignment: 'center',
                         fillColor: 'black',
@@ -9840,7 +10015,7 @@ const getDownloadTransactionsReport = (req, res) => {
         docDefinition.content.push(transactionsTable);
         // Make sure the browser knows this is a PDF.
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=loans-release-list.pdf`);
+        res.set('Content-Disposition', `attachment; filename=loans-released-list.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
@@ -10275,7 +10450,7 @@ const getDownloadTransactionsReport = (req, res) => {
                 headerRows: 2,
                 body: [
                     [{
-                        text: 'LIST OF WITHDRAWAL REQUESTS',
+                        text: 'LIST OF WITHDRAWALS/CASH RELEASE',
                         style: 'tableHeader',
                         alignment: 'center',
                         fillColor: 'black',
@@ -10402,7 +10577,7 @@ const getDownloadTransactionsReport = (req, res) => {
         docDefinition.content.push(transactionsTable);
         // Make sure the browser knows this is a PDF.
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=withdrawals-request-list.pdf`);
+        res.set('Content-Disposition', `attachment; filename=withdrawals-list.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
