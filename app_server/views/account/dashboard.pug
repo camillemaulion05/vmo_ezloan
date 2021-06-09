@@ -129,7 +129,7 @@ block content
                     .me-3
                       | Average Share Capital
                     - let monthToday = (new Date()).getMonth() + 1;
-                    - let aveCapital = parseFloat(totalCapital) / 12;
+                    - let aveCapital = parseFloat(totalCapital) / monthToday;
                     .fw-500.text-dark ₱ #{aveCapital.toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
@@ -170,32 +170,41 @@ block content
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Balance
-                    - let balance = parseFloat(contributions) + parseFloat(withdrawals)+ parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
+                    - let balance = parseFloat(contributions) + parseFloat(withdrawals) + parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
                     .fw-500.text-dark ₱ #{parseFloat(balance).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Net Surplus Before Distribution
-                    .fw-500.text-dark ₱ 
+                    - let netSurplusBefore = (parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome)) + parseFloat(expenses);
+                    .fw-500.text-dark ₱ #{parseFloat(netSurplusBefore).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | General Reserved Funds (10%)
-                    .fw-500.text-dark ₱ 
+                    - let reservedFunds = parseFloat(netSurplusBefore) * .10;
+                    .fw-500.text-dark ₱ #{parseFloat(reservedFunds).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Net Surplus for Distribution
-                    .fw-500.text-dark ₱
+                    - let netSurplusAfter = parseFloat(netSurplusBefore) - parseFloat(reservedFunds);
+                    .fw-500.text-dark ₱ #{parseFloat(netSurplusAfter).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Dividend (Interest on Share Capital)
-                    .fw-500.text-dark ₱ 
+                    - let sumOfShareCapitalAndIncome = parseFloat(aveCapital) + parseFloat(interestPaidByMember);
+                    - let aveShareCapital = parseFloat(aveCapital) / parseFloat(sumOfShareCapitalAndIncome);
+                    - let aveIncome = parseFloat(interestPaidByMember) / parseFloat(sumOfShareCapitalAndIncome);
+                    - let dividend = parseFloat(aveShareCapital) * parseFloat(netSurplusAfter);
+                    .fw-500.text-dark ₱ #{parseFloat(dividend).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
                       | Patronage Refund
-                    .fw-500.text-dark ₱ 
+                    - let patronageRefund = parseFloat(aveIncome) * parseFloat(netSurplusAfter);
+                    .fw-500.text-dark ₱ #{parseFloat(patronageRefund).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Total Balance
-                    .fw-500.text-dark ₱ 
+                    - let totalbalance = parseFloat(balance) - parseFloat(netSurplusAfter);
+                    .fw-500.text-dark ₱ #{parseFloat(totalbalance).toFixed(2)}
             .col-xl-6.col-lg-6
               if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")
                 // Donut Chart
