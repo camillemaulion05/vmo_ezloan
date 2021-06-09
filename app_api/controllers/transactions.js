@@ -720,6 +720,11 @@ const transactionsMonthlySummaryByType = (req, res) => {
                             $sum: 1
                         }
                     }
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
                 }
             ])
             .exec((err, transactions) => {

@@ -95,14 +95,10 @@ block content
                 // Bar Chart
                 .card.shadow.mb-4
                   .card-header.py-3
-                    h6.m-0.font-weight-bold.text-primary Bar Chart
+                    h6.m-0.font-weight-bold.text-primary Contribution Chart
                   .card-body
                     .chart-bar
-                      canvas#myBarChart
-                    hr
-                    | Styling for the bar chart can be found in the
-                    code /js/demo/chart-bar-demo.js
-                    |  file.
+                      canvas#myContributionChart
               .card.shadow.mb-4
                 .card-header.py-3
                   h6.m-0.font-weight-bold.text-primary Financial Statements
@@ -211,35 +207,40 @@ block content
                 .card.shadow.mb-4
                   // Card Header - Dropdown
                   .card-header.py-3
-                    h6.m-0.font-weight-bold.text-primary Donut Chart
+                    h6.m-0.font-weight-bold.text-primary Borrowers Chart
                   // Card Body
                   .card-body
                     .chart-pie.pt-4
-                      canvas#myPieChart
-                    hr
-                    | Styling for the donut chart can be found in the
-                    code /js/demo/chart-pie-demo.js
-                    |  file.
+                      canvas#myBorrowerChart
+                    .mt-4.text-center.small
+                      span.mr-2
+                        i.fas.fa-circle.text-primary
+                        i#borrower1
+                      span.mr-2
+                        i.fas.fa-circle.text-success
+                        i#borrower2
+
               // Area Chart
               .card.shadow.mb-4
                 .card-header.py-3
-                  h6.m-0.font-weight-bold.text-primary Area Chart
+                  h6.m-0.font-weight-bold.text-primary Loans Released Chart
                 .card-body
                   .chart-area
-                    canvas#myAreaChart
-                  hr
-                  | Styling for the area chart can be found in the
-                  code /js/demo/chart-area-demo.js
-                  |  file.
+                    canvas#myLoansReleaseChart
               // Area Chart
               .card.shadow.mb-4
                 .card-header.py-3
-                  h6.m-0.font-weight-bold.text-primary Area Chart
+                  h6.m-0.font-weight-bold.text-primary Loans Repayments Chart
                 .card-body
                   .chart-area
-                    canvas#myAreaChart
-                  hr
-                  | Styling for the area chart can be found in the
-                  code /js/demo/chart-area-demo.js
-                  |  file.
+                    canvas#myLoansRepaymentsChart
+              // Area Chart
+              .card.shadow.mb-4.bg-primary.border-0
+                .card-body
+                  h5.text-white-50 Balance
+                  .mb-4
+                    span.display-4.text-white ₱ #{parseFloat(balance).toFixed(2)}
+                    - let date = (new Date()).toString().split(' ');
+                    - let dateToday =  date[1] + ' ' + date[2] + ', ' + date[3];
+                    span.text-white-50 as of #{dateToday}
     include ../partials/page-footer

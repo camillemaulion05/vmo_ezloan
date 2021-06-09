@@ -26,7 +26,7 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
             |  #{title}
         if title.indexOf("Dashboard") != -1
           .col-12.col-xl-auto.mb-3
-            .dropdown
-              select#year.form-control.selectpicker(type='text' name='year')
-                option(value='2021') Year 2021
-                option(value='2020') Year 2020
+            input(type='hidden', name='_csrf', value=_csrf)
+            select#year.form-control.selectpicker(type='text' name='year')
+              option(value='2021') Year 2021
+              option(value='2020') Year 2020

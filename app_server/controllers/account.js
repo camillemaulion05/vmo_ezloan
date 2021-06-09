@@ -6162,6 +6162,41 @@ const getDownloadContributions = (req, res) => {
     );
 };
 
+const getContributionsReport = (req, res) => {
+    let yearNow = (new Date()).getFullYear();
+    path = '/api/transactions/summary/type/Contributions/' + yearNow;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, contributions) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading summary of contributions. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(contributions);
+            } else {
+                req.flash('errors', {
+                    msg: contributions.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getBorrowers = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -7729,6 +7764,41 @@ const getDownloadBorrowersReport = (req, res) => {
     }
 };
 
+const getBorrowersReport = (req, res) => {
+    let yearNow = (new Date()).getFullYear();
+    path = '/api/borrowers/summary/' + yearNow;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrowers) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading summary of borrowers. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(borrowers);
+            } else {
+                req.flash('errors', {
+                    msg: borrowers.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getLoans = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -9175,6 +9245,76 @@ const getDownloadLoansReport = (req, res) => {
     }
 };
 
+const getLoansReleaseReport = (req, res) => {
+    let yearNow = (new Date()).getFullYear();
+    path = '/api/transactions/summary/type/Release/' + yearNow;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, loansRelease) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading summary of loans release. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(loansRelease);
+            } else {
+                req.flash('errors', {
+                    msg: loansRelease.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getLoansRepaymentsReport = (req, res) => {
+    let yearNow = (new Date()).getFullYear();
+    path = '/api/transactions/summary/type/Repayments/' + yearNow;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, loansRepayments) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading summary of loans repayments. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                return res
+                    .status(200)
+                    .json(loansRepayments);
+            } else {
+                req.flash('errors', {
+                    msg: loansRepayments.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getTransactions = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -10015,7 +10155,7 @@ const getDownloadTransactionsReport = (req, res) => {
         docDefinition.content.push(transactionsTable);
         // Make sure the browser knows this is a PDF.
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=loans-released-list.pdf`);
+        res.set('Content-Disposition', `attachment; filename=loans-release-list.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
@@ -12922,6 +13062,7 @@ module.exports = {
     postWithdrawalRequest,
     getContributionDetails,
     getDownloadContributions,
+    getContributionsReport,
     getBorrowers,
     postBorrowers,
     getBorrowerDetails,
@@ -12929,12 +13070,15 @@ module.exports = {
     getDeleteBorrowers,
     getBorrowerLoans,
     getDownloadBorrowersReport,
+    getBorrowersReport,
     getLoans,
     postLoans,
     getLoanDetails,
     postUpdateLoans,
     getDeleteLoans,
     getDownloadLoansReport,
+    getLoansReleaseReport,
+    getLoansRepaymentsReport,
     getTransactions,
     postTransactions,
     getTransactionDetails,

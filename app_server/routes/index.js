@@ -112,6 +112,8 @@ router
 router.post('/withdrawalRequest', passportConfig.isAuthenticated, ctrlAccount.postWithdrawalRequest);
 router.get('/contributions/:borrowerid', passportConfig.isAuthenticated, ctrlAccount.getContributionDetails);
 router.get('/download/contributions', passportConfig.isAuthenticated, ctrlAccount.getDownloadContributions);
+router.get('/summary/report/contributions', passportConfig.isAuthenticated, ctrlAccount.getContributionsReport);
+
 router
     .route('/borrowers')
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowers)
@@ -122,9 +124,11 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getBorrowerDetails)
     .post(passportConfig.isAuthenticated, ctrlAccount.postUpdateBorrowers);
 
+router.get('/borrowers/:borrowerid/view', passportConfig.isAuthenticated, ctrlAccount.getBorrowerDetails);
 router.get('/borrowers/:borrowerid/:userid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteBorrowers);
 router.get('/borrowers/loans/:loanid', passportConfig.isAuthenticated, ctrlAccount.getBorrowerLoans);
 router.get('/download/report/borrowers/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadBorrowersReport);
+router.get('/summary/report/borrowers', passportConfig.isAuthenticated, ctrlAccount.getBorrowersReport);
 
 router
     .route('/loans')
@@ -138,7 +142,8 @@ router
 
 router.get('/loans/:loanid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteLoans);
 router.get('/download/report/loans/:type', passportConfig.isAuthenticated, ctrlAccount.getDownloadLoansReport);
-
+router.get('/summary/report/loans/release', passportConfig.isAuthenticated, ctrlAccount.getLoansReleaseReport);
+router.get('/summary/report/loans/repayments', passportConfig.isAuthenticated, ctrlAccount.getLoansRepaymentsReport);
 router
     .route('/transactions')
     .get(passportConfig.isAuthenticated, ctrlAccount.getTransactions)

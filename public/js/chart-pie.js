@@ -3,11 +3,11 @@ Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,Bli
 Chart.defaults.global.defaultFontColor = '#858796';
 
 // Pie Chart Example
-var ctx = $("#myVerificationChart");
+var verificationCtx = $("#myVerificationChart");
 var status = $("#userStatus")[0].innerHTML;
 var myVerificationChart;
 if (status == "Basic") {
-  myVerificationChart = new Chart(ctx, {
+  myVerificationChart = new Chart(verificationCtx, {
     type: 'doughnut',
     data: {
       labels: ["Full Verification", "Basic Verification"],
@@ -38,7 +38,7 @@ if (status == "Basic") {
     },
   });
 } else {
-  myVerificationChart = new Chart(ctx, {
+  myVerificationChart = new Chart(verificationCtx, {
     type: 'doughnut',
     data: {
       labels: ["Full Verification", "Basic Verification"],
