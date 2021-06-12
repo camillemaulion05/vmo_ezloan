@@ -55,27 +55,33 @@ block content
                                 option(value=x selected) #{x}
                               else
                                 option(value=x) #{x}
+                      if user.userId.type == "Borrower" && user.type == "Non-Member"
+                        .form-row
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='dependents') No. of dependents
+                            input#dependents.form-control(type='text' placeholder='Enter no. of dependents' name='dependents' value=user.profile.dependents)
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='educAttainment') Educational Attainment
+                            select#educAttainment.form-control.selectpicker(type='text' name='educAttainment')
+                              option(value='' selected='') Educational Attainment
+                              - let educAttainment = ["High School", "Vocational/Technical", "College", "Post Graduate", "Others"]
+                              for x in educAttainment
+                                if (x == user.profile.educAttainment) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4.mb-4
+                            label.small.mb-1(for='placeOfBirth') Place of Birth
+                            input#placeOfBirth.form-control(type='text' placeholder='Enter your place of birth' name='placeOfBirth' value=user.profile.placeOfBirth)
                       .form-row
-                        .form-group.col-md-4.mb-4
-                          label.small.mb-1(for='dependents') No. of dependents
-                          input#dependents.form-control(type='text' placeholder='Enter no. of dependents' name='dependents' value=user.profile.dependents)
-                        .form-group.col-md-4.mb-4
-                          label.small.mb-1(for='educAttainment') Educational Attainment
-                          select#educAttainment.form-control.selectpicker(type='text' name='educAttainment')
-                            option(value='' selected='') Educational Attainment
-                            - let educAttainment = ["High School", "Vocational/Technical", "College", "Post Graduate", "Others"]
-                            for x in educAttainment
-                              if (x == user.profile.educAttainment) 
-                                option(value=x selected) #{x}
-                              else
-                                option(value=x) #{x}
-                        .form-group.col-md-4.mb-4
-                          label.small.mb-1(for='placeOfBirth') Place of Birth
-                          input#placeOfBirth.form-control(type='text' placeholder='Enter your place of birth' name='placeOfBirth' value=user.profile.placeOfBirth)
-                      .form-row
-                        .form-group.col-md-4.mb-md-0
-                          label.small.mb-1(for='nationality') Nationality
-                          input#nationality.form-control(type='text' placeholder='Enter your nationality' name='nationality' value=user.profile.nationality)
+                        if user.userId.type == "Borrower" && user.type == "Member"
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='nameOfSpouse') Name of Spouse
+                            input#nameOfSpouse.form-control(type='text' placeholder='Enter your spouse name' name='nameOfSpouse' value=user.profile.nameOfSpouse)
+                        if user.userId.type == "Borrower" && user.type == "Non-Member"
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='nationality') Nationality
+                            input#nationality.form-control(type='text' placeholder='Enter your nationality' name='nationality' value=user.profile.nationality)
                         .form-group.col-md-4.mb-4
                           label.small.mb-1(for='homePhoneNum') Home Phone Number
                           .input-group

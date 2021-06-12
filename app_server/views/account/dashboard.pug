@@ -108,23 +108,23 @@ block content
                       | Share Capital Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Contributions
+                      | A. Contributions 
                     - let contributions = summary.filter(obj => obj._id == "Contributions").length > 0 ? summary.filter(obj => obj._id == "Contributions")[0].total["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(contributions).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Withdrawals
+                      | B. Withdrawals
                     - let withdrawals = summary.filter(obj => obj._id == "Withdrawals").length > 0 ? summary.filter(obj => obj._id == "Withdrawals")[0].total["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(withdrawals).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Total Share Capital
+                      | C. Total Share Capital (A + B)
                     - let totalCapital = parseFloat(contributions) + parseFloat(withdrawals);
                     .fw-500.text-dark ₱ #{totalCapital.toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
-                    .me-3
-                      | Average Share Capital
                     - let monthToday = (new Date()).getMonth() + 1;
+                    .me-3
+                      | D. Average Share Capital (C / #{monthToday})
                     - let aveCapital = parseFloat(totalCapital) / monthToday;
                     .fw-500.text-dark ₱ #{aveCapital.toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
@@ -132,20 +132,25 @@ block content
                       | Loans Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Loans Released (Principal)
+                      | E. Loans Released (Principal)
                     - let loansReleased = summary.filter(obj => obj._id == "Release").length > 0 ? summary.filter(obj => obj._id == "Release")[0].total["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(loansReleased).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Loans Repayments
+                      | F. Loan Repayments
                     - let loansRepayments = summary.filter(obj => obj._id == "Repayments").length > 0 ? summary.filter(obj => obj._id == "Repayments")[0].total["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(loansRepayments).toFixed(2)}
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | G. Loans Receivable (E + F)
+                    - let loansReceivables = parseFloat(loansReleased) + parseFloat(loansRepayments);
+                    .fw-500.text-dark ₱ #{parseFloat(loansReceivables).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
                       | Income Statement
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Interest Income (Interest Paid by Members)
+                      | H. Interest Income (Interest Paid by Members)
                     - let interestPaidByMember = interest.filter(obj => obj._id[0] == "Member").length > 0 ? interest.filter(obj => obj._id[0] == "Member")[0].totalInterestPaid["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(interestPaidByMember).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
@@ -153,53 +158,70 @@ block content
                       | Other Income 
                       br
                       .medium
-                        | (Membership Fees, Service Fees, Interest Paid by Non-Members)
+                        | &ensp; I. Membership Fees
+                      .medium
+                        | &ensp; J. Service Fee and Interest Paid by Non-Members
+                      .medium
+                        | &ensp; K. Total Other Income (I + J)
                       - let membershipFees = summary.filter(obj => obj._id == "Fees").length > 0 ? summary.filter(obj => obj._id == "Fees")[0].total["$numberDecimal"] : 0.00;
-                      - let otherIncome = parseFloat(membershipFees) + parseFloat(loansRepayments) + parseFloat(loansReleased);
-                      - let totalOtherIncome = parseFloat(otherIncome) - parseFloat(interestPaidByMember);
-                    .fw-500.text-dark ₱ #{parseFloat(totalOtherIncome).toFixed(2)}
+                      - let otherIncome = parseFloat(loansRepayments) + parseFloat(loansReleased)  - parseFloat(interestPaidByMember);
+                      - let totalOtherIncome = parseFloat(membershipFees) + parseFloat(otherIncome);
+                    .fw-500.text-dark 
+                      |
+                      br
+                      .medium.text-right
+                        | ₱ #{parseFloat(membershipFees).toFixed(2)}
+                      .medium.text-right
+                        | ₱ #{parseFloat(otherIncome).toFixed(2)}
+                      .medium.text-right
+                        | ₱ #{parseFloat(totalOtherIncome).toFixed(2)}  
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Expenses
+                      | L. Total Income (H + K)
+                    - let totalIncome = parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome);
+                    .fw-500.text-dark ₱ #{parseFloat(totalIncome).toFixed(2)}
+                  .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
+                    .me-3
+                      | M. Expenses
                     - let expenses = summary.filter(obj => obj._id == "Expenses").length > 0 ? summary.filter(obj => obj._id == "Expenses")[0].total["$numberDecimal"] : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(expenses).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
-                      | Balance
+                      | N. Balance (C + G + I + M)
                     - let balance = parseFloat(contributions) + parseFloat(withdrawals) + parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
                     .fw-500.text-dark ₱ #{parseFloat(balance).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Net Surplus Before Distribution
-                    - let netSurplusBefore = (parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome)) + parseFloat(expenses);
+                      | O. Net Surplus Before Distribution (L + M)
+                    - let netSurplusBefore = parseFloat(totalIncome) + parseFloat(expenses);
                     .fw-500.text-dark ₱ #{parseFloat(netSurplusBefore).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | General Reserved Funds (10%)
+                      | P. General Reserved Funds (10% of O)
                     - let reservedFunds = parseFloat(netSurplusBefore) * .10;
                     .fw-500.text-dark ₱ #{parseFloat(reservedFunds).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
-                      | Net Surplus for Distribution
+                      | Q. Net Surplus for Distribution (O - P)
                     - let netSurplusAfter = parseFloat(netSurplusBefore) - parseFloat(reservedFunds);
                     .fw-500.text-dark ₱ #{parseFloat(netSurplusAfter).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Dividend (Interest on Share Capital)
+                      | R. Dividend (Interest on Share Capital)
                     - let sumOfShareCapitalAndIncome = parseFloat(aveCapital) + parseFloat(interestPaidByMember);
                     - let aveShareCapital = parseFloat(aveCapital) / parseFloat(sumOfShareCapitalAndIncome);
                     - let aveIncome = parseFloat(interestPaidByMember) / parseFloat(sumOfShareCapitalAndIncome);
-                    - let dividend = parseFloat(aveShareCapital) * parseFloat(netSurplusAfter);
+                    - let dividend = (aveShareCapital) ? parseFloat(aveShareCapital) * parseFloat(netSurplusAfter) : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(dividend).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action
                     .me-3
-                      | Patronage Refund
-                    - let patronageRefund = parseFloat(aveIncome) * parseFloat(netSurplusAfter);
+                      | S. Patronage Refund
+                    - let patronageRefund = (aveIncome) ? parseFloat(aveIncome) * parseFloat(netSurplusAfter) : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(patronageRefund).toFixed(2)}
                   .list-group-item.d-flex.align-items-center.justify-content-between.list-group-item-action.bg-gray-300
                     .me-3.font-weight-bold
-                      | Total Balance
-                    - let totalbalance = parseFloat(balance) - parseFloat(netSurplusAfter);
+                      | T. Total Balance (N - Q)
+                    - let totalbalance = (balance) ? parseFloat(balance) - parseFloat(netSurplusAfter) : 0.00;
                     .fw-500.text-dark ₱ #{parseFloat(totalbalance).toFixed(2)}
             .col-xl-6.col-lg-6
               if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Officer")

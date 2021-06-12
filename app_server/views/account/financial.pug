@@ -44,38 +44,48 @@ block content
                               .input-group-prepend
                                 span.input-group-text +63
                               input#officePhone.form-control(type='text' placeholder='Enter your office phone no.' name='officePhone' minlength='9' maxlength='9' value=(user.workBusinessInfo) ? user.workBusinessInfo.officePhone : '')
+                        if user.userId.type == "Borrower" && user.type == "Non-Member"
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='employmentType') Employment Status
+                              select#employmentType.form-control.selectpicker(type='text' name='employmentType')
+                                option(value='' selected='') Employment Status
+                                - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
+                                for x in employmentType
+                                  if (user.workBusinessInfo && x == user.workBusinessInfo.employmentType) 
+                                    option(value=x selected) #{x}
+                                  else
+                                    option(value=x) #{x}
+                            .form-group.col-md-6
+                              label.small.mb-1(for='occupationType') Occupation Type
+                              select#occupationType.form-control.selectpicker(type='text' name='occupationType')
+                                option(value='' selected='') Occupation Type
+                                - let occupationType = ["Management","Marketing","Sales","Office Worker","Professional/Technical","Service/Reception","Production Worker/Labor","Security/Guard/Maid","Driver","Self Employee/Freelance","Others"]
+                                for x in occupationType
+                                  if (user.workBusinessInfo && x == user.workBusinessInfo.occupationType) 
+                                    option(value=x selected) #{x}
+                                  else
+                                    option(value=x) #{x}
+                          .form-row
+                            .form-group.col-md-6
+                              label.small.mb-1(for='businessType') Business Type
+                              select#businessType.form-control.selectpicker(type='text' name='businessType')
+                                option(value='' selected='') Business Type
+                                - let businessType = ["BPO/Communications/IT/Mass Media","Retail Sale/Restaurant/Hotel/Tourism/Other Service","Transportation/Shipping/Real Estate","Bank/Insurance/Finance","Government","Construction/Marker/Manufacturing","Trading/Export/Import/Wholesale","Electric/Gas/Waterworks","Medical/Education/School","Security","Agriculture/Forestry/Fisheries/Mining","Others"]
+                                for x in businessType
+                                  if (user.workBusinessInfo && x == user.workBusinessInfo.businessType) 
+                                    option(value=x selected) #{x}
+                                  else
+                                    option(value=x) #{x}
+                            .form-group.col-md-6.mb-md-0
+                              label.small.mb-1(for='monthlyIncome') Monthly Income
+                              .input-group
+                                .input-group-prepend
+                                  span.input-group-text ₱
+                                input#monthlyIncome.form-control(type='number' min='0' placeholder='Enter your monthly income' name='monthlyIncome' value=(user.workBusinessInfo) ? user.workBusinessInfo.monthlyIncome : '')
+                                .input-group-append
+                                  span.input-group-text .00
                         .form-row
-                          .form-group.col-md-6
-                            label.small.mb-1(for='employmentType') Employment Status
-                            select#employmentType.form-control.selectpicker(type='text' name='employmentType')
-                              option(value='' selected='') Employment Status
-                              - let employmentType = ["Regular", "Probation", "Contractual", "Project Based", "Part-Time", "Self-Employed/Freelancer"]
-                              for x in employmentType
-                                if (user.workBusinessInfo && x == user.workBusinessInfo.employmentType) 
-                                  option(value=x selected) #{x}
-                                else
-                                  option(value=x) #{x}
-                          .form-group.col-md-6
-                            label.small.mb-1(for='occupationType') Occupation Type
-                            select#occupationType.form-control.selectpicker(type='text' name='occupationType')
-                              option(value='' selected='') Occupation Type
-                              - let occupationType = ["Management","Marketing","Sales","Office Worker","Professional/Technical","Service/Reception","Production Worker/Labor","Security/Guard/Maid","Driver","Self Employee/Freelance","Others"]
-                              for x in occupationType
-                                if (user.workBusinessInfo && x == user.workBusinessInfo.occupationType) 
-                                  option(value=x selected) #{x}
-                                else
-                                  option(value=x) #{x}
-                        .form-row
-                          .form-group.col-md-6
-                            label.small.mb-1(for='businessType') Business Type
-                            select#businessType.form-control.selectpicker(type='text' name='businessType')
-                              option(value='' selected='') Business Type
-                              - let businessType = ["BPO/Communications/IT/Mass Media","Retail Sale/Restaurant/Hotel/Tourism/Other Service","Transportation/Shipping/Real Estate","Bank/Insurance/Finance","Government","Construction/Marker/Manufacturing","Trading/Export/Import/Wholesale","Electric/Gas/Waterworks","Medical/Education/School","Security","Agriculture/Forestry/Fisheries/Mining","Others"]
-                              for x in businessType
-                                if (user.workBusinessInfo && x == user.workBusinessInfo.businessType) 
-                                  option(value=x selected) #{x}
-                                else
-                                  option(value=x) #{x}
                           .form-group.col-md-6.mb-md-0
                             label.small.mb-1(for='position') Position
                             select#position.form-control.selectpicker(type='text' name='position')
@@ -86,7 +96,6 @@ block content
                                   option(value=x selected) #{x}
                                 else
                                   option(value=x) #{x}
-                        .form-row
                           .form-group.col-md-6
                             label.small.mb-1(for='dateHired') Date Hired
                             - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -94,14 +103,6 @@ block content
                             - let date = (new Date((user.workBusinessInfo && user.workBusinessInfo.dateHired) ? user.workBusinessInfo.dateHired : '')).toString().split(' ');
                             - let dateHired =  (user.workBusinessInfo && user.workBusinessInfo.dateHired) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] : "";
                             input#dateHired.form-control(type='date' name='dateHired' value=dateHired)
-                          .form-group.col-md-6.mb-md-0
-                            label.small.mb-1(for='monthlyIncome') Monthly Income
-                            .input-group
-                              .input-group-prepend
-                                span.input-group-text ₱
-                              input#monthlyIncome.form-control(type='number' min='0' placeholder='Enter your monthly income' name='monthlyIncome' value=(user.workBusinessInfo) ? user.workBusinessInfo.monthlyIncome : '')
-                              .input-group-append
-                                span.input-group-text .00
                       hr.my-4
                       fieldset
                         legend.text-primary Workplace Address

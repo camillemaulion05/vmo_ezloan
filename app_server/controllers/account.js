@@ -3463,7 +3463,8 @@ const postVerificationsPersonal = (req, res) => {
                 homePhoneNum: req.body.homePhoneNum,
                 mobileNum: req.body.mobileNum,
                 tin: req.body.tin,
-                email: req.body.email
+                email: req.body.email,
+                nameOfSpouse: req.body.nameOfSpouse
             }
         }
     };
@@ -3590,8 +3591,7 @@ const postVerificationsFinancial = (req, res) => {
                 occupationType: req.body.occupationType,
                 businessType: req.body.businessType,
                 position: req.body.position,
-                monthlyIncome: req.body.monthlyIncome,
-                employeeID: req.body.employeeID,
+                monthlyIncome: req.body.monthlyIncome
             },
             account: {
                 name: req.body.accountName,

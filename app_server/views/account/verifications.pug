@@ -25,21 +25,30 @@ block content
                           | Questions? Check out our verification 
                           span.text-primary FAQ
                           | .
-                        - let profileStat = (user.profile && user.profile.firstName && user.profile.middleName && user.profile.lastName && user.profile.gender && user.profile.dateOfBirth && user.profile.maritalStat && user.profile.dependents && user.profile.educAttainment && user.profile.placeOfBirth && user.profile.nationality && user.profile.homePhoneNum && user.profile.mobileNum && user.profile.tin && user.profile.email) ? 'Completed' : 'Incomplete'
+                        - let profileStat = (user.type == "Non-Member" && user.profile && user.profile.firstName && user.profile.middleName && user.profile.lastName && user.profile.gender && user.profile.dateOfBirth && user.profile.maritalStat && user.profile.dependents && user.profile.educAttainment && user.profile.placeOfBirth && user.profile.nationality && user.profile.homePhoneNum && user.profile.mobileNum && user.profile.tin && user.profile.email) ? 'Completed' : 'Incomplete'
+                        - let profileStatMember = (user.type == "Member" && user.profile && user.profile.firstName && user.profile.middleName && user.profile.lastName && user.profile.gender && user.profile.dateOfBirth && user.profile.maritalStat && user.profile.homePhoneNum && user.profile.mobileNum && user.profile.tin && user.profile.email) ? 'Completed' : 'Incomplete'
                         - let addressStat = (user.profile && user.profile.address && user.profile.address.sameAddress && user.profile.address.present && user.profile.address.present.unitNo && user.profile.address.present.houseNo && user.profile.address.present.street && user.profile.address.present.subdivision && user.profile.address.present.barangay && user.profile.address.present.city && user.profile.address.present.province && user.profile.address.present.zipCode && user.profile.address.permanent && user.profile.address.permanent.unitNo && user.profile.address.permanent.houseNo && user.profile.address.permanent.street && user.profile.address.permanent.subdivision && user.profile.address.permanent.barangay && user.profile.address.permanent.city && user.profile.address.permanent.province && user.profile.address.permanent.zipCode) ? 'Completed' : 'Incomplete'
-                        - let workStat = (user.workBusinessInfo && user.workBusinessInfo.companyName && user.workBusinessInfo.department && user.workBusinessInfo.officePhone && user.workBusinessInfo.officeAddress && user.workBusinessInfo.officeAddress.unitNo && user.workBusinessInfo.officeAddress.houseNo && user.workBusinessInfo.officeAddress.street && user.workBusinessInfo.officeAddress.subdivision && user.workBusinessInfo.officeAddress.barangay && user.workBusinessInfo.officeAddress.city && user.workBusinessInfo.officeAddress.province && user.workBusinessInfo.officeAddress.zipCode && user.workBusinessInfo.dateHired && user.workBusinessInfo.employmentType && user.workBusinessInfo.occupationType && user.workBusinessInfo.businessType && user.workBusinessInfo.position && user.workBusinessInfo.monthlyIncome) ? 'Completed' : 'Incomplete'
+                        - let workStat = (user.type == "Non-Member" && user.workBusinessInfo && user.workBusinessInfo.companyName && user.workBusinessInfo.department && user.workBusinessInfo.officePhone && user.workBusinessInfo.officeAddress && user.workBusinessInfo.officeAddress.unitNo && user.workBusinessInfo.officeAddress.houseNo && user.workBusinessInfo.officeAddress.street && user.workBusinessInfo.officeAddress.subdivision && user.workBusinessInfo.officeAddress.barangay && user.workBusinessInfo.officeAddress.city && user.workBusinessInfo.officeAddress.province && user.workBusinessInfo.officeAddress.zipCode && user.workBusinessInfo.dateHired && user.workBusinessInfo.employmentType && user.workBusinessInfo.occupationType && user.workBusinessInfo.businessType && user.workBusinessInfo.position && user.workBusinessInfo.monthlyIncome) ? 'Completed' : 'Incomplete'
+                        - let workStatMember = (user.type == "Member" && user.workBusinessInfo && user.workBusinessInfo.companyName && user.workBusinessInfo.department && user.workBusinessInfo.officePhone && user.workBusinessInfo.officeAddress && user.workBusinessInfo.officeAddress.unitNo && user.workBusinessInfo.officeAddress.houseNo && user.workBusinessInfo.officeAddress.street && user.workBusinessInfo.officeAddress.subdivision && user.workBusinessInfo.officeAddress.barangay && user.workBusinessInfo.officeAddress.city && user.workBusinessInfo.officeAddress.province && user.workBusinessInfo.officeAddress.zipCode && user.workBusinessInfo.dateHired && user.workBusinessInfo.employmentType && user.workBusinessInfo.occupationType && user.workBusinessInfo.businessType && user.workBusinessInfo.position && user.workBusinessInfo.monthlyIncome) ? 'Completed' : 'Incomplete'
                         - let accountStat = (user.account && user.account.name && user.account.number) ? 'Completed' : 'Incomplete' 
                         - let workAndAccountStat = (workStat == 'Completed' && accountStat == 'Completed') ? 'Completed' : 'Incomplete'
-                        - let documentsStat = (user.documents && user.documents.primaryIdFront && user.documents.primaryIdBack && (user.documents.companyIdFront && user.documents.companyIdBack || user.documents.coe) && (user.documents.payslip1 && user.documents.payslip2 || user.documents.bir) && user.documents.tinProof && user.documents.selfiewithId) ? 'Completed' : 'Incomplete'
-                        - let signatureStat = (user.signature)  ? 'Completed' : 'Incomplete'
+                        - let workAndAccountStatMember = (workStatMember == 'Completed' && accountStat == 'Completed') ? 'Completed' : 'Incomplete'
+                        - let documentsStat = (user.type == "Non-Member" && user.documents && user.documents.primaryIdFront && user.documents.primaryIdBack && (user.documents.companyIdFront && user.documents.companyIdBack || user.documents.coe) && (user.documents.payslip1 && user.documents.payslip2 || user.documents.bir) && user.documents.tinProof && user.documents.selfiewithId) ? 'Completed' : 'Incomplete'
+                        - let signatureStat = (user.type == "Non-Member" && user.signature)  ? 'Completed' : 'Incomplete'
                         if user.status == "Pending for Review"
                           p.text-primary Your application to Full verfication level is under review.
                           a.btn.btn-primary.p-2.mr-2(href='/verifications/cancel')
                             | Cancel Verification Request
-                        else if user.status == "Basic" && profileStat == 'Completed' && addressStat == 'Completed' && workAndAccountStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
+                        else if user.type == "Non-Member" && user.status == "Basic" && profileStat == 'Completed' && addressStat == 'Completed' && workAndAccountStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
                           a.btn.btn-primary.p-2.mr-2(href='/verifications/submit')
                             | Submit Verification Request
-                        if profileStat == 'Completed' && addressStat == 'Completed' && workAndAccountStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
+                        else if user.type == "Member" && user.status == "Basic" && profileStatMember == 'Completed' && addressStat == 'Completed' && workAndAccountStatMember == 'Completed'
+                          a.btn.btn-primary.p-2.mr-2(href='/verifications/submit')
+                            | Submit Verification Request
+                        if user.type == "Non-Member" && profileStat == 'Completed' && addressStat == 'Completed' && workAndAccountStat == 'Completed' && documentsStat == 'Completed' && signatureStat == 'Completed'
+                          a.btn.btn-success.p-2.mr-2(href='/download/borrower/'+user._id)
+                            | Download Application Form
+                        if user.type == "Member" && profileStatMember == 'Completed' && addressStat == 'Completed' && workAndAccountStatMember == 'Completed'
                           a.btn.btn-success.p-2.mr-2(href='/download/borrower/'+user._id)
                             | Download Application Form
               .col-xl-4
@@ -69,7 +78,10 @@ block content
                         h5 Personal Information
                         .text-muted.small
                           | Status: 
-                          span.text-primary #{profileStat}
+                          if user.type == "Non-Member"
+                            span.text-primary #{profileStat}
+                          if user.type == "Member"
+                            span.text-primary #{profileStatMember}
               .col-xl-4.mb-4
                 a.card.lift(href='/address')
                   .card-body.d-flex.justify-content-center.flex-column
@@ -91,28 +103,32 @@ block content
                         h5 Financial Questionnaire
                         .text-muted.small
                           | Status: 
-                          span.text-primary #{workAndAccountStat}
-            .row
-              .col-xl-4.mb-4
-                a.card.lift(href='/documents')
-                  .card-body.d-flex.justify-content-center.flex-column
-                    .d-flex.align-items-center.justify-content-between
-                      .mr-3
-                        .mb-2
-                          i.fas.fa-id-card.fa-2x
-                        h5 Identity Documentation
-                        .text-muted.small
-                          | Status: 
-                          span.text-primary #{documentsStat}
-              .col-xl-4.mb-4
-                a.card.lift(href='/declaration')
-                  .card-body.d-flex.justify-content-center.flex-column
-                    .d-flex.align-items-center.justify-content-between
-                      .mr-3
-                        .mb-2
-                          i.fas.fa-clipboard-check.fa-2x
-                        h5 KYC Declaration
-                        .text-muted.small
-                          | Status: 
-                          span.text-primary #{signatureStat}
+                          if user.type == "Non-Member"
+                            span.text-primary #{workAndAccountStat}
+                          if user.type == "Member"
+                            span.text-primary #{workAndAccountStatMember}
+            if user.userId.type == "Borrower" && user.type == "Non-Member"
+              .row
+                .col-xl-4.mb-4
+                  a.card.lift(href='/documents')
+                    .card-body.d-flex.justify-content-center.flex-column
+                      .d-flex.align-items-center.justify-content-between
+                        .mr-3
+                          .mb-2
+                            i.fas.fa-id-card.fa-2x
+                          h5 Identity Documentation
+                          .text-muted.small
+                            | Status: 
+                            span.text-primary #{documentsStat}
+                .col-xl-4.mb-4
+                  a.card.lift(href='/declaration')
+                    .card-body.d-flex.justify-content-center.flex-column
+                      .d-flex.align-items-center.justify-content-between
+                        .mr-3
+                          .mb-2
+                            i.fas.fa-clipboard-check.fa-2x
+                          h5 KYC Declaration
+                          .text-muted.small
+                            | Status: 
+                            span.text-primary #{signatureStat}
       include ../partials/page-footer
