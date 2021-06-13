@@ -344,7 +344,31 @@ const getDownloadFinancialReport = (req, res) => {
     }
     let printer = new PdfPrinter(fonts);
 
-    function downloadFinancial(contributions) {
+    function downloadFinancial(data) {
+        let contributions = data.summary.filter(obj => obj._id == "Contributions").length > 0 ? data.summary.filter(obj => obj._id == "Contributions")[0].total["$numberDecimal"] : 0.00;
+        let withdrawals = data.summary.filter(obj => obj._id == "Withdrawals").length > 0 ? data.summary.filter(obj => obj._id == "Withdrawals")[0].total["$numberDecimal"] : 0.00;
+        let totalCapital = parseFloat(contributions) + parseFloat(withdrawals);
+        let monthToday = (new Date()).getMonth() + 1;
+        let aveCapital = parseFloat(totalCapital) / monthToday;
+        let loansReleased = data.summary.filter(obj => obj._id == "Release").length > 0 ? data.summary.filter(obj => obj._id == "Release")[0].total["$numberDecimal"] : 0.00;
+        let loansRepayments = data.summary.filter(obj => obj._id == "Repayments").length > 0 ? data.summary.filter(obj => obj._id == "Repayments")[0].total["$numberDecimal"] : 0.00;
+        let loansReceivables = parseFloat(loansReleased) + parseFloat(loansRepayments);
+        let interestPaidByMember = data.interest.filter(obj => obj._id[0] == "Member").length > 0 ? data.interest.filter(obj => obj._id[0] == "Member")[0].totalInterestPaid["$numberDecimal"] : 0.00;
+        let membershipFees = data.summary.filter(obj => obj._id == "Fees").length > 0 ? data.summary.filter(obj => obj._id == "Fees")[0].total["$numberDecimal"] : 0.00;
+        let otherIncome = parseFloat(loansRepayments) + parseFloat(loansReleased) - parseFloat(interestPaidByMember);
+        let totalOtherIncome = parseFloat(membershipFees) + parseFloat(otherIncome);
+        let totalIncome = parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome);
+        let expenses = data.summary.filter(obj => obj._id == "Expenses").length > 0 ? data.summary.filter(obj => obj._id == "Expenses")[0].total["$numberDecimal"] : 0.00;
+        let balance = parseFloat(contributions) + parseFloat(withdrawals) + parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
+        let netSurplusBefore = parseFloat(totalIncome) + parseFloat(expenses);
+        let reservedFunds = parseFloat(netSurplusBefore) * .10;
+        let netSurplusAfter = parseFloat(netSurplusBefore) - parseFloat(reservedFunds);
+        let sumOfShareCapitalAndIncome = parseFloat(aveCapital) + parseFloat(interestPaidByMember);
+        let aveShareCapital = parseFloat(aveCapital) / parseFloat(sumOfShareCapitalAndIncome);
+        let aveIncome = parseFloat(interestPaidByMember) / parseFloat(sumOfShareCapitalAndIncome);
+        let dividend = (aveShareCapital) ? parseFloat(aveShareCapital) * parseFloat(netSurplusAfter) : 0.00;
+        let patronageRefund = (aveIncome) ? parseFloat(aveIncome) * parseFloat(netSurplusAfter) : 0.00;
+        let totalbalance = (balance) ? parseFloat(balance) - parseFloat(netSurplusAfter) : 0.00;
         let docDefinition = {
             pageOrientation: 'landscape',
             pageMargins: [40, 20, 40, 40],
@@ -391,7 +415,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ 20500.00',
+                                    text: '₱ ' + parseFloat(contributions).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, false, false]
                                 },
@@ -406,7 +430,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ 150.00',
+                                    text: '₱ ' + parseFloat(interestPaidByMember).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, true, false]
                                 },
@@ -417,7 +441,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ -1300.00',
+                                    text: '₱ ' + parseFloat(withdrawals).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, false, false]
                                 },
@@ -443,7 +467,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ 19200.00',
+                                    text: '₱ ' + parseFloat(totalCapital).toFixed(2),
                                     style: 'medium',
                                     border: [false, true, false, false]
                                 },
@@ -458,7 +482,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ 2000.00',
+                                    text: '₱ ' + parseFloat(membershipFees).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, true, false]
                                 }
@@ -469,7 +493,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, true]
                                 },
                                 {
-                                    text: '₱ 3200.00',
+                                    text: '₱ ' + parseFloat(aveCapital).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, false, true]
                                 },
@@ -484,7 +508,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: ['\n', '₱ -18319.44'],
+                                    text: ['\n', '₱ ' + parseFloat(otherIncome).toFixed(2)],
                                     style: 'subValue',
                                     border: [false, false, true, false]
                                 }
@@ -507,7 +531,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -16319.44',
+                                    text: '₱ ' + parseFloat(totalOtherIncome).toFixed(2),
                                     style: 'subValue',
                                     border: [false, true, true, false]
                                 }
@@ -518,7 +542,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ -19800.00',
+                                    text: '₱ ' + parseFloat(loansReleased).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, false, false]
                                 },
@@ -533,7 +557,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -16169.44',
+                                    text: '₱ ' + parseFloat(totalIncome).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, true, false]
                                 }
@@ -544,7 +568,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ 1630.56',
+                                    text: '₱ ' + parseFloat(loansRepayments).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, false, false]
                                 },
@@ -559,7 +583,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -100.00',
+                                    text: '₱ ' + parseFloat(expenses).toFixed(2),
                                     style: 'subValue',
                                     border: [false, false, true, false]
                                 }
@@ -570,7 +594,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ -18169.44',
+                                    text: '₱ ' + parseFloat(loansReceivables).toFixed(2),
                                     style: 'medium',
                                     border: [false, true, false, false]
                                 },
@@ -585,7 +609,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -16269.44',
+                                    text: '₱ ' + parseFloat(netSurplusBefore).toFixed(2),
                                     style: 'medium',
                                     border: [false, true, true, false]
                                 }
@@ -608,7 +632,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -1626.94',
+                                    text: '₱ ' + parseFloat(reservedFunds).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, true, false]
                                 }
@@ -634,7 +658,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -14642.50',
+                                    text: '₱ ' + parseFloat(netSurplusAfter).toFixed(2),
                                     style: 'medium',
                                     border: [false, true, true, false]
                                 }
@@ -645,7 +669,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, false]
                                 },
                                 {
-                                    text: '₱ 2930.56',
+                                    text: '₱ ' + parseFloat(balance).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, false, false]
                                 },
@@ -660,7 +684,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, false]
                                 },
                                 {
-                                    text: '₱ -13986.86',
+                                    text: '₱ ' + parseFloat(dividend).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, true, false]
                                 }
@@ -671,7 +695,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [true, false, false, true]
                                 },
                                 {
-                                    text: '₱ 17573.06',
+                                    text: '₱ ' + parseFloat(totalbalance).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, false, true]
                                 },
@@ -686,7 +710,7 @@ const getDownloadFinancialReport = (req, res) => {
                                     border: [false, false, false, true]
                                 },
                                 {
-                                    text: '₱ -655.63',
+                                    text: '₱ ' + parseFloat(patronageRefund).toFixed(2),
                                     style: 'medium',
                                     border: [false, false, true, true]
                                 }
@@ -743,10 +767,10 @@ const getDownloadFinancialReport = (req, res) => {
                 }
             }
         };
-
+        let yearNow = (new Date()).getFullYear();
         // Make sure the browser knows this is a PDF.
         res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=financial-statement.pdf`);
+        res.set('Content-Disposition', `attachment; filename=financial-statement-` + yearNow + `.pdf`);
         res.set('Content-Description: File Transfer');
         res.set('Cache-Control: no-cache');
         // Create the PDF and pipe it to the response object.
@@ -756,7 +780,7 @@ const getDownloadFinancialReport = (req, res) => {
     }
 
     let yearNow = (new Date()).getFullYear();
-    path = '/api/transactions/contributions/' + yearNow;
+    path = '/api/transactions/summary/type/' + yearNow;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'GET',
@@ -769,17 +793,48 @@ const getDownloadFinancialReport = (req, res) => {
         requestOptions,
         (err, {
             statusCode
-        }, contributions) => {
+        }, summary) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when loading list of contributions. Please try again later.'
+                    msg: 'There was an error when loading summary of transactions type. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                downloadFinancial(contributions)
+                path = '/api/loans/summary/type/' + yearNow;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, interest) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading summary of loans type. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            downloadFinancial({
+                                summary: summary,
+                                interest: interest
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: interest.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
-                    msg: contributions.message
+                    msg: summary.message
                 });
                 return res.redirect('back');
             }
