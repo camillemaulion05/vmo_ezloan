@@ -18,8 +18,9 @@ block content
                     circle(cx='12' cy='5' r='1')
                     circle(cx='12' cy='19' r='1')
                 .dropdown-menu.dropdown-menu-right.animated--fade-in-up(aria-labelledby='areaChartDropdownExample' x-placement='top-end' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-116px, -182px, 0px);')
-                  a#addNewWithdrawal.dropdown-item(href='#' data-toggle='modal' data-target='#addWithdrawalModal') Add New Withdrawal Request
-                  .dropdown-divider
+                  if user.userId.type == "Admin"
+                    a#addNewWithdrawal.dropdown-item(href='#' data-toggle='modal' data-target='#addWithdrawalModal') Add New Withdrawal Request
+                    .dropdown-divider
                   a.dropdown-item(href='/download/report/withdrawals/all') List of Withdrawal Requests
             .card-body
               .table-responsive

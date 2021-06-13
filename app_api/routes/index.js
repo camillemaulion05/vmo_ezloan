@@ -188,8 +188,8 @@ router
 router.get('/loans/:loanid/schedules/:scheduleid', auth, middleware.isSafe, ctrlLoans.loansSchedulesReadOne);
 router.get('/loans/:loanid/due', auth, middleware.isSafe, ctrlLoans.loansDueListByLoan);
 router.get('/loans/:loanid/pastDue', auth, middleware.isSafe, ctrlLoans.loansPastDueListByLoan);
-router.get('/loans/due/repayments', auth, middleware.isAdmin, ctrlLoans.loansDueRepaymentsList);
-router.get('/loans/pastMaturity/repayments', auth, middleware.isAdmin, ctrlLoans.loansPastMaturityRepaymentsList);
+router.get('/loans/due/repayments', auth, middleware.isModerator, ctrlLoans.loansDueRepaymentsList);
+router.get('/loans/pastMaturity/repayments', auth, middleware.isModerator, ctrlLoans.loansPastMaturityRepaymentsList);
 router.get('/loans/summary/:year', auth, middleware.isModerator, ctrlLoans.loansSummary);
 router.get('/loans/summary/type/:year', auth, middleware.isModerator, ctrlLoans.loansTypeSummary);
 router.get('/loans/interest/report/:year', auth, middleware.isModerator, ctrlLoans.loansInterestReport);

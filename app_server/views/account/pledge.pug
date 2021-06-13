@@ -1,0 +1,79 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.mb-4
+            .card-body
+              #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                .row.justify-content-center
+                  .col-xxl-6.col-xl-8
+                    h3.text-primary Capital Build-up Pledge
+                    form(method='POST')
+                      input(type='hidden', name='_csrf', value=_csrf)
+                      .custom-control.custom-checkbox
+                        if (user.signature)
+                          input#termsAndCondition.custom-control-input(type='checkbox' name='termsAndCondition' value='true' checked='')
+                        else
+                          input#termsAndCondition.custom-control-input(type='checkbox' name='termsAndCondition' value='false')
+                        label.custom-control-label(for='termsAndCondition')
+                          | I agree with the 
+                          a Terms and Conditions
+                          |  of Calamba VMO Coop.
+                      .custom-control.custom-checkbox
+                        if (user.signature)
+                          input#privacyPolicy.custom-control-input(type='checkbox' name='privacyPolicy' value='true' checked='')
+                        else
+                          input#privacyPolicy.custom-control-input(type='checkbox' name='privacyPolicy' value='false')
+                        label.custom-control-label(for='privacyPolicy')
+                          | I accept the 
+                          a Privacy Policy
+                          |  of Calamba VMO Coop.
+                      .custom-control.custom-checkbox
+                        if (user.signature)
+                          input#soa.custom-control-input(type='checkbox' name='soa'  value='true' checked='')
+                        else
+                          input#soa.custom-control-input(type='checkbox' name='soa' value='false')
+                        label.custom-control-label(for='soa')
+                          | I hereby subscribe to the Calamba VMO Multi-Purpose Cooperative common shares at P600 per share and my contribution per  payday for continued capital build up is: 
+                      .form-group.md-4.pl-4
+                        .form-check.form-check-inline
+                          if (parseFloat(user.sharesPerPayDay) == 300.00)
+                            input#regularOption.form-check-input(type='radio' name='sharesPerPayDayOption' value='Regular' checked='')
+                          else
+                            input#regularOption.form-check-input(type='radio' name='sharesPerPayDayOption' value='Regular')
+                          label.form-check-label(for='regularOption') ₱300 / per payday
+                        .form-check.form-check-inline
+                          if (parseFloat(user.sharesPerPayDay) > 300.00)
+                            input#otherOption.form-check-input(type='radio' name='sharesPerPayDayOption' value='Others' checked='')
+                          else
+                            input#otherOption.form-check-input(type='radio' name='sharesPerPayDayOption' value='Others')
+                          input#sharesPerPayDay.form-control.mr-2(type="number" step="100" min="400" name='sharesPerPayDay' value=(parseFloat(user.sharesPerPayDay) > 300.00) ? user.sharesPerPayDay : "" disabled='')
+                          label.form-check-label(for='otherOption') Amount of your choice
+                      .custom-control.custom-checkbox
+                        if (user.signature)
+                          input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='true' checked='')
+                        else
+                          input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='false')
+                        label.custom-control-label(for='letterOfAuthorization')
+                          | I willfully sign a Letter of Authorization and allow Calamba VMO Coop to use it for salary deduction for capital contribution and any future loan amortization to be paid to  Calamba VMO Coop hereafter.
+                      hr.my-4
+                      fieldset
+                        legend.text-primary Signature
+                        .form-group.mb-md-0
+                          .card
+                            .text-center
+                              img#defaultSignature.card-img.img-link.kbw-signature(style='width: 15rem;' src=(user.signature) ? user.signature : '/img/icon_signature.png' alt='' data-toggle='modal' data-target='#signatureModal')
+                          p.d-none
+                            span.demoLabel Signature Output:
+                            textarea#signatureDataURL.ui-state-active(rows='5' cols='50' readonly='true' name='signatureDataURL' value=(user.signature) ? user.signature : '')
+                      hr.my-4
+                      .d-flex.justify-content-between
+                        a.btn.btn-light(type='button' href='/verifications') Back
+                        button.btn.btn-primary(type='submit') Submit
+    include ../partials/page-footer

@@ -222,14 +222,23 @@ const borrowerSchema = mongoose.Schema({
         filename: String,
         contentType: String
     }],
-    beneficiaries: [{
-        fullName: String,
-        relationship: {
-            type: String,
-            enum: ["Parent", "Sibling", "Spouse", "Child"]
-        },
-        dateOfBirth: Date
-    }], //For Members Only
+    beneficiaries: {
+        fullName1: String,
+        relationship1: String,
+        dateOfBirth1: Date,
+        fullName2: String,
+        relationship2: String,
+        dateOfBirth2: Date,
+        fullName3: String,
+        relationship3: String,
+        dateOfBirth3: Date,
+        fullName4: String,
+        relationship4: String,
+        dateOfBirth4: Date,
+        fullName5: String,
+        relationship5: String,
+        dateOfBirth5: Date,
+    }, //For Members Only
     totalCreditLimit: {
         type: String,
         default: "0.00"

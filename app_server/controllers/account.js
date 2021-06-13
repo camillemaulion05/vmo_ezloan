@@ -2957,33 +2957,35 @@ const getDownloadBorrowerInfo = (req, res) => {
                             border: [true, false, true, true],
                             colSpan: 2
                         }, {}
-                    ]
+                    ],
+
                 ]
             },
             pageBreak: 'after'
         };
         let beneCount = 1;
-        user.beneficiaries.forEach(d => {
+        while (beneCount <= 5) {
             let beneficiarytRow = [{
-                    text: beneCount + '. ' + d.fullName,
+                    text: (user.beneficiaries["fullName" + beneCount]) ? beneCount + '. ' + user.beneficiaries["fullName" + beneCount] : beneCount + '. ',
                     style: 'medium',
                     border: [true, false, false, true],
                     colSpan: 3
                 }, {}, {},
                 {
-                    text: (d.dateOfBirth) ? parseDate(d.dateOfBirth) : "",
+                    text: (user.beneficiaries["dateOfBirth" + beneCount]) ? parseDate(user.beneficiaries["dateOfBirth" + beneCount]) : "",
                     style: 'medium',
                     border: [true, false, false, true],
                 },
                 {
-                    text: d.relationship,
+                    text: user.beneficiaries["relationship" + beneCount],
                     style: 'medium',
                     border: [true, false, true, true],
                     colSpan: 2
                 }, {}
             ];
+            beneCount++;
             beneficiariesTable.table.body.push(beneficiarytRow);
-        });
+        }
         let addtionalTable1 = {
             table: {
                 headerRows: 1,
@@ -2996,7 +2998,7 @@ const getDownloadBorrowerInfo = (req, res) => {
                         fillColor: 'black'
                     }],
                     [{
-                        text: 'CAPITAL BUILD-UP PLEDDGE',
+                        text: 'CAPITAL BUILD-UP PLEDGE',
                         bold: true,
                         border: [true, false, true, false],
                         alignment: 'center'
@@ -3799,6 +3801,149 @@ const postVerificationsDeclaration = (req, res) => {
         },
         json: {
             signature: req.body.signatureDataURL
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your KYC declaration. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'KYC declaration has been updated.'
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getVerificationsBeneficiaries = (req, res) => {
+    getUserDetails(req, res, 'account/beneficiaries', 'Account Management - Verifications - Beneficiaries');
+};
+
+const postVerificationsBeneficiaries = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.fullName1)) validationErrors.push({
+        msg: 'Beneficiary 1 Fullname cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.relationship1)) validationErrors.push({
+        msg: 'Beneficiary 1 Relationship cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.dateOfBirth1)) validationErrors.push({
+        msg: 'Beneficiary 1 Birth date cannot be blank.'
+    });
+    if (!validator.isDate(req.body.dateOfBirth1)) validationErrors.push({
+        msg: 'Enter a valid date.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            beneficiaries: {
+                fullName1: req.body.fullName1,
+                relationship1: req.body.relationship1,
+                dateOfBirth1: req.body.dateOfBirth1,
+                fullName2: req.body.fullName2,
+                relationship2: req.body.relationship2,
+                dateOfBirth2: req.body.dateOfBirth2,
+                fullName3: req.body.fullName3,
+                relationship3: req.body.relationship3,
+                dateOfBirth3: req.body.dateOfBirth3,
+                fullName4: req.body.fullName4,
+                relationship4: req.body.relationship4,
+                dateOfBirth4: req.body.dateOfBirth4,
+                fullName5: req.body.fullName5,
+                relationship5: req.body.relationship5,
+                dateOfBirth5: req.body.dateOfBirth5
+            }
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, borrower) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when updating your Beneficiaries. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                req.flash('success', {
+                    msg: 'Beneficiaries has been updated.'
+                });
+                return res.redirect('back');
+            } else {
+                req.flash('errors', {
+                    msg: borrower.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getVerificationsPledge = (req, res) => {
+    getUserDetails(req, res, 'account/pledge', 'Account Management - Verifications - KYC Declaration');
+};
+
+const postVerificationsPledge = (req, res) => {
+    const validationErrors = [];
+    if (req.body.termsAndCondition != 'true') validationErrors.push({
+        msg: 'You must agree with the Terms and Condition.'
+    });
+    if (req.body.privacyPolicy != 'true') validationErrors.push({
+        msg: 'You must accept the Privacy Policy.'
+    });
+    if (req.body.soa != 'true') validationErrors.push({
+        msg: 'You must subscribe to the Calamba VMO Multi-Purpose Cooperative common shares at P600 per share.'
+    });
+    if (req.body.letterOfAuthorization != 'true') validationErrors.push({
+        msg: 'You must sign a Letter of Authorization.'
+    });
+    if (validator.isEmpty(req.body.sharesPerPayDayOption)) validationErrors.push({
+        msg: 'Amount of shares cannot be blank.'
+    });
+    if (req.body.sharesPerPayDayOption == "Others" && validator.isEmpty(req.body.sharesPerPayDay)) validationErrors.push({
+        msg: 'Amount of shares cannot be blank.'
+    });
+    if (validator.isEmpty(req.body.signatureDataURL)) validationErrors.push({
+        msg: 'Signature cannot be blank.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
+    path = '/api/borrowers/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'PUT',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            signature: req.body.signatureDataURL,
+            sharesPerPayDay: (req.body.sharesPerPayDayOption == "Regular") ? "300.00" : (req.body.sharesPerPayDay) ? req.body.sharesPerPayDay : ""
         }
     };
     request(
@@ -13052,6 +13197,10 @@ module.exports = {
     postVerificationsDocuments,
     getVerificationsDeclaration,
     postVerificationsDeclaration,
+    getVerificationsBeneficiaries,
+    postVerificationsBeneficiaries,
+    getVerificationsPledge,
+    postVerificationsPledge,
     getCredits,
     postCredits,
     postRepayment,

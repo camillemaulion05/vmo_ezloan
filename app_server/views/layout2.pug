@@ -735,7 +735,7 @@ html
             });
         });
 
-    if title.indexOf("Account Management - Verifications") != -1
+    if title == "Account Management - Verifications"
       script(src='/js/chart-pie.js')
 
     if title.indexOf("Manage Dashboard") != -1
@@ -785,17 +785,17 @@ html
       script.
         $(function () {
           let radioChecked = function () {
-            if ($('input[name="identity2Options"]:checked')[0].value == "Company") {
+            if ($('input[name="identity2Options"]:checked').val() == "Company") {
               $('.company-id').show();
               $('.coe').hide();
-            } else if ($('input[name="identity2Options"]:checked')[0].value == "COE") {
+            } else if ($('input[name="identity2Options"]:checked').val() == "COE") {
               $('.coe').show();
               $('.company-id').hide();
             }
-            if ($('input[name="identity3Options"]:checked')[0].value == "Payslip") {
+            if ($('input[name="identity3Options"]:checked').val() == "Payslip") {
               $('.payslip').show();
               $('.bir').hide();
-            } else if ($('input[name="identity3Options"]:checked')[0].value == "BIR") {
+            } else if ($('input[name="identity3Options"]:checked').val() == "BIR") {
               $('.bir').show();
               $('.payslip').hide();
             }
@@ -926,6 +926,16 @@ html
           };
           boxChecked();
           $('input[type="checkbox"]').on("click", boxChecked);
+           let radioChecked = function () {
+            if ($('input[name="sharesPerPayDayOption"]:checked').val() == "Regular") {
+              $("input[name=sharesPerPayDay]").val("");
+              $("input[name=sharesPerPayDay]").prop('disabled', true);
+            } else if ($('input[name="sharesPerPayDayOption"]:checked').val() == "Others") {
+              $("input[name=sharesPerPayDay]").prop('disabled', false);
+            }
+          };
+          radioChecked();
+          $("input[type=radio]").on("click", radioChecked);
           var sig = $('#sig').signature();
           $('#clear').on('click',function () {
             sig.signature('clear');

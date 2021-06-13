@@ -1,0 +1,117 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.mb-4
+            .card-body
+              #wizard2.tab-pane.py-5.py-xl-10.fade.active.show(role='tabpanel' aria-labelledby='wizard2-tab')
+                .row.justify-content-center
+                  .col-xxl-6.col-xl-8
+                    form(method='POST')
+                      input(type='hidden', name='_csrf', value=_csrf)
+                      fieldset#beneSet
+                        legend Beneficiary Details
+                        - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                        - let relationship = ['Parent', 'Sibling', 'Spouse', 'Child']
+                        .form-row#addBene1
+                          .form-group.col-md-4
+                            label.small.mb-1(for='fullName1') First name
+                            input#fullName1.form-control(type='text' name='fullName1' maxlength='60' value=(user.beneficiaries && user.beneficiaries.fullName1) ? user.beneficiaries.fullName1 : "")
+                          .form-group.col-md-4
+                            label.small.mb-1(for='relationship1') Relationship
+                            select#relationship1.form-control.selectpicker(type='text' name='relationship1')
+                              option(value='' selected='') Relationship
+                              for x in relationship
+                                if (user.beneficiaries && x == user.beneficiaries.relationship1) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4
+                            label.small.mb-1(for='dateOfBirth1') Birthdate
+                            - let date1 = (new Date((user.beneficiaries) ? user.beneficiaries.dateOfBirth1 : '')).toString().split(' ');
+                            - let dateOfBirth1 =  (user.beneficiaries && user.beneficiaries.dateOfBirth1) ? date1[3] + '-' + month2[month.indexOf(date1[1])] + '-' + date1[2] : "";
+                            input#dateOfBirth1.form-control(type='date' name='dateOfBirth1' value=dateOfBirth1)
+                        .form-row#addBene2
+                          .form-group.col-md-4
+                            label.small.mb-1(for='fullName2') First name
+                            input#fullName2.form-control(type='text' name='fullName2' maxlength='60' value=(user.beneficiaries && user.beneficiaries.fullName2) ? user.beneficiaries.fullName2 : "")
+                          .form-group.col-md-4
+                            label.small.mb-1(for='relationship2') Relationship
+                            select#relationship2.form-control.selectpicker(type='text' name='relationship2')
+                              option(value='' selected='') Relationship
+                              for x in relationship
+                                if (user.beneficiaries && x == user.beneficiaries.relationship2) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4
+                            label.small.mb-1(for='dateOfBirth2') Birthdate
+                            - let date2 = (new Date((user.beneficiaries) ? user.beneficiaries.dateOfBirth2 : '')).toString().split(' ');
+                            - let dateOfBirth2 =  (user.beneficiaries && user.beneficiaries.dateOfBirth2) ? date2[3] + '-' + month2[month.indexOf(date2[1])] + '-' + date2[2] : "";
+                            input#dateOfBirth2.form-control(type='date' name='dateOfBirth2' value=dateOfBirth2)
+                        .form-row#addBene3
+                          .form-group.col-md-4
+                            label.small.mb-1(for='fullName3') First name
+                            input#fullName3.form-control(type='text' name='fullName3' maxlength='60' value=(user.beneficiaries && user.beneficiaries.fullName3) ? user.beneficiaries.fullName3 : "")
+                          .form-group.col-md-4
+                            label.small.mb-1(for='relationship3') Relationship
+                            select#relationship3.form-control.selectpicker(type='text' name='relationship3')
+                              option(value='' selected='') Relationship
+                              for x in relationship
+                                if (user.beneficiaries && x == user.beneficiaries.relationship3) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4
+                            label.small.mb-1(for='dateOfBirth3') Birthdate
+                            - let date3 = (new Date((user.beneficiaries) ? user.beneficiaries.dateOfBirth3 : '')).toString().split(' ');
+                            - let dateOfBirth3 =  (user.beneficiaries && user.beneficiaries.dateOfBirth3) ? date3[3] + '-' + month2[month.indexOf(date3[1])] + '-' + date3[2] : "";
+                            input#dateOfBirth3.form-control(type='date' name='dateOfBirth3' value=dateOfBirth3)
+                        .form-row#addBene4
+                          .form-group.col-md-4
+                            label.small.mb-1(for='fullName4') First name
+                            input#fullName4.form-control(type='text' name='fullName4' maxlength='60' value=(user.beneficiaries && user.beneficiaries.fullName4) ? user.beneficiaries.fullName4 : "")
+                          .form-group.col-md-4
+                            label.small.mb-1(for='relationship4') Relationship
+                            select#relationship4.form-control.selectpicker(type='text' name='relationship4')
+                              option(value='' selected='') Relationship
+                              for x in relationship
+                                if (user.beneficiaries && x == user.beneficiaries.relationship4) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4
+                            label.small.mb-1(for='dateOfBirth4') Birthdate
+                            - let date4 = (new Date((user.beneficiaries) ? user.beneficiaries.dateOfBirth4 : '')).toString().split(' ');
+                            - let dateOfBirth4 =  (user.beneficiaries && user.beneficiaries.dateOfBirth4) ? date4[3] + '-' + month2[month.indexOf(date4[1])] + '-' + date4[2] : "";
+                            input#dateOfBirth4.form-control(type='date' name='dateOfBirth4' value=dateOfBirth4)
+                        .form-row#addBene5
+                          .form-group.col-md-4
+                            label.small.mb-1(for='fullName5') First name
+                            input#fullName5.form-control(type='text' name='fullName5' maxlength='60' value=(user.beneficiaries && user.beneficiaries.fullName5) ? user.beneficiaries.fullName5 : "")
+                          .form-group.col-md-4
+                            label.small.mb-1(for='relationship5') Relationship
+                            select#relationship5.form-control.selectpicker(type='text' name='relationship5')
+                              option(value='' selected='') Relationship
+                              for x in relationship
+                                if (user.beneficiaries && x == user.beneficiaries.relationship5) 
+                                  option(value=x selected) #{x}
+                                else
+                                  option(value=x) #{x}
+                          .form-group.col-md-4
+                            label.small.mb-1(for='dateOfBirth5') Birthdate
+                            - let date5 = (new Date((user.beneficiaries) ? user.beneficiaries.dateOfBirth5 : '')).toString().split(' ');
+                            - let dateOfBirth5 =  (user.beneficiaries && user.beneficiaries.dateOfBirth5) ? date5[3] + '-' + month2[month.indexOf(date5[1])] + '-' + date5[2] : "";
+                            input#dateOfBirth5.form-control(type='date' name='dateOfBirth5' value=dateOfBirth5)
+                        hr.my-4
+                        .d-flex.justify-content-between
+                          a.btn.btn-light(type='button' href='/verifications') Back
+                          button.btn.btn-primary(type='submit') Submit
+    include ../partials/page-footer

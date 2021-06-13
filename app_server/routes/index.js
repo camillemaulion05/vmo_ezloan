@@ -95,6 +95,16 @@ router
     .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsDeclaration);
 
 router
+    .route('/beneficiaries')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsBeneficiaries)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsBeneficiaries);
+
+router
+    .route('/pledge')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsPledge)
+    .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsPledge);
+
+router
     .route('/credits')
     .get(passportConfig.isAuthenticated, ctrlAccount.getCredits)
     .post(passportConfig.isAuthenticated, ctrlAccount.postCredits);

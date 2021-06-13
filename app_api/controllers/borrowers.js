@@ -226,7 +226,22 @@ const borrowersUpdateOne = (req, res) => {
 
                     borrower.additionalDocuments = (req.body.additionalDocuments) ? req.body.additionalDocuments : borrower.additionalDocuments;
 
-                    borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
+                    borrower.beneficiaries.fullName1 = (req.body.beneficiaries && req.body.beneficiaries.fullName1) ? req.body.beneficiaries.fullName1 : borrower.beneficiaries.fullName1;
+                    borrower.beneficiaries.relationship1 = (req.body.beneficiaries && req.body.beneficiaries.relationship1) ? req.body.beneficiaries.relationship1 : borrower.beneficiaries.relationship1;
+                    borrower.beneficiaries.dateOfBirth1 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth1) ? req.body.beneficiaries.dateOfBirth1 : borrower.beneficiaries.dateOfBirth1;
+                    borrower.beneficiaries.fullName2 = (req.body.beneficiaries && req.body.beneficiaries.fullName2) ? req.body.beneficiaries.fullName2 : borrower.beneficiaries.fullName2;
+                    borrower.beneficiaries.relationship2 = (req.body.beneficiaries && req.body.beneficiaries.relationship2) ? req.body.beneficiaries.relationship2 : borrower.beneficiaries.relationship2;
+                    borrower.beneficiaries.dateOfBirth2 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth2) ? req.body.beneficiaries.dateOfBirth2 : borrower.beneficiaries.dateOfBirth2;
+                    borrower.beneficiaries.fullName3 = (req.body.beneficiaries && req.body.beneficiaries.fullName3) ? req.body.beneficiaries.fullName3 : borrower.beneficiaries.fullName3;
+                    borrower.beneficiaries.relationship3 = (req.body.beneficiaries && req.body.beneficiaries.relationship3) ? req.body.beneficiaries.relationship3 : borrower.beneficiaries.relationship3;
+                    borrower.beneficiaries.dateOfBirth3 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth3) ? req.body.beneficiaries.dateOfBirth3 : borrower.beneficiaries.dateOfBirth3;
+                    borrower.beneficiaries.fullName4 = (req.body.beneficiaries && req.body.beneficiaries.fullName4) ? req.body.beneficiaries.fullName4 : borrower.beneficiaries.fullName4;
+                    borrower.beneficiaries.relationship4 = (req.body.beneficiaries && req.body.beneficiaries.relationship4) ? req.body.beneficiaries.relationship4 : borrower.beneficiaries.relationship4;
+                    borrower.beneficiaries.dateOfBirth4 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth4) ? req.body.beneficiaries.dateOfBirth4 : borrower.beneficiaries.dateOfBirth4;
+                    borrower.beneficiaries.fullName5 = (req.body.beneficiaries && req.body.beneficiaries.fullName5) ? req.body.beneficiaries.fullName5 : borrower.beneficiaries.fullName5;
+                    borrower.beneficiaries.relationship5 = (req.body.beneficiaries && req.body.beneficiaries.relationship5) ? req.body.beneficiaries.relationship5 : borrower.beneficiaries.relationship5;
+                    borrower.beneficiaries.dateOfBirth5 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth5) ? req.body.beneficiaries.dateOfBirth5 : borrower.beneficiaries.dateOfBirth5;
+
                     if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
                     borrower.reviewedDate = (req.body.reviewedBy) ? Date.now() : borrower.reviewedDate;
@@ -627,7 +642,22 @@ const borrowersUpdateOneByUser = (req, res) => {
 
                     borrower.additionalDocuments = (req.body.additionalDocuments) ? req.body.additionalDocuments : borrower.additionalDocuments;
 
-                    borrower.beneficiaries = (req.body.beneficiaries) ? req.body.beneficiaries : borrower.beneficiaries;
+                    borrower.beneficiaries.fullName1 = (req.body.beneficiaries && req.body.beneficiaries.fullName1) ? req.body.beneficiaries.fullName1 : borrower.beneficiaries.fullName1;
+                    borrower.beneficiaries.relationship1 = (req.body.beneficiaries && req.body.beneficiaries.relationship1) ? req.body.beneficiaries.relationship1 : borrower.beneficiaries.relationship1;
+                    borrower.beneficiaries.dateOfBirth1 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth1) ? req.body.beneficiaries.dateOfBirth1 : borrower.beneficiaries.dateOfBirth1;
+                    borrower.beneficiaries.fullName2 = (req.body.beneficiaries && req.body.beneficiaries.fullName2) ? req.body.beneficiaries.fullName2 : borrower.beneficiaries.fullName2;
+                    borrower.beneficiaries.relationship2 = (req.body.beneficiaries && req.body.beneficiaries.relationship2) ? req.body.beneficiaries.relationship2 : borrower.beneficiaries.relationship2;
+                    borrower.beneficiaries.dateOfBirth2 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth2) ? req.body.beneficiaries.dateOfBirth2 : borrower.beneficiaries.dateOfBirth2;
+                    borrower.beneficiaries.fullName3 = (req.body.beneficiaries && req.body.beneficiaries.fullName3) ? req.body.beneficiaries.fullName3 : borrower.beneficiaries.fullName3;
+                    borrower.beneficiaries.relationship3 = (req.body.beneficiaries && req.body.beneficiaries.relationship3) ? req.body.beneficiaries.relationship3 : borrower.beneficiaries.relationship3;
+                    borrower.beneficiaries.dateOfBirth3 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth3) ? req.body.beneficiaries.dateOfBirth3 : borrower.beneficiaries.dateOfBirth3;
+                    borrower.beneficiaries.fullName4 = (req.body.beneficiaries && req.body.beneficiaries.fullName4) ? req.body.beneficiaries.fullName4 : borrower.beneficiaries.fullName4;
+                    borrower.beneficiaries.relationship4 = (req.body.beneficiaries && req.body.beneficiaries.relationship4) ? req.body.beneficiaries.relationship4 : borrower.beneficiaries.relationship4;
+                    borrower.beneficiaries.dateOfBirth4 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth4) ? req.body.beneficiaries.dateOfBirth4 : borrower.beneficiaries.dateOfBirth4;
+                    borrower.beneficiaries.fullName5 = (req.body.beneficiaries && req.body.beneficiaries.fullName5) ? req.body.beneficiaries.fullName5 : borrower.beneficiaries.fullName5;
+                    borrower.beneficiaries.relationship5 = (req.body.beneficiaries && req.body.beneficiaries.relationship5) ? req.body.beneficiaries.relationship5 : borrower.beneficiaries.relationship5;
+                    borrower.beneficiaries.dateOfBirth5 = (req.body.beneficiaries && req.body.beneficiaries.dateOfBirth5) ? req.body.beneficiaries.dateOfBirth5 : borrower.beneficiaries.dateOfBirth5;
+
                     if ("Verified" == borrower.status) borrower.totalCreditLimit = (req.body.totalCreditLimit) ? req.body.totalCreditLimit : borrower.totalCreditLimit;
                     borrower.reviewedBy = (req.body.reviewedBy) ? req.body.reviewedBy : borrower.reviewedBy;
                     borrower.reviewedDate = (req.body.reviewedBy) ? Date.now() : borrower.reviewedDate;

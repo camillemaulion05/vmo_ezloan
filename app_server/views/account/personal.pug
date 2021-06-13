@@ -95,12 +95,21 @@ block content
                               span.input-group-text +63
                             input#mobileNum.form-control(type='text' placeholder='Enter your mobile number' name='mobileNum' minlength='10' maxlength='10' value=user.profile.mobileNum)
                       .form-row
+                        if user.userId.type == "Borrower" && user.type == "Member"
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='employeeID') Employee ID
+                            input#employeeID.form-control(type='text' name='employeeID' value=user.employeeID disabled='')
                         .form-group.col-md-4.mb-md-0
                           label.small.mb-1(for='tin') TIN ID
                           input#tin.form-control(type='text' placeholder='Enter your TIN ID' name='tin' value=user.profile.tin)
-                        .form-group.col-md-8.mb-md-0
-                          label.small.mb-1(for='email') Email address
-                          input#email.form-control(type='email' placeholder='Enter your email address' name='email' value=user.profile.email)
+                        if user.userId.type == "Borrower" && user.type == "Member"
+                          .form-group.col-md-4.mb-md-0
+                            label.small.mb-1(for='email') Email address
+                            input#email.form-control(type='email' placeholder='Enter your email address' name='email' value=user.profile.email)
+                        if user.userId.type == "Borrower" && user.type == "Non-Member"
+                          .form-group.col-md-8.mb-md-0
+                            label.small.mb-1(for='email') Email address
+                            input#email.form-control(type='email' placeholder='Enter your email address' name='email' value=user.profile.email)
                       hr.my-4
                       .d-flex.justify-content-between
                         a.btn.btn-light(type='button' href='/verifications') Back

@@ -24,17 +24,19 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
               if title.indexOf("Dashboard") != -1
                 i.fas.fa-home
             |  #{title}
-        if title.indexOf("Dashboard") != -1
-          .col-12.col-xl-auto.mb-3
+        if title.indexOf("Dashboard") != -1 && user.userId.type == "Admin"
+          form(method='POST')
             input(type='hidden', name='_csrf', value=_csrf)
-            select#year.mr-2(type='text' name='year')
-              option(value='2021') Year 2021
-              option(value='2020') Year 2020
-            a.btn.btn-sm.btn-success.mr-2(href='#') 
-              i.fas.fa-share-alt.fa-sm.text-white
-                span 
-                |  Distribute
-            a.btn.btn-sm.btn-primary.mr-2(href='#') 
-              i.fas.fa-download.fa-sm.text-white
-                span 
-                |  Generate Report
+            .form-row
+              input(type='hidden', name='_csrf', value=_csrf)
+              .form-group.col-md-4
+                select#year.mr-2.form-control(type='text' name='year')
+                  option(value='2021') Year 2021
+                  option(value='2020') Year 2020
+              .form-group.col-md-8
+                a.btn.btn-md.btn-success.mr-2(href='#') 
+                  i.fas.fa-share-alt.fa-sm.text-white
+                    |  Distribute
+                a.btn.btn-md.btn-primary.mr-2(href='#') 
+                  i.fas.fa-download.fa-sm.text-white
+                    |  Generate Report
