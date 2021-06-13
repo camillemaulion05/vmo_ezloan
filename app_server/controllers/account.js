@@ -5830,10 +5830,10 @@ const getDownloadContributions = (req, res) => {
                                             text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.unitNo && data.user.profile.address.present.houseNo && data.user.profile.address.present.street) ? data.user.profile.address.present.unitNo + ' ' + data.user.profile.address.present.houseNo + ' ' + data.user.profile.address.present.street + ',\n' : ''
                                         },
                                         {
-                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.subdivision && data.user.profile.address.present.barangay) ? data.user.profile.address.present.subdivision + ', ' + data.user.rofile.address.present.barangay + ',\n' : ''
+                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.subdivision && data.user.profile.address.present.barangay) ? data.user.profile.address.present.subdivision + ', ' + data.user.profile.address.present.barangay + ',\n' : ''
                                         },
                                         {
-                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.city && data.user.profile.address.present.province && data.user.profile.address.present.zipCode) ? data.user.address.present.city + ', ' + data.user.profile.address.present.province + ' ' + data.user.profile.address.present.zipCode + '\n' : ''
+                                            text: (data.user.profile.address && data.user.profile.address.present && data.user.profile.address.present.city && data.user.profile.address.present.province && data.user.profile.address.present.zipCode) ? data.user.profile.address.present.city + ', ' + data.user.profile.address.present.province + ' ' + data.user.profile.address.present.zipCode + '\n' : ''
                                         },
                                         {
                                             text: (data.user.profile.mobileNum) ? '+63' + data.user.profile.mobileNum + '\n' : ''

@@ -202,7 +202,7 @@ loanSchema.methods.addRepayment = function (date, amount) {
                 if (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) this.loanPaymentSchedule[i].interestBalance = ROUND(parseFloat(this.loanPaymentSchedule[i - 1].interestBalance) + parseFloat(this.loanPaymentSchedule[i].interest) - parseFloat(this.loanPaymentSchedule[i].interestPaid));
                 this.loanPaymentSchedule[i].principalPaid = ROUND(this.loanPaymentSchedule[i].paymentAmount - this.loanPaymentSchedule[i].interestPaid);
                 this.loanPaymentSchedule[i].principal = ROUND(this.loanPaymentSchedule[i].amountDue - this.loanPaymentSchedule[i].interest);
-                this.loanPaymentSchedule[i].principalBalance = ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid);
+                this.loanPaymentSchedule[i].principalBalance = (this.loanPaymentSchedule[i].scheduleNum == scheduleNum) ? ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principalPaid) : ROUND(this.loanPaymentSchedule[i - 1].principalBalance - this.loanPaymentSchedule[i].principal);
             }
         }
 

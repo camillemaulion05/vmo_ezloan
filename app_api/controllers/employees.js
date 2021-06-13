@@ -86,13 +86,6 @@ const employeesReadOne = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Employee" == req.payload.type && employee.userId._id != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(employee);
@@ -440,13 +433,6 @@ const employeesReadOneByUser = (req, res) => {
                             "message": err._message
                         });
                 } else {
-                    if ("Employee" == req.payload.type && userid != req.payload._id) {
-                        return res
-                            .status(403)
-                            .json({
-                                "message": "You don\'t have permission to do that!"
-                            });
-                    }
                     res
                         .status(200)
                         .json(employee);
