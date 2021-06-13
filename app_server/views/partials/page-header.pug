@@ -28,7 +28,7 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
           form(method='POST')
             input(type='hidden', name='_csrf', value=_csrf)
             .form-row
-              .form-group.col-md-4
+              .form-group.col-md-6
                 - let year = (new Date()).getFullYear();
                 - let backdatedYear = "2020";
                 - let count = parseInt(year) - parseInt(backdatedYear);
@@ -36,11 +36,11 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
                 select#year.mr-2.form-control(type='text' name='year')
                   while (n <= count)
                     option(value=(parseInt(year) - n)) Year #{parseInt(year) - n++}
-              .form-group.col-md-8
+              .form-group.col-md-6
                 - let yearNow = (new Date()).getFullYear();
-                a#distribute.btn.btn-md.btn-success.mr-2(href='/download/report/distribution/' + yearNow) 
-                  i.fas.fa-share-alt.fa-sm.text-white
-                    |  Distribute
+                //- a#distribute.btn.btn-md.btn-success.mr-2(href='/download/report/distribution/' + yearNow) 
+                //-   i.fas.fa-share-alt.fa-sm.text-white
+                //-     |  Distribution
                 a#generate.btn.btn-md.btn-primary.mr-2(href='/download/report/financial/' + yearNow) 
                   i.fas.fa-download.fa-sm.text-white
-                    |  Generate Report
+                    |  Financial

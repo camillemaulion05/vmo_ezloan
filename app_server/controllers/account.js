@@ -13609,6 +13609,115 @@ const getDownloadFinancialReport = (req, res) => {
                 }
             }
         };
+
+        let distributionsTable = {
+            style: 'table',
+            table: {
+                headerRows: 2,
+                widths: [20, '*', '*', '*', '*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'INDIVIDUAL DIVIDEND DISTRIBUTION',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 8,
+                    }, {}, {}, {}, {}, {}, {}, {}],
+                    [{
+                            text: 'NO.',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'MEMBER NO.',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'NAME',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'TOTAL CONTRIBUTIONS',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'AVERAGE SHARE BALANCE',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'DIVIDEND',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'ACTUAL INTEREST PAID ON LOANS',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'PATRONAGE REFUND',
+                            style: 'medium',
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        let counter = 1;
+        data.distributions.forEach(d => {
+            let monthToday = (new Date()).getMonth() + 1;
+            let aveContributions = parseFloat(d.total["$numberDecimal"]) / monthToday;
+            let dividendPerCapital = (parseFloat(aveContributions) / parseFloat(aveCapital)) * parseFloat(dividend);
+            let interestPaid = data.interestReport.filter(obj => obj._id == d._id).length > 0 ? data.interestReport.filter(obj => obj._id == d._id)[0].totalInterestPaid["$numberDecimal"] : 0.00;
+            let patronageRefundPerInterestPaid = (parseFloat(interestPaid) / parseFloat(interestPaidByMember)) * parseFloat(patronageRefund);
+            let distributionRow = [{
+                    text: counter + '.',
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.borrowerNum[0],
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.firstName[0] + ' ' + d.lastName[0],
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseFloat(d.total["$numberDecimal"]).toFixed(2),
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseFloat(aveContributions).toFixed(2),
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseFloat(dividendPerCapital).toFixed(2),
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseFloat(interestPaid).toFixed(2),
+                    style: 'medium',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: parseFloat(patronageRefundPerInterestPaid).toFixed(2),
+                    style: 'medium',
+                    border: [true, true, true, true]
+                }
+            ];
+            distributionsTable.table.body.push(distributionRow);
+        });
+        docDefinition.content.push(distributionsTable);
         // Make sure the browser knows this is a PDF.
         res.set('Content-Type', 'application/pdf');
         res.set('Content-Disposition', `attachment; filename=financial-statement-` + parseInt(data.year) + `.pdf`);
@@ -13666,11 +13775,69 @@ const getDownloadFinancialReport = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            downloadFinancial({
-                                summary: summary,
-                                interest: interest,
-                                year: req.params.year
-                            });
+                            path = '/api/transactions/contributions/' + req.params.year;
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, distributions) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading summary of contributions. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/loans/interest/report/' + req.params.year;
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, interestReport) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when loading loan interest report. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    downloadFinancial({
+                                                        summary: summary,
+                                                        interest: interest,
+                                                        distributions: distributions,
+                                                        interestReport: interestReport,
+                                                        year: req.params.year
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: interestReport.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: distributions.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: interest.message
