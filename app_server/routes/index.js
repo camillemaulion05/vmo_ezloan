@@ -46,6 +46,7 @@ router.get('/logout', ctrlUsers.getLogout);
  * Account routes.
  */
 router.get('/account', passportConfig.isAuthenticated, ctrlAccount.getAccount);
+router.get('/download/report/financial', passportConfig.isAuthenticated, ctrlAccount.getDownloadFinancialReport);
 
 router
     .route('/profile')

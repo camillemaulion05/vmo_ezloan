@@ -762,6 +762,13 @@ const contributionsSummary = (req, res) => {
         date2.setFullYear(parseInt(year));
         Transaction
             .aggregate([{
+                    $lookup: {
+                        from: 'borrowers',
+                        localField: 'borrowerId',
+                        foreignField: '_id',
+                        as: 'borrower'
+                    }
+                }, {
                     $match: {
                         createdAt: {
                             $gte: new Date(date1),
@@ -781,14 +788,17 @@ const contributionsSummary = (req, res) => {
                             "$month": "$createdAt"
                         },
                         "amount": 1,
-                        "borrowerId": 1
+                        "borrower": 1
                     }
                 },
                 {
                     $group: {
                         _id: {
-                            borrower: '$borrowerId',
+                            borrower: '$borrower._id',
                             month: '$txnMonth',
+                            borrowerNum: "$borrower.borrowerNum",
+                            firstName: "$borrower.profile.firstName",
+                            lastName: "$borrower.profile.lastName",
                         },
                         txnCount: {
                             $sum: 1
@@ -803,6 +813,15 @@ const contributionsSummary = (req, res) => {
                 {
                     $group: {
                         _id: '$_id.borrower',
+                        borrowerNum: {
+                            $first: '$_id.borrowerNum',
+                        },
+                        firstName: {
+                            $first: '$_id.firstName',
+                        },
+                        lastName: {
+                            $first: '$_id.lastName',
+                        },
                         transactions: {
                             $push: {
                                 month: '$_id.month',
@@ -819,7 +838,7 @@ const contributionsSummary = (req, res) => {
                             }
                         }
                     }
-                }
+                },
             ])
             .exec((err, transactions) => {
                 if (err) {

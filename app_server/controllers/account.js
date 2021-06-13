@@ -330,6 +330,463 @@ const getAccount = (req, res) => {
     }
 };
 
+const getDownloadFinancialReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadFinancial(contributions) {
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        'FINANCIAL STATEMENT ',
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                },
+                {
+                    style: 'table',
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', 0, '*', '*'],
+                        body: [
+                            [{
+                                    text: 'SHARE CAPITAL STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'INCOME STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {}
+                            ],
+                            [{
+                                    text: 'A. Contributions :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ 20500.00',
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'H. Interest Paid by Members :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ 150.00',
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                },
+                            ],
+                            [{
+                                    text: 'B. Withdrawals :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ -1300.00',
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'Other Income :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'C. Total Share Capital (A + B) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ 19200.00',
+                                    style: 'medium',
+                                    border: [false, true, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'I. Membership Fees :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ 2000.00',
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'D. Average Share Capital (C / 6) :',
+                                    style: 'label',
+                                    border: [true, false, false, true]
+                                },
+                                {
+                                    text: '₱ 3200.00',
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'J. Service Fees and Interest Paid by Non-Members :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: ['\n', '₱ -18319.44'],
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'LOAN STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'K. Total Other Income (I + J) :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -16319.44',
+                                    style: 'subValue',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'E. Loans Released (Principal) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ -19800.00',
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'L. Total Income (H + K) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -16169.44',
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'F. Loan Repayments :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ 1630.56',
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'M. Expenses :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -100.00',
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'G. Loans Receivable (E + F) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ -18169.44',
+                                    style: 'medium',
+                                    border: [false, true, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'O. Net Surplus Before Distribution \n(L + M) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -16269.44',
+                                    style: 'medium',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'SUMMARY',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'P. Reserved Funds (10% of M) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -1626.94',
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'Q. Net Surplus for Distribution(O-P) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -14642.50',
+                                    style: 'medium',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'N. Balance (C + G + I + M) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ 2930.56',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'R. Dividend :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ -13986.86',
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'T. Total Balance (N - Q) :',
+                                    style: 'label',
+                                    border: [true, false, false, true]
+                                },
+                                {
+                                    text: '₱ 17573.06',
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'S. Patronage Refund :',
+                                    style: 'label',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '₱ -655.63',
+                                    style: 'medium',
+                                    border: [false, false, true, true]
+                                }
+                            ],
+                        ]
+                    }
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                label: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                subLabel: {
+                    fontSize: 11,
+                    alignment: 'left',
+                    margin: [20, 0, 0, 0]
+                },
+                subValue: {
+                    fontSize: 11,
+                    alignment: 'right',
+                    margin: [0, 0, 100, 0]
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'right'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                table: {
+                    margin: [0, 15, 0, 0]
+                }
+            }
+        };
+
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=financial-statement.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    let yearNow = (new Date()).getFullYear();
+    path = '/api/transactions/contributions/' + yearNow;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, contributions) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading list of contributions. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                downloadFinancial(contributions)
+            } else {
+                req.flash('errors', {
+                    msg: contributions.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getProfile = (req, res) => {
     getUserDetails(req, res, 'account/profile', 'Account Management - Profile');
 };
@@ -13173,6 +13630,7 @@ const getDownloadInquiriesReport = (req, res) => {
 
 module.exports = {
     getAccount,
+    getDownloadFinancialReport,
     getProfile,
     postProfile,
     postProfilePic,
