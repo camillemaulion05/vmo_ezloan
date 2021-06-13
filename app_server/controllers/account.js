@@ -330,518 +330,6 @@ const getAccount = (req, res) => {
     }
 };
 
-const getDownloadFinancialReport = (req, res) => {
-    let fonts = {
-        Roboto: {
-            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
-            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
-            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
-            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
-        },
-        Fontello: {
-            normal: __basedir + '/public/fonts/fontello.ttf'
-        }
-    }
-    let printer = new PdfPrinter(fonts);
-
-    function downloadFinancial(data) {
-        let contributions = data.summary.filter(obj => obj._id == "Contributions").length > 0 ? data.summary.filter(obj => obj._id == "Contributions")[0].total["$numberDecimal"] : 0.00;
-        let withdrawals = data.summary.filter(obj => obj._id == "Withdrawals").length > 0 ? data.summary.filter(obj => obj._id == "Withdrawals")[0].total["$numberDecimal"] : 0.00;
-        let totalCapital = parseFloat(contributions) + parseFloat(withdrawals);
-        let monthToday = (new Date()).getMonth() + 1;
-        let aveCapital = parseFloat(totalCapital) / monthToday;
-        let loansReleased = data.summary.filter(obj => obj._id == "Release").length > 0 ? data.summary.filter(obj => obj._id == "Release")[0].total["$numberDecimal"] : 0.00;
-        let loansRepayments = data.summary.filter(obj => obj._id == "Repayments").length > 0 ? data.summary.filter(obj => obj._id == "Repayments")[0].total["$numberDecimal"] : 0.00;
-        let loansReceivables = parseFloat(loansReleased) + parseFloat(loansRepayments);
-        let interestPaidByMember = data.interest.filter(obj => obj._id[0] == "Member").length > 0 ? data.interest.filter(obj => obj._id[0] == "Member")[0].totalInterestPaid["$numberDecimal"] : 0.00;
-        let membershipFees = data.summary.filter(obj => obj._id == "Fees").length > 0 ? data.summary.filter(obj => obj._id == "Fees")[0].total["$numberDecimal"] : 0.00;
-        let otherIncome = parseFloat(loansRepayments) + parseFloat(loansReleased) - parseFloat(interestPaidByMember);
-        let totalOtherIncome = parseFloat(membershipFees) + parseFloat(otherIncome);
-        let totalIncome = parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome);
-        let expenses = data.summary.filter(obj => obj._id == "Expenses").length > 0 ? data.summary.filter(obj => obj._id == "Expenses")[0].total["$numberDecimal"] : 0.00;
-        let balance = parseFloat(contributions) + parseFloat(withdrawals) + parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
-        let netSurplusBefore = parseFloat(totalIncome) + parseFloat(expenses);
-        let reservedFunds = parseFloat(netSurplusBefore) * .10;
-        let netSurplusAfter = parseFloat(netSurplusBefore) - parseFloat(reservedFunds);
-        let sumOfShareCapitalAndIncome = parseFloat(aveCapital) + parseFloat(interestPaidByMember);
-        let aveShareCapital = parseFloat(aveCapital) / parseFloat(sumOfShareCapitalAndIncome);
-        let aveIncome = parseFloat(interestPaidByMember) / parseFloat(sumOfShareCapitalAndIncome);
-        let dividend = (aveShareCapital) ? parseFloat(aveShareCapital) * parseFloat(netSurplusAfter) : 0.00;
-        let patronageRefund = (aveIncome) ? parseFloat(aveIncome) * parseFloat(netSurplusAfter) : 0.00;
-        let totalbalance = (balance) ? parseFloat(balance) - parseFloat(netSurplusAfter) : 0.00;
-        let docDefinition = {
-            pageOrientation: 'landscape',
-            pageMargins: [40, 20, 40, 40],
-            content: [{
-                    text: 'VMO EZ LOAN',
-                    style: 'header'
-                },
-                {
-                    text: [
-                        'FINANCIAL STATEMENT ',
-                        parseDate(new Date, 'month') + '\n\n'
-                    ],
-                    style: 'subheader'
-                },
-                {
-                    style: 'table',
-                    table: {
-                        headerRows: 1,
-                        widths: ['*', '*', 0, '*', '*'],
-                        body: [
-                            [{
-                                    text: 'SHARE CAPITAL STATEMENT',
-                                    style: 'tableHeader',
-                                    alignment: 'center',
-                                    fillColor: 'black',
-                                    colSpan: 2,
-                                }, {},
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'INCOME STATEMENT',
-                                    style: 'tableHeader',
-                                    alignment: 'center',
-                                    fillColor: 'black',
-                                    colSpan: 2,
-                                }, {}
-                            ],
-                            [{
-                                    text: 'A. Contributions :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(contributions).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'H. Interest Paid by Members :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(interestPaidByMember).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, true, false]
-                                },
-                            ],
-                            [{
-                                    text: 'B. Withdrawals :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(withdrawals).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'Other Income :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'C. Total Share Capital (A + B) :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(totalCapital).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, true, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'I. Membership Fees :',
-                                    style: 'subLabel',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(membershipFees).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'D. Average Share Capital (C / 6) :',
-                                    style: 'label',
-                                    border: [true, false, false, true]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(aveCapital).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, true]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'J. Service Fees and Interest Paid by Non-Members :',
-                                    style: 'subLabel',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: ['\n', '₱ ' + parseFloat(otherIncome).toFixed(2)],
-                                    style: 'subValue',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'LOAN STATEMENT',
-                                    style: 'tableHeader',
-                                    alignment: 'center',
-                                    fillColor: 'black',
-                                    colSpan: 2,
-                                }, {},
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'K. Total Other Income (I + J) :',
-                                    style: 'subLabel',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(totalOtherIncome).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, true, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'E. Loans Released (Principal) :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(loansReleased).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'L. Total Income (H + K) :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(totalIncome).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'F. Loan Repayments :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(loansRepayments).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'M. Expenses :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(expenses).toFixed(2),
-                                    style: 'subValue',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'G. Loans Receivable (E + F) :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(loansReceivables).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, true, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'O. Net Surplus Before Distribution \n(L + M) :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(netSurplusBefore).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, true, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'SUMMARY',
-                                    style: 'tableHeader',
-                                    alignment: 'center',
-                                    fillColor: 'black',
-                                    colSpan: 2,
-                                }, {},
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'P. Reserved Funds (10% of M) :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(reservedFunds).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: '',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'Q. Net Surplus for Distribution(O-P) :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(netSurplusAfter).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, true, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'N. Balance (C + G + I + M) :',
-                                    style: 'label',
-                                    border: [true, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(balance).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'R. Dividend :',
-                                    style: 'label',
-                                    border: [false, false, false, false]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(dividend).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, true, false]
-                                }
-                            ],
-                            [{
-                                    text: 'T. Total Balance (N - Q) :',
-                                    style: 'label',
-                                    border: [true, false, false, true]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(totalbalance).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, false, true]
-                                },
-                                {
-                                    text: '',
-                                    style: 'medium',
-                                    border: [true, false, true, false]
-                                },
-                                {
-                                    text: 'S. Patronage Refund :',
-                                    style: 'label',
-                                    border: [false, false, false, true]
-                                },
-                                {
-                                    text: '₱ ' + parseFloat(patronageRefund).toFixed(2),
-                                    style: 'medium',
-                                    border: [false, false, true, true]
-                                }
-                            ],
-                        ]
-                    }
-                }
-            ],
-            styles: {
-                header: {
-                    fontSize: 15,
-                    bold: true,
-                    alignment: 'center'
-                },
-                subheader: {
-                    fontSize: 9,
-                    alignment: 'center'
-                },
-                label: {
-                    fontSize: 11,
-                    alignment: 'left'
-                },
-                subLabel: {
-                    fontSize: 11,
-                    alignment: 'left',
-                    margin: [20, 0, 0, 0]
-                },
-                subValue: {
-                    fontSize: 11,
-                    alignment: 'right',
-                    margin: [0, 0, 100, 0]
-                },
-                medium: {
-                    fontSize: 11,
-                    alignment: 'right'
-                },
-                item: {
-                    fontSize: 10,
-                    alignment: 'left'
-                },
-                small: {
-                    fontSize: 7,
-                    alignment: 'left'
-                },
-                tableHeader: {
-                    fontSize: 12,
-                    bold: true,
-                    alignment: 'center',
-                    color: 'white',
-                    fillColor: 'black'
-                },
-                table: {
-                    margin: [0, 15, 0, 0]
-                }
-            }
-        };
-        let yearNow = (new Date()).getFullYear();
-        // Make sure the browser knows this is a PDF.
-        res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `attachment; filename=financial-statement-` + yearNow + `.pdf`);
-        res.set('Content-Description: File Transfer');
-        res.set('Cache-Control: no-cache');
-        // Create the PDF and pipe it to the response object.
-        let pdfDoc = printer.createPdfKitDocument(docDefinition);
-        pdfDoc.pipe(res);
-        pdfDoc.end();
-    }
-
-    let yearNow = (new Date()).getFullYear();
-    path = '/api/transactions/summary/type/' + yearNow;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {}
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, summary) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when loading summary of transactions type. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 200) {
-                path = '/api/loans/summary/type/' + yearNow;
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'GET',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {}
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, interest) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when loading summary of loans type. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 200) {
-                            downloadFinancial({
-                                summary: summary,
-                                interest: interest
-                            });
-                        } else {
-                            req.flash('errors', {
-                                msg: interest.message
-                            });
-                            return res.redirect('back');
-                        }
-                    }
-                );
-            } else {
-                req.flash('errors', {
-                    msg: summary.message
-                });
-                return res.redirect('back');
-            }
-        }
-    );
-};
-
 const getProfile = (req, res) => {
     getUserDetails(req, res, 'account/profile', 'Account Management - Profile');
 };
@@ -13683,9 +13171,526 @@ const getDownloadInquiriesReport = (req, res) => {
     );
 };
 
+
+const getDownloadFinancialReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadFinancial(data) {
+        let contributions = data.summary.filter(obj => obj._id == "Contributions").length > 0 ? data.summary.filter(obj => obj._id == "Contributions")[0].total["$numberDecimal"] : 0.00;
+        let withdrawals = data.summary.filter(obj => obj._id == "Withdrawals").length > 0 ? data.summary.filter(obj => obj._id == "Withdrawals")[0].total["$numberDecimal"] : 0.00;
+        let totalCapital = parseFloat(contributions) + parseFloat(withdrawals);
+        let monthToday = (new Date()).getMonth() + 1;
+        let aveCapital = parseFloat(totalCapital) / monthToday;
+        let loansReleased = data.summary.filter(obj => obj._id == "Release").length > 0 ? data.summary.filter(obj => obj._id == "Release")[0].total["$numberDecimal"] : 0.00;
+        let loansRepayments = data.summary.filter(obj => obj._id == "Repayments").length > 0 ? data.summary.filter(obj => obj._id == "Repayments")[0].total["$numberDecimal"] : 0.00;
+        let loansReceivables = parseFloat(loansReleased) + parseFloat(loansRepayments);
+        let interestPaidByMember = data.interest.filter(obj => obj._id[0] == "Member").length > 0 ? data.interest.filter(obj => obj._id[0] == "Member")[0].totalInterestPaid["$numberDecimal"] : 0.00;
+        let membershipFees = data.summary.filter(obj => obj._id == "Fees").length > 0 ? data.summary.filter(obj => obj._id == "Fees")[0].total["$numberDecimal"] : 0.00;
+        let otherIncome = parseFloat(loansRepayments) + parseFloat(loansReleased) - parseFloat(interestPaidByMember);
+        let totalOtherIncome = parseFloat(membershipFees) + parseFloat(otherIncome);
+        let totalIncome = parseFloat(interestPaidByMember) + parseFloat(totalOtherIncome);
+        let expenses = data.summary.filter(obj => obj._id == "Expenses").length > 0 ? data.summary.filter(obj => obj._id == "Expenses")[0].total["$numberDecimal"] : 0.00;
+        let balance = parseFloat(contributions) + parseFloat(withdrawals) + parseFloat(loansRepayments) + parseFloat(loansReleased) + parseFloat(membershipFees) + parseFloat(expenses);
+        let netSurplusBefore = parseFloat(totalIncome) + parseFloat(expenses);
+        let reservedFunds = parseFloat(netSurplusBefore) * .10;
+        let netSurplusAfter = parseFloat(netSurplusBefore) - parseFloat(reservedFunds);
+        let sumOfShareCapitalAndIncome = parseFloat(aveCapital) + parseFloat(interestPaidByMember);
+        let aveShareCapital = parseFloat(aveCapital) / parseFloat(sumOfShareCapitalAndIncome);
+        let aveIncome = parseFloat(interestPaidByMember) / parseFloat(sumOfShareCapitalAndIncome);
+        let dividend = (aveShareCapital) ? parseFloat(aveShareCapital) * parseFloat(netSurplusAfter) : 0.00;
+        let patronageRefund = (aveIncome) ? parseFloat(aveIncome) * parseFloat(netSurplusAfter) : 0.00;
+        let totalbalance = (balance) ? parseFloat(balance) - parseFloat(netSurplusAfter) : 0.00;
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [40, 20, 40, 40],
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        'FINANCIAL STATEMENT - ',
+                        parseInt(data.year) + '\n\n'
+                    ],
+                    style: 'subheader'
+                },
+                {
+                    style: 'table',
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', 0, '*', '*'],
+                        body: [
+                            [{
+                                    text: 'SHARE CAPITAL STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'INCOME STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {}
+                            ],
+                            [{
+                                    text: 'A. Contributions :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(contributions).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'H. Interest Paid by Members :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(interestPaidByMember).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                },
+                            ],
+                            [{
+                                    text: 'B. Withdrawals :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(withdrawals).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'Other Income :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'C. Total Share Capital (A + B) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(totalCapital).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, true, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'I. Membership Fees :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(membershipFees).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'D. Average Share Capital (C / 6) :',
+                                    style: 'label',
+                                    border: [true, false, false, true]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(aveCapital).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'J. Service Fees and Interest Paid by Non-Members :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: ['\n', '₱ ' + parseFloat(otherIncome).toFixed(2)],
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'LOAN STATEMENT',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'K. Total Other Income (I + J) :',
+                                    style: 'subLabel',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(totalOtherIncome).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'E. Loans Released (Principal) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(loansReleased).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'L. Total Income (H + K) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(totalIncome).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'F. Loan Repayments :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(loansRepayments).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'M. Expenses :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(expenses).toFixed(2),
+                                    style: 'subValue',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'G. Loans Receivable (E + F) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(loansReceivables).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, true, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'O. Net Surplus Before Distribution \n(L + M) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(netSurplusBefore).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'SUMMARY',
+                                    style: 'tableHeader',
+                                    alignment: 'center',
+                                    fillColor: 'black',
+                                    colSpan: 2,
+                                }, {},
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'P. Reserved Funds (10% of M) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(reservedFunds).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: '',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'Q. Net Surplus for Distribution(O-P) :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(netSurplusAfter).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, true, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'N. Balance (C + G + I + M) :',
+                                    style: 'label',
+                                    border: [true, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(balance).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'R. Dividend :',
+                                    style: 'label',
+                                    border: [false, false, false, false]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(dividend).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, true, false]
+                                }
+                            ],
+                            [{
+                                    text: 'T. Total Balance (N - Q) :',
+                                    style: 'label',
+                                    border: [true, false, false, true]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(totalbalance).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '',
+                                    style: 'medium',
+                                    border: [true, false, true, false]
+                                },
+                                {
+                                    text: 'S. Patronage Refund :',
+                                    style: 'label',
+                                    border: [false, false, false, true]
+                                },
+                                {
+                                    text: '₱ ' + parseFloat(patronageRefund).toFixed(2),
+                                    style: 'medium',
+                                    border: [false, false, true, true]
+                                }
+                            ],
+                        ]
+                    }
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                label: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                subLabel: {
+                    fontSize: 11,
+                    alignment: 'left',
+                    margin: [20, 0, 0, 0]
+                },
+                subValue: {
+                    fontSize: 11,
+                    alignment: 'right',
+                    margin: [0, 0, 100, 0]
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'right'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                table: {
+                    margin: [0, 15, 0, 0]
+                }
+            }
+        };
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=financial-statement-` + parseInt(data.year) + `.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+    let yearNow = (new Date()).getFullYear();
+    if (parseInt(req.params.year) < 2020 && parseInt(req.params.year) > parseInt(yearNow)) {
+        req.flash('errors', {
+            msg: "Invalid year."
+        });
+        return res.redirect('back');
+    }
+    path = '/api/transactions/summary/type/' + req.params.year;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, summary) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading summary of transactions type. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans/summary/type/' + req.params.year;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, interest) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading summary of loans type. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            downloadFinancial({
+                                summary: summary,
+                                interest: interest,
+                                year: req.params.year
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: interest.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: summary.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
-    getDownloadFinancialReport,
     getProfile,
     postProfile,
     postProfilePic,
@@ -13763,5 +13768,6 @@ module.exports = {
     getInquiryDerails,
     getUpdateInquiries,
     getDeleteInquiries,
-    getDownloadInquiriesReport
+    getDownloadInquiriesReport,
+    getDownloadFinancialReport
 };

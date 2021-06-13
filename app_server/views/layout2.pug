@@ -954,3 +954,12 @@ html
           });
           $('#redrawSignature').signature({ disabled: true });
         });
+
+    if title.indexOf("Dashboard") != -1
+      script.
+          $(function () {
+              $('select[name="year"]').change(function () {
+                  $('a#generate').attr('href', '/download/report/financial/' + $('select[name="year"]').val()); 
+                  $('a#distribute').attr('href', '/download/report/distribution/' + $('select[name="year"]').val()); 
+              });
+          });

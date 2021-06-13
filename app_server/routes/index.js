@@ -46,7 +46,6 @@ router.get('/logout', ctrlUsers.getLogout);
  * Account routes.
  */
 router.get('/account', passportConfig.isAuthenticated, ctrlAccount.getAccount);
-router.get('/download/report/financial', passportConfig.isAuthenticated, ctrlAccount.getDownloadFinancialReport);
 
 router
     .route('/profile')
@@ -205,5 +204,7 @@ router
 
 router.get('/inquiries/:inquiryid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteInquiries);
 router.get('/download/report/inquiries/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadInquiriesReport);
+
+router.get('/download/report/financial/:year', passportConfig.isAuthenticated, ctrlAccount.getDownloadFinancialReport);
 
 module.exports = router;
