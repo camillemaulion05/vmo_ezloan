@@ -216,15 +216,52 @@ block content
                             th Date of Birth
                             th Relationship
                         tbody 
-                          for x in borrower.beneficiaries
-                            tr
-                              td #{x.fullName}
-                              - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                              - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-                              - let d = (new Date(x.dateOfBirth)).toString().split(' ');
-                              - let dateFormat = month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3];
-                              td #{dateFormat}
-                              td #{x.relationship}
+                          if borrower.beneficiaries
+                            if borrower.beneficiaries.fullName1
+                              tr
+                                td #{borrower.beneficiaries.fullName1}
+                                - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                                - let d = (new Date(borrower.beneficiaries.dateOfBirth1)).toString().split(' ');
+                                - let dateFormat = (borrower.beneficiaries.dateOfBirth1) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+                                td #{dateFormat}
+                                td #{borrower.beneficiaries.relationship1}
+                            if borrower.beneficiaries.fullName2
+                              tr
+                                td #{borrower.beneficiaries.fullName2}
+                                - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                                - let d = (new Date(borrower.beneficiaries.dateOfBirth2)).toString().split(' ');
+                                - let dateFormat = (borrower.beneficiaries.dateOfBirth2) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+                                td #{dateFormat}
+                                td #{borrower.beneficiaries.relationship2}
+                            if borrower.beneficiaries.fullName3
+                              tr
+                                td #{borrower.beneficiaries.fullName3}
+                                - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                                - let d = (new Date(borrower.beneficiaries.dateOfBirth3)).toString().split(' ');
+                                - let dateFormat = (borrower.beneficiaries.dateOfBirth3) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+                                td #{dateFormat}
+                                td #{borrower.beneficiaries.relationship3}
+                            if borrower.beneficiaries.fullName4
+                              tr
+                                td #{borrower.beneficiaries.fullName4}
+                                - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                                - let d = (new Date(borrower.beneficiaries.dateOfBirth4)).toString().split(' ');
+                                - let dateFormat = (borrower.beneficiaries.dateOfBirth4) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+                                td #{dateFormat}
+                                td #{borrower.beneficiaries.relationship4}
+                            if borrower.beneficiaries.fullName5
+                              tr
+                                td #{borrower.beneficiaries.fullName5}
+                                - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                                - let d = (new Date(borrower.beneficiaries.dateOfBirth5)).toString().split(' ');
+                                - let dateFormat = (borrower.beneficiaries.dateOfBirth5) ? month2[month.indexOf(d[1])] + '/' + d[2] + '/' + d[3] : "";
+                                td #{dateFormat}
+                                td #{borrower.beneficiaries.relationship5}
                 if borrower.type == "Non-Member"
                   #documents.tab-pane.fade(role='tabpanel' aria-labelledby='documents-pill')  
                     .table-responsive

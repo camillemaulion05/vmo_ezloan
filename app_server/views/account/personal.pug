@@ -101,7 +101,7 @@ block content
                             input#employeeID.form-control(type='text' name='employeeID' value=user.employeeID disabled='')
                         .form-group.col-md-4.mb-md-0
                           label.small.mb-1(for='tin') TIN ID
-                          input#tin.form-control(type='text' placeholder='Enter your TIN ID' name='tin' value=user.profile.tin)
+                          input#tin.form-control(type='text' placeholder='Enter your TIN ID' name='tin' maxlength='15' value=user.profile.tin)
                         if user.userId.type == "Borrower" && user.type == "Member"
                           .form-group.col-md-4.mb-md-0
                             label.small.mb-1(for='email') Email address

@@ -17,10 +17,10 @@ $.ajax({
     let total = borrowers.reduce((a, b) => parseFloat(a) + parseFloat(b.count), 0);
     borrowers.forEach(d => {
       listOfBorrowersLabel.push(d._id);
-      listOfBorrowersData.push((parseInt(d.count) / total) * 100);
+      listOfBorrowersData.push(number_format((parseInt(d.count) / total) * 100));
     });
-    $('#borrower1').text(' ' + listOfBorrowersLabel[0] + ' - ' + listOfBorrowersData[0] + '%');
-    $('#borrower2').text(' ' + listOfBorrowersLabel[1] + ' - ' + listOfBorrowersData[1] + '%');
+    $('#borrower1').text(' ' + listOfBorrowersLabel[0] + ' - ' + number_format(listOfBorrowersData[0]) + '%');
+    $('#borrower2').text(' ' + listOfBorrowersLabel[1] + ' - ' + number_format(listOfBorrowersData[1]) + '%');
 
     var borrowerCtx = $("#myBorrowerChart");
     var myPieChart = new Chart(borrowerCtx, {

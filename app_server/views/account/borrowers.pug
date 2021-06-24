@@ -58,10 +58,10 @@ block content
                   if user.userId.type == "Admin"
                     a#addNewBorrower.dropdown-item(href='#' data-toggle='modal' data-target='#') Add New Borrower
                     .dropdown-divider
-                  if user.userId.type == "Employee" && user.type != "HRD Authorized Officer"
+                  if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
                     a.dropdown-item(href='/download/report/borrowers/all') List of Borrowers
                   a.dropdown-item(href='/download/report/borrowers/members') List of Members
-                  if user.userId.type == "Employee" && user.type != "HRD Authorized Officer"
+                  if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
                     a.dropdown-item(href='/download/report/borrowers/non-members') List of Non-Members 
             .card-body
               .table-responsive
