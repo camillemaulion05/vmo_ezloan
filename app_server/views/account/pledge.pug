@@ -55,13 +55,13 @@ block content
                             input#otherOption.form-check-input(type='radio' name='sharesPerPayDayOption' value='Others')
                           input#sharesPerPayDay.form-control.mr-2(type="number" step="100" min="400" name='sharesPerPayDay' value=(parseFloat(user.sharesPerPayDay) > 300.00) ? user.sharesPerPayDay : "" disabled='')
                           label.form-check-label(for='otherOption') Amount of your choice
-                      .custom-control.custom-checkbox
-                        if (user.signature)
-                          input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='true' checked='')
-                        else
-                          input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='false')
-                        label.custom-control-label(for='letterOfAuthorization')
-                          | I willfully sign a Letter of Authorization and allow Calamba VMO Coop to use it for salary deduction for capital contribution and any future loan amortization to be paid to  Calamba VMO Coop hereafter.
+                      //- .custom-control.custom-checkbox
+                      //-   if (user.signature)
+                      //-     input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='true' checked='')
+                      //-   else
+                      //-     input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='false')
+                      //-   label.custom-control-label(for='letterOfAuthorization')
+                      //-     | I willfully sign a Letter of Authorization and allow Calamba VMO Coop to use it for salary deduction for capital contribution and any future loan amortization to be paid to  Calamba VMO Coop hereafter.
                       hr.my-4
                       fieldset
                         legend.text-primary Signature

@@ -3034,12 +3034,12 @@ const getDownloadBorrowerInfo = (req, res) => {
                         border: [true, false, true, false],
                         alignment: 'center'
                     }],
-                    [{
-                        text: 'This servers as an authorization for salary deduction for capital contribution and any future loan amortization to be paid to Calamba VMO Coop hereafter.',
-                        style: 'item',
-                        border: [true, false, true, false],
-                        alignment: 'justify'
-                    }]
+                    // [{
+                    //     text: 'This servers as an authorization for salary deduction for capital contribution and any future loan amortization to be paid to Calamba VMO Coop hereafter.',
+                    //     style: 'item',
+                    //     border: [true, false, true, false],
+                    //     alignment: 'justify'
+                    // }]
                 ]
             }
         };
@@ -3918,9 +3918,9 @@ const postVerificationsPledge = (req, res) => {
     if (req.body.soa != 'true') validationErrors.push({
         msg: 'You must subscribe to the Calamba VMO Multi-Purpose Cooperative common shares at P600 per share.'
     });
-    if (req.body.letterOfAuthorization != 'true') validationErrors.push({
-        msg: 'You must sign a Letter of Authorization.'
-    });
+    // if (req.body.letterOfAuthorization != 'true') validationErrors.push({
+    //     msg: 'You must sign a Letter of Authorization.'
+    // });
     if (validator.isEmpty(req.body.sharesPerPayDayOption)) validationErrors.push({
         msg: 'Amount of shares cannot be blank.'
     });
@@ -4752,7 +4752,7 @@ const getDownloadLoanSOA = (req, res) => {
                             border: [true, true, true, true]
                         },
                         {
-                            text: 'Reference Code',
+                            text: 'Reference No.',
                             style: 'medium',
                             border: [true, true, true, true]
                         },
