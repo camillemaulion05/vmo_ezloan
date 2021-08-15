@@ -1,0 +1,50 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.shadow.mb-4
+            .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
+              h6.m-0.font-weight-bold.text-primary List of Activity Logs
+              .dropdown.no-arrow
+                a.btn.btn-sm.btn-primary(href='/download/report/activities/all') Download Logs
+            .card-body
+              .table-responsive
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th Activity No.
+                      th Description
+                      th Affected Table
+                      th Date/Time
+                      //- th Actions
+                  tfoot
+                    tr
+                      th Activity No.
+                      th Description
+                      th Affected Table
+                      th Date/Time
+                      //- th Actions
+                  tbody
+                    for x in activities
+                      tr
+                        td #{x.activityNum}
+                        td #{x.description}     
+                        td #{x.tableAffected}
+                        - let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        - let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+                        - let paramDate = new Date(x.createdAt);
+                        - let date = paramDate.toString().split(' ');
+                        - let newDate = (x.createdAt) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
+                        td #{newDate}
+                        //- td 
+                        //-   a.updateActivity.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                        //-     i.fas.fa-edit
+                        //-   a.deleteActivity.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.activityNum) data-toggle='modal' data-target='#')
+                        //-     i.fas.fa-trash
+    include ../partials/page-footer

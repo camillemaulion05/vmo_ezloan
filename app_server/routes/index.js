@@ -199,12 +199,18 @@ router
 
 router
     .route('/inquiries/:inquiryid')
-    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiryDerails)
+    .get(passportConfig.isAuthenticated, ctrlAccount.getInquiryDetails)
     .post(passportConfig.isAuthenticated, ctrlAccount.getUpdateInquiries);
 
 router.get('/inquiries/:inquiryid/delete', passportConfig.isAuthenticated, ctrlAccount.getDeleteInquiries);
 router.get('/download/report/inquiries/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadInquiriesReport);
 
 router.get('/download/report/financial/:year', passportConfig.isAuthenticated, ctrlAccount.getDownloadFinancialReport);
+
+router
+    .route('/activities')
+    .get(passportConfig.isAuthenticated, ctrlAccount.getActivities);
+
+router.get('/download/report/activities/all', passportConfig.isAuthenticated, ctrlAccount.getDownloadActivitiesReport);
 
 module.exports = router;

@@ -66,3 +66,4 @@ require('./withdrawals');
 require('./borrowers');
 require('./loans');
 require('./admins');
+require('./activities');

@@ -93,12 +93,45 @@ const postLogin = (req, res, next) => {
  */
 const getLogout = (req, res) => {
     let userType = (req.user.type != "Borrower") ? '/' + (req.user.type).toLowerCase() : '';
-    req.logout();
-    req.session.destroy((err) => {
-        if (err) console.log('Error : Failed to destroy the session during logout.', err);
-        req.user = null;
-        res.redirect('/login' + userType);
-    });
+    path = '/api/activities';
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {
+            description: req.user.type + " logged out.",
+            tableAffected: "User",
+            recordIdAffected: req.user.id
+        }
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, activity) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when logging your sign out. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 201) {
+                req.logout();
+                req.session.destroy((err) => {
+                    if (err) console.log('Error : Failed to destroy the session during logout.', err);
+                    req.user = null;
+                    res.redirect('/login' + userType);
+                });
+            } else {
+                req.flash('errors', {
+                    msg: activity.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+
 };
 
 /**
@@ -470,10 +503,43 @@ const postSignup = (req, res, next) => {
                                                                                             });
                                                                                             return res.redirect('back');
                                                                                         } else if (statusCode === 201) {
-                                                                                            req.flash("success", {
-                                                                                                msg: "Successfully Signed Up! Please login your credentials. "
-                                                                                            });
-                                                                                            return res.redirect('/login');
+                                                                                            path = '/api/activities';
+                                                                                            requestOptions = {
+                                                                                                url: `${apiOptions.server}${path}`,
+                                                                                                method: 'POST',
+                                                                                                headers: {
+                                                                                                    Authorization: 'Bearer ' + user.token
+                                                                                                },
+                                                                                                json: {
+                                                                                                    description: capitalizeFirstLetter(userType) + " signed up.",
+                                                                                                    tableAffected: "User",
+                                                                                                    recordIdAffected: "Dummy"
+                                                                                                }
+                                                                                            };
+                                                                                            request(
+                                                                                                requestOptions,
+                                                                                                (err, {
+                                                                                                    statusCode
+                                                                                                }, activity) => {
+                                                                                                    if (err) {
+                                                                                                        req.flash('errors', {
+                                                                                                            msg: 'There was an error when logging your sign out. Please try again later.'
+                                                                                                        });
+                                                                                                        return res.redirect('back');
+                                                                                                    } else if (statusCode === 201) {
+                                                                                                        req.flash("success", {
+                                                                                                            msg: "Successfully Signed Up! Please login your credentials. "
+                                                                                                        });
+                                                                                                        return res.redirect('/login');
+                                                                                                    } else {
+                                                                                                        req.flash('errors', {
+                                                                                                            msg: activity.message
+                                                                                                        });
+                                                                                                        return res.redirect('back');
+                                                                                                    }
+                                                                                                }
+                                                                                            );
+
                                                                                         } else {
                                                                                             req.flash('errors', {
                                                                                                 msg: newTransaction2.message
@@ -507,11 +573,43 @@ const postSignup = (req, res, next) => {
                                                 }
                                             );
                                         } else {
-                                            req.flash("success", {
-                                                msg: "Successfully Signed Up! Please login your credentials. "
-                                            });
-                                            userType = (userType != "borrower") ? '/' + userType : '';
-                                            return res.redirect('/login' + userType);
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + user.token
+                                                },
+                                                json: {
+                                                    description: capitalizeFirstLetter(userType) + " signed up.",
+                                                    tableAffected: "User",
+                                                    recordIdAffected: "Dummy"
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your sign out. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash("success", {
+                                                            msg: "Successfully Signed Up! Please login your credentials. "
+                                                        });
+                                                        userType = (userType != "borrower") ? '/' + userType : '';
+                                                        return res.redirect('/login' + userType);
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         }
                                     } else {
                                         req.flash('errors', {
@@ -649,10 +747,38 @@ const postForgot = (req, res) => {
                                         });
                                         return res.redirect('/forgot');
                                     } else if (statusCode === 200) {
-                                        req.flash('success', {
-                                            msg: `An e-mail has been sent to ${borrower.email} with further instructions.`
-                                        });
-                                        return res.redirect('/forgot');
+                                        path = '/api/activities/' + user.userid;
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'POST',
+                                            json: {
+                                                description: user.type + " requested password reset.",
+                                                tableAffected: "User",
+                                            }
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, activity) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 201) {
+                                                    req.flash('success', {
+                                                        msg: `An e-mail has been sent to ${borrower.email} with further instructions.`
+                                                    });
+                                                    return res.redirect('/forgot');
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: activity.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
                                     } else {
                                         req.flash('errors', {
                                             msg: body.message
@@ -677,7 +803,6 @@ const postForgot = (req, res) => {
             }
         }
     );
-
 };
 
 /**
@@ -816,6 +941,38 @@ const postReset = (req, res, next) => {
                                         });
                                         return res.redirect('/login');
                                     } else if (statusCode === 200) {
+                                        path = '/api/activities/' + user.userid;
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'POST',
+                                            json: {
+                                                description: "User changed password.",
+                                                tableAffected: "User",
+                                            }
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, activity) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 201) {
+                                                    req.flash('success', {
+                                                        msg: `An e-mail has been sent to ${borrower.email} with further instructions.`
+                                                    });
+                                                    return res.redirect('/forgot');
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: activity.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
                                         req.flash('success', {
                                             msg: 'Success! Your password has been changed.'
                                         });

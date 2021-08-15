@@ -90,7 +90,7 @@ const isSafe = (req, res, next) => {
                     }
                 }
             }
-            if (params && (apiPath == 'transactions' || apiPath == 'withdrawals' || apiPath == 'loans') && apiPath2 == 'users' && method == 'GET') {
+            if (params && (apiPath == 'transactions' || apiPath == 'withdrawals' || apiPath == 'loans' || apiPath == 'activities') && apiPath2 == 'users' && method == 'GET') {
                 if (user.type == "Borrower") {
                     if (user._id != params) {
                         return res

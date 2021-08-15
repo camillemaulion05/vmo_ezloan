@@ -44,7 +44,39 @@ passport.use(new LocalStrategy({
             if (err) {
                 return done(err);
             } else if (statusCode === 200) {
-                return done(null, user);
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + user.token
+                    },
+                    json: {
+                        description: user.type + " logged in.",
+                        tableAffected: "User",
+                        recordIdAffected: user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your sign in. Please try again later.'
+                            });
+                            return done(err);
+                        } else if (statusCode === 201) {
+                            return done(null, user);
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return done(err);
+                        }
+                    }
+                );
             } else {
                 return done(null, false, {
                     msg: 'Invalid username or password.'

@@ -23,6 +23,8 @@ header.page-header.page-header-compact.page-header-light.border-bottom.bg-white.
                 i.fas.fa-comments
               if title.indexOf("Dashboard") != -1
                 i.fas.fa-home
+              if title.indexOf("Activity Logs") != -1
+                i.fas.fa-history
             |  #{title}
         if title.indexOf("Dashboard") != -1 && user.userId.type == "Admin"
           form(method='POST')

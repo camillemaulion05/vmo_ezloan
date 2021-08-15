@@ -87,6 +87,10 @@ else
           i.fas.fa-comments
           span Inquiries
     if user.userId.type == "Admin" || user.userId.type == "Employee" || user.userId.type == "Borrower"
+      li.nav-item(class=(title.indexOf("Activity Logs") != -1) ? 'active' : undefined)
+        a.nav-link(href='/activities')
+          i.fas.fa-history
+          span Activity Logs
     hr.sidebar-divider.d-none.d-md-block
     .text-center.d-none.d-md-inline
       button#sidebarToggle.rounded-circle.border-0

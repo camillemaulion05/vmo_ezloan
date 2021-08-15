@@ -18,6 +18,7 @@ const ctrlWithdrawals = require('../controllers/withdrawals');
 const ctrlBorrowers = require('../controllers/borrowers');
 const ctrlLoans = require('../controllers/loans');
 const ctrlAdmin = require('../controllers/admins');
+const ctrlActivity = require('../controllers/activities');
 const middleware = require('../middlewares/authorization');
 
 router.get('/', ctrlHome.index);
@@ -214,5 +215,20 @@ router
     .route('/admins/users/:userid')
     .get(auth, middleware.isAdmin, ctrlAdmin.adminsReadOneByUser)
     .put(auth, middleware.isAdmin, ctrlAdmin.adminsUpdateOneByUser);
+
+// activities
+router
+    .route('/activities')
+    .get(auth, middleware.isSafe, ctrlActivity.activitiesList)
+    .post(auth, middleware.isSafe, ctrlActivity.activitiesCreate);
+
+router
+    .route('/activities/:activityid')
+    .get(auth, middleware.isSafe, ctrlActivity.activitiesReadOne)
+    .put(auth, middleware.isAdmin, ctrlActivity.activitiesUpdateOne)
+    .delete(auth, middleware.isAdmin, ctrlActivity.activitiesDeleteOne);
+
+router.get('/activities/users/:userid', auth, middleware.isSafe, ctrlActivity.activitiesListByUser);
+router.post('/activities/:userid', ctrlActivity.activitiesCreate2);
 
 module.exports = router;

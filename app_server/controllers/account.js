@@ -428,10 +428,42 @@ const postProfile = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            req.flash('success', {
-                                msg: 'Profile information has been updated.'
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " updated profile information.",
+                                    tableAffected: "User",
+                                    recordIdAffected: req.user.id
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: 'Profile information has been updated.'
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: borrower.message
@@ -493,10 +525,42 @@ const postProfilePic = (req, res) => {
                     });
                     return res.redirect('back');
                 } else if (statusCode === 200) {
-                    req.flash('success', {
-                        msg: 'Profile picture has been updated.'
-                    });
-                    return res.redirect('back');
+                    path = '/api/activities';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            description: req.user.type + " updated profile picture.",
+                            tableAffected: "User",
+                            recordIdAffected: req.user.id
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, activity) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: 'Profile picture has been updated.'
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: activity.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
                 } else {
                     req.flash('errors', {
                         msg: user.message
@@ -563,10 +627,42 @@ const postVerifyMobileNum = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 200) {
-                            req.flash('success', {
-                                msg: 'Thank you for verifying your mobile number.'
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " verified mobile number.",
+                                    tableAffected: "User",
+                                    recordIdAffected: req.user.id
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: 'Thank you for verifying your mobile number.'
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: borrower.message
@@ -691,10 +787,42 @@ const getVerifyEmailToken = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('info', {
-                    msg: 'Thank you for verifying your email address.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " verified email address.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('info', {
+                                msg: 'Thank you for verifying your email address.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -757,10 +885,42 @@ const postSecurity = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Success! Your password has been changed.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " changed password.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Success! Your password has been changed.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -829,10 +989,42 @@ const postSecurityQuestions = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Password Recovery Questions has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated password recovery questions.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Password Recovery Questions has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: user.message
@@ -870,10 +1062,42 @@ const getVerificationsSubmit = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Verification status has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " requested account verification.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Verification status has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -907,10 +1131,42 @@ const getVerificationsCancel = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Verification status has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " cancelled account verification.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Verification status has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3481,10 +3737,42 @@ const postVerificationsPersonal = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Personal information has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated personal information.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Personal information has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3547,10 +3835,42 @@ const postVerificationsAddress = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Address information has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated address information.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Address information has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3612,10 +3932,42 @@ const postVerificationsFinancial = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Work/Business information has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated work/business information.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Work/Business information has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3752,10 +4104,42 @@ const postVerificationsDocuments = (req, res) => {
                     });
                     return res.redirect('back');
                 } else if (statusCode === 200) {
-                    req.flash('success', {
-                        msg: 'Documents have been updated.'
-                    });
-                    return res.redirect('back');
+                    path = '/api/activities';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            description: req.user.type + " updated documents.",
+                            tableAffected: "User",
+                            recordIdAffected: req.user.id
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, activity) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: 'Documents have been updated.'
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: activity.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
                 } else {
                     req.flash('errors', {
                         msg: user.message
@@ -3814,10 +4198,42 @@ const postVerificationsDeclaration = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'KYC declaration has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated KYC declaration.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'KYC declaration has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3889,10 +4305,42 @@ const postVerificationsBeneficiaries = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Beneficiaries has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated beneficiaries.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Beneficiaries has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -3957,10 +4405,42 @@ const postVerificationsPledge = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'KYC declaration has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated KYC declaration.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'KYC declaration has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: borrower.message
@@ -4134,10 +4614,42 @@ const postCredits = (req, res) => {
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 201) {
-                                            req.flash('success', {
-                                                msg: "Your Personal Loan has been submitted successfully."
-                                            });
-                                            return res.redirect('back');
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {
+                                                    description: req.user.type + " applied personal loan.",
+                                                    tableAffected: "User",
+                                                    recordIdAffected: req.user.id
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash('success', {
+                                                            msg: "Your Personal Loan has been submitted successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         } else {
                                             req.flash('errors', {
                                                 msg: loan.message
@@ -4239,10 +4751,42 @@ const postRepayment = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 201) {
-                            req.flash('success', {
-                                msg: "Successfully added new repayment."
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " added repayment.",
+                                    tableAffected: "Loan",
+                                    recordIdAffected: req.params.loanid
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: "Successfully added new repayment."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: transaction.message
@@ -5581,10 +6125,42 @@ const postContributions = (req, res) => {
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 201) {
-                                        req.flash('success', {
-                                            msg: "Successfully added new contribution."
-                                        });
-                                        return res.redirect('back');
+                                        path = '/api/activities';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'POST',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {
+                                                description: req.user.type + " added contribution.",
+                                                tableAffected: "Transaction",
+                                                recordIdAffected: req.user.id
+                                            }
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, activity) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 201) {
+                                                    req.flash('success', {
+                                                        msg: "Successfully added new contribution."
+                                                    });
+                                                    return res.redirect('back');
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: activity.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
                                     } else {
                                         req.flash('errors', {
                                             msg: transaction.message
@@ -5688,10 +6264,42 @@ const postWithdrawalRequest = (req, res) => {
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 201) {
-                                            req.flash('success', {
-                                                msg: "Withdrawal Request has been added successfully."
-                                            });
-                                            return res.redirect('back');
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {
+                                                    description: req.user.type + " requested withdrawals.",
+                                                    tableAffected: "Transaction",
+                                                    recordIdAffected: req.user.id
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash('success', {
+                                                            msg: "Withdrawal Request has been added successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         } else {
                                             req.flash('errors', {
                                                 msg: withdrawal.message
@@ -6459,10 +7067,42 @@ const postBorrowers = (req, res) => {
                     });
                     return res.redirect('back');
                 } else if (statusCode === 200) {
-                    req.flash('success', {
-                        msg: data.message
-                    });
-                    return res.redirect('back');
+                    path = '/api/activities';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            description: req.user.type + " created borrower.",
+                            tableAffected: "User",
+                            recordIdAffected: req.user.id
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, activity) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: data.message
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: activity.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
                 } else {
                     req.flash('errors', {
                         msg: body.message
@@ -6960,10 +7600,42 @@ const postUpdateBorrowers = (req, res) => {
                                 });
                                 return res.redirect('back');
                             } else if (statusCode === 200) {
-                                req.flash('success', {
-                                    msg: 'Borrower information has been updated.'
-                                });
-                                return res.redirect('back');
+                                path = '/api/activities';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        description: req.user.type + " updated borrower information.",
+                                        tableAffected: "Borrower",
+                                        recordIdAffected: req.params.borrowerid
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, activity) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: 'Borrower information has been updated.'
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: activity.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
                             } else {
                                 req.flash('errors', {
                                     msg: borrower.message
@@ -7089,10 +7761,42 @@ const getDeleteBorrowers = (req, res) => {
                                                                 });
                                                                 return res.redirect('back');
                                                             } else if (statusCode === 204) {
-                                                                req.flash('success', {
-                                                                    msg: "Successfully deleting all borrower records."
-                                                                });
-                                                                return res.redirect('back');
+                                                                path = '/api/activities';
+                                                                requestOptions = {
+                                                                    url: `${apiOptions.server}${path}`,
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        Authorization: 'Bearer ' + req.user.token
+                                                                    },
+                                                                    json: {
+                                                                        description: req.user.type + " deleted a borrower account.",
+                                                                        tableAffected: "User",
+                                                                        recordIdAffected: req.params.userid
+                                                                    }
+                                                                };
+                                                                request(
+                                                                    requestOptions,
+                                                                    (err, {
+                                                                        statusCode
+                                                                    }, activity) => {
+                                                                        if (err) {
+                                                                            req.flash('errors', {
+                                                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                                                            });
+                                                                            return res.redirect('back');
+                                                                        } else if (statusCode === 201) {
+                                                                            req.flash('success', {
+                                                                                msg: "Successfully deleting all borrower records."
+                                                                            });
+                                                                            return res.redirect('back');
+                                                                        } else {
+                                                                            req.flash('errors', {
+                                                                                msg: activity.message
+                                                                            });
+                                                                            return res.redirect('back');
+                                                                        }
+                                                                    }
+                                                                );
                                                             } else {
                                                                 req.flash('errors', {
                                                                     msg: user.message
@@ -8163,10 +8867,42 @@ const postLoans = (req, res) => {
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 201) {
-                                            req.flash('success', {
-                                                msg: "New Loan has been submitted successfully."
-                                            });
-                                            return res.redirect('back');
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {
+                                                    description: req.user.type + " processed personal loan for a borrower.",
+                                                    tableAffected: "User",
+                                                    recordIdAffected: req.body.borrowerID
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash('success', {
+                                                            msg: "New Loan has been submitted successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         } else {
                                             req.flash('errors', {
                                                 msg: loan.message
@@ -8515,10 +9251,42 @@ const postUpdateLoans = (req, res) => {
                                                                                         });
                                                                                         return res.redirect('back');
                                                                                     } else if (statusCode === 200) {
-                                                                                        req.flash('success', {
-                                                                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. New repayment has been added successfully."
-                                                                                        });
-                                                                                        return res.redirect('back');
+                                                                                        path = '/api/activities';
+                                                                                        requestOptions = {
+                                                                                            url: `${apiOptions.server}${path}`,
+                                                                                            method: 'POST',
+                                                                                            headers: {
+                                                                                                Authorization: 'Bearer ' + req.user.token
+                                                                                            },
+                                                                                            json: {
+                                                                                                description: req.user.type + " added repayment.",
+                                                                                                tableAffected: "Loan",
+                                                                                                recordIdAffected: req.params.loanid
+                                                                                            }
+                                                                                        };
+                                                                                        request(
+                                                                                            requestOptions,
+                                                                                            (err, {
+                                                                                                statusCode
+                                                                                            }, activity) => {
+                                                                                                if (err) {
+                                                                                                    req.flash('errors', {
+                                                                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                } else if (statusCode === 201) {
+                                                                                                    req.flash('success', {
+                                                                                                        msg: "Loan application has been updated successfully. New transaction has been added successfully. New repayment has been added successfully."
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                } else {
+                                                                                                    req.flash('errors', {
+                                                                                                        msg: activity.message
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                }
+                                                                                            }
+                                                                                        );
                                                                                     } else {
                                                                                         req.flash('errors', {
                                                                                             msg: updatedLoan.message
@@ -8549,10 +9317,42 @@ const postUpdateLoans = (req, res) => {
                                                                                         });
                                                                                         return res.redirect('back');
                                                                                     } else if (statusCode === 200) {
-                                                                                        req.flash('success', {
-                                                                                            msg: "Loan application has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
-                                                                                        });
-                                                                                        return res.redirect('back');
+                                                                                        path = '/api/activities';
+                                                                                        requestOptions = {
+                                                                                            url: `${apiOptions.server}${path}`,
+                                                                                            method: 'POST',
+                                                                                            headers: {
+                                                                                                Authorization: 'Bearer ' + req.user.token
+                                                                                            },
+                                                                                            json: {
+                                                                                                description: req.user.type + " approved and release loan application.",
+                                                                                                tableAffected: "Loan",
+                                                                                                recordIdAffected: req.params.loanid
+                                                                                            }
+                                                                                        };
+                                                                                        request(
+                                                                                            requestOptions,
+                                                                                            (err, {
+                                                                                                statusCode
+                                                                                            }, activity) => {
+                                                                                                if (err) {
+                                                                                                    req.flash('errors', {
+                                                                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                } else if (statusCode === 201) {
+                                                                                                    req.flash('success', {
+                                                                                                        msg: "Loan application has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                } else {
+                                                                                                    req.flash('errors', {
+                                                                                                        msg: activity.message
+                                                                                                    });
+                                                                                                    return res.redirect('back');
+                                                                                                }
+                                                                                            }
+                                                                                        );
                                                                                     } else {
                                                                                         req.flash('errors', {
                                                                                             msg: body.message
@@ -8600,10 +9400,42 @@ const postUpdateLoans = (req, res) => {
                                                             });
                                                             return res.redirect('back');
                                                         } else if (statusCode === 200) {
-                                                            req.flash('success', {
-                                                                msg: "Loan application has been updated successfully. Email has been sent to respective email."
-                                                            });
-                                                            return res.redirect('back');
+                                                            path = '/api/activities';
+                                                            requestOptions = {
+                                                                url: `${apiOptions.server}${path}`,
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    Authorization: 'Bearer ' + req.user.token
+                                                                },
+                                                                json: {
+                                                                    description: req.user.type + " declined loan application.",
+                                                                    tableAffected: "Loan",
+                                                                    recordIdAffected: req.params.loanid
+                                                                }
+                                                            };
+                                                            request(
+                                                                requestOptions,
+                                                                (err, {
+                                                                    statusCode
+                                                                }, activity) => {
+                                                                    if (err) {
+                                                                        req.flash('errors', {
+                                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else if (statusCode === 201) {
+                                                                        req.flash('success', {
+                                                                            msg: "Loan application has been updated successfully. Email has been sent to respective email."
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    } else {
+                                                                        req.flash('errors', {
+                                                                            msg: activity.message
+                                                                        });
+                                                                        return res.redirect('back');
+                                                                    }
+                                                                }
+                                                            );
                                                         } else {
                                                             req.flash('errors', {
                                                                 msg: body.message
@@ -8691,10 +9523,42 @@ const getDeleteLoans = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting loan application and all transactions."
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " deleted loan application.",
+                                    tableAffected: "Loan",
+                                    recordIdAffected: req.params.loanid
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: "Successfully deleting loan application and all transactions."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: body.message
@@ -9679,10 +10543,42 @@ const postTransactions = (req, res) => {
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 201) {
-                                            req.flash('success', {
-                                                msg: "Transactions has been added successfully."
-                                            });
-                                            return res.redirect('back');
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {
+                                                    description: req.user.type + " added contribution for a member.",
+                                                    tableAffected: "Transaction",
+                                                    recordIdAffected: borrower._id
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash('success', {
+                                                            msg: "Transactions has been added successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         } else {
                                             req.flash('errors', {
                                                 msg: transaction.message
@@ -9723,10 +10619,42 @@ const postTransactions = (req, res) => {
                                 });
                                 return res.redirect('back');
                             } else if (statusCode === 201) {
-                                req.flash('success', {
-                                    msg: "Transactions has been added successfully."
-                                });
-                                return res.redirect('back');
+                                path = '/api/activities';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        description: req.user.type + " added expenses.",
+                                        tableAffected: "User",
+                                        recordIdAffected: req.user.id
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, activity) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Transactions has been added successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: activity.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
                             } else {
                                 req.flash('errors', {
                                     msg: transaction.message
@@ -9853,10 +10781,42 @@ const postUpdateTransactions = (req, res) => {
                                             });
                                             return res.redirect('back');
                                         } else if (statusCode === 200) {
-                                            req.flash('success', {
-                                                msg: "Transaction has been updated successfully. New repayment has been added successfully."
-                                            });
-                                            return res.redirect('back');
+                                            path = '/api/activities';
+                                            requestOptions = {
+                                                url: `${apiOptions.server}${path}`,
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: 'Bearer ' + req.user.token
+                                                },
+                                                json: {
+                                                    description: req.user.type + " review and posted repayments.",
+                                                    tableAffected: "Loan",
+                                                    recordIdAffected: updatedTransaction.loanId
+                                                }
+                                            };
+                                            request(
+                                                requestOptions,
+                                                (err, {
+                                                    statusCode
+                                                }, activity) => {
+                                                    if (err) {
+                                                        req.flash('errors', {
+                                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else if (statusCode === 201) {
+                                                        req.flash('success', {
+                                                            msg: "Transaction has been updated successfully. New repayment has been added successfully."
+                                                        });
+                                                        return res.redirect('back');
+                                                    } else {
+                                                        req.flash('errors', {
+                                                            msg: activity.message
+                                                        });
+                                                        return res.redirect('back');
+                                                    }
+                                                }
+                                            );
                                         } else {
                                             req.flash('errors', {
                                                 msg: updatedLoan.message
@@ -9866,10 +10826,42 @@ const postUpdateTransactions = (req, res) => {
                                     }
                                 );
                             } else {
-                                req.flash('success', {
-                                    msg: "Transaction has been updated successfully."
-                                });
-                                return res.redirect('back');
+                                path = '/api/activities';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        description: req.user.type + " posted a transaction.",
+                                        tableAffected: "Transaction",
+                                        recordIdAffected: updatedTransaction.borrowerId
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, activity) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Transaction has been updated successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: activity.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
                             }
                         } else {
                             req.flash('errors', {
@@ -9910,10 +10902,42 @@ const getDeleteTransactions = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
-                req.flash('success', {
-                    msg: "Successfully deleting transaction record."
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " deleted a transaction.",
+                        tableAffected: "Transaction",
+                        recordIdAffected: req.params.transactionid
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: "Successfully deleting transaction record."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: transactions.message
@@ -11441,10 +12465,42 @@ const postWithdrawals = (req, res) => {
                                 });
                                 return res.redirect('back');
                             } else if (statusCode === 201) {
-                                req.flash('success', {
-                                    msg: "Withdrawal Request has been added successfully."
-                                });
-                                return res.redirect('back');
+                                path = '/api/activities';
+                                requestOptions = {
+                                    url: `${apiOptions.server}${path}`,
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.user.token
+                                    },
+                                    json: {
+                                        description: req.user.type + " processed withdrawal request for a member.",
+                                        tableAffected: "Transaction",
+                                        recordIdAffected: req.body.receiverName
+                                    }
+                                };
+                                request(
+                                    requestOptions,
+                                    (err, {
+                                        statusCode
+                                    }, activity) => {
+                                        if (err) {
+                                            req.flash('errors', {
+                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                            });
+                                            return res.redirect('back');
+                                        } else if (statusCode === 201) {
+                                            req.flash('success', {
+                                                msg: "Withdrawal Request has been added successfully."
+                                            });
+                                            return res.redirect('back');
+                                        } else {
+                                            req.flash('errors', {
+                                                msg: activity.message
+                                            });
+                                            return res.redirect('back');
+                                        }
+                                    }
+                                );
                             } else {
                                 req.flash('errors', {
                                     msg: withdrawal.message
@@ -11666,10 +12722,42 @@ const postUpdateWithdrawals = (req, res) => {
                                                                         });
                                                                         return res.redirect('back');
                                                                     } else if (statusCode === 200) {
-                                                                        req.flash('success', {
-                                                                            msg: "Withdrawal request has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
-                                                                        });
-                                                                        return res.redirect('back');
+                                                                        path = '/api/activities';
+                                                                        requestOptions = {
+                                                                            url: `${apiOptions.server}${path}`,
+                                                                            method: 'POST',
+                                                                            headers: {
+                                                                                Authorization: 'Bearer ' + req.user.token
+                                                                            },
+                                                                            json: {
+                                                                                description: req.user.type + " approved and release withdrawal request.",
+                                                                                tableAffected: "Transaction",
+                                                                                recordIdAffected: withdrawal.requestedBy._id
+                                                                            }
+                                                                        };
+                                                                        request(
+                                                                            requestOptions,
+                                                                            (err, {
+                                                                                statusCode
+                                                                            }, activity) => {
+                                                                                if (err) {
+                                                                                    req.flash('errors', {
+                                                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                                                    });
+                                                                                    return res.redirect('back');
+                                                                                } else if (statusCode === 201) {
+                                                                                    req.flash('success', {
+                                                                                        msg: "Withdrawal request has been updated successfully. New transaction has been added successfully. Email has been sent to respective email."
+                                                                                    });
+                                                                                    return res.redirect('back');
+                                                                                } else {
+                                                                                    req.flash('errors', {
+                                                                                        msg: activity.message
+                                                                                    });
+                                                                                    return res.redirect('back');
+                                                                                }
+                                                                            }
+                                                                        );
                                                                     } else {
                                                                         req.flash('errors', {
                                                                             msg: body.message
@@ -11716,10 +12804,42 @@ const postUpdateWithdrawals = (req, res) => {
                                                 });
                                                 return res.redirect('back');
                                             } else if (statusCode === 200) {
-                                                req.flash('success', {
-                                                    msg: "Withdrawal request has been updated successfully. Email has been sent to respective email."
-                                                });
-                                                return res.redirect('back');
+                                                path = '/api/activities';
+                                                requestOptions = {
+                                                    url: `${apiOptions.server}${path}`,
+                                                    method: 'POST',
+                                                    headers: {
+                                                        Authorization: 'Bearer ' + req.user.token
+                                                    },
+                                                    json: {
+                                                        description: req.user.type + " declined withdrawal request.",
+                                                        tableAffected: "Transaction",
+                                                        recordIdAffected: withdrawal.requestedBy._id
+                                                    }
+                                                };
+                                                request(
+                                                    requestOptions,
+                                                    (err, {
+                                                        statusCode
+                                                    }, activity) => {
+                                                        if (err) {
+                                                            req.flash('errors', {
+                                                                msg: 'There was an error when logging your activity. Please try again later.'
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else if (statusCode === 201) {
+                                                            req.flash('success', {
+                                                                msg: "Withdrawal request has been updated successfully. Email has been sent to respective email."
+                                                            });
+                                                            return res.redirect('back');
+                                                        } else {
+                                                            req.flash('errors', {
+                                                                msg: activity.message
+                                                            });
+                                                            return res.redirect('back');
+                                                        }
+                                                    }
+                                                );
                                             } else {
                                                 req.flash('errors', {
                                                     msg: body.message
@@ -11729,10 +12849,42 @@ const postUpdateWithdrawals = (req, res) => {
                                         }
                                     );
                                 } else {
-                                    req.flash('success', {
-                                        msg: "Withdrawal request has been updated successfully."
-                                    });
-                                    return res.redirect('back');
+                                    path = '/api/activities';
+                                    requestOptions = {
+                                        url: `${apiOptions.server}${path}`,
+                                        method: 'POST',
+                                        headers: {
+                                            Authorization: 'Bearer ' + req.user.token
+                                        },
+                                        json: {
+                                            description: req.user.type + " updated withdrawal request.",
+                                            tableAffected: "Transaction",
+                                            recordIdAffected: withdrawal.requestedBy._id
+                                        }
+                                    };
+                                    request(
+                                        requestOptions,
+                                        (err, {
+                                            statusCode
+                                        }, activity) => {
+                                            if (err) {
+                                                req.flash('errors', {
+                                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                                });
+                                                return res.redirect('back');
+                                            } else if (statusCode === 201) {
+                                                req.flash('success', {
+                                                    msg: "Withdrawal request has been updated successfully."
+                                                });
+                                                return res.redirect('back');
+                                            } else {
+                                                req.flash('errors', {
+                                                    msg: activity.message
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        }
+                                    );
                                 }
                             } else {
                                 req.flash('errors', {
@@ -11799,10 +12951,42 @@ const getDeleteWithdrawals = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting withdrawal request and all transactions."
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " deleted a withdrawal request.",
+                                    tableAffected: "Withdrawal",
+                                    recordIdAffected: req.params.withdrawalid
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: "Successfully deleting withdrawal request and all transactions."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: body.message
@@ -12248,10 +13432,42 @@ const postEmployees = (req, res) => {
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
-                                        req.flash('success', {
-                                            msg: 'Success! New Employee has been created and password has been sent to respective email.'
-                                        });
-                                        return res.redirect('back');
+                                        path = '/api/activities';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'POST',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {
+                                                description: req.user.type + " created employee/staff.",
+                                                tableAffected: "User",
+                                                recordIdAffected: req.user.id
+                                            }
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, activity) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 201) {
+                                                    req.flash('success', {
+                                                        msg: 'Success! New Employee has been created and password has been sent to respective email.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: activity.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
                                     } else {
                                         req.flash('errors', {
                                             msg: body.message
@@ -12389,10 +13605,42 @@ const postUpdateEmployees = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                req.flash('success', {
-                    msg: 'Employee account has been updated.'
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " updated employee/staff information.",
+                        tableAffected: "Employee",
+                        recordIdAffected: req.params.employeeid
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Employee account has been updated.'
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: employee.message
@@ -12445,10 +13693,42 @@ const getDeleteEmployees = (req, res) => {
                             });
                             return res.redirect('back');
                         } else if (statusCode === 204) {
-                            req.flash('success', {
-                                msg: "Successfully deleting all employee records."
-                            });
-                            return res.redirect('back');
+                            path = '/api/activities';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'POST',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {
+                                    description: req.user.type + " deleted an employee account.",
+                                    tableAffected: "User",
+                                    recordIdAffected: req.params.userid
+                                }
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, activity) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when logging your activity. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 201) {
+                                        req.flash('success', {
+                                            msg: "Successfully deleting all employee records."
+                                        });
+                                        return res.redirect('back');
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: activity.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
                         } else {
                             req.flash('errors', {
                                 msg: user.message
@@ -12785,7 +14065,7 @@ const getInquiries = (req, res) => {
     );
 };
 
-const getInquiryDerails = (req, res) => {
+const getInquiryDetails = (req, res) => {
     path = '/api/inquiries/' + req.params.inquiryid;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
@@ -12894,10 +14174,42 @@ const getUpdateInquiries = (req, res) => {
                                         });
                                         return res.redirect('back');
                                     } else if (statusCode === 200) {
-                                        req.flash('success', {
-                                            msg: "Inquiry has been updated successfully. Email has been sent to respective email."
-                                        });
-                                        return res.redirect('back');
+                                        path = '/api/activities';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'POST',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {
+                                                description: req.user.type + " responded to an inquiry.",
+                                                tableAffected: "Inquiry",
+                                                recordIdAffected: req.params.inquiryid
+                                            }
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, activity) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when logging your activity. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 201) {
+                                                    req.flash('success', {
+                                                        msg: "Inquiry has been updated successfully. Email has been sent to respective email."
+                                                    });
+                                                    return res.redirect('back');
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: activity.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
                                     } else {
                                         req.flash('errors', {
                                             msg: body.message
@@ -12945,10 +14257,42 @@ const getDeleteInquiries = (req, res) => {
                 });
                 return res.redirect('back');
             } else if (statusCode === 204) {
-                req.flash('success', {
-                    msg: "Successfully deleting inquiry record."
-                });
-                return res.redirect('back');
+                path = '/api/activities';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {
+                        description: req.user.type + " deleted an inquiry.",
+                        tableAffected: "Inquiry",
+                        recordIdAffected: req.params.inquiryid
+                    }
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activity) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when logging your activity. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: "Successfully deleting inquiry record."
+                            });
+                            return res.redirect('back');
+                        } else {
+                            req.flash('errors', {
+                                msg: activity.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
             } else {
                 req.flash('errors', {
                     msg: inquiry.message
@@ -13170,7 +14514,6 @@ const getDownloadInquiriesReport = (req, res) => {
         }
     );
 };
-
 
 const getDownloadFinancialReport = (req, res) => {
     let fonts = {
@@ -13856,6 +15199,246 @@ const getDownloadFinancialReport = (req, res) => {
     );
 };
 
+const getActivities = (req, res) => {
+    path = '/api/borrowers/users/' + req.user.id;
+    if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/activities/users/' + req.user.id;
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, activities) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of activities.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            res.render('account/activities', {
+                                title: 'Manage Activity Logs',
+                                user: user,
+                                activities: activities
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: activities.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDownloadActivitiesReport = (req, res) => {
+    let fonts = {
+        Roboto: {
+            normal: __basedir + '/public/fonts/Roboto-Regular.ttf',
+            bold: __basedir + '/public/fonts/Roboto-Medium.ttf',
+            italics: __basedir + '/public/fonts/Roboto-Italic.ttf',
+            bolditalics: __basedir + '/public/fonts/Roboto-MediumItalic.ttf'
+        },
+        Fontello: {
+            normal: __basedir + '/public/fonts/fontello.ttf'
+        }
+    }
+    let printer = new PdfPrinter(fonts);
+
+    function downloadActivities(activities) {
+        let docDefinition = {
+            content: [{
+                    text: 'VMO EZ LOAN',
+                    style: 'header'
+                },
+                {
+                    text: [
+                        parseDate(new Date, 'month') + '\n\n'
+                    ],
+                    style: 'subheader'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 15,
+                    bold: true,
+                    alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 9,
+                    alignment: 'center'
+                },
+                medium: {
+                    fontSize: 11,
+                    alignment: 'left'
+                },
+                item: {
+                    fontSize: 10,
+                    alignment: 'left'
+                },
+                small: {
+                    fontSize: 7,
+                    alignment: 'left'
+                },
+                tableHeader: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    color: 'white',
+                    fillColor: 'black'
+                },
+                signature: {
+                    margin: [0, 200, 0, 0]
+                }
+            }
+        };
+
+        let activitiesTable = {
+            table: {
+                headerRows: 2,
+                widths: ['*', '*', '*', '*'],
+                body: [
+                    [{
+                        text: 'LIST OF ACTIVITY LOGS',
+                        style: 'tableHeader',
+                        alignment: 'center',
+                        fillColor: 'black',
+                        colSpan: 4,
+                    }, {}, {}, {}],
+                    [{
+                            text: 'Activity No.',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Description',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Affected Table',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        },
+                        {
+                            text: 'Date/Time',
+                            style: 'medium',
+                            bold: true,
+                            border: [true, true, true, true]
+                        }
+                    ]
+                ]
+            }
+        };
+        activities.forEach(d => {
+            let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let month2 = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+            let paramDate = new Date(d.createdAt);
+            let date = paramDate.toString().split(' ');
+            let newDate = (d.createdAt) ? date[3] + '-' + month2[month.indexOf(date[1])] + '-' + date[2] + ' ' + date[4] : '';
+            let activityRow = [{
+                    text: d.activityNum,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.description,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: d.tableAffected,
+                    style: 'item',
+                    border: [true, true, true, true]
+                },
+                {
+                    text: newDate,
+                    style: 'item',
+                    border: [true, true, true, true]
+                }
+            ];
+            activitiesTable.table.body.push(activityRow);
+        });
+        docDefinition.content.push(activitiesTable);
+        // Make sure the browser knows this is a PDF.
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `attachment; filename=activity-logs.pdf`);
+        res.set('Content-Description: File Transfer');
+        res.set('Cache-Control: no-cache');
+        // Create the PDF and pipe it to the response object.
+        let pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    }
+
+    path = '/api/activities/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, activities) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading list of activities. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                downloadActivities(activities)
+            } else {
+                req.flash('errors', {
+                    msg: activities.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 module.exports = {
     getAccount,
     getProfile,
@@ -13932,9 +15515,11 @@ module.exports = {
     getDeleteEmployees,
     getDownloadEmployeesReport,
     getInquiries,
-    getInquiryDerails,
+    getInquiryDetails,
     getUpdateInquiries,
     getDeleteInquiries,
     getDownloadInquiriesReport,
-    getDownloadFinancialReport
+    getDownloadFinancialReport,
+    getActivities,
+    getDownloadActivitiesReport
 };
