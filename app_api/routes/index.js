@@ -34,13 +34,14 @@ router.post('/sendMail', ctrlHome.sendMail);
 router
     .route('/users')
     .get(auth, middleware.isAdmin, ctrlUsers.usersList)
-    .post(ctrlUsers.usersCreate);
+    .post(ctrlUsers.usersCreate)
+    .delete(auth, middleware.isSafe, ctrlUsers.usersDeleteOne);
 
 router
     .route('/users/:userid')
     .get(auth, middleware.isSafe, ctrlUsers.usersReadOne)
     .put(auth, middleware.isSafe, ctrlUsers.usersUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlUsers.usersDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlUsers.usersSoftDeleteOne);
 
 router.post('/login/:type', ctrlUsers.usersAuthenticate);
 router.post('/setPassToken', ctrlUsers.usersSetPasswordToken);

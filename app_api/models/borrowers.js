@@ -72,7 +72,8 @@ const borrowerSchema = mongoose.Schema({
         homePhoneNum: String,
         mobileNum: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         mobileNumVerified: {
             type: Boolean,
@@ -81,7 +82,8 @@ const borrowerSchema = mongoose.Schema({
         tin: String,
         email: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         emailVerificationToken: String,
         emailVerified: {
@@ -150,8 +152,14 @@ const borrowerSchema = mongoose.Schema({
     },
     employeeID: String, //For Members Only
     account: {
-        name: String,
-        number: String
+        name: {
+            type: String,
+            unique: true
+        },
+        number: {
+            type: String,
+            unique: true
+        }
     },
     signature: String,
     documents: {

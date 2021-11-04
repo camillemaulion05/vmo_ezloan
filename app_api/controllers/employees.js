@@ -38,7 +38,9 @@ const employeesCreate = (req, res) => {
     } = req.body);
     employee.employeeNum = Date.now();
     if ("Employee" == req.payload.type) employee.userId = req.payload._id;
-    employee.save((err) => {
+    Employee.findOne({
+        'profile.mobileNum': profile.mobileNum
+    }, (err, existingMobileNum) => {
         if (err) {
             console.log(err);
             res
@@ -46,12 +48,67 @@ const employeesCreate = (req, res) => {
                 .json({
                     "message": err._message
                 });
+        } else if (existingMobileNum) {
+            Employee.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number and email address already exists."
+                        });
+                } else {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number already exists."
+                        });
+                }
+            });
         } else {
-            res
-                .status(201)
-                .json({
-                    "message": "Created successfully."
-                });
+            Employee.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that email address already exists."
+                        });
+                } else {
+                    employee.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(400)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(201)
+                                .json({
+                                    "message": "Created successfully."
+                                });
+                        }
+                    });
+                }
+            });
         }
     });
 };

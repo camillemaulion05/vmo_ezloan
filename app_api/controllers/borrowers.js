@@ -73,7 +73,9 @@ const borrowersCreate = (req, res) => {
     if (req.body.reviewedBy) borrower.reviewedDate = Date.now();
     if (req.body.hrCertifiedBy) borrower.hrCertifiedDate = Date.now();
     if ("Borrower" == req.payload.type) borrower.userId = mongoose.Types.ObjectId(req.payload._id);
-    borrower.save((err) => {
+    Borrower.findOne({
+        'profile.mobileNum': profile.mobileNum
+    }, (err, existingMobileNum) => {
         if (err) {
             console.log(err);
             res
@@ -81,14 +83,69 @@ const borrowersCreate = (req, res) => {
                 .json({
                     "message": err._message
                 });
+        } else if (existingMobileNum) {
+            Borrower.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number and email address already exists."
+                        });
+                } else {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number already exists."
+                        });
+                }
+            });
         } else {
-            let userId = CryptoJS.AES.encrypt(req.payload._id, process.env.CRYPTOJS_SERVER_SECRET).toString();
-            res
-                .status(201)
-                .json({
-                    "message": "Created successfully.",
-                    "id": userId
-                });
+            Borrower.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that email address already exists."
+                        });
+                } else {
+                    borrower.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(400)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            let userId = CryptoJS.AES.encrypt(req.payload._id, process.env.CRYPTOJS_SERVER_SECRET).toString();
+                            res
+                                .status(201)
+                                .json({
+                                    "message": "Created successfully.",
+                                    "id": userId
+                                });
+                        }
+                    });
+                }
+            });
         }
     });
 };

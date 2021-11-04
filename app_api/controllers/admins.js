@@ -35,7 +35,9 @@ const adminsCreate = (req, res) => {
     } = req.body);
     admin.adminNum = Date.now();
     if ("Admin" == req.payload.type) admin.userId = req.payload._id;
-    admin.save((err) => {
+    Admin.findOne({
+        'profile.mobileNum': profile.mobileNum
+    }, (err, existingMobileNum) => {
         if (err) {
             console.log(err);
             res
@@ -43,12 +45,67 @@ const adminsCreate = (req, res) => {
                 .json({
                     "message": err._message
                 });
+        } else if (existingMobileNum) {
+            Admin.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number and email address already exists."
+                        });
+                } else {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that mobile number already exists."
+                        });
+                }
+            });
         } else {
-            res
-                .status(201)
-                .json({
-                    "message": "Created successfully."
-                });
+            Admin.findOne({
+                'profile.email': profile.email
+            }, (err, existingEmail) => {
+                if (err) {
+                    console.log(err);
+                    res
+                        .status(400)
+                        .json({
+                            "message": err._message
+                        });
+                } else if (existingEmail) {
+                    res
+                        .status(400)
+                        .json({
+                            "message": "Account with that email address already exists."
+                        });
+                } else {
+                    admin.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(400)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(201)
+                                .json({
+                                    "message": "Created successfully."
+                                });
+                        }
+                    });
+                }
+            });
         }
     });
 };

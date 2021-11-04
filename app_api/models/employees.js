@@ -50,7 +50,8 @@ const employeeSchema = mongoose.Schema({
         },
         mobileNum: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         mobileNumVerified: {
             type: Boolean,
@@ -58,7 +59,8 @@ const employeeSchema = mongoose.Schema({
         },
         email: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         emailVerificationToken: String,
         emailVerified: {
@@ -67,8 +69,14 @@ const employeeSchema = mongoose.Schema({
         }
     },
     account: {
-        name: String,
-        number: String
+        name: {
+            type: String,
+            unique: true
+        },
+        number: {
+            type: String,
+            unique: true
+        }
     },
     employeeID: String,
     userId: {

@@ -234,7 +234,7 @@ const usersUpdateOne = (req, res) => {
     }
 };
 
-const usersDeleteOne = (req, res) => {
+const usersSoftDeleteOne = (req, res) => {
     const {
         userid
     } = req.params;
@@ -269,6 +269,31 @@ const usersDeleteOne = (req, res) => {
                 }
             });
     }
+};
+
+const usersDeleteOne = (req, res) => {
+    User
+        .findByIdAndRemove(req.payload._id)
+        .exec((err, user) => {
+            if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found."
+                    });
+            } else if (err) {
+                console.log(err);
+                res
+                    .status(404)
+                    .json({
+                        "message": err._message
+                    });
+            } else {
+                res
+                    .status(204)
+                    .json(null);
+            }
+        });
 };
 
 const usersAuthenticate = (req, res) => {
@@ -643,6 +668,7 @@ module.exports = {
     usersCreate,
     usersReadOne,
     usersUpdateOne,
+    usersSoftDeleteOne,
     usersDeleteOne,
     usersAuthenticate,
     usersSetPasswordToken,

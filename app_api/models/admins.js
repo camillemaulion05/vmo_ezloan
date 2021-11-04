@@ -45,7 +45,8 @@ const adminSchema = mongoose.Schema({
         },
         mobileNum: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         mobileNumVerified: {
             type: Boolean,
@@ -53,7 +54,8 @@ const adminSchema = mongoose.Schema({
         },
         email: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         emailVerificationToken: String,
         emailVerified: {

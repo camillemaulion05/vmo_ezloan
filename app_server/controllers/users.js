@@ -404,10 +404,24 @@ const postSignup = (req, res, next) => {
                                     statusCode
                                 }, account) => {
                                     if (err) {
-                                        req.flash('errors', {
-                                            msg: 'There was an error in creating your account profile.'
-                                        });
-                                        return res.redirect('back');
+                                        path = '/api/users';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'DELETE',
+                                            headers: {
+                                                Authorization: 'Bearer ' + user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            () => {
+                                                req.flash('errors', {
+                                                    msg: 'There was an error in creating your account profile.'
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        );
                                     } else if (statusCode === 201) {
                                         if (type == "Member") {
                                             let bytes = CryptoJS.AES.decrypt(account.id, process.env.CRYPTOJS_SERVER_SECRET);
@@ -612,10 +626,24 @@ const postSignup = (req, res, next) => {
                                             );
                                         }
                                     } else {
-                                        req.flash('errors', {
-                                            msg: account.message
-                                        });
-                                        return res.redirect('back');
+                                        path = '/api/users';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'DELETE',
+                                            headers: {
+                                                Authorization: 'Bearer ' + user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            () => {
+                                                req.flash('errors', {
+                                                    msg: account.message
+                                                });
+                                                return res.redirect('back');
+                                            }
+                                        );
                                     }
                                 }
                             );
