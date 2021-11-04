@@ -26,9 +26,6 @@ block content
                 .card-body
                   form(method='POST')
                     input(type='hidden', name='_csrf', value=_csrf)
-                    .form-group
-                      label.small.mb-1(for='username') Username (how your name will appear to other users on the site)
-                      input#username.form-control(type='text' placeholder='Enter your username' name='username' value=user.userId.username)
                     .form-row
                       .form-group.col-md-6
                         label.small.mb-1(for='firstName') First name

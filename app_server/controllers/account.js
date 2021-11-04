@@ -336,17 +336,6 @@ const getProfile = (req, res) => {
 
 const postProfile = (req, res) => {
     const validationErrors = [];
-    if (validator.isEmpty(req.body.username)) validationErrors.push({
-        msg: 'Username cannot be blank.'
-    });
-    if (!validator.isAlphanumeric(req.body.username)) validationErrors.push({
-        msg: 'Username must be alphanumeric.'
-    });
-    if (!validator.isLength(req.body.username, {
-            min: 8
-        })) validationErrors.push({
-        msg: 'Username must be at least 8 characters long'
-    });
     if (validator.isEmpty(req.body.firstName)) validationErrors.push({
         msg: 'First Name cannot be blank.'
     });
@@ -375,7 +364,9 @@ const postProfile = (req, res) => {
     req.body.email = validator.normalizeEmail(req.body.email, {
         gmail_remove_dots: false
     });
-    path = '/api/users/' + req.user.id;
+    path = '/api/borrowers/users/' + req.user.id;
+    if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
         method: 'PUT',
@@ -383,90 +374,58 @@ const postProfile = (req, res) => {
             Authorization: 'Bearer ' + req.user.token
         },
         json: {
-            username: req.body.username
+            profile: {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                gender: req.body.gender,
+                dateOfBirth: req.body.dateOfBirth,
+                email: req.body.email,
+                mobileNum: req.body.mobileNum
+            }
         }
     };
     request(
         requestOptions,
         (err, {
             statusCode
-        }, user) => {
+        }, borrower) => {
             if (err) {
                 req.flash('errors', {
-                    msg: 'There was an error when updating your username. Please try again later.'
+                    msg: 'There was an error when updating your profile. Please try again later.'
                 });
                 return res.redirect('back');
             } else if (statusCode === 200) {
-                path = '/api/borrowers/users/' + req.user.id;
-                if (req.user.type == "Admin") path = '/api/admins/users/' + req.user.id;
-                if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+                path = '/api/activities';
                 requestOptions = {
                     url: `${apiOptions.server}${path}`,
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         Authorization: 'Bearer ' + req.user.token
                     },
                     json: {
-                        profile: {
-                            firstName: req.body.firstName,
-                            lastName: req.body.lastName,
-                            gender: req.body.gender,
-                            dateOfBirth: req.body.dateOfBirth,
-                            email: req.body.email,
-                            mobileNum: req.body.mobileNum
-                        }
+                        description: req.user.type + " updated profile information.",
+                        tableAffected: "User",
+                        recordIdAffected: req.user.id
                     }
                 };
                 request(
                     requestOptions,
                     (err, {
                         statusCode
-                    }, borrower) => {
+                    }, activity) => {
                         if (err) {
                             req.flash('errors', {
-                                msg: 'There was an error when updating your profile. Please try again later.'
+                                msg: 'There was an error when logging your activity. Please try again later.'
                             });
                             return res.redirect('back');
-                        } else if (statusCode === 200) {
-                            path = '/api/activities';
-                            requestOptions = {
-                                url: `${apiOptions.server}${path}`,
-                                method: 'POST',
-                                headers: {
-                                    Authorization: 'Bearer ' + req.user.token
-                                },
-                                json: {
-                                    description: req.user.type + " updated profile information.",
-                                    tableAffected: "User",
-                                    recordIdAffected: req.user.id
-                                }
-                            };
-                            request(
-                                requestOptions,
-                                (err, {
-                                    statusCode
-                                }, activity) => {
-                                    if (err) {
-                                        req.flash('errors', {
-                                            msg: 'There was an error when logging your activity. Please try again later.'
-                                        });
-                                        return res.redirect('back');
-                                    } else if (statusCode === 201) {
-                                        req.flash('success', {
-                                            msg: 'Profile information has been updated.'
-                                        });
-                                        return res.redirect('back');
-                                    } else {
-                                        req.flash('errors', {
-                                            msg: activity.message
-                                        });
-                                        return res.redirect('back');
-                                    }
-                                }
-                            );
+                        } else if (statusCode === 201) {
+                            req.flash('success', {
+                                msg: 'Profile information has been updated.'
+                            });
+                            return res.redirect('back');
                         } else {
                             req.flash('errors', {
-                                msg: borrower.message
+                                msg: activity.message
                             });
                             return res.redirect('back');
                         }
@@ -474,7 +433,7 @@ const postProfile = (req, res) => {
                 );
             } else {
                 req.flash('errors', {
-                    msg: user.message
+                    msg: borrower.message
                 });
                 return res.redirect('back');
             }
@@ -3788,6 +3747,41 @@ const getVerificationsAddress = (req, res) => {
 };
 
 const postVerificationsAddress = (req, res) => {
+    const validationErrors = [];
+    if (validator.isEmpty(req.body.street)) validationErrors.push({
+        msg: 'Street cannot be blank in Present Address.'
+    });
+    if (validator.isEmpty(req.body.barangay)) validationErrors.push({
+        msg: 'Barangay Clearance/Utility Bill cannot be blank in Present Address.'
+    });
+    if (validator.isEmpty(req.body.city)) validationErrors.push({
+        msg: 'City/Municipality cannot be blank in Present Address.'
+    });
+    if (validator.isEmpty(req.body.province)) validationErrors.push({
+        msg: 'Province cannot be blank in Present Address.'
+    });
+    if (validator.isEmpty(req.body.zipCode)) validationErrors.push({
+        msg: 'Zip Code cannot be blank in Present Address.'
+    });
+    if (validator.isEmpty(req.body.street2)) validationErrors.push({
+        msg: 'Street cannot be blank in Permanent Address.'
+    });
+    if (validator.isEmpty(req.body.barangay2)) validationErrors.push({
+        msg: 'Barangay Clearance/Utility Bill cannot be blank in Permanent Address.'
+    });
+    if (validator.isEmpty(req.body.city2)) validationErrors.push({
+        msg: 'City/Municipality cannot be blank in Permanent Address.'
+    });
+    if (validator.isEmpty(req.body.province2)) validationErrors.push({
+        msg: 'Province cannot be blank in Permanent Address.'
+    });
+    if (validator.isEmpty(req.body.zipCode2)) validationErrors.push({
+        msg: 'Zip Code cannot be blank in Permanent Address.'
+    });
+    if (validationErrors.length) {
+        req.flash('errors', validationErrors);
+        return res.redirect('back');
+    }
     path = '/api/borrowers/users/' + req.user.id;
     requestOptions = {
         url: `${apiOptions.server}${path}`,
