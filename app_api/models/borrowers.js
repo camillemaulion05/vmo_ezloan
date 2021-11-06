@@ -156,14 +156,8 @@ const borrowerSchema = mongoose.Schema({
     },
     employeeID: String, //For Members Only
     account: {
-        name: {
-            type: String,
-            unique: true
-        },
-        number: {
-            type: String,
-            unique: true
-        }
+        name: String,
+        number: String
     },
     signature: String,
     documents: {

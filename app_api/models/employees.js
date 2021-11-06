@@ -73,14 +73,8 @@ const employeeSchema = mongoose.Schema({
         }
     },
     account: {
-        name: {
-            type: String,
-            unique: true
-        },
-        number: {
-            type: String,
-            unique: true
-        }
+        name: String,
+        number: String
     },
     employeeID: String,
     userId: {
