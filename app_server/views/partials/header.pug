@@ -58,31 +58,31 @@ else
           i.fas.fa-wallet
           span Contributions
     if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "Loan Processor")
-      li.nav-item(class=(title.indexOf("Borrowers") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Borrowers") != -1) ? 'active' : undefined)
         a.nav-link(href='/borrowers')
           i.fas.fa-user-friends
           span Borrowers
     if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
-      li.nav-item(class=(title.indexOf("Loans") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Loans") != -1) ? 'active' : undefined)
         a.nav-link(href='/loans')
           i.fas.fa-balance-scale
           span Loans
     if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type == "Loan Processor")
-      li.nav-item(class=(title.indexOf("Transactions") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Transactions") != -1) ? 'active' : undefined)
         a.nav-link(href='/transactions')
           i.fas.fa-wallet
           span Transactions
     if user.userId.type == "Admin" || (user.userId.type == "Employee" && user.type != "HRD Authorized Officer")
-      li.nav-item(class=(title.indexOf("Withdrawals") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Withdrawal Requests") != -1) ? 'active' : undefined)
         a.nav-link(href='/withdrawals')
           i.fas.fa-cash-register
           span Withdrawals
     if user.userId.type == "Admin"
-      li.nav-item(class=(title.indexOf("Employees") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Employees") != -1) ? 'active' : undefined)
         a.nav-link(href='/employees')
           i.fas.fa-user-friends
           span Employees
-      li.nav-item(class=(title.indexOf("Inquiries") != -1) ? 'active' : undefined)
+      li.nav-item(class=(title.indexOf("Manage Inquiries") != -1) ? 'active' : undefined)
         a.nav-link(href='/inquiries')
           i.fas.fa-comments
           span Inquiries
@@ -91,6 +91,20 @@ else
         a.nav-link(href='/activities')
           i.fas.fa-history
           span Activity Logs
+    if user.userId.type == "Admin"
+      li.nav-item(class=(title.indexOf("Manage Deleted") != -1) ? 'active' : undefined)
+        a.nav-link(href='#' data-toggle='collapse' data-target='#collapsePages' aria-expanded='true' aria-controls='collapsePages' class=(title.indexOf("Manage Deleted") != -1) ? undefined : 'collapsed')
+          i.fas.fa-fw.fa-folder
+          span Recycle Bin
+        #collapsePages.collapse(aria-labelledby='headingPages' data-parent='#accordionSidebar' class=(title.indexOf("Manage Deleted") != -1) ? 'show' : undefined)
+          .bg-white.py-2.collapse-inner.rounded
+            h6.collapse-header Deleted:
+            a.collapse-item(href='/deleted/borrowers' class=(title.indexOf("Deleted Borrowers") != -1) ? 'active' : undefined) Borrowers
+            a.collapse-item(href='/deleted/loans' class=(title.indexOf("Deleted Loans") != -1) ? 'active' : undefined) Loans
+            a.collapse-item(href='/deleted/transactions' class=(title.indexOf("Deleted Transactions") != -1) ? 'active' : undefined) Transactions
+            a.collapse-item(href='/deleted/withdrawals' class=(title.indexOf("Deleted Withdrawal Requests") != -1) ? 'active' : undefined) Withdrawals
+            a.collapse-item(href='/deleted/employees' class=(title.indexOf("Deleted Employees") != -1) ? 'active' : undefined) Employees
+            a.collapse-item(href='/deleted/inquiries' class=(title.indexOf("Deleted Inquiries") != -1) ? 'active' : undefined) Inquiries
     hr.sidebar-divider.d-none.d-md-block
     .text-center.d-none.d-md-inline
       button#sidebarToggle.rounded-circle.border-0

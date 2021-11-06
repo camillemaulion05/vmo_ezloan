@@ -6,6 +6,10 @@ const CryptoJS = require("crypto-js");
 
 const userSchema = mongoose.Schema({
     userNum: String, //Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     username: {
         type: String,
         unique: true,

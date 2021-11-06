@@ -10,20 +10,7 @@ block content
         .container-fluid
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
-              h6.m-0.font-weight-bold.text-primary List of Loans
-              .dropdown.no-caret
-                button#areaChartDropdownExample.btn.btn-transparent-dark.btn-icon.dropdown-toggle(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true')
-                  svg.feather.feather-more-vertical.text-gray-500(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
-                    circle(cx='12' cy='12' r='1')
-                    circle(cx='12' cy='5' r='1')
-                    circle(cx='12' cy='19' r='1')
-                .dropdown-menu.dropdown-menu-right.animated--fade-in-up(aria-labelledby='areaChartDropdownExample' x-placement='top-end' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-116px, -182px, 0px);')
-                  if user.userId.type == "Admin"
-                    a#addNewLoan.dropdown-item(href='#' data-toggle='modal' data-target='#addLoanModal') Add New Loan
-                    .dropdown-divider
-                  a.dropdown-item(href='/download/report/loans/all') List of Loans
-                  a.dropdown-item(href='/download/report/loans/maturityDue') List of Past Maturity Date
-                  a.dropdown-item(href='/download/report/loans/currentDue') List of Current Due
+              h6.m-0.font-weight-bold.text-primary List of Deleted Loans
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -40,7 +27,6 @@ block content
                       th Monthly Payment
                       th Principal Balance
                       th Status
-                      th Actions
                   tfoot
                     tr
                       th 
@@ -54,10 +40,9 @@ block content
                       th Monthly Payment
                       th Principal Balance
                       th Status
-                      th Actions
                   tbody
                     for x in loans
-                      if !x.isDeleted
+                      if x.isDeleted
                         - let borrowerName = x.requestedBy.profile.firstName + ' ' + x.requestedBy.profile.lastName;
                         - let date = (new Date(x.paymentStartDate)).toString().split(' ');
                         - let paymentStartDate =  (x.paymentStartDate) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
@@ -92,10 +77,4 @@ block content
                           else if x.status == "Loan Debt"
                             td
                               .badge.badge-warning.badge-pill #{x.status}
-                          td 
-                            a.updateLoan.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
-                              i.fas.fa-edit
-                            if user.userId.type == "Admin"
-                              a.deleteLoan.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.loanNum+'/'+borrowerName) data-toggle='modal' data-target='#')
-                                i.fas.fa-trash
     include ../partials/page-footer

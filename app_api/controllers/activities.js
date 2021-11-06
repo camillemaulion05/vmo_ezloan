@@ -202,7 +202,7 @@ const activitiesUpdateOne = (req, res) => {
     }
 };
 
-const activitiesDeleteOne = (req, res) => {
+const activitiesSoftDeleteOne = (req, res) => {
     const {
         activityid
     } = req.params;
@@ -215,7 +215,7 @@ const activitiesDeleteOne = (req, res) => {
             });
     } else {
         Activity
-            .findByIdAndRemove(activityid)
+            .findById(activityid)
             .exec((err, activity) => {
                 if (!activity) {
                     res
@@ -226,14 +226,26 @@ const activitiesDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    activity.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : activity.isDeleted;
+                    activity.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -287,6 +299,6 @@ module.exports = {
     activitiesCreate2,
     activitiesReadOne,
     activitiesUpdateOne,
-    activitiesDeleteOne,
+    activitiesSoftDeleteOne,
     activitiesListByUser
 };

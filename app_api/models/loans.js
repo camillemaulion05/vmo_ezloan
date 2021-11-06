@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const loanSchema = mongoose.Schema({
     loanNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     purposeOfLoan: {
         type: String,
         // enum: [

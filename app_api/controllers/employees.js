@@ -224,7 +224,7 @@ const employeesUpdateOne = (req, res) => {
     }
 };
 
-const employeesDeleteOne = (req, res) => {
+const employeesSoftDeleteOne = (req, res) => {
     const {
         employeeid
     } = req.params;
@@ -237,7 +237,7 @@ const employeesDeleteOne = (req, res) => {
             });
     } else {
         Employee
-            .findByIdAndRemove(employeeid)
+            .findById(employeeid)
             .exec((err, employee) => {
                 if (!employee) {
                     res
@@ -248,14 +248,26 @@ const employeesDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    employee.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : employee.isDeleted;
+                    employee.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -606,7 +618,7 @@ module.exports = {
     employeesCreate,
     employeesReadOne,
     employeesUpdateOne,
-    employeesDeleteOne,
+    employeesSoftDeleteOne,
     employeesGetEmailByUser,
     employeesSetEmailToken,
     employeesVerifyEmailToken,

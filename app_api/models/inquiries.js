@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const inquirySchema = mongoose.Schema({
     inquiryNum: String, //Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     firstName: {
         type: String,
         required: true

@@ -59,7 +59,7 @@ router
     .route('/inquiries/:inquiryid')
     .get(auth, middleware.isAdmin, ctrlInquiries.inquiriesReadOne)
     .put(auth, middleware.isAdmin, ctrlInquiries.inquiriesUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlInquiries.inquiriesDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlInquiries.inquiriesSoftDeleteOne);
 
 // employees
 router.get('/employees/account', ctrlEmployees.employeesAccountList);
@@ -73,7 +73,7 @@ router
     .route('/employees/:employeeid')
     .get(auth, middleware.isSafe, ctrlEmployees.employeesReadOne)
     .put(auth, middleware.isModerator, ctrlEmployees.employeesUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlEmployees.employeesDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlEmployees.employeesSoftDeleteOne);
 
 router.post('/employees/email', ctrlEmployees.employeesGetEmailByUser);
 router.get('/employees/setEmailToken/:userid', auth, middleware.isModerator, ctrlEmployees.employeesSetEmailToken);
@@ -94,12 +94,12 @@ router
     .route('/transactions/:transactionid')
     .get(auth, middleware.isSafe, ctrlTransactions.transactionsReadOne)
     .put(auth, middleware.isModerator, ctrlTransactions.transactionsUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsSoftDeleteOne);
 
 router
     .route('/transactions/borrowers/:borrowerid')
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByBorrower)
-    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByBorrower);
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsSoftDeleteManyByBorrower);
 
 router.get('/transactions/borrowers/:borrowerid/contributions', auth, middleware.isSafe, ctrlTransactions.contributionsListByBorrower);
 router.get('/transactions/type/:type', auth, middleware.isModerator, ctrlTransactions.transactionsListByType);
@@ -108,12 +108,12 @@ router.get('/transactions/users/:userid', auth, middleware.isSafe, ctrlTransacti
 router
     .route('/transactions/loans/:loanid')
     .get(auth, middleware.isSafe, ctrlTransactions.transactionsListByLoans)
-    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByLoans);
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsSoftDeleteManyByLoans);
 
 router
     .route('/transactions/withdrawals/:withdrawalid')
     .get(auth, middleware.isModerator, ctrlTransactions.transactionsListByWithdrawals)
-    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsDeleteManyByWithdrawals);
+    .delete(auth, middleware.isAdmin, ctrlTransactions.transactionsSoftDeleteManyByWithdrawals);
 
 router.get('/transactions/summary/:year', auth, middleware.isModerator, ctrlTransactions.transactionsSummary);
 router.get('/transactions/summary/type/:year', auth, middleware.isModerator, ctrlTransactions.transactionsTypeSummary);
@@ -130,14 +130,14 @@ router
     .route('/withdrawals/:withdrawalid')
     .get(auth, middleware.isSafe, ctrlWithdrawals.withdrawalsReadOne)
     .put(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsSoftDeleteOne);
 
 router.get('/withdrawals/users/:userid', auth, middleware.isSafe, ctrlWithdrawals.withdrawalsListByUser);
 router.get('/withdrawals/summary/:year', auth, middleware.isModerator, ctrlWithdrawals.withdrawalsSummary);
 router
     .route('/withdrawals/borrowers/:borrowerid')
     .get(auth, middleware.isModerator, ctrlWithdrawals.withdrawalsListByBorrower)
-    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsDeleteManyByBorrower);
+    .delete(auth, middleware.isAdmin, ctrlWithdrawals.withdrawalsSoftDeleteManyByBorrower);
 
 // borrowers
 router
@@ -149,7 +149,7 @@ router
     .route('/borrowers/:borrowerid')
     .get(auth, middleware.isSafe, ctrlBorrowers.borrowersReadOne)
     .put(auth, middleware.isSafe, ctrlBorrowers.borrowersUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlBorrowers.borrowersSoftDeleteOne);
 
 router.post('/borrowers/email', ctrlBorrowers.borrowersGetEmailByUser);
 router.get('/borrowers/setEmailToken/:userid', auth, middleware.isSafe, ctrlBorrowers.borrowersSetEmailToken);
@@ -173,14 +173,14 @@ router
     .route('/loans/:loanid')
     .get(auth, middleware.isSafe, ctrlLoans.loansReadOne)
     .put(auth, middleware.isModerator, ctrlLoans.loansUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlLoans.loansSoftDeleteOne);
 
 router.get('/loans/users/:userid', auth, middleware.isSafe, ctrlLoans.loansListByUser);
 
 router
     .route('/loans/borrowers/:borrowerid')
     .get(auth, middleware.isModerator, ctrlLoans.loansListByBorrower)
-    .delete(auth, middleware.isAdmin, ctrlLoans.loansDeleteManyByBorrower);
+    .delete(auth, middleware.isAdmin, ctrlLoans.loansSoftDeleteManyByBorrower);
 
 router
     .route('/loans/:loanid/schedules')
@@ -206,7 +206,7 @@ router
     .route('/admins/:adminid')
     .get(auth, middleware.isAdmin, ctrlAdmin.adminsReadOne)
     .put(auth, middleware.isAdmin, ctrlAdmin.adminsUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlAdmin.adminsDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlAdmin.adminsSoftDeleteOne);
 
 router.post('/admins/email', ctrlAdmin.adminsGetEmailByUser);
 router.get('/admins/setEmailToken/:userid', auth, middleware.isAdmin, ctrlAdmin.adminsSetEmailToken);
@@ -227,7 +227,7 @@ router
     .route('/activities/:activityid')
     .get(auth, middleware.isSafe, ctrlActivity.activitiesReadOne)
     .put(auth, middleware.isAdmin, ctrlActivity.activitiesUpdateOne)
-    .delete(auth, middleware.isAdmin, ctrlActivity.activitiesDeleteOne);
+    .delete(auth, middleware.isAdmin, ctrlActivity.activitiesSoftDeleteOne);
 
 router.get('/activities/users/:userid', auth, middleware.isSafe, ctrlActivity.activitiesListByUser);
 router.post('/activities/:userid', ctrlActivity.activitiesCreate2);

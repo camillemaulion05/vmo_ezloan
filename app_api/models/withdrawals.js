@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const withdrawalSchema = mongoose.Schema({
     withdrawalNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     amount: {
         type: String,
         required: true

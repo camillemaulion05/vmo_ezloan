@@ -246,28 +246,38 @@ const usersSoftDeleteOne = (req, res) => {
                 "message": "Not found, please enter a valid userid."
             });
     } else {
-        User
-            .findByIdAndRemove(userid)
-            .exec((err, user) => {
-                if (!user) {
-                    res
-                        .status(404)
-                        .json({
-                            "message": "User not found."
-                        });
-                } else if (err) {
-                    console.log(err);
-                    res
-                        .status(404)
-                        .json({
-                            "message": err._message
-                        });
-                } else {
-                    res
-                        .status(204)
-                        .json(null);
-                }
-            });
+        User.findById(userid, (err, user) => {
+            if (!user) {
+                res
+                    .status(404)
+                    .json({
+                        "message": "User not found."
+                    });
+            } else if (err) {
+                console.log(err);
+                res
+                    .status(400)
+                    .json({
+                        "message": err._message
+                    });
+            } else {
+                user.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : user.isDeleted;
+                user.save((err) => {
+                    if (err) {
+                        console.log(err);
+                        res
+                            .status(404)
+                            .json({
+                                "message": err._message
+                            });
+                    } else {
+                        res
+                            .status(204)
+                            .json(null);
+                    }
+                });
+            }
+        });
     }
 };
 
@@ -308,7 +318,8 @@ const usersAuthenticate = (req, res) => {
     } else {
         User.findOne({
                 username: req.body.username,
-                type: req.params.type
+                type: req.params.type,
+                isDeleted: false
             })
             .exec((err, user) => {
                 if (err) {

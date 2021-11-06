@@ -7662,7 +7662,9 @@ const getDeleteBorrowers = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -7682,7 +7684,9 @@ const getDeleteBorrowers = (req, res) => {
                     headers: {
                         Authorization: 'Bearer ' + req.user.token
                     },
-                    json: {}
+                    json: {
+                        isDeleted: true
+                    }
                 };
                 request(
                     requestOptions,
@@ -7702,7 +7706,9 @@ const getDeleteBorrowers = (req, res) => {
                                 headers: {
                                     Authorization: 'Bearer ' + req.user.token
                                 },
-                                json: {}
+                                json: {
+                                    isDeleted: true
+                                }
                             };
                             request(
                                 requestOptions,
@@ -7722,7 +7728,9 @@ const getDeleteBorrowers = (req, res) => {
                                             headers: {
                                                 Authorization: 'Bearer ' + req.user.token
                                             },
-                                            json: {}
+                                            json: {
+                                                isDeleted: true
+                                            }
                                         };
                                         request(
                                             requestOptions,
@@ -7742,7 +7750,9 @@ const getDeleteBorrowers = (req, res) => {
                                                         headers: {
                                                             Authorization: 'Bearer ' + req.user.token
                                                         },
-                                                        json: {}
+                                                        json: {
+                                                            isDeleted: true
+                                                        }
                                                     };
                                                     request(
                                                         requestOptions,
@@ -7826,6 +7836,100 @@ const getDeleteBorrowers = (req, res) => {
             } else {
                 req.flash('errors', {
                     msg: transactions.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeletedBorrowers = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/borrowers';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, borrowers) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of borrowers. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        res.render('account/deleted-borrowers', {
+                                            title: 'Manage Deleted Borrowers',
+                                            user: user,
+                                            borrowers: borrowers,
+                                            employees: employees
+                                        });
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: borrowers.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
                 });
                 return res.redirect('back');
             }
@@ -9484,7 +9588,9 @@ const getDeleteLoans = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -9504,7 +9610,9 @@ const getDeleteLoans = (req, res) => {
                     headers: {
                         Authorization: 'Bearer ' + req.user.token
                     },
-                    json: {}
+                    json: {
+                        isDeleted: true
+                    }
                 };
                 request(
                     requestOptions,
@@ -10318,6 +10426,129 @@ const getLoansRepaymentsReport = (req, res) => {
     );
 };
 
+const getDeletedLoans = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/loans';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, loans) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of loans. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/deleted-loans', {
+                                                        title: 'Manage Deleted Loans',
+                                                        user: user,
+                                                        loans: loans,
+                                                        employees: employees,
+                                                        borrowers: borrowers
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: loans.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getTransactions = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -10883,7 +11114,9 @@ const getDeleteTransactions = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -12275,6 +12508,129 @@ const getDownloadTransactionsReport = (req, res) => {
     }
 };
 
+const getDeletedTransactions = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/transactions';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, transactions) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of transactions. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/deleted-transactions', {
+                                                        title: 'Manage Deleted Transactions',
+                                                        user: user,
+                                                        borrowers: borrowers,
+                                                        employees: employees,
+                                                        transactions: transactions
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: transactions.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getWithdrawals = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -12912,7 +13268,9 @@ const getDeleteWithdrawals = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -12932,7 +13290,9 @@ const getDeleteWithdrawals = (req, res) => {
                     headers: {
                         Authorization: 'Bearer ' + req.user.token
                     },
-                    json: {}
+                    json: {
+                        isDeleted: true
+                    }
                 };
                 request(
                     requestOptions,
@@ -13196,6 +13556,129 @@ const getDownloadWithdrawalsReport = (req, res) => {
             } else {
                 req.flash('errors', {
                     msg: withdrawals.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeletedWithdrawals = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/withdrawals';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, withdrawals) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of withdrawals. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/employees';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, employees) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading list of employees. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        path = '/api/borrowers';
+                                        requestOptions = {
+                                            url: `${apiOptions.server}${path}`,
+                                            method: 'GET',
+                                            headers: {
+                                                Authorization: 'Bearer ' + req.user.token
+                                            },
+                                            json: {}
+                                        };
+                                        request(
+                                            requestOptions,
+                                            (err, {
+                                                statusCode
+                                            }, borrowers) => {
+                                                if (err) {
+                                                    req.flash('errors', {
+                                                        msg: 'There was an error when loading list of borrowers. Please try again later.'
+                                                    });
+                                                    return res.redirect('back');
+                                                } else if (statusCode === 200) {
+                                                    res.render('account/deleted-withdrawals', {
+                                                        title: 'Manage Deleted Withdrawal Requests',
+                                                        user: user,
+                                                        borrowers: borrowers,
+                                                        employees: employees,
+                                                        withdrawals: withdrawals
+                                                    });
+                                                } else {
+                                                    req.flash('errors', {
+                                                        msg: borrowers.message
+                                                    });
+                                                    return res.redirect('back');
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: employees.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: withdrawals.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
                 });
                 return res.redirect('back');
             }
@@ -13654,7 +14137,9 @@ const getDeleteEmployees = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -13674,7 +14159,9 @@ const getDeleteEmployees = (req, res) => {
                     headers: {
                         Authorization: 'Bearer ' + req.user.token
                     },
-                    json: {}
+                    json: {
+                        isDeleted: true
+                    }
                 };
                 request(
                     requestOptions,
@@ -13994,6 +14481,100 @@ const getDownloadEmployeesReport = (req, res) => {
     );
 };
 
+const getDeletedEmployees = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/employees';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, employees) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of employees. Please try again later.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            path = '/api/admins';
+                            requestOptions = {
+                                url: `${apiOptions.server}${path}`,
+                                method: 'GET',
+                                headers: {
+                                    Authorization: 'Bearer ' + req.user.token
+                                },
+                                json: {}
+                            };
+                            request(
+                                requestOptions,
+                                (err, {
+                                    statusCode
+                                }, admins) => {
+                                    if (err) {
+                                        req.flash('errors', {
+                                            msg: 'There was an error when loading list of admins. Please try again later.'
+                                        });
+                                        return res.redirect('back');
+                                    } else if (statusCode === 200) {
+                                        res.render('account/deleted-employees', {
+                                            title: 'Manage Deleted Employees',
+                                            user: user,
+                                            employees: employees,
+                                            admins: admins
+                                        });
+                                    } else {
+                                        req.flash('errors', {
+                                            msg: admins.message
+                                        });
+                                        return res.redirect('back');
+                                    }
+                                }
+                            );
+                        } else {
+                            req.flash('errors', {
+                                msg: employees.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
 const getInquiries = (req, res) => {
     path = '/api/admins/users/' + req.user.id;
     if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
@@ -14238,7 +14819,9 @@ const getDeleteInquiries = (req, res) => {
         headers: {
             Authorization: 'Bearer ' + req.user.token
         },
-        json: {}
+        json: {
+            isDeleted: true
+        }
     };
     request(
         requestOptions,
@@ -14502,6 +15085,71 @@ const getDownloadInquiriesReport = (req, res) => {
             } else {
                 req.flash('errors', {
                     msg: inquiries.message
+                });
+                return res.redirect('back');
+            }
+        }
+    );
+};
+
+const getDeletedInquiries = (req, res) => {
+    path = '/api/admins/users/' + req.user.id;
+    if (req.user.type == "Employee") path = '/api/employees/users/' + req.user.id;
+    requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + req.user.token
+        },
+        json: {}
+    };
+    request(
+        requestOptions,
+        (err, {
+            statusCode
+        }, user) => {
+            if (err) {
+                req.flash('errors', {
+                    msg: 'There was an error when loading your account. Please try again later.'
+                });
+                return res.redirect('back');
+            } else if (statusCode === 200) {
+                path = '/api/inquiries';
+                requestOptions = {
+                    url: `${apiOptions.server}${path}`,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + req.user.token
+                    },
+                    json: {}
+                };
+                request(
+                    requestOptions,
+                    (err, {
+                        statusCode
+                    }, inquiries) => {
+                        if (err) {
+                            req.flash('errors', {
+                                msg: 'There was an error when loading list of inquiries.'
+                            });
+                            return res.redirect('back');
+                        } else if (statusCode === 200) {
+                            res.render('account/deleted-inquiries', {
+                                title: 'Manage Deleted Inquiries',
+                                user: user,
+                                inquiries: inquiries
+                            });
+                        } else {
+                            req.flash('errors', {
+                                msg: inquiries.message
+                            });
+                            return res.redirect('back');
+                        }
+                    }
+                );
+            } else {
+                req.flash('errors', {
+                    msg: user.message
                 });
                 return res.redirect('back');
             }
@@ -15482,6 +16130,7 @@ module.exports = {
     getBorrowerLoans,
     getDownloadBorrowersReport,
     getBorrowersReport,
+    getDeletedBorrowers,
     getLoans,
     postLoans,
     getLoanDetails,
@@ -15490,29 +16139,34 @@ module.exports = {
     getDownloadLoansReport,
     getLoansReleaseReport,
     getLoansRepaymentsReport,
+    getDeletedLoans,
     getTransactions,
     postTransactions,
     getTransactionDetails,
     postUpdateTransactions,
     getDeleteTransactions,
     getDownloadTransactionsReport,
+    getDeletedTransactions,
     getWithdrawals,
     postWithdrawals,
     getWithdrawalDetails,
     postUpdateWithdrawals,
     getDeleteWithdrawals,
     getDownloadWithdrawalsReport,
+    getDeletedWithdrawals,
     getEmployees,
     postEmployees,
     getEmployeeDetails,
     postUpdateEmployees,
     getDeleteEmployees,
     getDownloadEmployeesReport,
+    getDeletedEmployees,
     getInquiries,
     getInquiryDetails,
     getUpdateInquiries,
     getDeleteInquiries,
     getDownloadInquiriesReport,
+    getDeletedInquiries,
     getDownloadFinancialReport,
     getActivities,
     getDownloadActivitiesReport

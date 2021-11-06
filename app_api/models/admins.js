@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const adminSchema = mongoose.Schema({
     adminNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     profile: {
         firstName: {
             type: String,

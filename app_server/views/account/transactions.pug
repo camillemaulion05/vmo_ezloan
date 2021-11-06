@@ -57,30 +57,31 @@ block content
                       th Actions
                   tbody
                     for x in transactions
-                      tr
-                        td #{x.transactionNum}
-                        - let date = (new Date(x.createdAt)).toString().split(' ');
-                        - let createdAt =  (x.createdAt) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
-                        td #{createdAt}
-                        td #{(parseFloat(x.amount)).toFixed(2)}
-                        td #{x.type} 
-                        td #{x.referenceNo} 
-                        td #{x.senderNum}
-                        td #{x.receiverNum}
-                        - let date2 = (new Date(x.postedDate)).toString().split(' ');
-                        - let postedDate =  (x.postedDate && x.status == "Posted") ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
-                        td #{postedDate}
-                        if x.status == "Processing"
-                          td
-                            .badge.badge-primary.badge-pill #{x.status}
-                        else if x.status == "Posted"
-                          td
-                            .badge.badge-success.badge-pill #{x.status}
-                        td 
-                          a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
-                            i.fas.fa-edit
-                          if user.userId.type == "Admin"
-                            - let transactionId = (x.type == 'Contributions' || x.type == 'Expenses') ? '/'+x._id+'/'+x.transactionNum : '/'+x.transactionNum;
-                            a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=transactionId data-toggle='modal' data-target='#')
-                              i.fas.fa-trash
+                      if !x.isDeleted
+                        tr
+                          td #{x.transactionNum}
+                          - let date = (new Date(x.createdAt)).toString().split(' ');
+                          - let createdAt =  (x.createdAt) ? date[1] + ' ' + date[2] + ', ' + date[3] : "";
+                          td #{createdAt}
+                          td #{(parseFloat(x.amount)).toFixed(2)}
+                          td #{x.type} 
+                          td #{x.referenceNo} 
+                          td #{x.senderNum}
+                          td #{x.receiverNum}
+                          - let date2 = (new Date(x.postedDate)).toString().split(' ');
+                          - let postedDate =  (x.postedDate && x.status == "Posted") ? date2[1] + ' ' + date2[2] + ', ' + date2[3] : "";
+                          td #{postedDate}
+                          if x.status == "Processing"
+                            td
+                              .badge.badge-primary.badge-pill #{x.status}
+                          else if x.status == "Posted"
+                            td
+                              .badge.badge-success.badge-pill #{x.status}
+                          td 
+                            a.updateTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
+                              i.fas.fa-edit
+                            if user.userId.type == "Admin"
+                              - let transactionId = (x.type == 'Contributions' || x.type == 'Expenses') ? '/'+x._id+'/'+x.transactionNum : '/'+x.transactionNum;
+                              a.deleteTransaction.btn.btn-datatable.btn-icon.btn-transparent-dark(href=transactionId data-toggle='modal' data-target='#')
+                                i.fas.fa-trash
     include ../partials/page-footer

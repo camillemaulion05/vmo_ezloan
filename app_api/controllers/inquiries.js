@@ -143,7 +143,7 @@ const inquiriesUpdateOne = (req, res) => {
     }
 };
 
-const inquiriesDeleteOne = (req, res) => {
+const inquiriesSoftDeleteOne = (req, res) => {
     const {
         inquiryid
     } = req.params;
@@ -156,7 +156,7 @@ const inquiriesDeleteOne = (req, res) => {
             });
     } else {
         Inquiry
-            .findByIdAndRemove(inquiryid)
+            .findById(inquiryid)
             .exec((err, inquiry) => {
                 if (!inquiry) {
                     res
@@ -167,14 +167,26 @@ const inquiriesDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    inquiry.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : inquiry.isDeleted;
+                    inquiry.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -185,5 +197,5 @@ module.exports = {
     inquiriesCreate,
     inquiriesReadOne,
     inquiriesUpdateOne,
-    inquiriesDeleteOne
+    inquiriesSoftDeleteOne
 };

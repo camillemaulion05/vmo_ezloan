@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const borrowerSchema = mongoose.Schema({
     borrowerNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     type: {
         type: String,
         default: "Non-Member",

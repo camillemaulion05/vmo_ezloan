@@ -211,7 +211,7 @@ const adminsUpdateOne = (req, res) => {
     }
 };
 
-const adminsDeleteOne = (req, res) => {
+const adminsSoftDeleteOne = (req, res) => {
     const {
         adminid
     } = req.params;
@@ -224,7 +224,7 @@ const adminsDeleteOne = (req, res) => {
             });
     } else {
         Admin
-            .findByIdAndRemove(adminid)
+            .findById(adminid)
             .exec((err, admin) => {
                 if (!admin) {
                     res
@@ -235,14 +235,26 @@ const adminsDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    admin.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : admin.isDeleted;
+                    admin.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -555,7 +567,7 @@ module.exports = {
     adminsCreate,
     adminsReadOne,
     adminsUpdateOne,
-    adminsDeleteOne,
+    adminsSoftDeleteOne,
     adminsGetEmailByUser,
     adminsSetEmailToken,
     adminsVerifyEmailToken,

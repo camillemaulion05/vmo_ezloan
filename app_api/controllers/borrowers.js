@@ -327,7 +327,7 @@ const borrowersUpdateOne = (req, res) => {
     }
 };
 
-const borrowersDeleteOne = (req, res) => {
+const borrowersSoftDeleteOne = (req, res) => {
     const {
         borrowerid
     } = req.params;
@@ -340,7 +340,7 @@ const borrowersDeleteOne = (req, res) => {
             });
     } else {
         Borrower
-            .findByIdAndRemove(borrowerid)
+            .findById(borrowerid)
             .exec((err, borrower) => {
                 if (!borrower) {
                     res
@@ -351,14 +351,26 @@ const borrowersDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    borrower.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : borrower.isDeleted;
+                    borrower.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -849,7 +861,7 @@ module.exports = {
     borrowersCreate,
     borrowersReadOne,
     borrowersUpdateOne,
-    borrowersDeleteOne,
+    borrowersSoftDeleteOne,
     borrowersGetEmailByUser,
     borrowersSetEmailToken,
     borrowersVerifyEmailToken,

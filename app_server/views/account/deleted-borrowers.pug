@@ -1,0 +1,62 @@
+extends ../layout2
+
+block content
+  #content-wrapper.d-flex.flex-column
+    #content.landing
+      include ../partials/page-topbar
+      main
+        include ../partials/page-header
+        include ../partials/page-flash
+        .container-fluid
+          .card.shadow.mb-4
+            .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
+              h6.m-0.font-weight-bold.text-primary List of Deleted Borrowers
+            .card-body
+              .table-responsive
+                table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th Borrower No.
+                      th Name
+                      th Age
+                      th Borrower Type
+                      th Mobile Number
+                      th Email Address
+                      th Status
+                  tfoot
+                    tr
+                      th Borrower No.
+                      th Name
+                      th Age
+                      th Borrower Type
+                      th Mobile Number
+                      th Email Address
+                      th Status
+                  tbody
+                    for x in borrowers
+                      if x.isDeleted
+                        - let dob = new Date(x.profile.dateOfBirth)
+                        - let diff_ms = Date.now() - dob.getTime();
+                        - let age_dt = new Date(diff_ms); 
+                        - let age = Math.abs(age_dt.getUTCFullYear() - 1970);
+                        tr
+                          td 
+                            a(href='/borrowers/'+x._id + '/view') #{x.borrowerNum}
+                          td #{x.profile.firstName} #{x.profile.lastName}
+                          td #{age}          
+                          td #{x.type}          
+                          td #{x.profile.mobileNum}          
+                          td #{x.profile.email}
+                          if x.status == "Basic"
+                            td
+                              .badge.badge-primary.badge-pill #{x.status}
+                          else if x.status == "Verified"
+                            td
+                              .badge.badge-success.badge-pill #{x.status}
+                          else if x.status == "Declined"
+                            td
+                              .badge.badge-danger.badge-pill #{x.status} 
+                          else if x.status == "Pending for Review"
+                            td
+                              .badge.badge-warning.badge-pill #{x.status} 
+    include ../partials/page-footer

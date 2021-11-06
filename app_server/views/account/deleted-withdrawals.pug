@@ -10,18 +10,7 @@ block content
         .container-fluid
           .card.shadow.mb-4
             .card-header.py-3.d-flex.flex-row.align-items-center.justify-content-between
-              h6.m-0.font-weight-bold.text-primary List of Withdrawal Requests
-              .dropdown.no-caret
-                button#areaChartDropdownExample.btn.btn-transparent-dark.btn-icon.dropdown-toggle(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true')
-                  svg.feather.feather-more-vertical.text-gray-500(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
-                    circle(cx='12' cy='12' r='1')
-                    circle(cx='12' cy='5' r='1')
-                    circle(cx='12' cy='19' r='1')
-                .dropdown-menu.dropdown-menu-right.animated--fade-in-up(aria-labelledby='areaChartDropdownExample' x-placement='top-end' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-116px, -182px, 0px);')
-                  if user.userId.type == "Admin"
-                    a#addNewWithdrawal.dropdown-item(href='#' data-toggle='modal' data-target='#addWithdrawalModal') Add New Withdrawal Request
-                    .dropdown-divider
-                  a.dropdown-item(href='/download/report/withdrawals/all') List of Withdrawal Requests
+              h6.m-0.font-weight-bold.text-primary List of Deleted Withdrawal Requests
             .card-body
               .table-responsive
                 table#dataTable.table.table-bordered.table-hover(width='100%' cellspacing='0')
@@ -33,7 +22,6 @@ block content
                       th Amount
                       th Reason
                       th Status
-                      th Actions
                   tfoot
                     tr
                       th Withdrawal Request No.
@@ -42,7 +30,6 @@ block content
                       th Amount
                       th Reason
                       th Status
-                      th Actions
                   tbody
                     for x in withdrawals
                       if !x.isDeleted
@@ -67,10 +54,4 @@ block content
                           else if x.status == "Cash Release"
                             td
                               .badge.badge-info.badge-pill #{x.status}
-                          td 
-                            a.updateWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark.mr-2(href=('/'+x._id) data-toggle='modal' data-target='#')
-                              i.fas.fa-edit
-                            if user.userId.type == "Admin"
-                              a.deleteWithdrawal.btn.btn-datatable.btn-icon.btn-transparent-dark(href=('/'+x._id+'/'+x.withdrawalNum+'/'+borrowerName) data-toggle='modal' data-target='#')
-                                i.fas.fa-trash
     include ../partials/page-footer

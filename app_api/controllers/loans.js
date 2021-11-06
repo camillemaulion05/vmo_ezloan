@@ -181,7 +181,7 @@ const loansUpdateOne = (req, res) => {
     }
 };
 
-const loansDeleteOne = (req, res) => {
+const loansSoftDeleteOne = (req, res) => {
     const {
         loanid
     } = req.params;
@@ -194,7 +194,7 @@ const loansDeleteOne = (req, res) => {
             });
     } else {
         Loan
-            .findByIdAndRemove(loanid)
+            .findById(loanid)
             .exec((err, loan) => {
                 if (!loan) {
                     res
@@ -205,14 +205,26 @@ const loansDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    loan.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : loan.isDeleted;
+                    loan.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -760,7 +772,7 @@ const loansListByBorrower = (req, res) => {
     }
 };
 
-const loansDeleteManyByBorrower = (req, res) => {
+const loansSoftDeleteManyByBorrower = (req, res) => {
     const {
         borrowerid
     } = req.params;
@@ -773,8 +785,12 @@ const loansDeleteManyByBorrower = (req, res) => {
             });
     } else {
         Loan
-            .deleteMany({
+            .updateMany({
                 "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            }, {
+                $set: {
+                    "isDeleted": req.body.isDeleted
+                }
             })
             .exec((err, loans) => {
                 if (!loans) {
@@ -1010,7 +1026,7 @@ module.exports = {
     loansCreate,
     loansReadOne,
     loansUpdateOne,
-    loansDeleteOne,
+    loansSoftDeleteOne,
     loansSchedulesList,
     loansSchedulesUpdate,
     loansSchedulesReadOne,
@@ -1020,7 +1036,7 @@ module.exports = {
     loansPastMaturityRepaymentsList,
     loansListByUser,
     loansListByBorrower,
-    loansDeleteManyByBorrower,
+    loansSoftDeleteManyByBorrower,
     loansSummary,
     loansTypeSummary,
     loansInterestReport

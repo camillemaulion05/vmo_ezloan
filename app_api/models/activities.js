@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const activityLogSchema = mongoose.Schema({
     activityNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     description: String,
     tableAffected: {
         type: String,

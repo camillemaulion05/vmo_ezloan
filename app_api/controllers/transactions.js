@@ -189,7 +189,7 @@ const transactionsUpdateOne = (req, res) => {
     }
 };
 
-const transactionsDeleteOne = (req, res) => {
+const transactionsSoftDeleteOne = (req, res) => {
     const {
         transactionid
     } = req.params;
@@ -202,7 +202,7 @@ const transactionsDeleteOne = (req, res) => {
             });
     } else {
         Transaction
-            .findByIdAndRemove(transactionid)
+            .findById(transactionid)
             .exec((err, transaction) => {
                 if (!transaction) {
                     res
@@ -213,14 +213,26 @@ const transactionsDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    transaction.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : transaction.isDeleted;
+                    transaction.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -261,7 +273,7 @@ const transactionsListByBorrower = (req, res) => {
     }
 };
 
-const transactionsDeleteManyByBorrower = (req, res) => {
+const transactionsSoftDeleteManyByBorrower = (req, res) => {
     const {
         borrowerid
     } = req.params;
@@ -274,8 +286,12 @@ const transactionsDeleteManyByBorrower = (req, res) => {
             });
     } else {
         Transaction
-            .deleteMany({
+            .updateMany({
                 "borrowerId": mongoose.Types.ObjectId(borrowerid)
+            }, {
+                $set: {
+                    "isDeleted": req.body.isDeleted
+                }
             })
             .exec((err, transactions) => {
                 if (!transactions) {
@@ -422,7 +438,7 @@ const transactionsListByLoans = (req, res) => {
     }
 };
 
-const transactionsDeleteManyByLoans = (req, res) => {
+const transactionsSoftDeleteManyByLoans = (req, res) => {
     const {
         loanid
     } = req.params;
@@ -435,8 +451,12 @@ const transactionsDeleteManyByLoans = (req, res) => {
             });
     } else {
         Transaction
-            .deleteMany({
+            .updateMany({
                 "loanId": mongoose.Types.ObjectId(loanid)
+            }, {
+                $set: {
+                    "isDeleted": req.body.isDeleted
+                }
             })
             .exec((err, transactions) => {
                 if (!transactions) {
@@ -496,7 +516,7 @@ const transactionsListByWithdrawals = (req, res) => {
     }
 };
 
-const transactionsDeleteManyByWithdrawals = (req, res) => {
+const transactionsSoftDeleteManyByWithdrawals = (req, res) => {
     const {
         withdrawalid
     } = req.params;
@@ -509,8 +529,12 @@ const transactionsDeleteManyByWithdrawals = (req, res) => {
             });
     } else {
         Transaction
-            .deleteMany({
+            .updateMany({
                 "withdrawalId": mongoose.Types.ObjectId(withdrawalid)
+            }, {
+                $set: {
+                    "isDeleted": req.body.isDeleted
+                }
             })
             .exec((err, transactions) => {
                 if (!transactions) {
@@ -917,15 +941,15 @@ module.exports = {
     transactionsCreate,
     transactionsReadOne,
     transactionsUpdateOne,
-    transactionsDeleteOne,
+    transactionsSoftDeleteOne,
     transactionsListByBorrower,
-    transactionsDeleteManyByBorrower,
+    transactionsSoftDeleteManyByBorrower,
     transactionsListByType,
     transactionsListByUser,
     transactionsListByLoans,
-    transactionsDeleteManyByLoans,
+    transactionsSoftDeleteManyByLoans,
     transactionsListByWithdrawals,
-    transactionsDeleteManyByWithdrawals,
+    transactionsSoftDeleteManyByWithdrawals,
     transactionsSummary,
     transactionsTypeSummary,
     transactionsMonthlySummaryByType,

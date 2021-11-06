@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const transactionSchema = mongoose.Schema({
     transactionNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     amount: {
         // Repayments (+)
         // Release (-)

@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const employeeSchema = mongoose.Schema({
     employeeNum: String, // Date.now();
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     type: {
         type: String,
         required: true,

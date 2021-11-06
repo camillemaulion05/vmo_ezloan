@@ -167,7 +167,7 @@ const withdrawalsUpdateOne = (req, res) => {
     }
 };
 
-const withdrawalsDeleteOne = (req, res) => {
+const withdrawalsSoftDeleteOne = (req, res) => {
     const {
         withdrawalid
     } = req.params;
@@ -180,7 +180,7 @@ const withdrawalsDeleteOne = (req, res) => {
             });
     } else {
         Withdrawal
-            .findByIdAndRemove(withdrawalid)
+            .findById(withdrawalid)
             .exec((err, withdrawal) => {
                 if (!withdrawal) {
                     res
@@ -191,14 +191,26 @@ const withdrawalsDeleteOne = (req, res) => {
                 } else if (err) {
                     console.log(err);
                     res
-                        .status(404)
+                        .status(400)
                         .json({
                             "message": err._message
                         });
                 } else {
-                    res
-                        .status(204)
-                        .json(null);
+                    withdrawal.isDeleted = (req.body.isDeleted) ? req.body.isDeleted : withdrawal.isDeleted;
+                    withdrawal.save((err) => {
+                        if (err) {
+                            console.log(err);
+                            res
+                                .status(404)
+                                .json({
+                                    "message": err._message
+                                });
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
                 }
             });
     }
@@ -292,7 +304,7 @@ const withdrawalsListByBorrower = (req, res) => {
     }
 };
 
-const withdrawalsDeleteManyByBorrower = (req, res) => {
+const withdrawalsSoftDeleteManyByBorrower = (req, res) => {
     const {
         borrowerid
     } = req.params;
@@ -305,8 +317,12 @@ const withdrawalsDeleteManyByBorrower = (req, res) => {
             });
     } else {
         Withdrawal
-            .deleteMany({
+            .updateMany({
                 "requestedBy": mongoose.Types.ObjectId(borrowerid)
+            }, {
+                $set: {
+                    "isDeleted": req.body.isDeleted
+                }
             })
             .exec((err, withdrawals) => {
                 if (!withdrawals) {
@@ -387,9 +403,9 @@ module.exports = {
     withdrawalsCreate,
     withdrawalsReadOne,
     withdrawalsUpdateOne,
-    withdrawalsDeleteOne,
+    withdrawalsSoftDeleteOne,
     withdrawalsListByUser,
     withdrawalsListByBorrower,
-    withdrawalsDeleteManyByBorrower,
+    withdrawalsSoftDeleteManyByBorrower,
     withdrawalsSummary
 };
