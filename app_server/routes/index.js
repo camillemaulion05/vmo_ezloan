@@ -41,6 +41,8 @@ router
     .post(ctrlUsers.postSignup);
 
 router.get('/logout', ctrlUsers.getLogout);
+router.get('/privacy-policy', ctrlUsers.getPrivacyPolicy);
+router.get('/terms-and-conditions', ctrlUsers.getTermsOfUse);
 
 /**
  * Account routes.

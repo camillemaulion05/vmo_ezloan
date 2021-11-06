@@ -1031,6 +1031,26 @@ const postReset = (req, res, next) => {
     );
 };
 
+/**
+ * GET /privacy-policy
+ * Privacy Policy page.
+ */
+const getPrivacyPolicy = (req, res) => {
+    res.render('user/privacy-policy', {
+        title: 'Privacy Policy'
+    });
+};
+
+/**
+ * GET /terms-and-conditions
+ * Terms and Conditions page.
+ */
+const getTermsOfUse = (req, res) => {
+    res.render('user/terms-and-conditions', {
+        title: 'Terms and Conditions'
+    });
+};
+
 module.exports = {
     getLogin,
     postLogin,
@@ -1040,5 +1060,7 @@ module.exports = {
     getForgot,
     postForgot,
     getReset,
-    postReset
+    postReset,
+    getPrivacyPolicy,
+    getTermsOfUse
 };

@@ -23,7 +23,7 @@ block content
                           input#termsAndCondition.custom-control-input(type='checkbox' name='termsAndCondition' value='false')
                         label.custom-control-label(for='termsAndCondition')
                           | I agree with the 
-                          a Terms and Conditions
+                          a(href="/terms-and-conditions") Terms and Conditions
                           |  of VMO EZ Loan.
                       .custom-control.custom-checkbox
                         if (user.signature)
@@ -32,7 +32,7 @@ block content
                           input#privacyPolicy.custom-control-input(type='checkbox' name='privacyPolicy' value='false')
                         label.custom-control-label(for='privacyPolicy')
                           | I accept the 
-                          a Privacy Policy
+                          a(href="/privacy-policy") Privacy Policy
                           |  of VMO EZ Loan.
                       .custom-control.custom-checkbox
                         if (user.signature)
