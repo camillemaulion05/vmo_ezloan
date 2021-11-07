@@ -944,7 +944,6 @@ html
           };
           radioChecked();
           $('input[name="signatureFile"]').change(function () {
-              console.log("submit")
               $("#signatureFileForm").submit();
           });
           $("input[type=radio]").on("click", radioChecked);
@@ -954,7 +953,6 @@ html
           });
           $('#redrawButton').on('click',function () {
             if ($('input[name="signatureType"]:checked').val() == "Data URL") {
-                console.log("Data URL");
                $('#signatureDataURL').val(sig.signature('toJSON'));
               var signature = JSON.parse($('#signatureDataURL').val());
               if (signature.lines.length > 0) {
@@ -966,7 +964,6 @@ html
                 $('#signatureDataURL').val("");
               }
             } else{
-              console.log("File");
               $("form#signatureFileForm").submit();
             }
           });
