@@ -4163,79 +4163,217 @@ const postVerificationsDeclaration = (req, res) => {
     if (req.body.letterOfAuthorization != 'true') validationErrors.push({
         msg: 'You must sign a Letter of Authorization.'
     });
-    if (validator.isEmpty(req.body.signatureDataURL)) validationErrors.push({
-        msg: 'Signature cannot be blank.'
+
+    if (validator.isEmpty(req.body.signatureOption)) validationErrors.push({
+        msg: 'Signature Type cannot be blank.'
     });
+    if (req.body.signatureOption == "Data URL") {
+        if (validator.isEmpty(req.body.signatureDataURL)) validationErrors.push({
+            msg: 'Signature cannot be blank.'
+        });
+    }
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
         return res.redirect('back');
     }
-    path = '/api/borrowers/users/' + req.user.id;
-    requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'PUT',
-        headers: {
-            Authorization: 'Bearer ' + req.user.token
-        },
-        json: {
-            signature: req.body.signatureDataURL
-        }
-    };
-    request(
-        requestOptions,
-        (err, {
-            statusCode
-        }, borrower) => {
-            if (err) {
-                req.flash('errors', {
-                    msg: 'There was an error when updating your KYC declaration. Please try again later.'
-                });
-                return res.redirect('back');
-            } else if (statusCode === 200) {
-                path = '/api/activities';
-                requestOptions = {
-                    url: `${apiOptions.server}${path}`,
-                    method: 'POST',
-                    headers: {
-                        Authorization: 'Bearer ' + req.user.token
-                    },
-                    json: {
-                        description: req.user.type + " updated KYC declaration.",
-                        tableAffected: "User",
-                        recordIdAffected: req.user.id
-                    }
-                };
-                request(
-                    requestOptions,
-                    (err, {
-                        statusCode
-                    }, activity) => {
-                        if (err) {
-                            req.flash('errors', {
-                                msg: 'There was an error when logging your activity. Please try again later.'
-                            });
-                            return res.redirect('back');
-                        } else if (statusCode === 201) {
-                            req.flash('success', {
-                                msg: 'KYC declaration has been updated.'
-                            });
-                            return res.redirect('back');
-                        } else {
-                            req.flash('errors', {
-                                msg: activity.message
-                            });
-                            return res.redirect('back');
-                        }
-                    }
-                );
-            } else {
-                req.flash('errors', {
-                    msg: borrower.message
-                });
-                return res.redirect('back');
+    if (req.body.signatureOption == "Data URL") {
+        path = '/api/borrowers/users/' + req.user.id;
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {
+                signatureData: req.body.signatureDataURL,
+                signatureType: req.body.signatureOption
             }
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, borrower) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when updating your KYC declaration. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    path = '/api/activities';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            description: req.user.type + " updated KYC declaration.",
+                            tableAffected: "User",
+                            recordIdAffected: req.user.id
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, activity) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: 'KYC declaration has been updated.'
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: activity.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
+                } else {
+                    req.flash('errors', {
+                        msg: borrower.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    } else {
+        path = '/api/activities';
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {
+                description: req.user.type + " updated KYC declaration.",
+                tableAffected: "User",
+                recordIdAffected: req.user.id
+            }
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, activity) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when logging your activity. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 201) {
+                    req.flash('success', {
+                        msg: 'KYC declaration has been updated.'
+                    });
+                    return res.redirect('back');
+                } else {
+                    req.flash('errors', {
+                        msg: activity.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    }
+};
+
+const postVerificationsSignature = (req, res) => {
+    const upload = multerConfig.uploadImage.single('signatureFile');
+    upload(req, res, (err) => {
+        if (err) {
+            req.flash('errors', {
+                msg: "File format should be JPG, JPEG, PNG and size should be no larger than 1 MB."
+            });
+            return res.redirect('back');
         }
-    );
+        const validationErrors = [];
+        if (validator.isEmpty(req.file.filename)) validationErrors.push({
+            msg: 'Signature cannot be blank.'
+        });
+        if (validationErrors.length) {
+            req.flash('errors', validationErrors);
+            return res.redirect('back');
+        }
+        path = '/api/borrowers/users/' + req.user.id;
+        requestOptions = {
+            url: `${apiOptions.server}${path}`,
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + req.user.token
+            },
+            json: {
+                signatureType: 'File',
+                signatureFile: {
+                    originalname: req.file.originalname,
+                    filename: req.file.filename,
+                    contentType: req.file.mimetype,
+                    uploaded: new Date()
+                }
+            }
+        };
+        request(
+            requestOptions,
+            (err, {
+                statusCode
+            }, borrower) => {
+                if (err) {
+                    req.flash('errors', {
+                        msg: 'There was an error when updating your KYC declaration. Please try again later.'
+                    });
+                    return res.redirect('back');
+                } else if (statusCode === 200) {
+                    path = '/api/activities';
+                    requestOptions = {
+                        url: `${apiOptions.server}${path}`,
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer ' + req.user.token
+                        },
+                        json: {
+                            description: req.user.type + " updated KYC declaration.",
+                            tableAffected: "User",
+                            recordIdAffected: req.user.id
+                        }
+                    };
+                    request(
+                        requestOptions,
+                        (err, {
+                            statusCode
+                        }, activity) => {
+                            if (err) {
+                                req.flash('errors', {
+                                    msg: 'There was an error when logging your activity. Please try again later.'
+                                });
+                                return res.redirect('back');
+                            } else if (statusCode === 201) {
+                                req.flash('success', {
+                                    msg: 'KYC declaration has been updated.'
+                                });
+                                return res.redirect('back');
+                            } else {
+                                req.flash('errors', {
+                                    msg: activity.message
+                                });
+                                return res.redirect('back');
+                            }
+                        }
+                    );
+                } else {
+                    req.flash('errors', {
+                        msg: borrower.message
+                    });
+                    return res.redirect('back');
+                }
+            }
+        );
+    });
 };
 
 const getVerificationsBeneficiaries = (req, res) => {
@@ -16107,6 +16245,7 @@ module.exports = {
     postVerificationsDocuments,
     getVerificationsDeclaration,
     postVerificationsDeclaration,
+    postVerificationsSignature,
     getVerificationsBeneficiaries,
     postVerificationsBeneficiaries,
     getVerificationsPledge,

@@ -932,24 +932,42 @@ html
               $("input[name=sharesPerPayDay]").prop('disabled', true);
             } else if ($('input[name="sharesPerPayDayOption"]:checked').val() == "Others") {
               $("input[name=sharesPerPayDay]").prop('disabled', false);
+            } else if ($('input[name="signatureType"]:checked').val() == "Data URL") {
+              $("input[name=signatureOption]").val("Data URL");
+              $(".uploadSignature").addClass("d-none");
+              $(".signaturePad").removeClass("d-none");
+            } else if ($('input[name="signatureType"]:checked').val() == "File") {
+              $("input[name=signatureOption]").val("File");
+              $(".uploadSignature").removeClass("d-none");
+              $(".signaturePad").addClass("d-none");
             }
           };
           radioChecked();
+          $('input[name="signatureFile"]').change(function () {
+              console.log("submit")
+              $("#signatureFileForm").submit();
+          });
           $("input[type=radio]").on("click", radioChecked);
           var sig = $('#sig').signature();
           $('#clear').on('click',function () {
             sig.signature('clear');
           });
           $('#redrawButton').on('click',function () {
-            $('#signatureDataURL').val(sig.signature('toJSON'));
-            var signature = JSON.parse($('#signatureDataURL').val());
-            if (signature.lines.length > 0) {
-              $('#defaultSignature').attr("src", sig.signature('toDataURL', 'image/jpeg'));
-              $('#signatureDataURL').val(sig.signature('toDataURL', 'image/jpeg'));
-            }
-            else {
-              $('#defaultSignature').attr("src", "img/icon_signature.png");
-              $('#signatureDataURL').val("");
+            if ($('input[name="signatureType"]:checked').val() == "Data URL") {
+                console.log("Data URL");
+               $('#signatureDataURL').val(sig.signature('toJSON'));
+              var signature = JSON.parse($('#signatureDataURL').val());
+              if (signature.lines.length > 0) {
+                $('#defaultSignature').attr("src", sig.signature('toDataURL', 'image/jpeg'));
+                $('#signatureDataURL').val(sig.signature('toDataURL', 'image/jpeg'));
+              }
+              else {
+                $('#defaultSignature').attr("src", "img/icon_signature.png");
+                $('#signatureDataURL').val("");
+              }
+            } else{
+              console.log("File");
+              $("form#signatureFileForm").submit();
             }
           });
           $('#redrawSignature').signature({ disabled: true });

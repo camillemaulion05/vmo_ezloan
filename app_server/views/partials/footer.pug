@@ -978,10 +978,24 @@ else
             h5#signatureModalLabel.modal-title Signature
             button.close(type='button' data-dismiss='modal' aria-label='Close')
               span(aria-hidden='true') ×
-          form
+          form#signatureFileForm(method='POST' enctype='multipart/form-data' action='/upload/signature')
             .modal-body
-              .text-center
+              .form-group.md-4
+                .form-check.form-check-inline
+                  input#companyIdOption.form-check-input(type='radio' name='signatureType' value='Data URL' checked='')
+                  label.form-check-label(for='signaturePadOption') Signature Pad
+                .form-check.form-check-inline
+                  input#coeOption.form-check-input(type='radio' name='signatureType' value='File')
+                  label.form-check-label(for='uploadPicOption') Upload Picture
+              .text-center.signaturePad
                 #sig
+              .uploadSignature
+                input(type='hidden', name='_csrf', value=_csrf)
+                .form-row
+                  .form-group.col-md-12.mb-md-0
+                    .custom-file
+                      input#signatureFile.custom-file-input(type='file' name='signatureFile')
+                      label.custom-file-label(for='signatureFile') Choose file
             .modal-footer
               button#clear.btn.btn-secondary(type='button') Clear
               button#redrawButton.btn.btn-primary(type='button' data-dismiss='modal') Done

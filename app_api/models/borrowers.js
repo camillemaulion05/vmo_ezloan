@@ -159,7 +159,18 @@ const borrowerSchema = mongoose.Schema({
         name: String,
         number: String
     },
-    signature: String,
+    signatureType: {
+        type: String,
+        enum: ["Data URL", "File"],
+        default: "Data URL"
+    },
+    signatureData: String,
+    signatureFile: {
+        originalname: String,
+        filename: String,
+        contentType: String,
+        uploaded: Date
+    },
     documents: {
         primaryIdFront: {
             originalname: String,

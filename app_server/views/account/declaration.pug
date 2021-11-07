@@ -17,7 +17,7 @@ block content
                     form(method='POST')
                       input(type='hidden', name='_csrf', value=_csrf)
                       .custom-control.custom-checkbox
-                        if (user.signature)
+                        if (user.signatureData || user.signatureFile)
                           input#termsAndCondition.custom-control-input(type='checkbox' name='termsAndCondition' value='true' checked='')
                         else
                           input#termsAndCondition.custom-control-input(type='checkbox' name='termsAndCondition' value='false')
@@ -26,7 +26,7 @@ block content
                           a(href="/terms-and-conditions") Terms and Conditions
                           |  of VMO EZ Loan.
                       .custom-control.custom-checkbox
-                        if (user.signature)
+                        if (user.signatureData || user.signatureFile)
                           input#privacyPolicy.custom-control-input(type='checkbox' name='privacyPolicy' value='true' checked='')
                         else
                           input#privacyPolicy.custom-control-input(type='checkbox' name='privacyPolicy' value='false')
@@ -35,14 +35,14 @@ block content
                           a(href="/privacy-policy") Privacy Policy
                           |  of VMO EZ Loan.
                       .custom-control.custom-checkbox
-                        if (user.signature)
+                        if (user.signatureData || user.signatureFile)
                           input#soa.custom-control-input(type='checkbox' name='soa'  value='true' checked='')
                         else
                           input#soa.custom-control-input(type='checkbox' name='soa' value='false')
                         label.custom-control-label(for='soa')
                           | I agree that in case I do not have email address or haven't received my statement of account and any letters in relation to my application with VMO EZ Loan thru my e-mail address I allow VMO EZ Loan to send it in my office.
                       .custom-control.custom-checkbox
-                        if (user.signature)
+                        if (user.signatureData || user.signatureFile)
                           input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='true' checked='')
                         else
                           input#letterOfAuthorization.custom-control-input(type='checkbox' name='letterOfAuthorization' value='false')
@@ -53,11 +53,12 @@ block content
                         legend.text-primary Signature
                         .form-group.mb-md-0
                           .card
-                            .text-center
-                              img#defaultSignature.card-img.img-link.kbw-signature(style='width: 15rem;' src=(user.signature) ? user.signature : '/img/icon_signature.png' alt='' data-toggle='modal' data-target='#signatureModal')
+                            .text-center.signaturePad
+                              img#defaultSignature.card-img.img-link.kbw-signature(style='width: 15rem;' src=(user.signatureData || user.signatureFile) ? (user.signatureType == 'File') ? '/download/' + user.signatureFile.filename + '/' + user.signatureFile.originalname : user.signatureData : '/img/icon_signature.png' alt='Signature' data-toggle='modal' data-target='#signatureModal')
                           p.d-none
                             span.demoLabel Signature Output:
-                            textarea#signatureDataURL.ui-state-active(rows='5' cols='50' readonly='true' name='signatureDataURL' value=(user.signature) ? user.signature : '')
+                            input#signatureOption.custom-control-input(type='text' name='signatureOption' value=(user.signatureType) ? user.signatureType : '')
+                            textarea#signatureDataURL.ui-state-active(rows='5' cols='50' readonly='true' name='signatureDataURL' value=(user.signatureType == "Data URL") ? '' : user.signatureData)
                       hr.my-4
                       .d-flex.justify-content-between
                         a.btn.btn-light(type='button' href='/verifications') Back

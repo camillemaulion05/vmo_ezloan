@@ -96,6 +96,8 @@ router
     .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsDeclaration)
     .post(passportConfig.isAuthenticated, ctrlAccount.postVerificationsDeclaration);
 
+router.post('/upload/signature', passportConfig.isAuthenticated, ctrlAccount.postVerificationsSignature);
+
 router
     .route('/beneficiaries')
     .get(passportConfig.isAuthenticated, ctrlAccount.getVerificationsBeneficiaries)

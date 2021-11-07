@@ -268,7 +268,9 @@ const borrowersUpdateOne = (req, res) => {
 
                     borrower.employeeID = (req.body.employeeID) ? req.body.employeeID : borrower.employeeID;
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
-                    borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
+                    borrower.signatureType = (req.body.signatureType) ? req.body.signatureType : borrower.signatureType;
+                    borrower.signatureData = (req.body.signatureData) ? req.body.signatureData : borrower.signatureData;
+                    borrower.signatureFile = (req.body.signatureFile) ? req.body.signatureFile : borrower.signatureFile;
 
                     borrower.documents.primaryIdFront = (req.body.documents && req.body.documents.primaryIdFront) ? req.body.documents.primaryIdFront : borrower.documents.primaryIdFront;
                     borrower.documents.primaryIdBack = (req.body.documents && req.body.documents.primaryIdBack) ? req.body.documents.primaryIdBack : borrower.documents.primaryIdBack;
@@ -696,7 +698,9 @@ const borrowersUpdateOneByUser = (req, res) => {
 
                     borrower.employeeID = (req.body.employeeID) ? req.body.employeeID : borrower.employeeID;
                     borrower.account = (req.body.account) ? req.body.account : borrower.account;
-                    borrower.signature = (req.body.signature) ? req.body.signature : borrower.signature;
+                    borrower.signatureType = (req.body.signatureType) ? req.body.signatureType : borrower.signatureType;
+                    borrower.signatureData = (req.body.signatureData) ? req.body.signatureData : borrower.signatureData;
+                    borrower.signatureFile = (req.body.signatureFile) ? req.body.signatureFile : borrower.signatureFile;
 
                     borrower.documents.primaryIdFront = (req.body.documents && req.body.documents.primaryIdFront) ? req.body.documents.primaryIdFront : borrower.documents.primaryIdFront;
                     borrower.documents.primaryIdBack = (req.body.documents && req.body.documents.primaryIdBack) ? req.body.documents.primaryIdBack : borrower.documents.primaryIdBack;
