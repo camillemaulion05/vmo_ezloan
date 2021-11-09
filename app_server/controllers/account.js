@@ -3763,21 +3763,23 @@ const postVerificationsAddress = (req, res) => {
     if (validator.isEmpty(req.body.zipCode)) validationErrors.push({
         msg: 'Zip Code cannot be blank in Present Address.'
     });
-    if (validator.isEmpty(req.body.street2)) validationErrors.push({
-        msg: 'Street cannot be blank in Permanent Address.'
-    });
-    if (validator.isEmpty(req.body.barangay2)) validationErrors.push({
-        msg: 'Barangay Clearance/Utility Bill cannot be blank in Permanent Address.'
-    });
-    if (validator.isEmpty(req.body.city2)) validationErrors.push({
-        msg: 'City/Municipality cannot be blank in Permanent Address.'
-    });
-    if (validator.isEmpty(req.body.province2)) validationErrors.push({
-        msg: 'Province cannot be blank in Permanent Address.'
-    });
-    if (validator.isEmpty(req.body.zipCode2)) validationErrors.push({
-        msg: 'Zip Code cannot be blank in Permanent Address.'
-    });
+    if (req.body.sameAddress && req.body.sameAddress != 'true') {
+        if (validator.isEmpty(req.body.street2)) validationErrors.push({
+            msg: 'Street cannot be blank in Permanent Address.'
+        });
+        if (validator.isEmpty(req.body.barangay2)) validationErrors.push({
+            msg: 'Barangay Clearance/Utility Bill cannot be blank in Permanent Address.'
+        });
+        if (validator.isEmpty(req.body.city2)) validationErrors.push({
+            msg: 'City/Municipality cannot be blank in Permanent Address.'
+        });
+        if (validator.isEmpty(req.body.province2)) validationErrors.push({
+            msg: 'Province cannot be blank in Permanent Address.'
+        });
+        if (validator.isEmpty(req.body.zipCode2)) validationErrors.push({
+            msg: 'Zip Code cannot be blank in Permanent Address.'
+        });
+    }
     if (validationErrors.length) {
         req.flash('errors', validationErrors);
         return res.redirect('back');
